@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+# OOST post-commit hook
+# Purpose: optional auto-push after successful commit checks
+
+set -eu
+
+if [ -x "tools/scripts/auto_push_after_commit.sh" ]; then
+  sh "tools/scripts/auto_push_after_commit.sh"
+else
+  echo "[post-commit][WARN] auto_push_after_commit.sh not found"
+fi
