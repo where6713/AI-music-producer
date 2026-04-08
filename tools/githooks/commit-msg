@@ -1,0 +1,27 @@
+#!/usr/bin/env sh
+# OOST commit-msg hook
+# 规则来源：开发清单.md -> type(scope): summary
+
+set -eu
+
+msg_file="${1:-}"
+if [ -z "$msg_file" ] || [ ! -f "$msg_file" ]; then
+  echo "[commit-msg][BLOCK] 未收到 commit message 文件路径。"
+  exit 1
+fi
+
+first_line="$(head -n 1 "$msg_file")"
+
+# 允许 merge/revert 自动消息
+if printf '%s' "$first_line" | grep -Eq '^(Merge|Revert) '; then
+  exit 0
+fi
+
+if ! printf '%s' "$first_line" | grep -Eq '^(feat|fix|docs|refactor|test|chore|build|ci|perf|revert)\([a-z0-9._/-]+\): .+'; then
+  echo "[commit-msg][BLOCK] 提交信息不符合规范：type(scope): summary"
+  echo "示例: feat(hooks): add pre-commit guardrails"
+  exit 1
+fi
+
+echo "[commit-msg] OK"
+exit 0

@@ -1,0 +1,49 @@
+{
+  "version": "1.0.0",
+  "policy": {
+    "mode": "ai-oriented",
+    "single_source_required": true,
+    "reference_only_reuse": true,
+    "consistency_script": "tools/scripts/check_docs_consistency.ps1"
+  },
+  "canonical_topics": [
+    {
+      "topic_id": "one_law",
+      "owner_file": "one law.md",
+      "owner_marker": "## 唯一法则",
+      "forbidden_fulltext_outside_owner": [
+        "凡新增内容，必须同时满足三条"
+      ]
+    },
+    {
+      "topic_id": "dev_order_law",
+      "owner_file": "one law.md",
+      "owner_marker": "## 开发顺序法则",
+      "forbidden_fulltext_outside_owner": [
+        "先法则，后 Hook；先测试，后实现；先通过 Hook，再允许流程扩张"
+      ]
+    },
+    {
+      "topic_id": "rule_13_18",
+      "owner_file": "目录框架规范.md",
+      "owner_marker": "## 7. RULE-13 ~ RULE-18（最优解版本）",
+      "forbidden_fulltext_outside_owner": [
+        "RULE-13（命名规范）",
+        "RULE-14（单一输出）",
+        "RULE-15（反杂乱）",
+        "RULE-16（反漂移）",
+        "RULE-17（最小复杂度）",
+        "RULE-18（可安装性）"
+      ]
+    },
+    {
+      "topic_id": "violation_handling",
+      "owner_file": "目录框架规范.md",
+      "owner_marker": "## 9. 违规处理流程（Violation Handling）",
+      "forbidden_fulltext_outside_owner": [
+        "立即停止当前 Task",
+        "清理异常产物并回滚到最近可验证状态"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+#!/usr/bin/env sh
+# OOST pre-commit hook
+# 对齐文档：one law.md / 开发清单.md / 目录框架规范.md
+
+set -eu
+
+staged_files="$(git diff --cached --name-only --diff-filter=ACMR)"
+
+if [ -z "$staged_files" ]; then
+  exit 0
+fi
+
+echo "[pre-commit] running OOST checks..."
+
+# 0) 文档一致性检查（AI-Oriented: 单一归属 + 引用复用）
+if command -v powershell >/dev/null 2>&1; then
+  powershell -NoProfile -ExecutionPolicy Bypass -File "tools/scripts/check_docs_consistency.ps1"
+elif command -v pwsh >/dev/null 2>&1; then
+  pwsh -NoProfile -File "tools/scripts/check_docs_consistency.ps1"
+else
+  echo "[pre-commit][WARN] PowerShell not found; skip docs consistency check."
+fi
+
+# 1) 禁止提交二进制音频（PRD硬约束）
+if printf '%s\n' "$staged_files" | grep -Eiq '\.(wav|mp3|flac|ogg|aac|m4a)$'; then
+  echo "[pre-commit][BLOCK] 检测到音频文件被提交（*.wav/*.mp3...），违反 PRD git 卫生规则。"
+  exit 1
+fi
+
+# 2) 禁止模糊脚本命名（RULE-13）
+if printf '%s\n' "$staged_files" | grep -Eiq '(^|/)(temp|new|utils|helper)\.(ps1|sh|py|js|ts)$'; then
+  echo "[pre-commit][BLOCK] 检测到模糊命名脚本（temp/new/utils/helper），请使用动词+对象命名。"
+  exit 1
+fi
+
+# 3) 根目录反杂乱（RULE-15）
+# 允许的根目录文件白名单（可按需扩展）
+if printf '%s\n' "$staged_files" | grep -Eq '^[^/]+$'; then
+  root_files="$(printf '%s\n' "$staged_files" | grep -E '^[^/]+$' || true)"
+  if [ -n "$root_files" ]; then
+    disallowed_root="$(printf '%s\n' "$root_files" | grep -Ev '^(AI-music-producer PRD_v1\.1\.md|one law\.md|开发清单\.md|目录框架规范\.md|README\.md|LICENSE|CHANGELOG\.md|\.gitignore)$' || true)"
+    if [ -n "$disallowed_root" ]; then
+      echo "[pre-commit][BLOCK] 根目录出现非核心入口文件（违反 RULE-15）："
+      printf '%s\n' "$disallowed_root"
+      exit 1
+    fi
+  fi
+fi
+
+# 4) 轻量密钥扫描（开发清单要求）
+if git diff --cached | grep -Eiq '(AKIA[0-9A-Z]{16}|BEGIN[[:space:]]+PRIVATE[[:space:]]+KEY|api[_-]?key[[:space:]]*[:=][[:space:]]*["'"'"'][^"'"'"']+["'"'"'])'; then
+  echo "[pre-commit][BLOCK] 可能包含敏感凭据，请移除后再提交。"
+  exit 1
+fi
+
+echo "[pre-commit] OK"
+exit 0

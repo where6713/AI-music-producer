@@ -1,0 +1,32 @@
+#!/usr/bin/env sh
+# OOST pre-push hook
+# 目标：执行“快速测试集”，阻止明显回归进入远端
+
+set -eu
+
+echo "[pre-push] running quick test gates..."
+
+ran_any_test=0
+
+# Python 快速测试（优先）
+if command -v python >/dev/null 2>&1; then
+  if [ -d "tests" ] && find tests -type f | grep -qv '\.gitkeep$'; then
+    echo "[pre-push] python -m pytest -q"
+    python -m pytest -q
+    ran_any_test=1
+  fi
+fi
+
+# Node 快速测试（若存在 package.json）
+if [ -f "package.json" ] && command -v npm >/dev/null 2>&1; then
+  echo "[pre-push] npm test -- --watch=false"
+  npm test -- --watch=false
+  ran_any_test=1
+fi
+
+if [ "$ran_any_test" -eq 0 ]; then
+  echo "[pre-push] 未发现可执行快速测试（当前仓库尚无可运行测试栈），跳过。"
+fi
+
+echo "[pre-push] OK"
+exit 0
