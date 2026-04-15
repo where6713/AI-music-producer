@@ -4,17 +4,99 @@
 
 set -eu
 
+git_dir="$(git rev-parse --git-dir)"
+ledger_file="$git_dir/oost-hook-ledger"
+
+pending_commits=""
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  if [ -z "${local_ref:-}" ]; then
+    continue
+  fi
+
+  # 删除远端分支场景，无需检查
+  if [ "$local_sha" = "0000000000000000000000000000000000000000" ]; then
+    continue
+  fi
+
+  if [ "$remote_sha" = "0000000000000000000000000000000000000000" ]; then
+    range="$local_sha"
+  else
+    range="$remote_sha..$local_sha"
+  fi
+
+  commits="$(git rev-list "$range" 2>/dev/null || true)"
+  if [ -n "$commits" ]; then
+    pending_commits="$(printf '%s\n%s' "$pending_commits" "$commits")"
+  fi
+done
+
+if [ -z "$pending_commits" ]; then
+  pending_commits="$(git rev-list -n 1 HEAD 2>/dev/null || true)"
+fi
+
+if [ -z "$pending_commits" ]; then
+  echo "[pre-push][WARN] 未解析到待推送 commit，跳过 no-bypass 检查。"
+elif [ ! -f "$ledger_file" ]; then
+  echo "[pre-push][BLOCK] 缺少 hook 验证台账：$ledger_file"
+  echo "[pre-push][BLOCK] 请先安装并执行完整 hook 链。"
+  exit 1
+else
+  unverified_commits=""
+  unique_pending="$(printf '%s\n' "$pending_commits" | grep -E '^[0-9a-f]{40}$' | sort -u)"
+  for commit_hash in $unique_pending; do
+    if ! grep -Eq "^${commit_hash} verified$" "$ledger_file"; then
+      unverified_commits="$(printf '%s\n%s' "$unverified_commits" "$commit_hash")"
+    fi
+  done
+
+  if [ -n "$unverified_commits" ]; then
+    echo "[pre-push][BLOCK] 检测到未通过完整 hook 链验证的提交（禁止 bypass）。"
+    printf '%s\n' "$unverified_commits" | grep -E '^[0-9a-f]{40}$' || true
+    echo "[pre-push][BLOCK] 请对相关提交执行：git commit --amend --no-edit（不要使用 --no-verify）"
+    exit 1
+  fi
+fi
+
 echo "[pre-push] running quick test gates..."
 
 ran_any_test=0
 
+resolve_python_313() {
+  if command -v python3.13 >/dev/null 2>&1; then
+    echo "python3.13"
+    return 0
+  fi
+
+  if command -v py >/dev/null 2>&1; then
+    if py -3.13 -V >/dev/null 2>&1; then
+      echo "py -3.13"
+      return 0
+    fi
+  fi
+
+  if command -v python >/dev/null 2>&1; then
+    if python -c 'import sys; raise SystemExit(0 if sys.version_info[:2] == (3, 13) else 1)' >/dev/null 2>&1; then
+      echo "python"
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
 # Python 快速测试（优先）
-if command -v python >/dev/null 2>&1; then
+python_cmd="$(resolve_python_313 || true)"
+if [ -n "$python_cmd" ]; then
   if [ -d "tests" ] && find tests -type f | grep -qv '\.gitkeep$'; then
-    echo "[pre-push] python -m pytest -q"
-    python -m pytest -q
+    echo "[pre-push] $python_cmd -m pytest -q"
+    # shellcheck disable=SC2086
+    $python_cmd -m pytest -q
     ran_any_test=1
   fi
+else
+  echo "[pre-push][BLOCK] Python 3.13 runtime is required for tests, but not found."
+  exit 1
 fi
 
 # Node 快速测试（若存在 package.json）

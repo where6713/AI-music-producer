@@ -4,6 +4,9 @@
 
 set -eu
 
+git_dir="$(git rev-parse --git-dir)"
+commitmsg_marker="$git_dir/oost-commitmsg-pass"
+
 msg_file="${1:-}"
 if [ -z "$msg_file" ] || [ ! -f "$msg_file" ]; then
   echo "[commit-msg][BLOCK] 未收到 commit message 文件路径。"
@@ -14,6 +17,7 @@ first_line="$(head -n 1 "$msg_file")"
 
 # 允许 merge/revert 自动消息
 if printf '%s' "$first_line" | grep -Eq '^(Merge|Revert) '; then
+  printf '%s\n' "$(date +%s 2>/dev/null || echo 0)" > "$commitmsg_marker"
   exit 0
 fi
 
@@ -24,4 +28,5 @@ if ! printf '%s' "$first_line" | grep -Eq '^(feat|fix|docs|refactor|test|chore|b
 fi
 
 echo "[commit-msg] OK"
+printf '%s\n' "$(date +%s 2>/dev/null || echo 0)" > "$commitmsg_marker"
 exit 0

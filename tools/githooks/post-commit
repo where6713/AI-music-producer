@@ -4,6 +4,33 @@
 
 set -eu
 
+git_dir="$(git rev-parse --git-dir)"
+precommit_marker="$git_dir/oost-precommit-pass"
+commitmsg_marker="$git_dir/oost-commitmsg-pass"
+ledger_file="$git_dir/oost-hook-ledger"
+ledger_tmp="$git_dir/oost-hook-ledger.tmp"
+
+commit_hash="$(git rev-parse HEAD)"
+verification_status="unverified"
+
+if [ -f "$precommit_marker" ] && [ -f "$commitmsg_marker" ]; then
+  verification_status="verified"
+fi
+
+if [ -f "$ledger_file" ]; then
+  grep -Ev "^${commit_hash} " "$ledger_file" > "$ledger_tmp" || true
+  mv "$ledger_tmp" "$ledger_file"
+fi
+
+printf '%s %s\n' "$commit_hash" "$verification_status" >> "$ledger_file"
+rm -f "$precommit_marker" "$commitmsg_marker"
+
+if [ "$verification_status" != "verified" ]; then
+  echo "[post-commit][BLOCK] commit $commit_hash 未经过完整 hook 链验证（可能使用了 --no-verify）。"
+  echo "[post-commit][BLOCK] 请执行修复后再推送：git commit --amend --no-edit"
+  exit 0
+fi
+
 if [ -x "tools/scripts/auto_push_after_commit.sh" ]; then
   sh "tools/scripts/auto_push_after_commit.sh"
 else

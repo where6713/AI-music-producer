@@ -1,0 +1,38 @@
+{
+  "template_id": "modern_lostlove_v1",
+  "template_version": "1.0.0",
+  "line_length_distribution": [8, 10, 12, 10],
+  "stress_anchor_policy": "chorus_peak_open_vowel",
+  "sections": [
+    {
+      "tag": "Verse 1",
+      "emotional_arc": "reflective",
+      "word_count": 60
+    },
+    {
+      "tag": "Pre-Chorus",
+      "emotional_arc": "building",
+      "word_count": 30
+    },
+    {
+      "tag": "Chorus",
+      "emotional_arc": "emotional_peak",
+      "word_count": 80
+    },
+    {
+      "tag": "Verse 2",
+      "emotional_arc": "narrative",
+      "word_count": 60
+    },
+    {
+      "tag": "Bridge",
+      "emotional_arc": "transitional",
+      "word_count": 40
+    },
+    {
+      "tag": "Final Chorus",
+      "emotional_arc": "resolution",
+      "word_count": 80
+    }
+  ]
+}

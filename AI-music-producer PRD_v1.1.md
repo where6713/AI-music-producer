@@ -36,7 +36,7 @@
 | **零样本音色嵌入** | LAION CLAP (`larger_clap_music`) | HuggingFace `transformers` 接入 | **走 `transformers` 而非 `laion_clap`**，绕开依赖地狱；4M 音乐样本预训练 |
 | **乐理符号分析** | music21 | `cuthbertLab/music21` | 和声/对位/调性合规检查权威库 |
 | **中文拼音/声调** | pypinyin | `mozillazg/python-pinyin` | 拿声调和韵母的唯一正确方式 |
-| **中文分词/词性** | jieba | `fxsjy/jieba` | 找句子的重音落点（名词/动词骨架） |
+| **中文押韵/韵母** | pypinyin + 本地十三辙映射 | `mozillazg/python-pinyin` + `shisanzhe_map.json` | 仅做句尾押韵与开口音物理判断，不做词性校验 |
 | **音频效果链** | Spotify Pedalboard | `spotify/pedalboard` | C++/JUCE 内核，比 pySoX 快 300×，Windows wheel 现成 |
 | **母带匹配** | Matchering 2.0.6 | `sergree/matchering` (GPLv3) | 自带 4 位错误码体系，直接做自愈知识库种子 |
 | **终端播放** | sounddevice | `spatialaudio/python-sounddevice` | 轻量，不拉整个 PyAudio 全家桶 |
@@ -48,12 +48,45 @@
 
 | 用途 | 资源 | 仓库 / 出处 | 备注 |
 |---|---|---|---|
-| **中文流行歌词 Few-Shot / 结构模板** | Chinese-Lyric-Corpus | `gaussic/Chinese-Lyric-Corpus` | 10 万+首中文流行歌词，按歌手分类；用于提取叙事骨架与字数栅格 |
+| **本地模板库 + 语料注册表（主路径）** | Template Library + Corpus Registry | 本地 `templates/` + `corpus_registry.json` | 模板骨架为唯一事实源；语料仅用于词汇/风格填充，不可改骨架 |
 | **Genre 描述词金矿** | Google MusicCaps | HuggingFace `google/MusicCaps` | 5.5k 专家标注 caption，丰富 Genre Seed 文本描述 |
 | **MIDI 结构参考** | Lakh MIDI Dataset | `craffel/lmd` | 17.6 万首，用于 music21 结构分析 |
 | **烂梗黑名单** | 自建 `cliche_blacklist.json` | 内置出厂 | 从 Chinese-Lyric-Corpus 做词频 + 人工拉黑初始版本 |
 
 **显式废弃**：`chinese-poetry` 的唐诗宋词（v1.0 的错误决策，流行乐不用）。
+
+### 2.3 纯数据资产路由（v1.2 补充条款）
+
+为满足"零复杂度、高精准度"，填词主链升级为纯 JSON 查表路由：
+
+1. `visual_montage_nouns.json`（THUOCL 提取）
+   - 来源：`THUOCL_animal.txt` / `THUOCL_food.txt` / `THUOCL_medical.txt` / `THUOCL_car.txt`
+   - 用途：主歌/副歌场景构建，强制至少 2 个具象名词
+
+2. `cliche_blacklist.json`（funNLP 提取）
+   - 来源：`常见中文网络流行语.txt` + `中文褒贬义词典.txt`
+   - 用途：命中即重写拦截，禁止抽象空话
+
+3. `shisanzhe_map.json`（本地定义）
+   - 来源：本地小脚本 + `pypinyin` 韵母集合
+   - 用途：句尾押韵判断 + 副歌高点开口音判断
+
+4. `chinese_pop_grids.json`（本地脱水）
+   - 来源：`Chinese_Lyrics` 指定歌手子集
+   - 方法：正则脱水，仅保留字数与标点位置，不做词性标注
+   - 用途：填词模具唯一来源
+
+5. `modern_literary_lexicon.json`
+   - 用途：高文采模式下的现代意象强制抽词
+
+6. `emotion_acoustic_router.json`
+   - 用途：悲伤/欢快等意图的 BPM/调式/排除乐器硬锁定
+
+红线：
+- 不引入 POS 校验；
+- 不以英文 ChordPro 作为华语主链模板；
+- 不使用平水韵作为现代流行主链；
+- 不新增中间件与模型训练步骤。
 
 ### 2.2 显式拒绝清单
 
@@ -202,7 +235,7 @@
 
 ### 5.4 工具四：`lyric_architect` 填词架构师 ★ **(v1.1 新增核心 IP)**
 
-**职责**：用户意图 → 98 分中文歌词。不是"让 LLM 自由发挥"，而是"用声学物理法则和修辞黑名单把 LLM 的输出夹逼到可用区间"。
+**职责**：用户意图 + 本地模板骨架 → 高质量中文歌词。LLM 仅做 slot 填充，不得改写骨架。
 
 **设计背景**：AI 写中文词的三大硬伤：
 1. **高音憋死**：副歌最高音填了"哭/你/一"（闭口音），物理上唱不开
@@ -228,15 +261,13 @@
 [Step 1] 结构栅格生成 (Plot Planner)
   │ 输入: 用户意图 + reference_dna 的 structure
   │ 处理: OpenAI 结构化输出 (JSON mode) 生成叙事大纲
-  │ 约束: 必须产出 {verse1, pre_chorus, chorus, verse2, bridge, final_chorus}
-  │      每段指定 emotional_arc + 主题关键词 + 字数栅格
-  │      字数栅格从 gaussic 同风格曲目统计
+  │ 约束: 模板骨架为唯一事实源（章节、句长、重音位）
+  │      不允许 LLM 增删章节或改写骨架规则
   ▼
 [Step 2] 草稿生成 (Draft Writer)
-  │ 基于 Step 1 大纲, 分段 (非一次性) 让 LLM 写出初稿
-  │ 每段完成后把前文作为上下文继续, 避免"前言不搭后语"
-  │ 同时强制 Few-Shot 注入 gaussic 语料 3 首同风格范例
-  │ (周杰伦/陶喆/林俊杰等)
+  │ 基于模板骨架, 分段让 LLM 填充内容 slot
+  │ 语料注册表仅提供词汇/语气参考，不提供结构决策
+  │ 所有输出先过骨架一致性校验，再进入后续拦截
   ▼
 [Step 3] 物理层拦截 (Vowel Openness Check)
   │ pypinyin 把每一句转成带声调的拼音
@@ -252,10 +283,10 @@
   │ 阈值: 全曲咬合风险 > 15% → 触发 LLM 二次改写
   ▼
 [Step 5] 语义层拦截 (Anti-Cliché Engine)
-  │ jieba 分词 → 命中 cliche_blacklist.json 计数
+  │ 纯词表匹配(不做 POS): 命中 cliche_blacklist.json 计数
   │ 阈值: 烂梗率 > 5% (每 100 字 >5 个烂梗词) → 触发重写
-  │ 重写 Prompt: "用物理场景代替情感形容词, 严禁使用以下词汇: [...]"
-  │ 迭代上限: 3 次。第 3 次仍超标则保留并标注, 交给用户决定
+  │ 重写 Prompt: "禁止抽象情绪词，必须从 visual_montage_nouns.json 抽取具象名词"
+  │ 迭代上限: 3 次。第 3 次仍超标则失败返回，不做灰度放行
   ▼
 输出 lyrics.json
 ```
@@ -326,7 +357,7 @@
 
 Suno 有三个槽：
 1. **Style 字段**（无方括号）— 风格/BPM/调/人声类型/乐器
-2. **Lyrics 字段** — 歌词正文 + `[Verse]/[Chorus]` 结构标签 + `[Mood:]/[Energy:]/[Instrument:]` 描述符
+2. **Lyrics 字段** — 歌词正文 + `[Verse]/[Chorus]` 结构标签 + 标点/空格形成的物理停顿
 3. **Exclude Styles 字段** — 负面 Prompt（Suno 原生支持）
 
 #### 编译规则
@@ -337,8 +368,7 @@ Suno 有三个槽：
 {vocal_style_tags 拼接}, {instrumentation_emphasis 拼接}
 
 [Lyrics 字段]
-[Mood: {mood}] [Energy: {energy_curve_start}]
-[Instrument: {top_3_instruments}]
+# 不使用虚假 Groove 标签，仅使用标点与空格控制停连
 
 [Intro]
 [Verse 1] [intimate, moody]
@@ -796,8 +826,8 @@ class DownloadWatcher(FileSystemEventHandler):
                                                           ▼
                                               friction_report.json
                                                           │
-                                  (用户意图 + gaussic 语料 +
-                                   cliche_blacklist + MusicCaps)
+                                  (用户意图 + 本地模板库 +
+                                   语料注册表 + cliche_blacklist + MusicCaps)
                                                           │
                                                           ▼
                                               lyric_architect
@@ -865,7 +895,7 @@ class DownloadWatcher(FileSystemEventHandler):
 | WebUI / 桌面 GUI / Textual TUI | CLI 是约束 |
 | Podman / Docker / WSL | Windows 原生 wheel |
 | guidance / outlines 框架 | OpenAI JSON mode 够用 |
-| chinese-poetry 语料 | 流行乐用错语料,已换 gaussic |
+| chinese-poetry 语料 | 流行乐用错语料,已废弃；改为本地模板+语料注册表 |
 | 区块链存证 / 授权分级 | 不是 PRD 问题 |
 | 遗传算法 Prompt 优化 | 抽卡太贵 |
 | 全文件快照 + 回滚树 | git + registry 就够了 |
@@ -901,7 +931,6 @@ music21>=9.1
 
 # 中文填词
 pypinyin>=0.51
-jieba>=0.42
 
 # 明确不引入（本版排除）
 # visqol
@@ -921,8 +950,11 @@ sqlalchemy>=2.0
 **首次启动自动下载**（总计约 1GB，Agent 在需要时逐个请求用户同意）：
 - Demucs `htdemucs_ft`（~320MB）
 - LAION `larger_clap_music`（~640MB via HuggingFace cache）
-- `gaussic/Chinese-Lyric-Corpus`（~80MB）
+- 本地模板库（`templates/`）与语料注册表（`corpus_registry.json`）
 - `cliche_blacklist.json`（<1MB，出厂内置）
+- `visual_montage_nouns.json`（THUOCL 精简意象名词）
+- `shisanzhe_map.json`（现代流行十三辙与开口音映射）
+- `chinese_pop_grids.json`（本地华语流行断句栅格）
 - `google/MusicCaps` metadata CSV（<5MB）
 
 ---

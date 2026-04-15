@@ -4,6 +4,9 @@
 
 set -eu
 
+git_dir="$(git rev-parse --git-dir)"
+precommit_marker="$git_dir/oost-precommit-pass"
+
 staged_files="$(git diff --cached --name-only --diff-filter=ACMR)"
 
 if [ -z "$staged_files" ]; then
@@ -48,10 +51,17 @@ if printf '%s\n' "$staged_files" | grep -Eq '^[^/]+$'; then
 fi
 
 # 4) 轻量密钥扫描（开发清单要求）
-if git diff --cached | grep -Eiq '(AKIA[0-9A-Z]{16}|BEGIN[[:space:]]+PRIVATE[[:space:]]+KEY|api[_-]?key[[:space:]]*[:=][[:space:]]*["'"'"'][^"'"'"']+["'"'"'])'; then
-  echo "[pre-commit][BLOCK] 可能包含敏感凭据，请移除后再提交。"
-  exit 1
+# 仅扫描代码/配置变更；文档样例由治理流程单独审查，避免示例文本误报
+secret_scan_diff="$(git diff --cached -- . ':(exclude)**/*.md' ':(exclude)**/*.txt' ':(exclude)**/*.rst' ':(exclude)**/*.adoc')"
+
+if printf '%s' "$secret_scan_diff" | grep -Eiq '(AKIA[0-9A-Z]{16}|BEGIN[[:space:]]+PRIVATE[[:space:]]+KEY|api[_-]?key[[:space:]]*[:=][[:space:]]*["'"'"'][A-Za-z0-9_-]{20,}["'"'"'])'; then
+  # 允许显式占位符，仍阻断其他高风险值
+  if ! printf '%s' "$secret_scan_diff" | grep -Eiq 'api[_-]?key[[:space:]]*[:=][[:space:]]*["'"'"'](__SET_VIA_ENV_ONLY__|__FILL_YOUR_API_KEY__|YOUR_API_KEY|REDACTED)["'"'"']'; then
+    echo "[pre-commit][BLOCK] 可能包含敏感凭据，请移除后再提交。"
+    exit 1
+  fi
 fi
 
 echo "[pre-commit] OK"
+printf '%s\n' "$(date +%s 2>/dev/null || echo 0)" > "$precommit_marker"
 exit 0

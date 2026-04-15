@@ -1,0 +1,8 @@
+# Raw corpus assets must stay local-only
+projects/_shared/corpus/Chinese_Lyrics/
+projects/_shared/corpus/Chinese_Lyrics.zip
+
+# Runtime/transient artifacts
+.tmp/
+.sisyphus/
+**/__pycache__/

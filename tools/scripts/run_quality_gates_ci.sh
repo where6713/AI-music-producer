@@ -49,12 +49,40 @@ fi
 # 5) quick tests (mirror pre-push intent)
 ran_any_test=0
 
-if command -v python >/dev/null 2>&1; then
+resolve_python_313() {
+  if command -v python3.13 >/dev/null 2>&1; then
+    echo "python3.13"
+    return 0
+  fi
+
+  if command -v py >/dev/null 2>&1; then
+    if py -3.13 -V >/dev/null 2>&1; then
+      echo "py -3.13"
+      return 0
+    fi
+  fi
+
+  if command -v python >/dev/null 2>&1; then
+    if python -c 'import sys; raise SystemExit(0 if sys.version_info[:2] == (3, 13) else 1)' >/dev/null 2>&1; then
+      echo "python"
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
+python_cmd="$(resolve_python_313 || true)"
+if [ -n "$python_cmd" ]; then
   if [ -d "tests" ] && find tests -type f | grep -qv '\.gitkeep$'; then
-    echo "[ci-gates] python -m pytest -q"
-    python -m pytest -q
+    echo "[ci-gates] $python_cmd -m pytest -q"
+    # shellcheck disable=SC2086
+    $python_cmd -m pytest -q
     ran_any_test=1
   fi
+else
+  echo "[ci-gates][BLOCK] Python 3.13 runtime is required for tests, but not found."
+  exit 1
 fi
 
 if [ -f "package.json" ] && command -v npm >/dev/null 2>&1; then
