@@ -670,3 +670,43 @@ def test_generate_draft_injects_hard_constraints_into_prompt() -> None:
     assert "句长分布硬约束" in prompt_text
     assert "停连节奏硬约束" in prompt_text
     assert "本段是否必须复现副歌钩子: 是" in prompt_text
+
+
+def test_run_quality_gate_blocks_long_lines() -> None:
+    """Hard quality gate should fail when line length constraints are violated."""
+    from src.producer_tools.business.lyric_architect import run
+
+    def _long_line_adapter(prompt: dict[str, object]) -> dict[str, object]:
+        _ = prompt
+        return {
+            "lines": [
+                "这是一句明显超长并且超过限制的歌词文本",
+                "副歌这里也给一条特别特别长的句子",
+            ]
+        }
+
+    result = run(
+        {
+            "intent": "现代感, 略带古风, 失恋但豁达",
+            "reference_dna": {
+                "structure": [
+                    {"label": "verse", "energy": 0.4},
+                    {"label": "chorus", "energy": 0.8},
+                ]
+            },
+            "use_llm": True,
+            "llm_adapter": _long_line_adapter,
+            "max_rewrite_iterations": 0,
+            "max_line_length": 14,
+            "chorus_max_line_length": 10,
+        }
+    )
+
+    assert result["ok"] is False
+    assert result.get("error") == "lyric_quality_gate_failed"
+    gate = result.get("quality_gate", {})
+    assert isinstance(gate, dict)
+    assert gate.get("pass") is False
+    violations = gate.get("line_length_violations", [])
+    assert isinstance(violations, list)
+    assert len(violations) > 0

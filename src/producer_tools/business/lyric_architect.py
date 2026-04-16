@@ -946,6 +946,46 @@ def check_anti_lexicon(
     }
 
 
+def check_line_length_constraints(
+    sections: list[dict[str, object]],
+    max_line_length: int,
+    chorus_max_line_length: int,
+) -> dict[str, object]:
+    """Enforce hard line-length constraints for all generated lines."""
+    violations: list[dict[str, object]] = []
+
+    for section_idx, section in enumerate(sections):
+        if not isinstance(section, dict):
+            continue
+        section_tag = str(section.get("tag", "")).strip().lower()
+        is_chorus = section_tag in {"chorus", "final chorus"}
+        section_limit = chorus_max_line_length if is_chorus else max_line_length
+
+        lines_val = section.get("lines", [])
+        lines = [str(x) for x in lines_val] if isinstance(lines_val, list) else []
+        for line_idx, line in enumerate(lines):
+            line_len = len(line)
+            if line_len > section_limit:
+                violations.append(
+                    {
+                        "section": section_idx,
+                        "section_tag": section.get("tag", "Unknown"),
+                        "line": line_idx,
+                        "length": line_len,
+                        "limit": section_limit,
+                        "severity": "high",
+                    }
+                )
+
+    return {
+        "ok": True,
+        "violations": violations,
+        "pass": len(violations) == 0,
+        "max_line_length": max_line_length,
+        "chorus_max_line_length": chorus_max_line_length,
+    }
+
+
 def run(payload: ToolPayload) -> ToolResult:
     """Execute the lyric_architect tool.
 
@@ -1075,6 +1115,30 @@ def run(payload: ToolPayload) -> ToolResult:
         "pass": True,
     }
     anti_lexicon_result: dict[str, object] = {"ok": True, "hits": [], "pass": True}
+    has_line_length_limits = (
+        "max_line_length" in payload or "chorus_max_line_length" in payload
+    )
+    max_line_length_raw = payload.get("max_line_length", 14)
+    max_line_length = (
+        int(max_line_length_raw)
+        if isinstance(max_line_length_raw, (int, float))
+        and int(max_line_length_raw) > 0
+        else 14
+    )
+    chorus_max_line_length_raw = payload.get("chorus_max_line_length", 10)
+    chorus_max_line_length = (
+        int(chorus_max_line_length_raw)
+        if isinstance(chorus_max_line_length_raw, (int, float))
+        and int(chorus_max_line_length_raw) > 0
+        else 10
+    )
+    line_length_result: dict[str, object] = {
+        "ok": True,
+        "violations": [],
+        "pass": True,
+        "max_line_length": max_line_length,
+        "chorus_max_line_length": chorus_max_line_length,
+    }
 
     negative_lexicon_raw = payload.get("negative_lexicon", [])
     negative_lexicon: set[str] = set(DEFAULT_ANTI_LEXICON)
@@ -1088,6 +1152,7 @@ def run(payload: ToolPayload) -> ToolResult:
     draft_iterations = 0
     vowel_fix_count = 0
     cliche_fix_count = 0
+    line_length_fix_count = 0
 
     for attempt in range(max_rewrite_iterations + 1):
         draft_iterations += 1
@@ -1131,14 +1196,36 @@ def run(payload: ToolPayload) -> ToolResult:
         tone_result = check_tone_collision(all_lines, long_note_positions)
         cliche_result = check_anti_cliche(all_lines)
         anti_lexicon_result = check_anti_lexicon(all_lines, negative_lexicon)
+        if has_line_length_limits:
+            line_length_result = check_line_length_constraints(
+                draft_sections,
+                max_line_length=max_line_length,
+                chorus_max_line_length=chorus_max_line_length,
+            )
+        else:
+            line_length_result = {
+                "ok": True,
+                "violations": [],
+                "pass": True,
+                "max_line_length": max_line_length,
+                "chorus_max_line_length": chorus_max_line_length,
+            }
 
         needs_vowel_fix = (not bool(vowel_result.get("pass", True))) or (
             not bool(tone_result.get("pass", True))
         )
         needs_cliche_fix = not bool(cliche_result.get("pass", True))
         needs_anti_lexicon_fix = not bool(anti_lexicon_result.get("pass", True))
+        needs_line_length_fix = has_line_length_limits and not bool(
+            line_length_result.get("pass", True)
+        )
 
-        if not (needs_vowel_fix or needs_cliche_fix or needs_anti_lexicon_fix):
+        if not (
+            needs_vowel_fix
+            or needs_cliche_fix
+            or needs_anti_lexicon_fix
+            or needs_line_length_fix
+        ):
             break
         if attempt >= max_rewrite_iterations:
             break
@@ -1149,6 +1236,8 @@ def run(payload: ToolPayload) -> ToolResult:
             cliche_fix_count += 1
         if needs_anti_lexicon_fix:
             cliche_fix_count += 1
+        if needs_line_length_fix:
+            line_length_fix_count += 1
 
         current_intent = (
             intent
@@ -1156,6 +1245,15 @@ def run(payload: ToolPayload) -> ToolResult:
             + "\n- 避免烂梗与抽象空话，优先具象场景。"
             + "\n- 长音位置尽量使用更顺口字。"
             + "\n- 避免重复句式与重复关键词。"
+            + (
+                "\n- 严格短句：普通段落每行不超过"
+                + str(max_line_length)
+                + "字；副歌每行不超过"
+                + str(chorus_max_line_length)
+                + "字。"
+                if has_line_length_limits
+                else ""
+            )
             + "\n- 禁用词："
             + "、".join(sorted(negative_lexicon))
         )
@@ -1198,6 +1296,22 @@ def run(payload: ToolPayload) -> ToolResult:
             }
         )
 
+    length_violations = line_length_result.get("violations", [])
+    if isinstance(length_violations, list):
+        for v in length_violations:
+            if isinstance(v, dict):
+                warnings.append(
+                    {
+                        "line_index": v.get("line", 0),
+                        "type": "line_length",
+                        "severity": "high",
+                        "human": (
+                            f"{v.get('section_tag', 'Unknown')} 第{int(v.get('line', 0)) + 1}行"
+                            f"长度{v.get('length', 0)}超限{v.get('limit', 0)}"
+                        ),
+                    }
+                )
+
     # Build sections with line details
     sections: list[dict[str, object]] = []
     for section in draft_sections:
@@ -1234,6 +1348,7 @@ def run(payload: ToolPayload) -> ToolResult:
                 "draft": draft_iterations,
                 "vowel_fix": vowel_fix_count,
                 "cliche_fix": cliche_fix_count,
+                "line_length_fix": line_length_fix_count,
             },
         },
         "sections": sections,
@@ -1244,6 +1359,9 @@ def run(payload: ToolPayload) -> ToolResult:
             else "fail",
             "cliche_density_pct": cliche_result.get("density_pct", 0.0),
             "tone_collision_pct": tone_result.get("risk_percentage", 0.0),
+            "line_length_violation_count": len(length_violations)
+            if isinstance(length_violations, list)
+            else 0,
         },
     }
 
@@ -1265,8 +1383,12 @@ def run(payload: ToolPayload) -> ToolResult:
         "pass": bool(vowel_result.get("pass", True))
         and bool(tone_result.get("pass", True))
         and bool(cliche_result.get("pass", True))
-        and bool(anti_lexicon_result.get("pass", True)),
+        and bool(anti_lexicon_result.get("pass", True))
+        and bool(line_length_result.get("pass", True)),
         "anti_lexicon_hits": anti_lexicon_result.get("hits", []),
+        "line_length_violations": length_violations,
+        "max_line_length": max_line_length,
+        "chorus_max_line_length": chorus_max_line_length,
     }
 
     if not bool(quality_gate.get("pass", False)):
