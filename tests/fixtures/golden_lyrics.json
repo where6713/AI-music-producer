@@ -1,0 +1,64 @@
+{
+  "meta": {
+    "intent": "现代华语流行，轻微古风，失恋但豁达",
+    "model": "golden-fixture-v1"
+  },
+  "sections": [
+    {
+      "tag": "Verse 1",
+      "lines": [
+        { "text": "地铁到站风停在袖口" },
+        { "text": "我把旧钥匙放回口袋" }
+      ]
+    },
+    {
+      "tag": "Pre-Chorus",
+      "lines": [
+        { "text": "站台灯暗我学会转身" },
+        { "text": "雨停以后我先说再见" }
+      ]
+    },
+    {
+      "tag": "Chorus",
+      "lines": [
+        { "text": "回头吧我不再追" },
+        { "text": "回头吧风会停" }
+      ]
+    },
+    {
+      "tag": "Verse 2",
+      "lines": [
+        { "text": "便利店门口我买热汤" },
+        { "text": "你走以后我学会平静" }
+      ]
+    },
+    {
+      "tag": "Bridge",
+      "lines": [
+        { "text": "桥下风起我慢慢呼吸" },
+        { "text": "把旧合照轻轻收好" }
+      ]
+    },
+    {
+      "tag": "Final Chorus",
+      "lines": [
+        { "text": "就这样吧我往前走" },
+        { "text": "就这样吧天会亮" }
+      ]
+    }
+  ],
+  "quality_gate": {
+    "pass": true,
+    "anti_lexicon_hits": [],
+    "sentence_completeness_violations": [],
+    "line_length_violations": [],
+    "max_line_length": 14,
+    "chorus_max_line_length": 10,
+    "autofix_mode": "llm_rewrite"
+  },
+  "stats": {
+    "cliche_density_pct": 1.2,
+    "tone_collision_pct": 6.5,
+    "line_length_violation_count": 0
+  }
+}
