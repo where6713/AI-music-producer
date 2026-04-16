@@ -386,10 +386,17 @@ def generate_draft(
             reference_constraints=reference_constraints or {},
         )
         if not llm_result.get("ok"):
+            llm_error = str(llm_result.get("error", ""))
+            llm_detail = str(llm_result.get("detail", ""))
+            merged_detail = llm_error
+            if llm_detail:
+                merged_detail = (
+                    f"{llm_error}: {llm_detail}" if llm_error else llm_detail
+                )
             return {
                 "ok": False,
                 "error": "llm_generation_failed",
-                "error_detail": str(llm_result.get("error", "")),
+                "error_detail": merged_detail,
                 "draft": None,
             }
         lines_val = llm_result.get("lines", [])
@@ -451,6 +458,24 @@ def _build_openai_adapter(
     else:
         client = OpenAI(api_key=resolved_api_key)
 
+    def _classify_openai_error(exc: Exception) -> tuple[str, str]:
+        name = type(exc).__name__
+        msg = str(exc)
+        lowered = msg.lower()
+        if (
+            name == "AuthenticationError"
+            or "401" in lowered
+            or "unauthorized" in lowered
+        ):
+            return "llm_error_401", msg
+        if name == "APITimeoutError" or "timeout" in lowered or "timed out" in lowered:
+            return "llm_error_timeout", msg
+        if name == "RateLimitError" or "rate limit" in lowered or "429" in lowered:
+            return "llm_error_rate_limit", msg
+        if name == "APIError":
+            return "llm_api_error", msg
+        return "llm_api_error", msg
+
     def _adapter(prompt: dict[str, object]) -> dict[str, object]:
         prompt_text = str(prompt.get("prompt", ""))
         if not prompt_text:
@@ -472,6 +497,15 @@ def _build_openai_adapter(
                 if isinstance(text, str) and text:
                     parsed: Any = json_mod.loads(text)
                     if isinstance(parsed, dict):
+                        if parsed.get("ok") is False and isinstance(
+                            parsed.get("error"), str
+                        ):
+                            return {
+                                "ok": False,
+                                "error": str(parsed.get("error")),
+                                "detail": str(parsed.get("detail", "")),
+                                "lines": [],
+                            }
                         lines = parsed.get("lines", [])
                         if isinstance(lines, list):
                             return {
@@ -479,39 +513,65 @@ def _build_openai_adapter(
                                     str(x) for x in lines if isinstance(x, str) and x
                                 ]
                             }
-            except Exception:
-                pass
+            except Exception as exc:
+                error_code, detail = _classify_openai_error(exc)
+                return {
+                    "ok": False,
+                    "error": error_code,
+                    "detail": detail,
+                    "lines": [],
+                }
 
         # Fallback path: Chat Completions API
         chat_api = getattr(client, "chat", None)
         completions_api = getattr(chat_api, "completions", None)
         chat_create_fn = getattr(completions_api, "create", None)
         if callable(chat_create_fn):
-            resp = chat_create_fn(
-                model=resolved_model,
-                messages=[
-                    {
-                        "role": "system",
-                        "content": 'Return JSON only: {"lines": ["..."]}',
-                    },
-                    {"role": "user", "content": prompt_text},
-                ],
-                response_format={"type": "json_object"},
-            )
-            choices = getattr(resp, "choices", [])
-            if isinstance(choices, list) and choices:
-                msg = getattr(choices[0], "message", None)
-                content = getattr(msg, "content", "")
-                if isinstance(content, str) and content:
-                    parsed2: Any = json_mod.loads(content)
-                    if isinstance(parsed2, dict):
-                        lines2 = parsed2.get("lines", [])
-                        if isinstance(lines2, list):
-                            return {
-                                "lines": [
-                                    str(x) for x in lines2 if isinstance(x, str) and x
-                                ]
-                            }
+            try:
+                resp = chat_create_fn(
+                    model=resolved_model,
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": 'Return JSON only: {"lines": ["..."]}',
+                        },
+                        {"role": "user", "content": prompt_text},
+                    ],
+                    response_format={"type": "json_object"},
+                )
+                choices = getattr(resp, "choices", [])
+                if isinstance(choices, list) and choices:
+                    msg = getattr(choices[0], "message", None)
+                    content = getattr(msg, "content", "")
+                    if isinstance(content, str) and content:
+                        parsed2: Any = json_mod.loads(content)
+                        if isinstance(parsed2, dict):
+                            if parsed2.get("ok") is False and isinstance(
+                                parsed2.get("error"), str
+                            ):
+                                return {
+                                    "ok": False,
+                                    "error": str(parsed2.get("error")),
+                                    "detail": str(parsed2.get("detail", "")),
+                                    "lines": [],
+                                }
+                            lines2 = parsed2.get("lines", [])
+                            if isinstance(lines2, list):
+                                return {
+                                    "lines": [
+                                        str(x)
+                                        for x in lines2
+                                        if isinstance(x, str) and x
+                                    ]
+                                }
+            except Exception as exc:
+                error_code, detail = _classify_openai_error(exc)
+                return {
+                    "ok": False,
+                    "error": error_code,
+                    "detail": detail,
+                    "lines": [],
+                }
 
         return {"lines": []}
 
@@ -659,9 +719,32 @@ def _generate_section_lines_with_llm(
     try:
         out = adapter_callable(prompt)
     except Exception as exc:
-        return {"ok": False, "lines": [], "error": str(exc)}
+        msg = str(exc)
+        lowered = msg.lower()
+        if "timeout" in lowered or "timed out" in lowered:
+            return {
+                "ok": False,
+                "lines": [],
+                "error": "llm_error_timeout",
+                "detail": msg,
+            }
+        if "401" in lowered or "unauthorized" in lowered:
+            return {
+                "ok": False,
+                "lines": [],
+                "error": "llm_error_401",
+                "detail": msg,
+            }
+        return {"ok": False, "lines": [], "error": msg}
 
     if isinstance(out, dict):
+        if out.get("ok") is False and isinstance(out.get("error"), str):
+            return {
+                "ok": False,
+                "lines": [],
+                "error": str(out.get("error")),
+                "detail": str(out.get("detail", "")),
+            }
         lines = out.get("lines", [])
         if isinstance(lines, list):
             cleaned = [
@@ -675,7 +758,12 @@ def _generate_section_lines_with_llm(
         if cleaned:
             return {"ok": True, "lines": cleaned}
 
-    return {"ok": False, "lines": [], "error": "empty_or_invalid_llm_output"}
+    return {
+        "ok": False,
+        "lines": [],
+        "error": "empty_or_invalid_llm_output",
+        "detail": "adapter returned no usable lines",
+    }
 
 
 # Vowel classification for Chinese

@@ -820,3 +820,55 @@ def test_run_sets_autofix_mode_llm_with_callable_adapter() -> None:
     gate = result.get("quality_gate", {})
     assert isinstance(gate, dict)
     assert gate.get("autofix_mode") == "llm_rewrite"
+
+
+def test_generate_section_lines_propagates_llm_error_codes() -> None:
+    """LLM adapter explicit errors should be propagated verbatim."""
+    from src.producer_tools.business.lyric_architect import (
+        _generate_section_lines_with_llm,
+    )
+
+    def _auth_error_adapter(prompt: dict[str, object]) -> dict[str, object]:
+        _ = prompt
+        return {"ok": False, "error": "llm_error_401", "detail": "unauthorized"}
+
+    result = _generate_section_lines_with_llm(
+        adapter_callable=_auth_error_adapter,
+        tag="Verse 1",
+        word_count=16,
+        emotional_arc="reflective",
+        intent="测试",
+        template_meta={},
+        corpus_lines=[],
+        forbidden_terms=set(),
+        reference_constraints={},
+    )
+
+    assert result["ok"] is False
+    assert result.get("error") == "llm_error_401"
+
+
+def test_generate_section_lines_handles_timeout_exception() -> None:
+    """Adapter timeout exceptions should classify to llm_error_timeout."""
+    from src.producer_tools.business.lyric_architect import (
+        _generate_section_lines_with_llm,
+    )
+
+    def _timeout_adapter(prompt: dict[str, object]) -> dict[str, object]:
+        _ = prompt
+        raise TimeoutError("Request timed out.")
+
+    result = _generate_section_lines_with_llm(
+        adapter_callable=_timeout_adapter,
+        tag="Verse 1",
+        word_count=16,
+        emotional_arc="reflective",
+        intent="测试",
+        template_meta={},
+        corpus_lines=[],
+        forbidden_terms=set(),
+        reference_constraints={},
+    )
+
+    assert result["ok"] is False
+    assert result.get("error") in {"llm_error_timeout", "llm_generation_failed"}
