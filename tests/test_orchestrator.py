@@ -250,6 +250,76 @@ class TestEndToEndFlow:
             assert hit and hit[0].get("status") == "skipped"
             assert hit[0].get("note") == "blocked_by_acoustic_failure"
 
+    def test_orchestrate_runs_style_deconstructor_when_reference_audio_provided(
+        self, tmp_path: Path
+    ) -> None:
+        """When reference_audio_path exists, style_deconstructor must run."""
+        from src.producer_tools.orchestrator import orchestrator
+
+        voice_file = tmp_path / "voice_input.wav"
+        voice_file.write_bytes(b"RIFFtest")
+        ref_file = tmp_path / "ref_input.wav"
+        ref_file.write_bytes(b"RIFFtest")
+
+        result = orchestrator.run(
+            {
+                "intent": "现代感, 略带古风, 失恋但豁达",
+                "output_dir": str(tmp_path),
+                "voice_audio_path": str(voice_file),
+                "reference_audio_path": str(ref_file),
+                "genre_seed": {"descriptors": ["neo-r&b", "oriental pop"]},
+                "corpus_sources": [_write_real_corpus_file(tmp_path)],
+                "llm_adapter": _good_adapter,
+            }
+        )
+
+        pipeline = result.get("pipeline", [])
+        assert isinstance(pipeline, list)
+        style_steps = [s for s in pipeline if s.get("step") == "style_deconstructor"]
+        assert style_steps
+        assert style_steps[0].get("status") == "completed"
+        assert (
+            style_steps[0].get("note") == "style_deconstructor_run_from_reference_audio"
+        )
+
+    def test_orchestrate_blocks_downstream_when_style_reference_audio_missing(
+        self, tmp_path: Path
+    ) -> None:
+        """Missing reference audio file should fail style and block downstream."""
+        from src.producer_tools.orchestrator import orchestrator
+
+        voice_file = tmp_path / "voice_input.wav"
+        voice_file.write_bytes(b"RIFFtest")
+
+        result = orchestrator.run(
+            {
+                "intent": "现代感, 略带古风, 失恋但豁达",
+                "output_dir": str(tmp_path),
+                "voice_audio_path": str(voice_file),
+                "reference_audio_path": str(tmp_path / "missing_ref.wav"),
+                "genre_seed": {"descriptors": ["neo-r&b", "oriental pop"]},
+                "corpus_sources": [_write_real_corpus_file(tmp_path)],
+                "llm_adapter": _good_adapter,
+            }
+        )
+
+        assert result.get("status") == "failed"
+        pipeline = result.get("pipeline", [])
+        assert isinstance(pipeline, list)
+        style_steps = [s for s in pipeline if s.get("step") == "style_deconstructor"]
+        assert style_steps and style_steps[0].get("status") == "failed"
+        assert style_steps[0].get("note") == "reference_audio_not_found"
+
+        for step_name in [
+            "friction_calculator",
+            "lyric_architect",
+            "prompt_compiler",
+            "post_processor",
+        ]:
+            hit = [s for s in pipeline if s.get("step") == step_name]
+            assert hit and hit[0].get("status") == "skipped"
+            assert hit[0].get("note") == "blocked_by_style_deconstructor_failure"
+
 
 class TestTraceIds:
     """Tests for trace ID generation and tracking."""

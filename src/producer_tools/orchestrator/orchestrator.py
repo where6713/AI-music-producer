@@ -20,6 +20,7 @@ from ..business import (
     friction_calculator,
     lyric_architect,
     prompt_compiler,
+    style_deconstructor,
 )
 from ..contracts import ToolPayload, ToolResult
 
@@ -247,13 +248,119 @@ def _orchestrate_full_pipeline(
         }
     )
 
-    # Step 2: Style Deconstructor (or precomputed reference_dna)
-    if reference_dna:
+    # Step 2: Style Deconstructor (real reference-audio analysis first)
+    reference_audio_value = payload.get("reference_audio_path")
+    reference_audio_path: Path | None = None
+    if isinstance(reference_audio_value, Path):
+        reference_audio_path = reference_audio_value.expanduser().resolve()
+    elif isinstance(reference_audio_value, str) and reference_audio_value.strip():
+        reference_audio_path = Path(reference_audio_value).expanduser().resolve()
+
+    if reference_audio_path is not None:
+        if not reference_audio_path.exists() or not reference_audio_path.is_file():
+            pipeline.append(
+                {
+                    "step": "style_deconstructor",
+                    "status": "failed",
+                    "note": "reference_audio_not_found",
+                }
+            )
+            pipeline.extend(
+                [
+                    {
+                        "step": "friction_calculator",
+                        "status": "skipped",
+                        "note": "blocked_by_style_deconstructor_failure",
+                    },
+                    {
+                        "step": "lyric_architect",
+                        "status": "skipped",
+                        "note": "blocked_by_style_deconstructor_failure",
+                    },
+                    {
+                        "step": "prompt_compiler",
+                        "status": "skipped",
+                        "note": "blocked_by_style_deconstructor_failure",
+                    },
+                    {
+                        "step": "post_processor",
+                        "status": "skipped",
+                        "note": "blocked_by_style_deconstructor_failure",
+                    },
+                ]
+            )
+            results["pipeline"] = pipeline
+            results["status"] = "failed"
+            results["message"] = (
+                "style_deconstructor failed; downstream pipeline blocked"
+            )
+            return results
+
+        style_result = style_deconstructor.run(
+            {
+                "reference_audio_path": str(reference_audio_path),
+                "use_demucs": bool(payload.get("use_demucs", False)),
+                "demucs_model": payload.get("demucs_model", "htdemucs_6s"),
+                "reference_dna_output_path": str(output_dir / "reference_dna.json"),
+            }
+        )
+        if not style_result.get("ok"):
+            pipeline.append(
+                {
+                    "step": "style_deconstructor",
+                    "status": "failed",
+                    "note": str(
+                        style_result.get("error", "style_deconstructor_failed")
+                    ),
+                }
+            )
+            pipeline.extend(
+                [
+                    {
+                        "step": "friction_calculator",
+                        "status": "skipped",
+                        "note": "blocked_by_style_deconstructor_failure",
+                    },
+                    {
+                        "step": "lyric_architect",
+                        "status": "skipped",
+                        "note": "blocked_by_style_deconstructor_failure",
+                    },
+                    {
+                        "step": "prompt_compiler",
+                        "status": "skipped",
+                        "note": "blocked_by_style_deconstructor_failure",
+                    },
+                    {
+                        "step": "post_processor",
+                        "status": "skipped",
+                        "note": "blocked_by_style_deconstructor_failure",
+                    },
+                ]
+            )
+            results["pipeline"] = pipeline
+            results["status"] = "failed"
+            results["message"] = (
+                "style_deconstructor failed; downstream pipeline blocked"
+            )
+            return results
+
+        style_reference_dna = style_result.get("reference_dna", {})
+        if isinstance(style_reference_dna, dict) and style_reference_dna:
+            reference_dna = style_reference_dna
         pipeline.append(
             {
                 "step": "style_deconstructor",
                 "status": "completed",
-                "note": "Using precomputed reference_dna",
+                "note": "style_deconstructor_run_from_reference_audio",
+            }
+        )
+    elif reference_dna:
+        pipeline.append(
+            {
+                "step": "style_deconstructor",
+                "status": "completed",
+                "note": "precomputed_reference_dna_from_payload",
             }
         )
     else:
