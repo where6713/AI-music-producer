@@ -58,11 +58,25 @@ def _is_librosa_available() -> bool:
 
 def _extract_tempo_key(input_path: Path) -> dict[str, object]:
     """Extract BPM, musical key, and song structure from audio."""
+    fallback_sections: list[dict[str, object]] = [
+        {"label": "verse", "bars": 4, "beats": 16, "target_words": 16},
+        {"label": "pre_chorus", "bars": 4, "beats": 16, "target_words": 16},
+        {"label": "chorus", "bars": 4, "beats": 16, "target_words": 16},
+        {"label": "verse", "bars": 4, "beats": 16, "target_words": 16},
+        {"label": "bridge", "bars": 4, "beats": 16, "target_words": 16},
+        {"label": "chorus", "bars": 4, "beats": 16, "target_words": 16},
+    ]
+
     default: dict[str, object] = {
         "bpm": 0.0,
         "key": "C",
         "scale": "major",
         "structure": [],
+        "lyric_beat_budget": {
+            "beats_per_bar": 4,
+            "total_beats": len(fallback_sections) * 16,
+            "sections": fallback_sections,
+        },
     }
 
     if not _is_librosa_available():
@@ -117,11 +131,52 @@ def _extract_tempo_key(input_path: Path) -> dict[str, object]:
         else:
             structure = []
 
+        structure_sections = structure
+        total_beats = max(0, len(structure_sections) * 16)
+        section_budgets: list[dict[str, object]] = []
+        if structure_sections:
+            for seg in structure_sections:
+                if not isinstance(seg, dict):
+                    continue
+                label = str(seg.get("label", "verse"))
+                section_budgets.append(
+                    {
+                        "label": label,
+                        "bars": 4,
+                        "beats": 16,
+                        "target_words": 16,
+                    }
+                )
+        else:
+            fallback_labels = [
+                "verse",
+                "pre_chorus",
+                "chorus",
+                "verse",
+                "bridge",
+                "chorus",
+            ]
+            for lbl in fallback_labels:
+                section_budgets.append(
+                    {
+                        "label": lbl,
+                        "bars": 4,
+                        "beats": 16,
+                        "target_words": 16,
+                    }
+                )
+            total_beats = len(section_budgets) * 16
+
         return {
             "bpm": round(bpm_val, 1),
             "key": detected_key,
             "scale": scale,
-            "structure": structure,
+            "structure": structure_sections,
+            "lyric_beat_budget": {
+                "beats_per_bar": 4,
+                "total_beats": total_beats,
+                "sections": section_budgets,
+            },
         }
 
     except Exception:
@@ -336,8 +391,11 @@ def run(payload: ToolPayload) -> ToolResult:
         "key": tempo_key.get("key", "C"),
         "scale": tempo_key.get("scale", "major"),
         "structure": tempo_key.get("structure", []),
+        "lyric_beat_budget": tempo_key.get("lyric_beat_budget", {}),
         "instrumentation": instrumentation,
         "energy_curve": energy_curve,
+        "vocal_pitch_range_midi": None,
+        "vocal_melismatic_density": 0.0,
         "stems_dir": str(demucs_meta.get("output_dir", "")) if use_demucs else "",
     }
 
@@ -360,6 +418,7 @@ def run(payload: ToolPayload) -> ToolResult:
         "demucs": demucs_meta,
         "stems": stems,
         "tempo_key": tempo_key,
+        "reference_dna": reference_dna,
         "instrumentation": instrumentation,
         "energy_curve": energy_curve,
         "reference_dna_path": str(reference_dna_path) if reference_dna_path else "",

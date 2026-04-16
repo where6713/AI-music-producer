@@ -61,3 +61,41 @@ def test_missing_audio_returns_error_without_tempo_key() -> None:
 
     assert result["ok"] is False
     assert "tempo_key" not in result or result.get("tempo_key") is None
+
+
+def test_tempo_key_contains_lyric_beat_budget(tmp_path: Path) -> None:
+    """tempo_key should include beat-aligned lyric budget fields."""
+    reference_path = tmp_path / "ref.wav"
+    reference_path.write_bytes(b"fake")
+
+    result = style_deconstructor.run({"reference_audio_path": str(reference_path)})
+
+    assert result["ok"] is True
+    tempo_key = result.get("tempo_key", {})
+    assert isinstance(tempo_key, dict)
+    assert "lyric_beat_budget" in tempo_key
+    budget = tempo_key.get("lyric_beat_budget", {})
+    assert isinstance(budget, dict)
+    assert "total_beats" in budget
+    assert "beats_per_bar" in budget
+    assert "sections" in budget
+    assert isinstance(budget.get("sections"), list)
+    assert len(budget.get("sections", [])) > 0
+
+
+def test_reference_dna_contains_beat_budget_and_prd_voice_fields(
+    tmp_path: Path,
+) -> None:
+    """reference_dna should expose beat budget and required PRD voice fields."""
+    reference_path = tmp_path / "ref.wav"
+    reference_path.write_bytes(b"fake")
+
+    result = style_deconstructor.run({"reference_audio_path": str(reference_path)})
+
+    assert result["ok"] is True
+    reference_dna = result.get("reference_dna", {})
+    assert isinstance(reference_dna, dict)
+    assert "lyric_beat_budget" in reference_dna
+    assert isinstance(reference_dna.get("lyric_beat_budget"), dict)
+    assert "vocal_pitch_range_midi" in reference_dna
+    assert "vocal_melismatic_density" in reference_dna
