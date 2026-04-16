@@ -90,6 +90,7 @@ def _energy_for_section(
 def plan_structure_grid(
     intent: str,
     structure: list[dict[str, object]],
+    lyric_beat_budget: dict[str, object] | None = None,
 ) -> dict[str, object]:
     """Generate structure grid from user intent and reference structure.
 
@@ -100,11 +101,42 @@ def plan_structure_grid(
     Args:
         intent: User's intent description (e.g., "失恋 R&B 碎碎念").
         structure: Reference DNA structure (list of segment dicts).
+        lyric_beat_budget: Optional beat-derived word budget per section.
 
     Returns:
         dict with ok, grid{sections[{tag, emotional_arc, keywords, word_count}]}
     """
     _ = intent
+
+    budget_sections_raw = (
+        lyric_beat_budget.get("sections", [])
+        if isinstance(lyric_beat_budget, dict)
+        else []
+    )
+    budget_sections: list[dict[str, object]] = (
+        budget_sections_raw if isinstance(budget_sections_raw, list) else []
+    )
+
+    def _word_count_from_budget(source_label: str, idx: int, default_wc: int) -> int:
+        # Prefer positional mapping (same ordering as structure planner)
+        if idx < len(budget_sections):
+            item = budget_sections[idx]
+            if isinstance(item, dict):
+                tw = item.get("target_words")
+                if isinstance(tw, (int, float)) and int(tw) > 0:
+                    return int(tw)
+
+        # Fallback to first matching section label
+        for item in budget_sections:
+            if not isinstance(item, dict):
+                continue
+            lbl = str(item.get("label", "")).strip().lower()
+            if lbl == source_label:
+                tw = item.get("target_words")
+                if isinstance(tw, (int, float)) and int(tw) > 0:
+                    return int(tw)
+
+        return default_wc
 
     sections: list[dict[str, object]] = []
     for i, spec in enumerate(REQUIRED_SECTION_SPECS):
@@ -113,9 +145,10 @@ def plan_structure_grid(
         default_arc = str(spec.get("emotional_arc", "reflective"))
         inferred_arc = _emotional_arc_from_energy(energy)
         word_count_raw = spec.get("word_count", 50)
-        word_count = (
+        default_wc = (
             int(word_count_raw) if isinstance(word_count_raw, (int, float)) else 50
         )
+        word_count = _word_count_from_budget(src_label, i, default_wc)
 
         # Keep PRD-specific semantic anchors for special sections
         if str(spec.get("tag", "")) in {"Bridge", "Final Chorus"}:
@@ -247,7 +280,12 @@ def _build_template_binding(
                 pass
 
     # Fallback to deterministic structure-derived template binding.
-    planned = plan_structure_grid("template-bootstrap", structure)
+    reference_dna_raw = payload.get("reference_dna", {})
+    reference_dna = reference_dna_raw if isinstance(reference_dna_raw, dict) else {}
+    beat_budget_raw = reference_dna.get("lyric_beat_budget", [])
+    beat_budget = beat_budget_raw if isinstance(beat_budget_raw, dict) else {}
+
+    planned = plan_structure_grid("template-bootstrap", structure, beat_budget)
     grid_raw = planned.get("grid", {}) if isinstance(planned, dict) else {}
     grid = grid_raw if isinstance(grid_raw, dict) else {}
     sections_raw = grid.get("sections", [])
@@ -986,6 +1024,209 @@ def check_line_length_constraints(
     }
 
 
+def _shorten_line_to_limit(text: str, limit: int) -> str:
+    """Best-effort deterministic shortening for overlong lines."""
+    if len(text) <= limit:
+        return text
+
+    stripped = text.strip()
+    for sep in ["，", "。", "！", "？", "；", "、", ",", ".", "!", "?", ";"]:
+        if sep in stripped:
+            chunks = [x.strip() for x in stripped.split(sep) if x.strip()]
+            for chunk in chunks:
+                if len(chunk) <= limit:
+                    return chunk
+
+    compact = stripped.replace(" ", "")
+    if len(compact) <= limit:
+        return compact
+
+    return compact[:limit]
+
+
+def _rewrite_line_to_limit_with_llm(
+    adapter_callable: object,
+    line: str,
+    limit: int,
+    section_tag: str,
+    intent: str,
+) -> str | None:
+    """Ask LLM to rewrite a single overlong line under strict char limit."""
+    if not callable(adapter_callable):
+        return None
+
+    prompt = {
+        "prompt": (
+            "你是中文流行歌词改写助手。"
+            "把下面这句歌词改写成不超过给定字数的自然短句，保持原意与场景，不要截断残句。"
+            '输出JSON: {"line": "..."}。\n'
+            f"段落: {section_tag}\n"
+            f"用户意图: {intent}\n"
+            f"最大字数: {limit}\n"
+            f"原句: {line}\n"
+        )
+    }
+
+    try:
+        out = adapter_callable(prompt)
+    except Exception:
+        return None
+
+    candidate = None
+    if isinstance(out, dict):
+        line_val = out.get("line")
+        if isinstance(line_val, str) and line_val.strip():
+            candidate = line_val.strip()
+        if candidate is None:
+            lines_val = out.get("lines")
+            if isinstance(lines_val, list) and lines_val:
+                first = lines_val[0]
+                if isinstance(first, str) and first.strip():
+                    candidate = first.strip()
+    elif isinstance(out, list) and out:
+        first = out[0]
+        if isinstance(first, str) and first.strip():
+            candidate = first.strip()
+
+    if candidate and len(candidate) <= limit:
+        return candidate
+    return None
+
+
+def check_sentence_completeness(lyrics: list[str]) -> dict[str, object]:
+    """Detect likely truncated/unfinished lyric lines.
+
+    This is a heuristic quality gate to block obvious half-sentences,
+    especially those produced by hard truncation.
+    """
+    if not lyrics:
+        return {"ok": True, "violations": [], "pass": True}
+
+    bad_suffixes = {
+        "的",
+        "了",
+        "着",
+        "把",
+        "被",
+        "和",
+        "跟",
+        "与",
+        "及",
+        "就",
+        "再",
+        "还",
+        "都",
+        "又",
+        "也",
+        "吗",
+        "呢",
+        "吧",
+        "呀",
+        "啊",
+        "在",
+        "到",
+        "向",
+        "给",
+        "对",
+        "从",
+        "把",
+    }
+    banned_end_bigrams = {
+        "把钥匙",
+        "我拎着",
+        "点头说",
+        "再锁好",
+        "我把",
+        "你把",
+    }
+
+    violations: list[dict[str, object]] = []
+    for idx, line in enumerate(lyrics):
+        text = str(line).strip()
+        if not text:
+            violations.append({"line": idx, "reason": "empty_line", "severity": "high"})
+            continue
+
+        if text[-1] in bad_suffixes:
+            violations.append(
+                {
+                    "line": idx,
+                    "reason": "bad_suffix",
+                    "suffix": text[-1],
+                    "severity": "high",
+                }
+            )
+
+        for frag in banned_end_bigrams:
+            if text.endswith(frag):
+                violations.append(
+                    {
+                        "line": idx,
+                        "reason": "truncated_phrase",
+                        "phrase": frag,
+                        "severity": "high",
+                    }
+                )
+                break
+
+    return {
+        "ok": True,
+        "violations": violations,
+        "pass": len(violations) == 0,
+    }
+
+
+def apply_line_length_autofix(
+    sections: list[dict[str, object]],
+    max_line_length: int,
+    chorus_max_line_length: int,
+    adapter_callable: object,
+    intent: str,
+) -> tuple[list[dict[str, object]], int]:
+    """Auto-fix overlong lines with deterministic shortening.
+
+    Returns fixed sections and number of changed lines.
+    """
+    fixed: list[dict[str, object]] = []
+    changed = 0
+
+    for section in sections:
+        if not isinstance(section, dict):
+            continue
+        tag = str(section.get("tag", "")).strip().lower()
+        is_chorus = tag in {"chorus", "final chorus"}
+        limit = chorus_max_line_length if is_chorus else max_line_length
+
+        lines_val = section.get("lines", [])
+        lines = [str(x) for x in lines_val] if isinstance(lines_val, list) else []
+        new_lines: list[str] = []
+        section_name = str(section.get("tag", "Unknown"))
+        for line in lines:
+            shortened = line
+            if len(line) > limit:
+                llm_rewritten = _rewrite_line_to_limit_with_llm(
+                    adapter_callable=adapter_callable,
+                    line=line,
+                    limit=limit,
+                    section_tag=section_name,
+                    intent=intent,
+                )
+                if isinstance(llm_rewritten, str) and llm_rewritten:
+                    shortened = llm_rewritten
+                else:
+                    # Last resort deterministic clip; better than overflow but less preferred.
+                    shortened = _shorten_line_to_limit(line, limit)
+            if shortened != line:
+                changed += 1
+            new_lines.append(shortened)
+
+        cloned = dict(section)
+        cloned["lines"] = new_lines
+        fixed.append(cloned)
+
+    return fixed, changed
+
+
 def run(payload: ToolPayload) -> ToolResult:
     """Execute the lyric_architect tool.
 
@@ -1030,6 +1271,14 @@ def run(payload: ToolPayload) -> ToolResult:
             "lyrics": None,
         }
 
+    resolved_adapter = llm_adapter if callable(llm_adapter) else None
+    if resolved_adapter is None:
+        resolved_adapter = _build_openai_adapter(
+            api_key=llm_api_key,
+            base_url=llm_base_url,
+            model_name=llm_model,
+        )
+
     # Step 1: Plan structure grid
     structure_raw = (
         reference_dna.get("structure", []) if isinstance(reference_dna, dict) else []
@@ -1037,7 +1286,14 @@ def run(payload: ToolPayload) -> ToolResult:
     structure: list[dict[str, object]] = (
         structure_raw if isinstance(structure_raw, list) else []
     )
-    grid_result = plan_structure_grid(intent, structure)
+    beat_budget_raw = (
+        reference_dna.get("lyric_beat_budget", [])
+        if isinstance(reference_dna, dict)
+        else []
+    )
+    beat_budget = beat_budget_raw if isinstance(beat_budget_raw, dict) else {}
+
+    grid_result = plan_structure_grid(intent, structure, beat_budget)
     if not grid_result.get("ok"):
         return {"ok": False, "error": "grid_planning_failed", "lyrics": None}
 
@@ -1115,6 +1371,11 @@ def run(payload: ToolPayload) -> ToolResult:
         "pass": True,
     }
     anti_lexicon_result: dict[str, object] = {"ok": True, "hits": [], "pass": True}
+    completeness_result: dict[str, object] = {
+        "ok": True,
+        "violations": [],
+        "pass": True,
+    }
     has_line_length_limits = (
         "max_line_length" in payload or "chorus_max_line_length" in payload
     )
@@ -1139,6 +1400,7 @@ def run(payload: ToolPayload) -> ToolResult:
         "max_line_length": max_line_length,
         "chorus_max_line_length": chorus_max_line_length,
     }
+    line_length_autofix = bool(payload.get("line_length_autofix", True))
 
     negative_lexicon_raw = payload.get("negative_lexicon", [])
     negative_lexicon: set[str] = set(DEFAULT_ANTI_LEXICON)
@@ -1153,6 +1415,7 @@ def run(payload: ToolPayload) -> ToolResult:
     vowel_fix_count = 0
     cliche_fix_count = 0
     line_length_fix_count = 0
+    line_length_autofix_count = 0
 
     for attempt in range(max_rewrite_iterations + 1):
         draft_iterations += 1
@@ -1161,7 +1424,7 @@ def run(payload: ToolPayload) -> ToolResult:
             grid,
             current_intent,
             use_llm=use_llm,
-            llm_adapter=llm_adapter,
+            llm_adapter=resolved_adapter,
             forbidden_terms=negative_lexicon,
             reference_constraints=reference_constraints,
             template_binding=template_binding,
@@ -1184,6 +1447,15 @@ def run(payload: ToolPayload) -> ToolResult:
         draft_sections = (
             draft_sections_raw if isinstance(draft_sections_raw, list) else []
         )
+        if has_line_length_limits and line_length_autofix:
+            draft_sections, changed = apply_line_length_autofix(
+                draft_sections,
+                max_line_length=max_line_length,
+                chorus_max_line_length=chorus_max_line_length,
+                adapter_callable=resolved_adapter,
+                intent=current_intent,
+            )
+            line_length_autofix_count += changed
         all_lines = []
         for section in draft_sections:
             if not isinstance(section, dict):
@@ -1196,6 +1468,7 @@ def run(payload: ToolPayload) -> ToolResult:
         tone_result = check_tone_collision(all_lines, long_note_positions)
         cliche_result = check_anti_cliche(all_lines)
         anti_lexicon_result = check_anti_lexicon(all_lines, negative_lexicon)
+        completeness_result = check_sentence_completeness(all_lines)
         if has_line_length_limits:
             line_length_result = check_line_length_constraints(
                 draft_sections,
@@ -1216,6 +1489,7 @@ def run(payload: ToolPayload) -> ToolResult:
         )
         needs_cliche_fix = not bool(cliche_result.get("pass", True))
         needs_anti_lexicon_fix = not bool(anti_lexicon_result.get("pass", True))
+        needs_completeness_fix = not bool(completeness_result.get("pass", True))
         needs_line_length_fix = has_line_length_limits and not bool(
             line_length_result.get("pass", True)
         )
@@ -1224,6 +1498,7 @@ def run(payload: ToolPayload) -> ToolResult:
             needs_vowel_fix
             or needs_cliche_fix
             or needs_anti_lexicon_fix
+            or needs_completeness_fix
             or needs_line_length_fix
         ):
             break
@@ -1245,6 +1520,7 @@ def run(payload: ToolPayload) -> ToolResult:
             + "\n- 避免烂梗与抽象空话，优先具象场景。"
             + "\n- 长音位置尽量使用更顺口字。"
             + "\n- 避免重复句式与重复关键词。"
+            + "\n- 句子必须完整，禁止半截句、禁止以虚词或介词收尾。"
             + (
                 "\n- 严格短句：普通段落每行不超过"
                 + str(max_line_length)
@@ -1295,6 +1571,20 @@ def run(payload: ToolPayload) -> ToolResult:
                 "human": f"命中禁用词: {'、'.join(str(x) for x in anti_hits)}",
             }
         )
+
+    completeness_violations = completeness_result.get("violations", [])
+    if isinstance(completeness_violations, list):
+        for v in completeness_violations:
+            if isinstance(v, dict):
+                reason = str(v.get("reason", "incomplete_line"))
+                warnings.append(
+                    {
+                        "line_index": v.get("line", 0),
+                        "type": "sentence_completeness",
+                        "severity": "high",
+                        "human": f"句子不完整: {reason}",
+                    }
+                )
 
     length_violations = line_length_result.get("violations", [])
     if isinstance(length_violations, list):
@@ -1349,6 +1639,7 @@ def run(payload: ToolPayload) -> ToolResult:
                 "vowel_fix": vowel_fix_count,
                 "cliche_fix": cliche_fix_count,
                 "line_length_fix": line_length_fix_count,
+                "line_length_autofix": line_length_autofix_count,
             },
         },
         "sections": sections,
@@ -1384,11 +1675,16 @@ def run(payload: ToolPayload) -> ToolResult:
         and bool(tone_result.get("pass", True))
         and bool(cliche_result.get("pass", True))
         and bool(anti_lexicon_result.get("pass", True))
+        and bool(completeness_result.get("pass", True))
         and bool(line_length_result.get("pass", True)),
         "anti_lexicon_hits": anti_lexicon_result.get("hits", []),
+        "sentence_completeness_violations": completeness_violations,
         "line_length_violations": length_violations,
         "max_line_length": max_line_length,
         "chorus_max_line_length": chorus_max_line_length,
+        "autofix_mode": "llm_rewrite"
+        if callable(resolved_adapter)
+        else "deterministic_clip",
     }
 
     if not bool(quality_gate.get("pass", False)):

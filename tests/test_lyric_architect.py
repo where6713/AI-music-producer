@@ -80,6 +80,36 @@ def test_structure_grid_empty_structure() -> None:
     assert "grid" in result
 
 
+def test_structure_grid_uses_beat_budget_target_words() -> None:
+    """word_count should come from beat budget when provided by analysis stage."""
+    from src.producer_tools.business.lyric_architect import plan_structure_grid
+
+    result = plan_structure_grid(
+        "测试意图",
+        [{"index": 0, "label": "verse", "energy": 0.4}],
+        {
+            "beats_per_bar": 4,
+            "total_beats": 96,
+            "sections": [
+                {"label": "verse", "bars": 4, "beats": 16, "target_words": 16},
+                {
+                    "label": "pre_chorus",
+                    "bars": 2,
+                    "beats": 8,
+                    "target_words": 8,
+                },
+                {"label": "chorus", "bars": 4, "beats": 16, "target_words": 16},
+            ],
+        },
+    )
+
+    assert result["ok"] is True
+    sections = result["grid"]["sections"]
+    assert sections[0]["word_count"] == 16  # Verse 1
+    assert sections[1]["word_count"] == 8  # Pre-Chorus
+    assert sections[2]["word_count"] == 16  # Chorus
+
+
 def test_draft_generation_basic() -> None:
     """G2: draft generation should produce lyrics from grid."""
     from src.producer_tools.business.lyric_architect import generate_draft
@@ -699,6 +729,7 @@ def test_run_quality_gate_blocks_long_lines() -> None:
             "max_rewrite_iterations": 0,
             "max_line_length": 14,
             "chorus_max_line_length": 10,
+            "line_length_autofix": False,
         }
     )
 
@@ -710,3 +741,82 @@ def test_run_quality_gate_blocks_long_lines() -> None:
     violations = gate.get("line_length_violations", [])
     assert isinstance(violations, list)
     assert len(violations) > 0
+
+
+def test_run_quality_gate_blocks_incomplete_tail_lines() -> None:
+    """Quality gate should fail for obviously incomplete half-sentences."""
+    from src.producer_tools.business.lyric_architect import run
+
+    def _tail_broken_adapter(prompt: dict[str, object]) -> dict[str, object]:
+        _ = prompt
+        return {"lines": ["回头吧回头吧我把钥匙", "地铁到站你先下我拎着"]}
+
+    result = run(
+        {
+            "intent": "现代感, 略带古风, 失恋但豁达",
+            "reference_dna": {"structure": [{"label": "verse", "energy": 0.4}]},
+            "use_llm": True,
+            "llm_adapter": _tail_broken_adapter,
+            "max_rewrite_iterations": 0,
+            "line_length_autofix": False,
+            "max_line_length": 30,
+            "chorus_max_line_length": 30,
+        }
+    )
+
+    assert result["ok"] is False
+    assert result.get("error") == "lyric_quality_gate_failed"
+    gate = result.get("quality_gate", {})
+    assert isinstance(gate, dict)
+    assert gate.get("pass") is False
+    scv = gate.get("sentence_completeness_violations", [])
+    assert isinstance(scv, list)
+    assert len(scv) > 0
+
+
+def test_run_without_adapter_returns_llm_not_configured() -> None:
+    """Without callable adapter and API config, run should fail explicitly."""
+    from src.producer_tools.business.lyric_architect import run
+
+    result = run(
+        {
+            "intent": "现代感, 略带古风, 失恋但豁达",
+            "reference_dna": {"structure": [{"label": "verse", "energy": 0.4}]},
+            "use_llm": True,
+            "llm_adapter": None,
+            "max_rewrite_iterations": 0,
+            "line_length_autofix": True,
+            "max_line_length": 8,
+            "chorus_max_line_length": 8,
+            "llm_api_key": "",
+        }
+    )
+
+    assert result["ok"] is False
+    assert result.get("error") in {"llm_not_configured", "llm_generation_failed"}
+
+
+def test_run_sets_autofix_mode_llm_with_callable_adapter() -> None:
+    """With callable adapter, quality_gate should report llm_rewrite mode."""
+    from src.producer_tools.business.lyric_architect import run
+
+    def _adapter(prompt: dict[str, object]) -> dict[str, object]:
+        _ = prompt
+        return {"lines": ["地铁到站你把伞还我", "我点头说好先上车"]}
+
+    result = run(
+        {
+            "intent": "现代感, 略带古风, 失恋但豁达",
+            "reference_dna": {"structure": [{"label": "verse", "energy": 0.4}]},
+            "use_llm": True,
+            "llm_adapter": _adapter,
+            "max_rewrite_iterations": 0,
+            "line_length_autofix": True,
+            "max_line_length": 20,
+            "chorus_max_line_length": 20,
+        }
+    )
+
+    gate = result.get("quality_gate", {})
+    assert isinstance(gate, dict)
+    assert gate.get("autofix_mode") == "llm_rewrite"
