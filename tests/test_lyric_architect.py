@@ -874,6 +874,41 @@ def test_generate_section_lines_handles_timeout_exception() -> None:
     assert result.get("error") in {"llm_error_timeout", "llm_generation_failed"}
 
 
+def test_run_uses_custom_cliche_blacklist_file(tmp_path: Path) -> None:
+    """run() should use external cliche blacklist file when provided."""
+    from src.producer_tools.business.lyric_architect import run
+
+    blacklist_path = tmp_path / "custom_cliche.json"
+    blacklist_path.write_text('["测试烂梗词"]', encoding="utf-8")
+
+    def _adapter(prompt: dict[str, object]) -> dict[str, object]:
+        _ = prompt
+        return {"lines": ["测试烂梗词在这里出现", "这句正常"]}
+
+    result = run(
+        {
+            "intent": "现代感, 略带古风, 失恋但豁达",
+            "reference_dna": {"structure": [{"label": "verse", "energy": 0.4}]},
+            "use_llm": True,
+            "llm_adapter": _adapter,
+            "max_rewrite_iterations": 0,
+            "cliche_blacklist_path": str(blacklist_path),
+        }
+    )
+
+    assert result["ok"] is False
+    assert result.get("error") == "lyric_quality_gate_failed"
+
+
+def test_load_cliche_blacklist_fallback_when_file_missing() -> None:
+    """Missing cliche blacklist file should fallback to built-in defaults."""
+    from src.producer_tools.business.lyric_architect import _load_cliche_blacklist
+
+    loaded = _load_cliche_blacklist(Path("./not_exists_cliche_blacklist.json"))
+    assert isinstance(loaded, set)
+    assert "星辰大海" in loaded
+
+
 def test_derive_peak_positions_from_dna_returns_non_empty_for_outliers() -> None:
     from src.producer_tools.business.lyric_architect import (
         derive_peak_positions_from_dna,

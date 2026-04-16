@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import os
 import json
+import logging
 from pathlib import Path
 from typing import Any
 
 from ..contracts import ToolPayload, ToolResult
 
 TOOL_NAME = "lyric_architect"
+logger = logging.getLogger(__name__)
 
 REQUIRED_SECTION_SPECS: list[dict[str, object]] = [
     {
@@ -1024,6 +1026,35 @@ CLICHE_BLACKLIST = {
     "心碎",
 }
 
+
+def _load_cliche_blacklist(path: Path | None = None) -> set[str]:
+    """Load cliche blacklist from JSON file with safe fallback.
+
+    Expected JSON shape: ["phrase1", "phrase2", ...]
+    """
+    target_path = path if isinstance(path, Path) else Path("data/cliche_blacklist.json")
+    resolved = target_path.expanduser().resolve()
+
+    if resolved.exists() and resolved.is_file():
+        try:
+            payload = json.loads(resolved.read_text(encoding="utf-8"))
+            if isinstance(payload, list):
+                loaded = {
+                    str(x).strip()
+                    for x in payload
+                    if isinstance(x, str) and str(x).strip()
+                }
+                if loaded:
+                    return loaded
+        except (OSError, json.JSONDecodeError):
+            logger.warning("failed to parse cliche blacklist json: %s", resolved)
+
+    logger.warning(
+        "cliche blacklist file unavailable, fallback to built-in set: %s", resolved
+    )
+    return set(CLICHE_BLACKLIST)
+
+
 # Anti-lexicon (user negative lexicon + product defaults)
 DEFAULT_ANTI_LEXICON = {
     "霓虹",
@@ -1564,6 +1595,12 @@ def run(payload: ToolPayload) -> ToolResult:
 
     reference_constraints = _build_reference_hard_constraints(reference_dna)
 
+    cliche_blacklist_path_raw = payload.get("cliche_blacklist_path")
+    cliche_blacklist_path: Path | None = None
+    if isinstance(cliche_blacklist_path_raw, (str, Path)):
+        cliche_blacklist_path = Path(cliche_blacklist_path_raw)
+    cliche_blacklist = _load_cliche_blacklist(cliche_blacklist_path)
+
     draft_iterations = 0
     vowel_fix_count = 0
     cliche_fix_count = 0
@@ -1631,7 +1668,7 @@ def run(payload: ToolPayload) -> ToolResult:
 
         vowel_result = check_vowel_openness(all_lines, effective_peak_positions)
         tone_result = check_tone_collision(all_lines, effective_long_note_positions)
-        cliche_result = check_anti_cliche(all_lines)
+        cliche_result = check_anti_cliche(all_lines, blacklist=cliche_blacklist)
         anti_lexicon_result = check_anti_lexicon(all_lines, negative_lexicon)
         completeness_result = check_sentence_completeness(all_lines)
         if has_line_length_limits:
