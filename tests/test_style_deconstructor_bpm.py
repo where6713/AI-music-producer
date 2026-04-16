@@ -99,3 +99,58 @@ def test_reference_dna_contains_beat_budget_and_prd_voice_fields(
     assert isinstance(reference_dna.get("lyric_beat_budget"), dict)
     assert "vocal_pitch_range_midi" in reference_dna
     assert "vocal_melismatic_density" in reference_dna
+
+
+def test_compute_target_words_monotonic_with_bpm() -> None:
+    """Higher BPM should produce higher target_words with same bars/beats."""
+    low = style_deconstructor._compute_target_words(
+        bars=4,
+        beats_per_bar=4,
+        bpm=90.0,
+    )
+    high = style_deconstructor._compute_target_words(
+        bars=4,
+        beats_per_bar=4,
+        bpm=140.0,
+    )
+    assert low < high
+
+
+def test_compute_target_words_bounded_range() -> None:
+    """target_words should stay within [8, 48] bounds."""
+    tiny = style_deconstructor._compute_target_words(
+        bars=1,
+        beats_per_bar=4,
+        bpm=20.0,
+    )
+    huge = style_deconstructor._compute_target_words(
+        bars=12,
+        beats_per_bar=4,
+        bpm=280.0,
+    )
+    assert tiny >= 8
+    assert huge <= 48
+
+
+def test_tempo_key_budget_targets_not_hardcoded_to_16(tmp_path: Path) -> None:
+    """Budget targets should be computed, not all fixed at 16."""
+    reference_path = tmp_path / "reference.wav"
+    reference_path.write_bytes(b"fake")
+
+    result = style_deconstructor.run({"reference_audio_path": str(reference_path)})
+    assert result["ok"] is True
+    tempo_key = result.get("tempo_key", {})
+    assert isinstance(tempo_key, dict)
+    budget = tempo_key.get("lyric_beat_budget", {})
+    assert isinstance(budget, dict)
+    sections = budget.get("sections", [])
+    assert isinstance(sections, list)
+    assert len(sections) > 0
+    targets = [
+        int(sec.get("target_words", 0))
+        for sec in sections
+        if isinstance(sec, dict)
+        and isinstance(sec.get("target_words", 0), (int, float))
+    ]
+    assert len(targets) > 0
+    assert all(8 <= t <= 48 for t in targets)

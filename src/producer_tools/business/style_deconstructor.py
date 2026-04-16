@@ -19,6 +19,22 @@ logger = logging.getLogger(__name__)
 TOOL_NAME = "style_deconstructor"
 
 
+def _compute_target_words(
+    bars: int,
+    beats_per_bar: int,
+    bpm: float,
+    avg_syllables_per_beat: float = 1.2,
+) -> int:
+    """Compute beat-aligned target words with bounded range."""
+    safe_bars = max(1, int(bars))
+    safe_beats = max(1, int(beats_per_bar))
+    safe_bpm = bpm if isinstance(bpm, (int, float)) and bpm > 0 else 100.0
+    raw = round(
+        safe_bars * safe_beats * (float(safe_bpm) / 60.0) * avg_syllables_per_beat
+    )
+    return max(8, min(48, int(raw)))
+
+
 def _is_demucs_available() -> bool:
     return (
         importlib.util.find_spec("demucs") is not None
@@ -58,14 +74,24 @@ def _is_librosa_available() -> bool:
 
 def _extract_tempo_key(input_path: Path) -> dict[str, object]:
     """Extract BPM, musical key, and song structure from audio."""
-    fallback_sections: list[dict[str, object]] = [
-        {"label": "verse", "bars": 4, "beats": 16, "target_words": 16},
-        {"label": "pre_chorus", "bars": 4, "beats": 16, "target_words": 16},
-        {"label": "chorus", "bars": 4, "beats": 16, "target_words": 16},
-        {"label": "verse", "bars": 4, "beats": 16, "target_words": 16},
-        {"label": "bridge", "bars": 4, "beats": 16, "target_words": 16},
-        {"label": "chorus", "bars": 4, "beats": 16, "target_words": 16},
-    ]
+    beats_per_bar = 4
+    fallback_bpm = 100.0
+    fallback_sections: list[dict[str, object]] = []
+    for lbl in ["verse", "pre_chorus", "chorus", "verse", "bridge", "chorus"]:
+        bars = 4
+        beats = bars * beats_per_bar
+        fallback_sections.append(
+            {
+                "label": lbl,
+                "bars": bars,
+                "beats": beats,
+                "target_words": _compute_target_words(
+                    bars=bars,
+                    beats_per_bar=beats_per_bar,
+                    bpm=fallback_bpm,
+                ),
+            }
+        )
 
     default: dict[str, object] = {
         "bpm": 0.0,
@@ -73,7 +99,8 @@ def _extract_tempo_key(input_path: Path) -> dict[str, object]:
         "scale": "major",
         "structure": [],
         "lyric_beat_budget": {
-            "beats_per_bar": 4,
+            "beats_per_bar": beats_per_bar,
+            "bpm": fallback_bpm,
             "total_beats": len(fallback_sections) * 16,
             "sections": fallback_sections,
         },
@@ -132,6 +159,7 @@ def _extract_tempo_key(input_path: Path) -> dict[str, object]:
             structure = []
 
         structure_sections = structure
+        bpm_for_budget = bpm_val if bpm_val > 0 else fallback_bpm
         total_beats = max(0, len(structure_sections) * 16)
         section_budgets: list[dict[str, object]] = []
         if structure_sections:
@@ -139,12 +167,18 @@ def _extract_tempo_key(input_path: Path) -> dict[str, object]:
                 if not isinstance(seg, dict):
                     continue
                 label = str(seg.get("label", "verse"))
+                bars = 4
+                beats = bars * beats_per_bar
                 section_budgets.append(
                     {
                         "label": label,
-                        "bars": 4,
-                        "beats": 16,
-                        "target_words": 16,
+                        "bars": bars,
+                        "beats": beats,
+                        "target_words": _compute_target_words(
+                            bars=bars,
+                            beats_per_bar=beats_per_bar,
+                            bpm=bpm_for_budget,
+                        ),
                     }
                 )
         else:
@@ -157,15 +191,21 @@ def _extract_tempo_key(input_path: Path) -> dict[str, object]:
                 "chorus",
             ]
             for lbl in fallback_labels:
+                bars = 4
+                beats = bars * beats_per_bar
                 section_budgets.append(
                     {
                         "label": lbl,
-                        "bars": 4,
-                        "beats": 16,
-                        "target_words": 16,
+                        "bars": bars,
+                        "beats": beats,
+                        "target_words": _compute_target_words(
+                            bars=bars,
+                            beats_per_bar=beats_per_bar,
+                            bpm=bpm_for_budget,
+                        ),
                     }
                 )
-            total_beats = len(section_budgets) * 16
+            total_beats = len(section_budgets) * beats_per_bar * 4
 
         return {
             "bpm": round(bpm_val, 1),
@@ -173,7 +213,8 @@ def _extract_tempo_key(input_path: Path) -> dict[str, object]:
             "scale": scale,
             "structure": structure_sections,
             "lyric_beat_budget": {
-                "beats_per_bar": 4,
+                "beats_per_bar": beats_per_bar,
+                "bpm": round(bpm_for_budget, 1),
                 "total_beats": total_beats,
                 "sections": section_budgets,
             },
