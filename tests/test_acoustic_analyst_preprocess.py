@@ -3,6 +3,8 @@ from __future__ import annotations
 import importlib
 import json
 import sys
+import types
+from types import ModuleType
 from pathlib import Path
 
 
@@ -13,12 +15,74 @@ sys.path.insert(0, str(SRC_ROOT))
 acoustic_analyst = importlib.import_module("producer_tools.business.acoustic_analyst")
 
 
+def test_parselmouth_selected_array_iterable_without_get_is_supported(
+    tmp_path: Path,
+) -> None:
+    sample_path = tmp_path / "voice.wav"
+    sample_path.write_bytes(b"fake")
+
+    class _FakePitch:
+        selected_array = [0.0, 120.0, 180.0, float("nan"), -5.0]
+
+    class _FakeFormant:
+        def get_value_at_time(self, idx: int, _: float) -> float:
+            return {1: 500.0, 2: 1500.0, 3: 2500.0}.get(idx, 0.0)
+
+    class _FakeIntensity:
+        values = [[40.0, 55.0, 52.0]]
+
+    class _FakeSound:
+        def __init__(self, _: str) -> None:
+            pass
+
+        def get_total_duration(self) -> float:
+            return 10.0
+
+        def to_pitch(self) -> _FakePitch:
+            return _FakePitch()
+
+        def to_formant_burg(self) -> _FakeFormant:
+            return _FakeFormant()
+
+        def to_intensity(self) -> _FakeIntensity:
+            return _FakeIntensity()
+
+    fake_module = ModuleType("parselmouth")
+    setattr(fake_module, "Sound", _FakeSound)
+    original_module = sys.modules.get("parselmouth")
+    sys.modules["parselmouth"] = fake_module
+    try:
+        features = acoustic_analyst._extract_parselmouth_features(sample_path)
+    finally:
+        if original_module is not None:
+            sys.modules["parselmouth"] = original_module
+        else:
+            del sys.modules["parselmouth"]
+
+    # _quantile uses nearest-index rounding strategy; for [120, 180] median resolves to 120.
+    assert features["f0"]["median"] == 120.0
+    assert features["f0"]["p10"] == 120.0
+    assert features["f0"]["p90"] == 180.0
+    assert features["formants"]["f2"] == 1500.0
+    assert features["dynamics"]["intensity_range"] == 15.0
+
+
 def test_missing_audio_path_returns_error() -> None:
     result = acoustic_analyst.run({"audio_path": "missing.wav"})
 
     assert result["ok"] is False
     assert result["error"] == "audio_not_found"
     assert Path(result["input_path"]).is_absolute()
+
+
+def test_legacy_dry_vocal_path_is_supported(tmp_path: Path) -> None:
+    sample_path = tmp_path / "legacy.wav"
+    sample_path.write_bytes(b"fake")
+
+    result = acoustic_analyst.run({"dry_vocal_path": str(sample_path)})
+
+    assert result["ok"] is True
+    assert result["input_path"] == str(sample_path.resolve())
 
 
 def test_demucs_unavailable_falls_back_to_input(tmp_path: Path) -> None:
@@ -100,6 +164,37 @@ def test_parselmouth_unavailable_falls_back_without_error(tmp_path: Path) -> Non
     assert result["parselmouth"]["available"] is False
     assert result["parselmouth"]["ran"] is False
     assert result["parselmouth"]["reason"] == "parselmouth_unavailable"
+
+
+def test_parselmouth_failure_uses_degraded_fallback(tmp_path: Path) -> None:
+    sample_path = tmp_path / "voice.wav"
+    sample_path.write_bytes(b"fake")
+
+    def _parselmouth_available() -> bool:
+        return True
+
+    def _raise_parselmouth_error(_: Path) -> dict[str, object]:
+        raise RuntimeError("mock_parselmouth_failure")
+
+    original_available = acoustic_analyst._is_parselmouth_available
+    original_extract = acoustic_analyst._extract_parselmouth_features
+    setattr(acoustic_analyst, "_is_parselmouth_available", _parselmouth_available)
+    setattr(acoustic_analyst, "_extract_parselmouth_features", _raise_parselmouth_error)
+    try:
+        result = acoustic_analyst.run(
+            {
+                "audio_path": str(sample_path),
+                "use_parselmouth": True,
+            }
+        )
+    finally:
+        setattr(acoustic_analyst, "_is_parselmouth_available", original_available)
+        setattr(acoustic_analyst, "_extract_parselmouth_features", original_extract)
+
+    assert result["ok"] is True
+    assert result["degraded"] is True
+    assert result["parselmouth"]["reason"] == "parselmouth_failed_fallback"
+    assert result["warnings"]
 
 
 def test_parselmouth_feature_extraction_records_metrics(tmp_path: Path) -> None:
@@ -320,3 +415,39 @@ def test_voice_profile_schema_output_and_write(tmp_path: Path) -> None:
 
     persisted = json.loads(profile_path.read_text(encoding="utf-8"))
     assert persisted["f0"]["absolute_high"] == 255.0
+
+
+def test_voice_profile_contains_all_prd_5_1_fields(tmp_path: Path) -> None:
+    sample_path = tmp_path / "voice.wav"
+    sample_path.write_bytes(b"fake")
+
+    result = acoustic_analyst.run({"audio_path": str(sample_path)})
+
+    assert result["ok"] is True
+    vp = result.get("voice_profile", {})
+    assert isinstance(vp, dict)
+
+    f0 = vp.get("f0", {})
+    assert isinstance(f0, dict)
+    for k in ["median", "p10", "p90", "comfort_range", "absolute_high"]:
+        assert k in f0
+    assert isinstance(f0["comfort_range"], list)
+    assert len(f0["comfort_range"]) == 2
+
+    formants = vp.get("formants", {})
+    assert isinstance(formants, dict)
+    for k in ["f1", "f2", "f3", "vowel_space_area", "brightness"]:
+        assert k in formants
+
+    timbre = vp.get("timbre", {})
+    assert isinstance(timbre, dict)
+    for k in ["hnr", "jitter", "shimmer", "breathiness", "roughness"]:
+        assert k in timbre
+
+    dynamics = vp.get("dynamics", {})
+    assert isinstance(dynamics, dict)
+    for k in ["intensity_range", "phrase_length"]:
+        assert k in dynamics
+
+    assert "embedding_clap" in vp
+    assert isinstance(vp["embedding_clap"], list)

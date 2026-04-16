@@ -71,10 +71,27 @@ def _extract_parselmouth_features(audio_path: Path) -> dict[str, object]:
     duration = _safe_float(sound.get_total_duration())
 
     pitch = sound.to_pitch()
+    selected_array = getattr(pitch, "selected_array", [])
+    selected_any: Any = selected_array
+    getter = getattr(selected_any, "get", None)
+    if callable(getter):
+        try:
+            raw_frequency_values: Any = getter("frequency", selected_any)
+        except Exception:
+            raw_frequency_values = selected_any
+    else:
+        raw_frequency_values = selected_any
+
+    if isinstance(raw_frequency_values, (str, bytes)):
+        frequency_candidates: list[Any] = []
+    else:
+        try:
+            frequency_candidates = list(raw_frequency_values)
+        except TypeError:
+            frequency_candidates = []
+
     frequencies = [
-        _safe_float(value)
-        for value in pitch.selected_array.get("frequency", [])
-        if _safe_float(value) > 0
+        _safe_float(value) for value in frequency_candidates if _safe_float(value) > 0
     ]
 
     formant = sound.to_formant_burg()
@@ -180,6 +197,96 @@ def _voice_profile_from_features(
     }
 
 
+def _normalize_voice_profile_schema(
+    voice_profile: dict[str, object],
+) -> tuple[dict[str, object], list[str]]:
+    """Normalize voice_profile to required PRD 5.1 schema."""
+    normalized = dict(voice_profile) if isinstance(voice_profile, dict) else {}
+    missing: list[str] = []
+
+    f0_raw = normalized.get("f0", {})
+    f0 = dict(f0_raw) if isinstance(f0_raw, dict) else {}
+    if "median" not in f0:
+        missing.append("f0.median")
+    if "p10" not in f0:
+        missing.append("f0.p10")
+    if "p90" not in f0:
+        missing.append("f0.p90")
+    if "comfort_range" not in f0:
+        missing.append("f0.comfort_range")
+    if "absolute_high" not in f0:
+        missing.append("f0.absolute_high")
+    f0_out = {
+        "median": _safe_float(f0.get("median", 0.0)),
+        "p10": _safe_float(f0.get("p10", 0.0)),
+        "p90": _safe_float(f0.get("p90", 0.0)),
+        "comfort_range": (
+            [
+                _safe_float(f0.get("comfort_range", [0.0, 0.0])[0]),
+                _safe_float(f0.get("comfort_range", [0.0, 0.0])[1]),
+            ]
+            if isinstance(f0.get("comfort_range"), list)
+            and len(f0.get("comfort_range", [])) >= 2
+            else [0.0, 0.0]
+        ),
+        "absolute_high": _safe_float(f0.get("absolute_high", 0.0)),
+    }
+
+    formants_raw = normalized.get("formants", {})
+    formants = dict(formants_raw) if isinstance(formants_raw, dict) else {}
+    for key in ["f1", "f2", "f3", "vowel_space_area", "brightness"]:
+        if key not in formants:
+            missing.append(f"formants.{key}")
+    formants_out = {
+        "f1": _safe_float(formants.get("f1", 0.0)),
+        "f2": _safe_float(formants.get("f2", 0.0)),
+        "f3": _safe_float(formants.get("f3", 0.0)),
+        "vowel_space_area": _safe_float(formants.get("vowel_space_area", 0.0)),
+        "brightness": _safe_float(formants.get("brightness", 0.0)),
+    }
+
+    timbre_raw = normalized.get("timbre", {})
+    timbre = dict(timbre_raw) if isinstance(timbre_raw, dict) else {}
+    for key in ["hnr", "jitter", "shimmer", "breathiness", "roughness"]:
+        if key not in timbre:
+            missing.append(f"timbre.{key}")
+    timbre_out = {
+        "hnr": _safe_float(timbre.get("hnr", 0.0)),
+        "jitter": _safe_float(timbre.get("jitter", 0.0)),
+        "shimmer": _safe_float(timbre.get("shimmer", 0.0)),
+        "breathiness": _safe_float(timbre.get("breathiness", 0.0)),
+        "roughness": _safe_float(timbre.get("roughness", 0.0)),
+    }
+
+    dynamics_raw = normalized.get("dynamics", {})
+    dynamics = dict(dynamics_raw) if isinstance(dynamics_raw, dict) else {}
+    for key in ["intensity_range", "phrase_length"]:
+        if key not in dynamics:
+            missing.append(f"dynamics.{key}")
+    dynamics_out = {
+        "intensity_range": _safe_float(dynamics.get("intensity_range", 0.0)),
+        "phrase_length": _safe_float(dynamics.get("phrase_length", 0.0)),
+    }
+
+    embedding_raw = normalized.get("embedding_clap", [])
+    if "embedding_clap" not in normalized:
+        missing.append("embedding_clap")
+    embedding_out: list[float] = (
+        [_safe_float(x) for x in embedding_raw]
+        if isinstance(embedding_raw, list)
+        else []
+    )
+
+    schema: dict[str, object] = {
+        "f0": f0_out,
+        "formants": formants_out,
+        "timbre": timbre_out,
+        "dynamics": dynamics_out,
+        "embedding_clap": embedding_out,
+    }
+    return schema, missing
+
+
 def _coerce_path(value: object) -> Path | None:
     if isinstance(value, Path):
         return value
@@ -190,7 +297,11 @@ def _coerce_path(value: object) -> Path | None:
 
 def run(payload: ToolPayload) -> ToolResult:
     """Execute minimal preprocessing for acoustic_analyst."""
+    # Backward-compatible key bridge:
+    # prefer audio_path, fallback to legacy dry_vocal_path.
     audio_path_value = payload.get("audio_path")
+    if audio_path_value is None:
+        audio_path_value = payload.get("dry_vocal_path")
     audio_path = _coerce_path(audio_path_value)
     input_path = audio_path.expanduser().resolve() if audio_path else None
 
@@ -306,18 +417,19 @@ def run(payload: ToolPayload) -> ToolResult:
                 parselmouth_meta["features"] = _extract_parselmouth_features(
                     preprocessed_path
                 )
-            except Exception:
-                parselmouth_meta["reason"] = "parselmouth_failed"
-                return {
-                    "ok": False,
-                    "error": "parselmouth_failed",
-                    "input_path": str(input_path),
-                    "preprocessed_path": str(preprocessed_path),
-                    "demucs": demucs_meta,
-                    "parselmouth": parselmouth_meta,
+            except Exception as exc:
+                # Non-fatal fallback: keep pipeline running with default profile.
+                parselmouth_meta["reason"] = "parselmouth_failed_fallback"
+                parselmouth_meta["warning"] = str(exc)
+                parselmouth_meta["features"] = {
+                    "f0": {"median": 0.0, "p10": 0.0, "p90": 0.0},
+                    "formants": {"f1": 0.0, "f2": 0.0, "f3": 0.0},
+                    "timbre": {"hnr": 0.0, "jitter": 0.0, "shimmer": 0.0},
+                    "dynamics": {"intensity_range": 0.0},
                 }
-            parselmouth_meta["ran"] = True
-            parselmouth_meta["reason"] = "parselmouth_ran"
+            else:
+                parselmouth_meta["ran"] = True
+                parselmouth_meta["reason"] = "parselmouth_ran"
 
     if bool(mfcc_meta["requested"]):
         available = _is_librosa_available()
@@ -383,6 +495,7 @@ def run(payload: ToolPayload) -> ToolResult:
     )
 
     voice_profile = _voice_profile_from_features(parselmouth_features, clap_embedding)
+    voice_profile, missing_fields = _normalize_voice_profile_schema(voice_profile)
 
     voice_profile_path_value = payload.get("voice_profile_path")
     voice_profile_path = _coerce_path(voice_profile_path_value)
@@ -397,6 +510,12 @@ def run(payload: ToolPayload) -> ToolResult:
             encoding="utf-8",
         )
 
+    degraded = (
+        str(parselmouth_meta.get("reason", "")).startswith("parselmouth_failed")
+        or str(mfcc_meta.get("reason", "")).endswith("_failed")
+        or str(clap_meta.get("reason", "")).endswith("_failed")
+    )
+
     return {
         "ok": True,
         "input_path": str(input_path),
@@ -409,4 +528,15 @@ def run(payload: ToolPayload) -> ToolResult:
         "voice_profile_path": (
             str(resolved_voice_profile_path) if resolved_voice_profile_path else ""
         ),
+        "degraded": degraded,
+        "warnings": [
+            value
+            for value in [
+                parselmouth_meta.get("warning"),
+                mfcc_meta.get("warning"),
+                clap_meta.get("warning"),
+            ]
+            if isinstance(value, str) and value
+        ],
+        "missing_profile_fields": missing_fields,
     }
