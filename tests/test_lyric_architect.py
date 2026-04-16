@@ -872,3 +872,73 @@ def test_generate_section_lines_handles_timeout_exception() -> None:
 
     assert result["ok"] is False
     assert result.get("error") in {"llm_error_timeout", "llm_generation_failed"}
+
+
+def test_derive_peak_positions_from_dna_returns_non_empty_for_outliers() -> None:
+    from src.producer_tools.business.lyric_architect import (
+        derive_peak_positions_from_dna,
+    )
+
+    reference_dna = {
+        "energy_curve": [
+            {"time": 0.0, "energy": 0.10},
+            {"time": 1.0, "energy": 0.12},
+            {"time": 2.0, "energy": 0.11},
+            {"time": 3.0, "energy": 1.20},
+            {"time": 4.0, "energy": 0.09},
+            {"time": 5.0, "energy": 0.11},
+        ]
+    }
+    positions = derive_peak_positions_from_dna(reference_dna, total_chars=120)
+    assert isinstance(positions, list)
+    assert len(positions) > 0
+
+
+def test_derive_long_note_positions_from_dna_handles_empty_curve() -> None:
+    from src.producer_tools.business.lyric_architect import (
+        derive_long_note_positions_from_dna,
+    )
+
+    positions = derive_long_note_positions_from_dna(
+        {"energy_curve": []}, total_chars=80
+    )
+    assert positions == []
+
+
+def test_run_derives_positions_from_energy_curve_without_explicit_payload() -> None:
+    from src.producer_tools.business.lyric_architect import run
+
+    def _adapter(prompt: dict[str, object]) -> dict[str, object]:
+        _ = prompt
+        return {
+            "lines": [
+                "一直一直一直一直一直一直一直一直",
+                "一直一直一直一直一直一直一直一直",
+            ]
+        }
+
+    result = run(
+        {
+            "intent": "现代感, 略带古风, 失恋但豁达",
+            "reference_dna": {
+                "structure": [{"label": "verse", "energy": 0.4}],
+                "energy_curve": [
+                    {"time": 0.0, "energy": 0.12},
+                    {"time": 1.0, "energy": 0.11},
+                    {"time": 2.0, "energy": 0.10},
+                    {"time": 3.0, "energy": 1.30},
+                    {"time": 4.0, "energy": 0.10},
+                    {"time": 5.0, "energy": 0.10},
+                ],
+            },
+            "use_llm": True,
+            "llm_adapter": _adapter,
+            "max_rewrite_iterations": 0,
+            "line_length_autofix": False,
+            "max_line_length": 32,
+            "chorus_max_line_length": 32,
+        }
+    )
+
+    assert result["ok"] is False
+    assert result.get("error") == "lyric_quality_gate_failed"

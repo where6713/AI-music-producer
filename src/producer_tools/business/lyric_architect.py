@@ -945,6 +945,71 @@ def check_tone_collision(
     }
 
 
+def derive_peak_positions_from_dna(
+    reference_dna: dict[str, object],
+    total_chars: int,
+) -> list[int]:
+    """Derive peak-note character positions from high-energy outliers."""
+    if total_chars <= 0:
+        return []
+
+    curve_raw = reference_dna.get("energy_curve", [])
+    curve = curve_raw if isinstance(curve_raw, list) else []
+    values: list[float] = []
+    for point in curve:
+        if isinstance(point, dict):
+            energy = point.get("energy")
+            if isinstance(energy, (int, float)):
+                values.append(float(energy))
+
+    if not values:
+        return []
+
+    mean_val = sum(values) / len(values)
+    variance = sum((x - mean_val) ** 2 for x in values) / len(values)
+    std_val = variance**0.5
+    threshold = mean_val + 1.5 * std_val
+
+    n = len(values)
+    out: list[int] = []
+    for idx, val in enumerate(values):
+        if val > threshold:
+            mapped = int(round((idx / max(1, n - 1)) * max(0, total_chars - 1)))
+            out.append(mapped)
+
+    return sorted(set(x for x in out if 0 <= x < total_chars))
+
+
+def derive_long_note_positions_from_dna(
+    reference_dna: dict[str, object],
+    total_chars: int,
+) -> list[int]:
+    """Derive long-note character positions from low-delta energy plateaus."""
+    if total_chars <= 0:
+        return []
+
+    curve_raw = reference_dna.get("energy_curve", [])
+    curve = curve_raw if isinstance(curve_raw, list) else []
+    values: list[float] = []
+    for point in curve:
+        if isinstance(point, dict):
+            energy = point.get("energy")
+            if isinstance(energy, (int, float)):
+                values.append(float(energy))
+
+    if len(values) < 2:
+        return []
+
+    n = len(values)
+    out: list[int] = []
+    for idx in range(1, n):
+        if abs(values[idx] - values[idx - 1]) < 0.05:
+            mapped = int(round((idx / max(1, n - 1)) * max(0, total_chars - 1)))
+            out.append(mapped)
+
+    return sorted(set(x for x in out if 0 <= x < total_chars))
+
+
 # === P07.05: Anti-Cliché Interceptor ===
 
 # Cliche blacklist based on PRD examples
@@ -1552,8 +1617,20 @@ def run(payload: ToolPayload) -> ToolResult:
             if isinstance(lines_val, list):
                 all_lines.extend(str(line) for line in lines_val)
 
-        vowel_result = check_vowel_openness(all_lines, peak_positions)
-        tone_result = check_tone_collision(all_lines, long_note_positions)
+        total_chars = sum(len(line) for line in all_lines)
+        effective_peak_positions = (
+            peak_positions
+            if peak_positions
+            else derive_peak_positions_from_dna(reference_dna, total_chars)
+        )
+        effective_long_note_positions = (
+            long_note_positions
+            if long_note_positions
+            else derive_long_note_positions_from_dna(reference_dna, total_chars)
+        )
+
+        vowel_result = check_vowel_openness(all_lines, effective_peak_positions)
+        tone_result = check_tone_collision(all_lines, effective_long_note_positions)
         cliche_result = check_anti_cliche(all_lines)
         anti_lexicon_result = check_anti_lexicon(all_lines, negative_lexicon)
         completeness_result = check_sentence_completeness(all_lines)
