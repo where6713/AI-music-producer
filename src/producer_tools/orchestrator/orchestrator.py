@@ -111,9 +111,11 @@ def _orchestrate_full_pipeline(
         "trace_id": trace_id,
         "intent": intent,
         "pipeline": [],
+        "warnings": [],
     }
 
     pipeline: list[dict[str, str]] = []
+    warnings: list[dict[str, str]] = []
     reference_dna_raw = payload.get("reference_dna", {})
     reference_dna: dict[str, object] = (
         reference_dna_raw if isinstance(reference_dna_raw, dict) else {}
@@ -405,7 +407,14 @@ def _orchestrate_full_pipeline(
             {
                 "step": "friction_calculator",
                 "status": "skipped",
-                "note": "Requires voice_profile and reference_dna",
+                "note": "friction_skipped_no_reference_dna: lyrics generated without style/friction constraints",
+            }
+        )
+        warnings.append(
+            {
+                "stage": "friction_calculator",
+                "severity": "warning",
+                "message": "friction_skipped_no_reference_dna",
             }
         )
 
@@ -523,7 +532,8 @@ def _orchestrate_full_pipeline(
     )
 
     results["pipeline"] = pipeline
-    results["status"] = "orchestrated"
+    results["warnings"] = warnings
+    results["status"] = "orchestrated_with_warnings" if warnings else "orchestrated"
     results["message"] = f"Pipeline orchestrated with trace_id={trace_id}"
 
     return results

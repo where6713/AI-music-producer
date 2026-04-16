@@ -320,6 +320,42 @@ class TestEndToEndFlow:
             assert hit and hit[0].get("status") == "skipped"
             assert hit[0].get("note") == "blocked_by_style_deconstructor_failure"
 
+    def test_orchestrate_adds_warning_when_friction_skipped_no_reference_dna(
+        self, tmp_path: Path
+    ) -> None:
+        """If reference_dna is absent, friction skip must emit warning and warning status."""
+        from src.producer_tools.orchestrator import orchestrator
+
+        voice_file = tmp_path / "voice_input.wav"
+        voice_file.write_bytes(b"RIFFtest")
+
+        result = orchestrator.run(
+            {
+                "intent": "现代感, 略带古风, 失恋但豁达",
+                "output_dir": str(tmp_path),
+                "voice_audio_path": str(voice_file),
+                "genre_seed": {"descriptors": ["neo-r&b", "oriental pop"]},
+                "corpus_sources": [_write_real_corpus_file(tmp_path)],
+                "llm_adapter": _good_adapter,
+            }
+        )
+
+        assert result.get("status") == "orchestrated_with_warnings"
+        warnings = result.get("warnings", [])
+        assert isinstance(warnings, list)
+        assert warnings
+        assert warnings[0].get("message") == "friction_skipped_no_reference_dna"
+
+        pipeline = result.get("pipeline", [])
+        assert isinstance(pipeline, list)
+        friction_steps = [s for s in pipeline if s.get("step") == "friction_calculator"]
+        assert friction_steps
+        assert friction_steps[0].get("status") == "skipped"
+        assert (
+            friction_steps[0].get("note")
+            == "friction_skipped_no_reference_dna: lyrics generated without style/friction constraints"
+        )
+
 
 class TestTraceIds:
     """Tests for trace ID generation and tracking."""
