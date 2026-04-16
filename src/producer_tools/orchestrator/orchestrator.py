@@ -15,7 +15,12 @@ from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from ..business import friction_calculator, lyric_architect, prompt_compiler
+from ..business import (
+    acoustic_analyst,
+    friction_calculator,
+    lyric_architect,
+    prompt_compiler,
+)
 from ..contracts import ToolPayload, ToolResult
 
 if TYPE_CHECKING:
@@ -122,12 +127,123 @@ def _orchestrate_full_pipeline(
     )
     require_real_corpus = bool(payload.get("require_real_corpus", True))
 
-    # Step 1: Acoustic Analyst (if voice provided)
+    # Step 1: Acoustic Analyst (MANDATORY)
+    voice_audio_value = payload.get("voice_audio_path")
+    if voice_audio_value is None:
+        voice_audio_value = payload.get("audio_path")
+    if voice_audio_value is None:
+        voice_audio_value = payload.get("dry_vocal_path")
+
+    voice_audio_path: Path | None = None
+    if isinstance(voice_audio_value, Path):
+        voice_audio_path = voice_audio_value.expanduser().resolve()
+    elif isinstance(voice_audio_value, str) and voice_audio_value.strip():
+        voice_audio_path = Path(voice_audio_value).expanduser().resolve()
+
+    if (
+        voice_audio_path is None
+        or not voice_audio_path.exists()
+        or not voice_audio_path.is_file()
+    ):
+        pipeline.append(
+            {
+                "step": "acoustic_analyst",
+                "status": "failed",
+                "note": "voice_audio_path_required",
+            }
+        )
+        pipeline.extend(
+            [
+                {
+                    "step": "style_deconstructor",
+                    "status": "skipped",
+                    "note": "blocked_by_acoustic_failure",
+                },
+                {
+                    "step": "friction_calculator",
+                    "status": "skipped",
+                    "note": "blocked_by_acoustic_failure",
+                },
+                {
+                    "step": "lyric_architect",
+                    "status": "skipped",
+                    "note": "blocked_by_acoustic_failure",
+                },
+                {
+                    "step": "prompt_compiler",
+                    "status": "skipped",
+                    "note": "blocked_by_acoustic_failure",
+                },
+                {
+                    "step": "post_processor",
+                    "status": "skipped",
+                    "note": "blocked_by_acoustic_failure",
+                },
+            ]
+        )
+        results["pipeline"] = pipeline
+        results["status"] = "failed"
+        results["message"] = "acoustic_analyst is mandatory and cannot be skipped"
+        return results
+
+    acoustic_result = acoustic_analyst.run(
+        {
+            "audio_path": str(voice_audio_path),
+            "use_parselmouth": True,
+            "voice_profile_path": str(output_dir / "voice_profile.json"),
+        }
+    )
+    if not acoustic_result.get("ok"):
+        pipeline.append(
+            {
+                "step": "acoustic_analyst",
+                "status": "failed",
+                "note": str(acoustic_result.get("error", "acoustic_failed")),
+            }
+        )
+        pipeline.extend(
+            [
+                {
+                    "step": "style_deconstructor",
+                    "status": "skipped",
+                    "note": "blocked_by_acoustic_failure",
+                },
+                {
+                    "step": "friction_calculator",
+                    "status": "skipped",
+                    "note": "blocked_by_acoustic_failure",
+                },
+                {
+                    "step": "lyric_architect",
+                    "status": "skipped",
+                    "note": "blocked_by_acoustic_failure",
+                },
+                {
+                    "step": "prompt_compiler",
+                    "status": "skipped",
+                    "note": "blocked_by_acoustic_failure",
+                },
+                {
+                    "step": "post_processor",
+                    "status": "skipped",
+                    "note": "blocked_by_acoustic_failure",
+                },
+            ]
+        )
+        results["pipeline"] = pipeline
+        results["status"] = "failed"
+        results["message"] = "acoustic_analyst failed; downstream pipeline blocked"
+        return results
+
+    profile_val = acoustic_result.get("voice_profile", {})
+    if isinstance(profile_val, dict):
+        voice_profile = profile_val
+
     pipeline.append(
         {
             "step": "acoustic_analyst",
-            "status": "skipped",
-            "note": "Requires voice input",
+            "status": "completed",
+            "note": "voice_profile generated",
         }
     )
 

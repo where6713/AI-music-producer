@@ -94,10 +94,14 @@ class TestEndToEndFlow:
         """Orchestrator should execute lyric+prompt steps when inputs are provided."""
         from src.producer_tools.orchestrator import orchestrator
 
+        voice_file = tmp_path / "voice_input.wav"
+        voice_file.write_bytes(b"RIFFtest")
+
         result = orchestrator.run(
             {
                 "intent": "现代感, 略带古风, 失恋但豁达",
                 "output_dir": str(tmp_path),
+                "voice_audio_path": str(voice_file),
                 "reference_dna": {
                     "key": "C#",
                     "scale": "minor",
@@ -127,10 +131,14 @@ class TestEndToEndFlow:
         """Orchestrator should write style/exclude slot files for Suno."""
         from src.producer_tools.orchestrator import orchestrator
 
+        voice_file = tmp_path / "voice_input.wav"
+        voice_file.write_bytes(b"RIFFtest")
+
         result = orchestrator.run(
             {
                 "intent": "现代感, 略带古风, 失恋但豁达",
                 "output_dir": str(tmp_path),
+                "voice_audio_path": str(voice_file),
                 "reference_dna": {
                     "key": "C#",
                     "scale": "minor",
@@ -162,6 +170,9 @@ class TestEndToEndFlow:
         """Prompt compiler should be skipped when lyric quality gate fails."""
         from src.producer_tools.orchestrator import orchestrator
 
+        voice_file = tmp_path / "voice_input.wav"
+        voice_file.write_bytes(b"RIFFtest")
+
         def _bad_adapter(prompt: dict[str, object]) -> dict[str, object]:
             _ = prompt
             return {"lines": ["霓虹碎成破碎感", "夜色继续漂浮"]}
@@ -170,6 +181,7 @@ class TestEndToEndFlow:
             {
                 "intent": "现代感, 略带古风, 失恋但豁达",
                 "output_dir": str(tmp_path),
+                "voice_audio_path": str(voice_file),
                 "reference_dna": {
                     "key": "C#",
                     "scale": "minor",
@@ -193,6 +205,50 @@ class TestEndToEndFlow:
         prompt_steps = [s for s in pipeline if s.get("step") == "prompt_compiler"]
         assert lyric_steps and lyric_steps[0].get("status") == "failed"
         assert prompt_steps and prompt_steps[0].get("status") == "skipped"
+
+    def test_orchestrate_fails_when_acoustic_input_missing(
+        self, tmp_path: Path
+    ) -> None:
+        """Acoustic stage is mandatory and cannot be skipped."""
+        from src.producer_tools.orchestrator import orchestrator
+
+        result = orchestrator.run(
+            {
+                "intent": "现代感, 略带古风, 失恋但豁达",
+                "output_dir": str(tmp_path),
+                "reference_dna": {
+                    "key": "C#",
+                    "scale": "minor",
+                    "tempo": 101.3,
+                    "structure": [{"index": 0, "label": "verse", "energy": 0.42}],
+                    "energy_curve": [{"time": 0.0, "energy": 0.35}],
+                    "instrumentation": {
+                        "vocals": {"presence": True, "role": "lead_vocal"},
+                        "bass": {"presence": True, "role": "foundation"},
+                    },
+                },
+                "genre_seed": {"descriptors": ["neo-r&b", "oriental pop"]},
+                "corpus_sources": [_write_real_corpus_file(tmp_path)],
+                "llm_adapter": _good_adapter,
+            }
+        )
+
+        assert result.get("status") == "failed"
+        pipeline = result.get("pipeline", [])
+        assert isinstance(pipeline, list)
+        assert pipeline[0].get("step") == "acoustic_analyst"
+        assert pipeline[0].get("status") == "failed"
+        assert pipeline[0].get("note") == "voice_audio_path_required"
+        for step_name in [
+            "style_deconstructor",
+            "friction_calculator",
+            "lyric_architect",
+            "prompt_compiler",
+            "post_processor",
+        ]:
+            hit = [s for s in pipeline if s.get("step") == step_name]
+            assert hit and hit[0].get("status") == "skipped"
+            assert hit[0].get("note") == "blocked_by_acoustic_failure"
 
 
 class TestTraceIds:
