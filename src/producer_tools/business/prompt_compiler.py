@@ -207,34 +207,72 @@ def compile_lyrics_field(
         else:
             lines.append("[Instrument: vocal, soft drums, synth pad]")
 
+        # Suno/MiniMax section tag mapping (PROD-3)
+        _SUNO_TAG_MAP = {
+            "verse 1": "[Verse]",
+            "verse 2": "[Verse]",
+            "verse": "[Verse]",
+            "pre-chorus": "[Pre-Chorus]",
+            "prechorus": "[Pre-Chorus]",
+            "chorus": "[Chorus]",
+            "final chorus": "[Chorus]",
+            "bridge": "[Bridge]",
+            "intro": "[Intro]",
+            "outro": "[Outro]",
+        }
+
+        # Breath/action tag injection rules (PROD-3)
+        # verse first line → [breath], prechorus last line → [inhale], bridge first → [sigh]
+        def _suno_tag(tag: str) -> str:
+            return _SUNO_TAG_MAP.get(tag.strip().lower(), f"[{tag}]")
+
+        is_first_section = True
+
         # Section content
-        for section in sections:
+        for sec_idx, section in enumerate(sections):
             if not isinstance(section, dict):
                 continue
 
             tag = section.get("tag", "Verse")
             section_lines = section.get("lines", [])
-
             if not isinstance(section_lines, list):
                 section_lines = []
 
-            # Add section header with mood
+            tag_lower = tag.strip().lower()
+            suno_header = _suno_tag(tag)
             mood = _get_mood_for_tag(tag)
-            lines.append(f"\n[{tag}] [{mood}]")
+
+            # Intro marker before first section
+            if is_first_section:
+                lines.append("\n[Intro]")
+                is_first_section = False
+
+            lines.append(f"\n{suno_header}")
+
+            # Pre-section breath action tag
+            if "verse" in tag_lower:
+                lines.append("[breath]")
+            elif "bridge" in tag_lower:
+                lines.append("[sigh]")
 
             # Add lyrics text
+            text_lines: list[str] = []
             for line_data in section_lines:
                 if isinstance(line_data, dict):
                     text = line_data.get("text", "")
                     if isinstance(text, str) and text:
-                        # Check for tone collision warnings (difficult syllable timing)
-                        warnings = line_data.get("warnings", [])
-                        if isinstance(warnings, list) and "tone_collision" in warnings:
-                            # Mark last character for timing adjustment
-                            text = text[:-1] + "~" + text[-1] if len(text) > 1 else text
-                        lines.append(text)
-                elif isinstance(line_data, str):
-                    lines.append(line_data)
+                        text_lines.append(text)
+                elif isinstance(line_data, str) and line_data:
+                    text_lines.append(line_data)
+
+            for t_idx, text in enumerate(text_lines):
+                lines.append(text)
+                # [inhale] after last line of pre-chorus (tension build)
+                if "pre" in tag_lower and t_idx == len(text_lines) - 1:
+                    lines.append("[inhale]")
+
+        # Outro marker at the end
+        lines.append("\n[Outro]")
 
         lyrics_text = "\n".join(lines)
 
@@ -352,10 +390,14 @@ def validate_prompt_semantics(
         violations.append("lyrics_missing_mood_tag")
     if "[Instrument:" not in lyrics_text:
         violations.append("lyrics_missing_instrument_tag")
-    if "[Verse 1]" not in lyrics_text:
+    if "[Verse]" not in lyrics_text and "[Verse 1]" not in lyrics_text:
         violations.append("lyrics_missing_verse1")
-    if "[Chorus" not in lyrics_text:
+    if "[Chorus]" not in lyrics_text and "[Chorus" not in lyrics_text:
         violations.append("lyrics_missing_chorus")
+    if "[breath]" not in lyrics_text:
+        violations.append("lyrics_missing_breath_tag")
+    if "[Outro]" not in lyrics_text:
+        violations.append("lyrics_missing_outro")
 
     if not exclude_text.strip():
         violations.append("exclude_missing")

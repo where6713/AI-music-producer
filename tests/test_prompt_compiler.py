@@ -159,7 +159,7 @@ class TestCompileLyricsField:
         result = compile_lyrics_field(lyrics, reference_dna)
 
         assert result["ok"] is True
-        assert "[Verse 1]" in result["lyrics"]
+        assert "[Verse]" in result["lyrics"]
         assert "[Chorus]" in result["lyrics"]
         assert "便利店玻璃映着我没换的衬衫" in result["lyrics"]
 

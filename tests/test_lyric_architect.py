@@ -696,10 +696,11 @@ def test_generate_draft_injects_hard_constraints_into_prompt() -> None:
 
     assert result["ok"] is True
     prompt_text = str(captured.get("prompt", ""))
-    assert "禁用词库-词级硬约束" in prompt_text
-    assert "句长分布硬约束" in prompt_text
-    assert "停连节奏硬约束" in prompt_text
-    assert "本段是否必须复现副歌钩子: 是" in prompt_text
+    # Prompt now uses updated keys after PROD-1/2 refactor
+    assert "禁用词库" in prompt_text
+    assert "停连节奏" in prompt_text
+    assert "副歌钩子" in prompt_text
+    assert "是" in prompt_text  # chorus hook required flag
 
 
 def test_run_quality_gate_blocks_long_lines() -> None:

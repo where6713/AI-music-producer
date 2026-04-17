@@ -656,6 +656,53 @@ def _build_reference_hard_constraints(
     }
 
 
+def _load_pop_grid(tag: str) -> list[int] | None:
+    """Load a line-length grid from chinese_pop_grids.json for the given section tag."""
+    import random
+
+    grids_path = Path(__file__).parent.parent.parent.parent / "data" / "chinese_pop_grids.json"
+    try:
+        data = json.loads(grids_path.read_text(encoding="utf-8"))
+        tag_map: dict[str, str] = data.get("tag_map", {})
+        grids: dict[str, list[list[int]]] = data.get("grids", {})
+        grid_key = tag_map.get(tag.strip().lower(), "")
+        if not grid_key:
+            # fallback by keyword
+            tl = tag.strip().lower()
+            if "chorus" in tl:
+                grid_key = "chorus_hook"
+            elif "bridge" in tl:
+                grid_key = "bridge"
+            elif "pre" in tl:
+                grid_key = "prechorus"
+            else:
+                grid_key = "verse_reflective"
+        options = grids.get(grid_key, [])
+        if options:
+            return random.choice(options)
+    except Exception:
+        pass
+    return None
+
+
+def _load_montage_nouns(n: int = 5) -> list[str]:
+    """Sample n concrete nouns from visual_montage_nouns.json."""
+    import random
+
+    nouns_path = Path(__file__).parent.parent.parent.parent / "data" / "visual_montage_nouns.json"
+    try:
+        data = json.loads(nouns_path.read_text(encoding="utf-8"))
+        categories: dict[str, list[str]] = data.get("categories", {})
+        pool: list[str] = []
+        for words in categories.values():
+            pool.extend(words)
+        if pool:
+            return random.sample(pool, min(n, len(pool)))
+    except Exception:
+        pass
+    return []
+
+
 def _generate_section_lines_with_llm(
     adapter_callable: object,
     tag: str,
@@ -674,7 +721,10 @@ def _generate_section_lines_with_llm(
     sentence_lengths = reference_constraints.get("sentence_length_distribution", [])
     pause_rhythm = reference_constraints.get("pause_rhythm", [])
     chorus_hook = str(reference_constraints.get("chorus_hook", "")).strip()
-    chorus_required = "chorus" in tag.strip().lower()
+    tag_lower = tag.strip().lower()
+    chorus_required = "chorus" in tag_lower
+    is_verse = "verse" in tag_lower
+    is_chorus = chorus_required
 
     forbidden_terms_sorted = sorted(
         x for x in forbidden_terms if isinstance(x, str) and x
@@ -687,33 +737,60 @@ def _generate_section_lines_with_llm(
         x for x in (str(line).strip() for line in corpus_lines[:5]) if x
     )
 
+    # PROD-1: load rhythm grid — forces varied line lengths
+    pop_grid = _load_pop_grid(tag)
+    grid_str = str(pop_grid) if pop_grid else str(sentence_lengths)
+    line_count = len(pop_grid) if pop_grid else max(3, min(6, word_count // 10))
+
+    # PROD-2: section-specific writing rules
+    if is_verse:
+        montage_nouns = _load_montage_nouns(6)
+        nouns_str = "、".join(montage_nouns) if montage_nouns else "地铁、便利店、手机屏、窗台、钥匙、外卖袋"
+        section_rules = (
+            "【主歌写法（Verse）】\n"
+            f"  - 必须从以下具象名词中选取至少3个融入歌词: {nouns_str}\n"
+            "  - 句子是观察性陈述，写行为和物件，不是直接抒情\n"
+            "  - 禁止出现情绪形容词（失落/难过/释怀/心碎），只写看得见的动作和场景\n"
+            "  - 语气口语化，像在自言自语\n"
+        )
+    elif is_chorus:
+        section_rules = (
+            "【副歌写法（Chorus）】\n"
+            "  - 必须包含1句核心Hook，这句话是全曲最强记忆点，需在本段重复出现（允许轻微变体）\n"
+            "  - 每行句尾最后一个字必须是开口音字，韵母含 a/ai/ao/an/ang，例如：花/来/跑/散/忘/开/找/站/烫\n"
+            "  - 绝对禁止句尾以 了/啊/吗/呢/吧/啦 结尾\n"
+            "  - 情绪是爆发与释放，不是叙述\n"
+            "  - 句子比主歌更短、更有力、更易记\n"
+        )
+    else:
+        section_rules = (
+            "【过渡段写法】\n"
+            "  - 字数必须出现明显变化，制造紧张或转折感\n"
+            "  - 语气可以比主歌更急促或更克制\n"
+        )
+
     prompt = {
         "prompt": (
-            "你是中文流行歌词写作助手。"
-            "请按给定段落写2-6行歌词，避免套话和重复，保证因果连贯与可唱性。"
-            "语气现代、可带轻微古风，情绪是失恋但豁达。\n"
+            "你是中文流行歌词写作助手，专门为 AI 音乐引擎（Suno/MiniMax）生成可唱性强的歌词。\n"
             f"段落: {tag}\n"
             f"情绪弧线: {emotional_arc}\n"
-            f"目标字数(近似): {word_count}\n"
             f"用户意图: {intent}\n"
-            f"模板ID(唯一事实源): {template_id}\n"
-            f"模板章节骨架(只读): {template_sections}\n"
-            f"模板句长分布(只读): {template_line_lengths}\n"
-            f"语料片段参考(只读): {corpus_preview}\n"
-            f"禁用词库-词级硬约束: {lexical_ban}\n"
-            "禁用句式-句式级硬约束: 你像X我像Y、如果...就好了、把抽象词当主语、连续两行同模板。\n"
-            "禁用语义-语义级硬约束: 不允许空泛鸡汤、命运论、无场景抒情、无因果跳跃。\n"
-            f"句长分布硬约束: {sentence_lengths}\n"
+            "\n"
+            "【节奏律动约束 - 最高优先级】\n"
+            f"  必须严格按照以下字数模板逐行输出，共 {line_count} 行，每行字数按顺序: {grid_str}\n"
+            "  字数偏差不超过1字。绝对禁止相邻两行字数完全一致（排比句直接判失败）。\n"
+            "  字数少的行（<=6字）是切分句，字数多的行（>=9字）是延伸句，两者必须交错出现。\n"
+            "\n"
+            + section_rules
+            + "\n"
             f"停连节奏硬约束: {pause_rhythm}\n"
             f"副歌钩子: {chorus_hook}\n"
             f"本段是否必须复现副歌钩子: {'是' if chorus_required else '否'}\n"
-            "必须满足:\n"
-            "1) 每行长度贴合 sentence_length_distribution；\n"
-            "2) 行内停连遵循 pause_rhythm；\n"
-            "3) 若本段是 Chorus/Final Chorus，则必须复现 chorus_hook（允许轻微变体但核心意象不变）；\n"
-            "4) 禁止出现禁用词，禁止逻辑跳跃和乱比喻。\n"
-            "5) 所有行必须是具体场景，不得只写抽象情绪词。\n"
-            "6) 不允许新增/删除模板章节，不允许改写模板骨架与句长规则。\n"
+            f"禁用词库: {lexical_ban}\n"
+            "禁用句式: 你像X我像Y、如果...就好了、把抽象词当主语。\n"
+            "禁用语义: 不允许空泛鸡汤、命运论、无场景抒情。\n"
+            "所有行必须是具体场景，不得只写抽象情绪词。\n"
+            f"语料参考(只读): {corpus_preview}\n"
             '输出JSON: {"lines": ["...", "..."]}'
         )
     }
@@ -1704,12 +1781,29 @@ def run(payload: ToolPayload) -> ToolResult:
             line_length_result.get("pass", True)
         )
 
+        # PROD-4: check groove within loop so monotone output triggers rewrite
+        import statistics as _stats_loop
+
+        _monotone_now: list[str] = []
+        for _s in draft_sections:
+            if not isinstance(_s, dict):
+                continue
+            _sl = [
+                str(l.get("text", "") if isinstance(l, dict) else l)
+                for l in _s.get("lines", [])
+            ]
+            _ll = [len(t) for t in _sl if t]
+            if len(_ll) >= 3 and _stats_loop.variance(_ll) < 1.0:
+                _monotone_now.append(str(_s.get("tag", "")))
+        needs_groove_fix = len(_monotone_now) > 0
+
         if not (
             needs_vowel_fix
             or needs_cliche_fix
             or needs_anti_lexicon_fix
             or needs_completeness_fix
             or needs_line_length_fix
+            or needs_groove_fix
         ):
             break
         if attempt >= max_rewrite_iterations:
@@ -1742,6 +1836,12 @@ def run(payload: ToolPayload) -> ToolResult:
             )
             + "\n- 禁用词："
             + "、".join(sorted(negative_lexicon))
+            + (
+                "\n- 上次产出字数过于均一（排比句），本次必须严格按字数模板生成长短句，"
+                "相邻行字数差必须 >=2，整段方差必须 >4。"
+                if needs_groove_fix
+                else ""
+            )
         )
 
     # Build warnings list
@@ -1880,13 +1980,31 @@ def run(payload: ToolPayload) -> ToolResult:
         except OSError:
             pass
 
+    # PROD-4: sentence length variance gate — reject monotone/排比 output
+    import statistics as _stats
+
+    monotone_sections: list[str] = []
+    for _sec in draft_sections:
+        if not isinstance(_sec, dict):
+            continue
+        _sec_lines = [
+            str(l.get("text", "") if isinstance(l, dict) else l)
+            for l in _sec.get("lines", [])
+        ]
+        _lens = [len(t) for t in _sec_lines if t]
+        if len(_lens) >= 3 and _stats.variance(_lens) < 1.0:
+            monotone_sections.append(str(_sec.get("tag", "")))
+
+    groove_gate_pass = len(monotone_sections) == 0
+
     quality_gate = {
         "pass": bool(vowel_result.get("pass", True))
         and bool(tone_result.get("pass", True))
         and bool(cliche_result.get("pass", True))
         and bool(anti_lexicon_result.get("pass", True))
         and bool(completeness_result.get("pass", True))
-        and bool(line_length_result.get("pass", True)),
+        and bool(line_length_result.get("pass", True))
+        and groove_gate_pass,
         "anti_lexicon_hits": anti_lexicon_result.get("hits", []),
         "sentence_completeness_violations": completeness_violations,
         "line_length_violations": length_violations,
@@ -1895,6 +2013,8 @@ def run(payload: ToolPayload) -> ToolResult:
         "autofix_mode": "llm_rewrite"
         if callable(resolved_adapter)
         else "deterministic_clip",
+        "groove_gate_pass": groove_gate_pass,
+        "monotone_sections": monotone_sections,
     }
 
     if not bool(quality_gate.get("pass", False)):
