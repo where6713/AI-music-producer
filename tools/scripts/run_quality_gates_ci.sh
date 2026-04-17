@@ -39,10 +39,10 @@ if [ -n "$root_files" ]; then
   fi
 fi
 
-# 4) light secret scan
-if git grep -nE '(AKIA[0-9A-Z]{16}|BEGIN[[:space:]]+PRIVATE[[:space:]]+KEY|api[_-]?key[[:space:]]*[:=][[:space:]]*["'"'"'"'"'"'][^"'"'"'"'"'"']+["'"'"'"'"'"'])' -- . >/dev/null 2>&1; then
+# 4) light secret scan (exclude *.md — docs may contain pattern examples as documentation)
+if git grep -nE '(AKIA[0-9A-Z]{16}|BEGIN[[:space:]]+PRIVATE[[:space:]]+KEY|api[_-]?key[[:space:]]*[:=][[:space:]]*["'"'"'"'"'"'][^"'"'"'"'"'"']+["'"'"'"'"'"'])' -- . ':!*.md' >/dev/null 2>&1; then
   echo "[ci-gates][BLOCK] potential secrets detected in tracked files."
-  git grep -nE '(AKIA[0-9A-Z]{16}|BEGIN[[:space:]]+PRIVATE[[:space:]]+KEY|api[_-]?key[[:space:]]*[:=][[:space:]]*["'"'"'"'"'"'][^"'"'"'"'"'"']+["'"'"'"'"'"'])' -- . || true
+  git grep -nE '(AKIA[0-9A-Z]{16}|BEGIN[[:space:]]+PRIVATE[[:space:]]+KEY|api[_-]?key[[:space:]]*[:=][[:space:]]*["'"'"'"'"'"'][^"'"'"'"'"'"']+["'"'"'"'"'"'])' -- . ':!*.md' || true
   exit 1
 fi
 
