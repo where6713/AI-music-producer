@@ -1,5 +1,7 @@
 from pathlib import Path
 import json
+import os
+import sys
 
 import click
 import typer
@@ -12,6 +14,36 @@ app = typer.Typer(
     rich_markup_mode=None,
     context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
 )
+
+
+def _ensure_utf8_output() -> None:
+    stdout_reconf = getattr(sys.stdout, "reconfigure", None)
+    if callable(stdout_reconf):
+        try:
+            stdout_reconf(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+    stderr_reconf = getattr(sys.stderr, "reconfigure", None)
+    if callable(stderr_reconf):
+        try:
+            stderr_reconf(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+
+
+def _load_dotenv_if_exists() -> None:
+    dotenv_path = Path.cwd() / ".env"
+    if not dotenv_path.exists():
+        return
+    for line in dotenv_path.read_text(encoding="utf-8", errors="ignore").splitlines():
+        raw = line.strip()
+        if not raw or raw.startswith("#") or "=" not in raw:
+            continue
+        key, value = raw.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        if key and key not in os.environ:
+            os.environ[key] = value
 
 
 @app.callback()
@@ -139,6 +171,8 @@ def produce(
 
 
 def main() -> None:
+    _ensure_utf8_output()
+    _load_dotenv_if_exists()
     app()
 
 

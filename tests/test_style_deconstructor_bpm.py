@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import importlib
 import sys
+import types
 from pathlib import Path
+
+import numpy as np
 
 SRC_ROOT = Path(__file__).resolve().parents[1] / "src"
 sys.path.insert(0, str(SRC_ROOT))
@@ -154,3 +157,38 @@ def test_tempo_key_budget_targets_not_hardcoded_to_16(tmp_path: Path) -> None:
     ]
     assert len(targets) > 0
     assert all(8 <= t <= 48 for t in targets)
+
+
+def test_load_audio_mono_prefers_soundfile_and_downmixes_stereo(tmp_path: Path) -> None:
+    """_load_audio_mono should use soundfile and downmix stereo arrays."""
+    sample = tmp_path / "sample.wav"
+    sample.write_bytes(b"fake")
+
+    fake_sf = types.SimpleNamespace(
+        read=lambda *_args, **_kwargs: (
+            np.array([[0.1, -0.1], [0.2, -0.2]], dtype=np.float32),
+            16000,
+        )
+    )
+    original_sf = sys.modules.get("soundfile")
+    sys.modules["soundfile"] = fake_sf
+
+    import librosa
+
+    original_load = librosa.load
+    librosa.load = lambda *_args, **_kwargs: (_ for _ in ()).throw(
+        AssertionError("librosa.load should not be called when soundfile works")
+    )
+
+    try:
+        y, sr = style_deconstructor._load_audio_mono(sample)
+    finally:
+        librosa.load = original_load
+        if original_sf is not None:
+            sys.modules["soundfile"] = original_sf
+        else:
+            del sys.modules["soundfile"]
+
+    assert isinstance(y, np.ndarray)
+    assert y.ndim == 1
+    assert sr == 16000

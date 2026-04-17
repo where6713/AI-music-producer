@@ -557,6 +557,13 @@ def run(payload: ToolPayload) -> ToolResult:
             - pipeline: List of pipeline steps and their status
             - status: Overall pipeline status
     """
+    try:
+        from dotenv import load_dotenv  # type: ignore[import-untyped]
+
+        load_dotenv(override=False)
+    except Exception:
+        pass
+
     intent = _validate_intent(payload)
     output_dir = _get_output_dir(payload)
 
