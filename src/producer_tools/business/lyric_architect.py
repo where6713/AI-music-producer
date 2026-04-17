@@ -986,7 +986,7 @@ def derive_long_note_positions_from_dna(
     reference_dna: dict[str, object],
     total_chars: int,
 ) -> list[int]:
-    """Derive long-note character positions from low-delta energy plateaus."""
+    """Derive long-note positions by selecting one minimum per 8-beat window."""
     if total_chars <= 0:
         return []
 
@@ -999,15 +999,21 @@ def derive_long_note_positions_from_dna(
             if isinstance(energy, (int, float)):
                 values.append(float(energy))
 
-    if len(values) < 2:
+    if len(values) < 1:
         return []
 
     n = len(values)
     out: list[int] = []
-    for idx in range(1, n):
-        if abs(values[idx] - values[idx - 1]) < 0.05:
-            mapped = int(round((idx / max(1, n - 1)) * max(0, total_chars - 1)))
-            out.append(mapped)
+
+    beats_window = 8
+    for start in range(0, n, beats_window):
+        segment = values[start : start + beats_window]
+        if not segment:
+            continue
+        local_min_idx = min(range(len(segment)), key=lambda i: segment[i])
+        global_idx = start + local_min_idx
+        mapped = int(round((global_idx / max(1, n - 1)) * max(0, total_chars - 1)))
+        out.append(mapped)
 
     return sorted(set(x for x in out if 0 <= x < total_chars))
 
@@ -1288,7 +1294,6 @@ def check_sentence_completeness(lyrics: list[str]) -> dict[str, object]:
 
     bad_suffixes = {
         "的",
-        "了",
         "着",
         "把",
         "被",
@@ -1302,11 +1307,6 @@ def check_sentence_completeness(lyrics: list[str]) -> dict[str, object]:
         "都",
         "又",
         "也",
-        "吗",
-        "呢",
-        "吧",
-        "呀",
-        "啊",
         "在",
         "到",
         "向",
@@ -1398,8 +1398,9 @@ def apply_line_length_autofix(
                 if isinstance(llm_rewritten, str) and llm_rewritten:
                     shortened = llm_rewritten
                 else:
-                    # Last resort deterministic clip; better than overflow but less preferred.
-                    shortened = _shorten_line_to_limit(line, limit)
+                    # Do NOT hard-clip residual sentence fragments.
+                    # Keep original overlong line and let quality_gate trigger rewrite/fail.
+                    shortened = line
             if shortened != line:
                 changed += 1
             new_lines.append(shortened)
@@ -1427,6 +1428,13 @@ def run(payload: ToolPayload) -> ToolResult:
     Returns:
         dict with ok, lyrics (meta/sections/warnings/stats)
     """
+    try:
+        from dotenv import load_dotenv  # type: ignore[import-untyped]
+
+        load_dotenv(override=False)
+    except Exception:
+        pass
+
     intent_val = payload.get("intent", "")
     intent = str(intent_val) if isinstance(intent_val, str) else ""
     reference_dna_val = payload.get("reference_dna", {})
@@ -1570,12 +1578,12 @@ def run(payload: ToolPayload) -> ToolResult:
         and int(max_line_length_raw) > 0
         else 14
     )
-    chorus_max_line_length_raw = payload.get("chorus_max_line_length", 10)
+    chorus_max_line_length_raw = payload.get("chorus_max_line_length", 12)
     chorus_max_line_length = (
         int(chorus_max_line_length_raw)
         if isinstance(chorus_max_line_length_raw, (int, float))
         and int(chorus_max_line_length_raw) > 0
-        else 10
+        else 12
     )
     line_length_result: dict[str, object] = {
         "ok": True,

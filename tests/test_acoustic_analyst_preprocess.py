@@ -451,3 +451,30 @@ def test_voice_profile_contains_all_prd_5_1_fields(tmp_path: Path) -> None:
 
     assert "embedding_clap" in vp
     assert isinstance(vp["embedding_clap"], list)
+
+
+def test_acoustic_run_loads_dotenv_when_available(tmp_path: Path) -> None:
+    sample_path = tmp_path / "voice.wav"
+    sample_path.write_bytes(b"fake")
+
+    calls: list[bool] = []
+    fake = ModuleType("dotenv")
+
+    def _fake_load_dotenv(*, override: bool = False) -> bool:
+        calls.append(override)
+        return True
+
+    setattr(fake, "load_dotenv", _fake_load_dotenv)
+    original = sys.modules.get("dotenv")
+    sys.modules["dotenv"] = fake
+    try:
+        result = acoustic_analyst.run({"audio_path": str(sample_path)})
+    finally:
+        if original is not None:
+            sys.modules["dotenv"] = original
+        else:
+            del sys.modules["dotenv"]
+
+    assert result["ok"] is True
+    assert calls
+    assert calls[0] is False

@@ -378,6 +378,13 @@ def run(payload: ToolPayload) -> ToolResult:
     Returns:
         dict with ok, style, lyrics, exclude, compile_log
     """
+    try:
+        from dotenv import load_dotenv  # type: ignore[import-untyped]
+
+        load_dotenv(override=False)
+    except Exception:
+        pass
+
     # Skeleton check
     if payload.get("_skeleton"):
         raise NotImplementedError("prompt_compiler tool skeleton")
