@@ -15,21 +15,21 @@ else
 fi
 
 # 1) block tracked audio binaries
-if git ls-files | grep -Eiq '\.(wav|mp3|flac|ogg|aac|m4a)$'; then
+if git -c core.quotePath=false ls-files | grep -Eiq '\.(wav|mp3|flac|ogg|aac|m4a)$'; then
   echo "[ci-gates][BLOCK] tracked audio binaries detected (PRD hygiene rule)."
-  git ls-files | grep -Ei '\.(wav|mp3|flac|ogg|aac|m4a)$' || true
+  git -c core.quotePath=false ls-files | grep -Ei '\.(wav|mp3|flac|ogg|aac|m4a)$' || true
   exit 1
 fi
 
 # 2) block fuzzy script naming (RULE-13)
-if git ls-files | grep -Eiq '(^|/)(temp|new|utils|helper)\.(ps1|sh|py|js|ts)$'; then
+if git -c core.quotePath=false ls-files | grep -Eiq '(^|/)(temp|new|utils|helper)\.(ps1|sh|py|js|ts)$'; then
   echo "[ci-gates][BLOCK] fuzzy script naming detected (temp/new/utils/helper)."
-  git ls-files | grep -Ei '(^|/)(temp|new|utils|helper)\.(ps1|sh|py|js|ts)$' || true
+  git -c core.quotePath=false ls-files | grep -Ei '(^|/)(temp|new|utils|helper)\.(ps1|sh|py|js|ts)$' || true
   exit 1
 fi
 
 # 3) root clutter guard (RULE-15)
-root_files="$(git ls-files | grep -E '^[^/]+$' || true)"
+root_files="$(git -c core.quotePath=false ls-files | grep -E '^[^/]+$' || true)"
 if [ -n "$root_files" ]; then
   disallowed_root="$(printf '%s\n' "$root_files" | grep -Ev '^(AI-music-producer PRD_v1\.1\.md|one law\.md|开发清单\.md|目录框架规范\.md|README\.md|LICENSE|CHANGELOG\.md|\.gitignore)$' || true)"
   if [ -n "$disallowed_root" ]; then
