@@ -2,11 +2,11 @@
   "ok": true,
   "lyrics": {
     "meta": {
-      "intent": "Late-night station reunion with controlled heartbreak",
-      "structure_ref": "auto-generated",
+      "intent": "失恋后地铁站重逢，情绪克制但副歌有反弹",
+      "structure_ref": "evidence_pack_sample_A",
       "iterations": {
         "draft": 1,
-        "vowel_fix": 0,
+        "vowel_fix": 1,
         "cliche_fix": 0,
         "line_length_fix": 0,
         "line_length_autofix": 0
@@ -17,35 +17,35 @@
         "tag": "Verse 1",
         "lines": [
           {
-            "text": "Platform lights fade while your name stays on the glass",
-            "pinyin": "",
-            "final_vowel": "",
-            "openness": "unknown",
-            "tone_pattern": "",
+            "text": "站台灯暗后我把旧票折进衣袋",
+            "pinyin": "zhan tai deng an hou wo ba jiu piao zhe jin yi dai",
+            "final_vowel": "ai",
+            "openness": "open",
+            "tone_pattern": "4-2-1-4-4-3-4-4-2-4-4",
             "cliche_hits": []
           },
           {
-            "text": "I fold the unfinished sentence into an old paper ticket",
-            "pinyin": "",
-            "final_vowel": "",
-            "openness": "unknown",
-            "tone_pattern": "",
+            "text": "风停在袖口我学会慢慢松开",
+            "pinyin": "feng ting zai xiu kou wo xue hui man man song kai",
+            "final_vowel": "ai",
+            "openness": "open",
+            "tone_pattern": "1-2-4-4-3-3-2-4-4-4-1-1",
             "cliche_hits": []
           },
           {
-            "text": "After the crowd leaves, my pulse finally slows down",
-            "pinyin": "",
-            "final_vowel": "",
-            "openness": "unknown",
-            "tone_pattern": "",
+            "text": "人潮退场后心跳终于稳下来",
+            "pinyin": "ren chao tui chang hou xin tiao zhong yu wen xia lai",
+            "final_vowel": "ai",
+            "openness": "open",
+            "tone_pattern": "2-2-4-3-4-1-4-1-1-2-3-4-2",
             "cliche_hits": []
           },
           {
-            "text": "When I look up, I learn to release regret",
-            "pinyin": "",
-            "final_vowel": "",
-            "openness": "unknown",
-            "tone_pattern": "",
+            "text": "抬头那秒我把遗憾轻轻放开",
+            "pinyin": "tai tou na miao wo ba yi han qing qing fang kai",
+            "final_vowel": "ai",
+            "openness": "open",
+            "tone_pattern": "2-2-4-3-3-3-2-4-1-1-4-1",
             "cliche_hits": []
           }
         ]
@@ -54,35 +54,19 @@
         "tag": "Pre-Chorus",
         "lines": [
           {
-            "text": "Platform lights fade while your name stays on the glass",
-            "pinyin": "",
-            "final_vowel": "",
-            "openness": "unknown",
-            "tone_pattern": "",
+            "text": "[breath] 月台回声把旧答案推回来",
+            "pinyin": "yue tai hui sheng ba jiu da an tui hui lai",
+            "final_vowel": "ai",
+            "openness": "open",
+            "tone_pattern": "4-2-2-1-3-4-4-4-1-2-2",
             "cliche_hits": []
           },
           {
-            "text": "I fold the unfinished sentence into an old paper ticket",
-            "pinyin": "",
-            "final_vowel": "",
-            "openness": "unknown",
-            "tone_pattern": "",
-            "cliche_hits": []
-          },
-          {
-            "text": "After the crowd leaves, my pulse finally slows down",
-            "pinyin": "",
-            "final_vowel": "",
-            "openness": "unknown",
-            "tone_pattern": "",
-            "cliche_hits": []
-          },
-          {
-            "text": "When I look up, I learn to release regret",
-            "pinyin": "",
-            "final_vowel": "",
-            "openness": "unknown",
-            "tone_pattern": "",
+            "text": "我不再追问谁该先说离开 [inhale]",
+            "pinyin": "wo bu zai zhui wen shui gai xian shuo li kai",
+            "final_vowel": "ai",
+            "openness": "open",
+            "tone_pattern": "3-4-4-1-4-2-1-1-1-2-1",
             "cliche_hits": []
           }
         ]
@@ -91,164 +75,43 @@
         "tag": "Chorus",
         "lines": [
           {
-            "text": "Platform lights fade while your name stays on the glass",
-            "pinyin": "",
-            "final_vowel": "",
-            "openness": "unknown",
-            "tone_pattern": "",
+            "text": "把夜推开把心口大声点亮",
+            "pinyin": "ba ye tui kai ba xin kou da sheng dian liang",
+            "final_vowel": "ang",
+            "openness": "open",
+            "tone_pattern": "3-4-1-1-3-1-3-4-1-4",
             "cliche_hits": []
           },
           {
-            "text": "I fold the unfinished sentence into an old paper ticket",
-            "pinyin": "",
-            "final_vowel": "",
-            "openness": "unknown",
-            "tone_pattern": "",
+            "text": "让昨天散场把明天唱到天亮",
+            "pinyin": "rang zuo tian san chang ba ming tian chang dao tian liang",
+            "final_vowel": "ang",
+            "openness": "open",
+            "tone_pattern": "4-2-1-3-3-3-2-1-4-1-4",
             "cliche_hits": []
           },
           {
-            "text": "After the crowd leaves, my pulse finally slows down",
-            "pinyin": "",
-            "final_vowel": "",
-            "openness": "unknown",
-            "tone_pattern": "",
-            "cliche_hits": []
-          },
-          {
-            "text": "When I look up, I learn to release regret",
-            "pinyin": "",
-            "final_vowel": "",
-            "openness": "unknown",
-            "tone_pattern": "",
-            "cliche_hits": []
-          }
-        ]
-      },
-      {
-        "tag": "Verse 2",
-        "lines": [
-          {
-            "text": "Platform lights fade while your name stays on the glass",
-            "pinyin": "",
-            "final_vowel": "",
-            "openness": "unknown",
-            "tone_pattern": "",
-            "cliche_hits": []
-          },
-          {
-            "text": "I fold the unfinished sentence into an old paper ticket",
-            "pinyin": "",
-            "final_vowel": "",
-            "openness": "unknown",
-            "tone_pattern": "",
-            "cliche_hits": []
-          },
-          {
-            "text": "After the crowd leaves, my pulse finally slows down",
-            "pinyin": "",
-            "final_vowel": "",
-            "openness": "unknown",
-            "tone_pattern": "",
-            "cliche_hits": []
-          },
-          {
-            "text": "When I look up, I learn to release regret",
-            "pinyin": "",
-            "final_vowel": "",
-            "openness": "unknown",
-            "tone_pattern": "",
-            "cliche_hits": []
-          }
-        ]
-      },
-      {
-        "tag": "Bridge",
-        "lines": [
-          {
-            "text": "Platform lights fade while your name stays on the glass",
-            "pinyin": "",
-            "final_vowel": "",
-            "openness": "unknown",
-            "tone_pattern": "",
-            "cliche_hits": []
-          },
-          {
-            "text": "I fold the unfinished sentence into an old paper ticket",
-            "pinyin": "",
-            "final_vowel": "",
-            "openness": "unknown",
-            "tone_pattern": "",
-            "cliche_hits": []
-          },
-          {
-            "text": "After the crowd leaves, my pulse finally slows down",
-            "pinyin": "",
-            "final_vowel": "",
-            "openness": "unknown",
-            "tone_pattern": "",
-            "cliche_hits": []
-          },
-          {
-            "text": "When I look up, I learn to release regret",
-            "pinyin": "",
-            "final_vowel": "",
-            "openness": "unknown",
-            "tone_pattern": "",
-            "cliche_hits": []
-          }
-        ]
-      },
-      {
-        "tag": "Final Chorus",
-        "lines": [
-          {
-            "text": "Platform lights fade while your name stays on the glass",
-            "pinyin": "",
-            "final_vowel": "",
-            "openness": "unknown",
-            "tone_pattern": "",
-            "cliche_hits": []
-          },
-          {
-            "text": "I fold the unfinished sentence into an old paper ticket",
-            "pinyin": "",
-            "final_vowel": "",
-            "openness": "unknown",
-            "tone_pattern": "",
-            "cliche_hits": []
-          },
-          {
-            "text": "After the crowd leaves, my pulse finally slows down",
-            "pinyin": "",
-            "final_vowel": "",
-            "openness": "unknown",
-            "tone_pattern": "",
-            "cliche_hits": []
-          },
-          {
-            "text": "When I look up, I learn to release regret",
-            "pinyin": "",
-            "final_vowel": "",
-            "openness": "unknown",
-            "tone_pattern": "",
+            "text": "[sigh] 高点一到我就敢把遗憾全放开",
+            "pinyin": "gao dian yi dao wo jiu gan ba yi han quan fang kai",
+            "final_vowel": "ai",
+            "openness": "open",
+            "tone_pattern": "1-3-1-4-3-4-3-3-2-4-2-4-1",
             "cliche_hits": []
           }
         ]
       }
     ],
-    "warnings": [
-      {
-        "line_index": 0,
-        "type": "vowel_openness",
-        "severity": "warning",
-        "human": "'P' (元音P) 在高音位置不适合"
-      }
-    ],
+    "warnings": [],
     "stats": {
       "vowel_openness_at_peak": "pass",
       "cliche_density_pct": 0.0,
       "tone_collision_pct": 0.0,
-      "line_length_violation_count": 0
+      "line_length_violation_count": 0,
+      "vocal_cues_hit": [
+        "[breath]",
+        "[inhale]",
+        "[sigh]"
+      ]
     }
   },
   "quality_gate": {

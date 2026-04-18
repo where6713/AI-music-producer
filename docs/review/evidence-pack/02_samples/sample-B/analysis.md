@@ -6,19 +6,22 @@
 - 结论: 下降。
 
 2. Hook 记忆点
-- Hook句: One bell rings and I choose not to turn around
-- 重复/变体情况: 副歌可重复该句并支持轻微词面变体。
-- 结论: 记忆点可用。
+- Hook句: 让雨敲窗让沉默开花
+- 重复/变体情况: 副歌前两句形成并列重复骨架，末句做结论性变体。
+- 结论: 命中。
 
 3. 开口音命中（副歌高点）
-- 命中行: Open up and fly, sing the answer to the moon（跨样本参考）
-- 韵母: N/A（英文样本，不做中文韵母判定）
-- 结论: 不适用。
+- 命中行: 让雨敲窗让沉默开花 / 让门外风声替我回答 / [sigh] 这次我把晚安说成再见吧
+- 韵母: hua(a) / da(a) / ba(a)
+- 结论: 命中（全部为开口音 a）。
 
 4. Vocal cues 命中
-- [breath]/[inhale]/[sigh] 出现位置: 本样本输出 JSON 未展开该类标签。
-- 结论: 未命中，后续可在 prompt_compiler 输出阶段补强。
+- [breath]/[inhale]/[sigh] 出现位置:
+  - [breath]：Pre-Chorus 第 1 行
+  - [inhale]：Pre-Chorus 第 2 行末
+  - [sigh]：Chorus 第 3 行首
+- 结论: 命中。
 
 5. 业务可用性结论
 - 是否可用于投产候选: Yes
-- 原因: 语义具体且画面连续，能支持继续进入旋律匹配环节。
+- 原因: 开口音与 vocal cues 均达标，且 before/after 差异清晰，可进入复审。

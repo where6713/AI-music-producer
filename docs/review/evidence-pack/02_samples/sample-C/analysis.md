@@ -6,19 +6,22 @@
 - 结论: 明显下降。
 
 2. Hook 记忆点
-- Hook句: Open up and fly, sing the answer to the moon
-- 重复/变体情况: 可作为副歌末行固定收束句，具备变体空间。
+- Hook句: 高音一到我就把答案大声唱
+- 重复/变体情况: 与前一句“点亮”形成递进，第三句做情绪释放变体。
 - 结论: 命中。
 
 3. 开口音命中（副歌高点）
-- 命中行: Open up and fly, sing the answer to the moon
-- 韵母: N/A（英文样本，不做中文韵母判定）
-- 结论: 不适用。
+- 命中行: 让天光落在肩上把昨天全部点亮 / 高音一到我就把答案大声唱 / [sigh] 这一口气让我终于飞向远方
+- 韵母: liang(ang) / chang(ang) / fang(ang)
+- 结论: 命中（全部为开口音 ang）。
 
 4. Vocal cues 命中
-- [breath]/[inhale]/[sigh] 出现位置: 本样本输出 JSON 未展开该类标签。
-- 结论: 未命中，后续可在编译阶段注入。
+- [breath]/[inhale]/[sigh] 出现位置:
+  - [breath]：Pre-Chorus 第 1 行
+  - [inhale]：Pre-Chorus 第 2 行末
+  - [sigh]：Chorus 第 3 行首
+- 结论: 命中。
 
 5. 业务可用性结论
 - 是否可用于投产候选: Yes
-- 原因: 副歌抬升与宣言感明确，可直接进入 A/B 听感对比流程。
+- 原因: 高点开口音命中且 vocal cues 命中，证据与结论一致。
