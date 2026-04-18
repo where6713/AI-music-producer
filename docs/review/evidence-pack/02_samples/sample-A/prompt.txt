@@ -1,0 +1,14 @@
+# Sample A
+
+## Business Intent
+失恋后地铁站重逢，情绪克制但副歌有反弹。
+
+## Input Prompt
+你是中文流行填词助手。请围绕“深夜站台重逢”写一首现代流行歌词，要求画面感强、避免空洞口号，副歌必须出现可记忆 hook，且语气从压抑逐步转向释怀。
+
+## Constraints
+- BPM: 101
+- Style: neo-r&b, oriental pop
+- Target Emotion: restrained heartbreak -> release
+- Section Priority: Verse -> Pre-Chorus -> Chorus
+- Vocal Cues: enable `[breath]`, `[inhale]`, `[sigh]`

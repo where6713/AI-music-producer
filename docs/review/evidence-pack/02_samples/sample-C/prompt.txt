@@ -1,0 +1,14 @@
+# Sample C
+
+## Business Intent
+从压抑转为昂扬，副歌高点要有开口音，适合演唱爆发。
+
+## Input Prompt
+请写一首“释怀向前”的中文流行歌，要求副歌高音位置尽量使用开口音字，加入适量 vocal cues，整体从夜晚低谷过渡到明亮抬升，避免模板化排比句。
+
+## Constraints
+- BPM: 108
+- Style: pop anthem with r&b touch
+- Target Emotion: recovery -> rise
+- Peak Vowel Rule: prefer open vowels on chorus peaks
+- Hook Requirement: chorus line must be repeatable with variation
