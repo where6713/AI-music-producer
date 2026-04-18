@@ -5,6 +5,8 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+import pytest
+
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
@@ -978,3 +980,143 @@ def test_run_derives_positions_from_energy_curve_without_explicit_payload() -> N
 
     assert result["ok"] is False
     assert result.get("error") == "lyric_quality_gate_failed"
+
+
+def test_load_pop_grid_emits_audit_and_uses_asymmetric_pattern() -> None:
+    from src.producer_tools.business.lyric_architect import _load_pop_grid
+
+    audit_context = {"run_id": "r1", "trace_id": "t1", "trace": []}
+    pattern = _load_pop_grid("Verse 1", audit_context=audit_context)
+
+    assert isinstance(pattern, list)
+    assert len(pattern) >= 3
+    assert len(set(pattern)) > 1
+    trace = audit_context.get("trace", [])
+    assert isinstance(trace, list)
+    assert any("[Grid Loaded]" in str(item.get("event", "")) for item in trace)
+
+
+def test_load_montage_nouns_emits_audit_with_seed() -> None:
+    from src.producer_tools.business.lyric_architect import _load_montage_nouns
+
+    audit_context = {"run_id": "r2", "trace_id": "t2", "trace": []}
+    nouns = _load_montage_nouns(5, audit_context=audit_context, section_tag="Verse 1")
+
+    assert isinstance(nouns, list)
+    assert len(nouns) >= 5
+    trace = audit_context.get("trace", [])
+    assert isinstance(trace, list)
+    assert any("[Montage Hit]" in str(item.get("event", "")) for item in trace)
+
+
+def test_check_vowel_openness_blocks_function_words_and_logs() -> None:
+    from src.producer_tools.business.lyric_architect import check_vowel_openness
+
+    audit_context = {"run_id": "r3", "trace_id": "t3", "trace": []}
+    result = check_vowel_openness(
+        ["了", "你", "花"],
+        [0, 1, 2],
+        rewrite_round=1,
+        audit_context=audit_context,
+    )
+
+    assert result["ok"] is True
+    assert result["pass"] is False
+    violations = result.get("violations", [])
+    assert isinstance(violations, list)
+    assert any(v.get("reason_code") == "function_word_blocked" for v in violations)
+    assert any(v.get("reason_code") == "non_open_yunmu" for v in violations)
+    trace = audit_context.get("trace", [])
+    assert isinstance(trace, list)
+    assert any("[Phonetic Check]" in str(item.get("event", "")) for item in trace)
+
+
+def test_run_retries_rate_limit_and_writes_ledger(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from src.producer_tools.business.lyric_architect import run
+    from src.producer_tools.business import lyric_architect
+
+    monkeypatch.setattr(
+        lyric_architect,
+        "_load_montage_nouns",
+        lambda n=5, audit_context=None, section_tag="": [
+            "地铁",
+            "站台",
+            "路灯",
+            "玻璃门",
+            "钥匙",
+        ],
+    )
+
+    state = {"calls": 0}
+
+    def _adapter(prompt: dict[str, object]) -> dict[str, object]:
+        _ = prompt
+        state["calls"] += 1
+        if state["calls"] == 1:
+            return {"ok": False, "error": "llm_error_rate_limit", "detail": "429"}
+        return {"lines": ["地铁站台路灯照着钥匙", "玻璃门外夜风慢慢过"]}
+
+    ledger_path = tmp_path / "ledger.jsonl"
+    result = run(
+        {
+            "intent": "测试重试",
+            "reference_dna": {"structure": [{"label": "verse", "energy": 0.4}]},
+            "use_llm": True,
+            "llm_adapter": _adapter,
+            "max_rewrite_iterations": 0,
+            "line_length_autofix": False,
+            "max_line_length": 40,
+            "chorus_max_line_length": 40,
+            "ledger_path": str(ledger_path),
+            "max_section_retries": 2,
+            "enforce_montage_hit_rate": True,
+        }
+    )
+
+    assert result["ok"] is True
+    assert state["calls"] >= 2
+    assert ledger_path.exists()
+    text = ledger_path.read_text(encoding="utf-8")
+    assert "reason_code" in text
+    assert "llm_error_rate_limit" in text
+
+
+def test_run_rewrites_when_montage_hit_rate_below_threshold(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from src.producer_tools.business import lyric_architect
+
+    monkeypatch.setattr(
+        lyric_architect,
+        "_load_montage_nouns",
+        lambda n=5, audit_context=None, section_tag="": ["a", "ai", "ao", "ang", "hua"],
+    )
+
+    state = {"calls": 0}
+
+    def _adapter(prompt: dict[str, object]) -> dict[str, object]:
+        _ = prompt
+        state["calls"] += 1
+        if state["calls"] <= 1:
+            return {"lines": ["我很难过", "我不说话"]}
+        return {"lines": ["a ai ao ang", "hua ai ao ang"]}
+
+    result = lyric_architect.run(
+        {
+            "intent": "测试意象命中",
+            "reference_dna": {"structure": [{"label": "verse", "energy": 0.4}]},
+            "use_llm": True,
+            "llm_adapter": _adapter,
+            "max_rewrite_iterations": 1,
+            "line_length_autofix": False,
+            "max_line_length": 40,
+            "chorus_max_line_length": 40,
+            "enforce_montage_hit_rate": True,
+        }
+    )
+
+    assert result["ok"] is True
+    assert state["calls"] >= 2

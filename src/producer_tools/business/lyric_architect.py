@@ -5,13 +5,132 @@ from __future__ import annotations
 import os
 import json
 import logging
+import hashlib
+import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from uuid import uuid4
 
 from ..contracts import ToolPayload, ToolResult
 
 TOOL_NAME = "lyric_architect"
 logger = logging.getLogger(__name__)
+
+
+def _now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _hash_payload(payload: object) -> str:
+    try:
+        data = json.dumps(payload, ensure_ascii=False, sort_keys=True, default=str)
+    except Exception:
+        data = str(payload)
+    return hashlib.sha256(data.encode("utf-8")).hexdigest()[:16]
+
+
+def _audit_emit(
+    audit_context: dict[str, object] | None,
+    *,
+    event: str,
+    step: str,
+    attempt: int,
+    rule: str,
+    input_hash: str,
+    decision: str,
+    reason_code: str,
+    extra: dict[str, object] | None = None,
+) -> None:
+    if not isinstance(audit_context, dict):
+        return
+
+    record: dict[str, object] = {
+        "run_id": str(audit_context.get("run_id", "")),
+        "trace_id": str(audit_context.get("trace_id", "")),
+        "event": event,
+        "step": step,
+        "attempt": int(attempt),
+        "rule": rule,
+        "input_hash": input_hash,
+        "decision": decision,
+        "reason_code": reason_code,
+        "timestamp": _now_iso(),
+    }
+    if isinstance(extra, dict):
+        record.update(extra)
+
+    trace_val = audit_context.get("trace")
+    if isinstance(trace_val, list):
+        trace_val.append(record)
+
+    ledger_path_val = audit_context.get("ledger_path")
+    if isinstance(ledger_path_val, str) and ledger_path_val.strip():
+        try:
+            ledger_path = Path(ledger_path_val).expanduser().resolve()
+            ledger_path.parent.mkdir(parents=True, exist_ok=True)
+            with ledger_path.open("a", encoding="utf-8") as fh:
+                fh.write(json.dumps(record, ensure_ascii=False) + "\n")
+        except OSError:
+            pass
+
+
+def _run_llm_self_checks(audit_context: dict[str, object]) -> dict[str, object]:
+    env_state = {
+        "OPENAI_API_KEY": bool(os.getenv("OPENAI_API_KEY", "").strip()),
+        "OPENAI_BASE_URL": bool(os.getenv("OPENAI_BASE_URL", "").strip()),
+        "OPENAI_MODEL": bool(os.getenv("OPENAI_MODEL", "").strip()),
+    }
+    result: dict[str, object] = {
+        "env": env_state,
+        "shell_probe": None,
+        "py_eval": None,
+    }
+    payload_hash = _hash_payload(env_state)
+
+    try:
+        from ..self_check import py_eval, shell_probe
+
+        shell_out = shell_probe.run(
+            {
+                "command": "python -c \"import os;print('api='+str(bool(os.getenv('OPENAI_API_KEY'))))\"",
+                "timeout_s": 5,
+            }
+        )
+        py_out = py_eval.run(
+            {
+                "code": "import os;print({'base':bool(os.getenv('OPENAI_BASE_URL')),'model':bool(os.getenv('OPENAI_MODEL'))})",
+                "timeout_s": 5,
+            }
+        )
+        result["shell_probe"] = shell_out
+        result["py_eval"] = py_out
+        _audit_emit(
+            audit_context,
+            event="[Self Check]",
+            step="llm_config_probe",
+            attempt=0,
+            rule="self_check",
+            input_hash=payload_hash,
+            decision="captured",
+            reason_code="llm_not_configured",
+            extra={"env": env_state},
+        )
+    except Exception as exc:
+        result["error"] = str(exc)
+        _audit_emit(
+            audit_context,
+            event="[Self Check]",
+            step="llm_config_probe",
+            attempt=0,
+            rule="self_check",
+            input_hash=payload_hash,
+            decision="failed",
+            reason_code="self_check_error",
+            extra={"detail": str(exc)},
+        )
+
+    return result
 
 REQUIRED_SECTION_SPECS: list[dict[str, object]] = [
     {
@@ -324,6 +443,11 @@ def generate_draft(
     llm_api_key: str | None = None,
     llm_base_url: str | None = None,
     llm_model: str | None = None,
+    audit_context: dict[str, object] | None = None,
+    max_section_retries: int = 2,
+    retry_backoff_ms: int = 120,
+    circuit_breaker_threshold: int = 6,
+    enforce_montage_hit_rate: bool = False,
 ) -> dict[str, object]:
     """Generate draft lyrics from structure grid.
 
@@ -359,15 +483,21 @@ def generate_draft(
             model_name=llm_model,
         )
     if use_llm and adapter_callable is None:
+        # TODO(PM_AUDIT): 严重级别 - 当前在 LLM 未配置时直接失败，未执行“车间主任式”自检闭环；这会让 E2E 在无可审计证据的情况下中断，且无法确认是否正确命中 Kimi 2.6 / code.ppchat.vip 端点。
+        # EXPECTED_FIX: 失败前强制调用 shell_probe/py_eval 进行配置体检（OPENAI_API_KEY/OPENAI_BASE_URL/OPENAI_MODEL、网络连通、鉴权状态），将诊断结果按 run_id 写入结构化 trace 与本地 ledger(.sqlite 或等价审计表)；若可自动修复（如缺省 model/base_url）则补全后重试一次，否则返回明确的可执行修复指令。
+        checks = _run_llm_self_checks(audit_context if isinstance(audit_context, dict) else {})
         return {
             "ok": False,
             "error": "llm_not_configured",
+            "error_detail": "missing_llm_adapter_or_env",
+            "self_check": checks,
             "draft": None,
         }
 
     # Generate draft sections
     draft_sections: list[dict[str, object]] = []
 
+    consecutive_failures = 0
     for section in sections_raw:
         if not isinstance(section, dict):
             continue
@@ -376,28 +506,95 @@ def generate_draft(
         word_count = int(section.get("word_count", 50))
         emotional_arc = str(section.get("emotional_arc", "neutral"))
 
-        llm_result = _generate_section_lines_with_llm(
-            adapter_callable=adapter_callable,
-            tag=tag,
-            word_count=word_count,
-            emotional_arc=emotional_arc,
-            intent=intent,
-            template_meta=template_meta,
-            corpus_lines=corpus_lines,
-            forbidden_terms=forbidden_terms or set(),
-            reference_constraints=reference_constraints or {},
-        )
+        llm_result: dict[str, object] = {"ok": False, "error": "not_run"}
+        for attempt in range(1, max(0, max_section_retries) + 2):
+            llm_result = _generate_section_lines_with_llm(
+                adapter_callable=adapter_callable,
+                tag=tag,
+                word_count=word_count,
+                emotional_arc=emotional_arc,
+                intent=intent,
+                template_meta=template_meta,
+                corpus_lines=corpus_lines,
+                forbidden_terms=forbidden_terms or set(),
+                reference_constraints=reference_constraints or {},
+                audit_context=audit_context,
+                attempt=attempt,
+                enforce_montage_hit_rate=enforce_montage_hit_rate,
+            )
+            payload_hash = _hash_payload(
+                {
+                    "tag": tag,
+                    "word_count": word_count,
+                    "emotional_arc": emotional_arc,
+                    "attempt": attempt,
+                }
+            )
+
+            if llm_result.get("ok"):
+                consecutive_failures = 0
+                _audit_emit(
+                    audit_context,
+                    event="[LLM Attempt]",
+                    step="generate_section",
+                    attempt=attempt,
+                    rule="llm_retry_policy",
+                    input_hash=payload_hash,
+                    decision="success",
+                    reason_code="ok",
+                    extra={"section": tag},
+                )
+                break
+
+            llm_error = str(llm_result.get("error", "llm_generation_failed"))
+            llm_detail = str(llm_result.get("detail", ""))
+            reason_code = llm_error
+
+            should_retry = llm_error in {
+                "llm_error_rate_limit",
+                "llm_error_timeout",
+                "empty_or_invalid_llm_output",
+                "invalid_output",
+                "montage_hit_rate_low",
+            }
+            immediate_fail = llm_error in {"llm_error_401"}
+
+            _audit_emit(
+                audit_context,
+                event="[LLM Attempt]",
+                step="generate_section",
+                attempt=attempt,
+                rule="llm_retry_policy",
+                input_hash=payload_hash,
+                decision="retry" if (should_retry and not immediate_fail) else "fail",
+                reason_code=reason_code,
+                extra={"section": tag, "detail": llm_detail},
+            )
+
+            consecutive_failures += 1
+            if immediate_fail:
+                break
+            if consecutive_failures >= max(1, circuit_breaker_threshold):
+                return {
+                    "ok": False,
+                    "error": "llm_circuit_breaker_open",
+                    "error_detail": "too_many_consecutive_failures",
+                    "draft": None,
+                }
+            if should_retry and attempt <= max(0, max_section_retries):
+                time.sleep(max(0, retry_backoff_ms) / 1000.0 * (2 ** (attempt - 1)))
+                continue
+            break
+
         if not llm_result.get("ok"):
-            llm_error = str(llm_result.get("error", ""))
+            llm_error = str(llm_result.get("error", "llm_generation_failed"))
             llm_detail = str(llm_result.get("detail", ""))
             merged_detail = llm_error
             if llm_detail:
-                merged_detail = (
-                    f"{llm_error}: {llm_detail}" if llm_error else llm_detail
-                )
+                merged_detail = f"{llm_error}: {llm_detail}" if llm_error else llm_detail
             return {
                 "ok": False,
-                "error": "llm_generation_failed",
+                "error": llm_error if llm_error else "llm_generation_failed",
                 "error_detail": merged_detail,
                 "draft": None,
             }
@@ -656,8 +853,13 @@ def _build_reference_hard_constraints(
     }
 
 
-def _load_pop_grid(tag: str) -> list[int] | None:
+def _load_pop_grid(
+    tag: str,
+    audit_context: dict[str, object] | None = None,
+) -> list[int] | None:
     """Load a line-length grid from chinese_pop_grids.json for the given section tag."""
+    # TODO(PM_AUDIT): 严重级别 - 当前虽读取 grids.json，但缺少“物理栅格锚定”的可审计证据；开发仍可被误判为 LLM 自由创作。
+    # EXPECTED_FIX: 强制输出 [Grid Loaded] 日志，至少包含 Source=chinese_pop_grids.json、section_tag、grid_key、pattern(例如 7-5-8-4)、run_id、trace_id、BPM compatibility；并将选中的 pattern 注入结构化字段 structure_template，作为后续 Kimi 2.6 请求的强制前缀上下文。若未命中非对称栅格，必须熔断而非回落到等长句。
     import random
 
     grids_path = Path(__file__).parent.parent.parent.parent / "data" / "chinese_pop_grids.json"
@@ -678,15 +880,51 @@ def _load_pop_grid(tag: str) -> list[int] | None:
             else:
                 grid_key = "verse_reflective"
         options = grids.get(grid_key, [])
-        if options:
-            return random.choice(options)
+        asymmetric = [x for x in options if isinstance(x, list) and len(set(x)) > 1]
+        if asymmetric:
+            selected = random.choice(asymmetric)
+            _audit_emit(
+                audit_context,
+                event="[Grid Loaded]",
+                step="load_pop_grid",
+                attempt=0,
+                rule="non_symmetric_grid_required",
+                input_hash=_hash_payload({"tag": tag, "grid_key": grid_key}),
+                decision="selected",
+                reason_code="grid_loaded",
+                extra={
+                    "source": "chinese_pop_grids.json",
+                    "section": tag,
+                    "grid_key": grid_key,
+                    "pattern": "-".join(str(i) for i in selected),
+                },
+            )
+            return selected
     except Exception:
         pass
+
+    _audit_emit(
+        audit_context,
+        event="[Grid Loaded]",
+        step="load_pop_grid",
+        attempt=0,
+        rule="non_symmetric_grid_required",
+        input_hash=_hash_payload({"tag": tag}),
+        decision="blocked",
+        reason_code="grid_not_found_or_symmetric",
+        extra={"source": "chinese_pop_grids.json", "section": tag},
+    )
     return None
 
 
-def _load_montage_nouns(n: int = 5) -> list[str]:
+def _load_montage_nouns(
+    n: int = 5,
+    audit_context: dict[str, object] | None = None,
+    section_tag: str = "",
+) -> list[str]:
     """Sample n concrete nouns from visual_montage_nouns.json."""
+    # TODO(PM_AUDIT): 严重级别 - 主歌意象抽样缺少“反偷懒”证据链，无法证明词汇来自 visual_montage_nouns.json（而非模型臆造）。
+    # EXPECTED_FIX: 强制随机采样>=5个具象名词并输出 [Montage Hit]（Source、category、selected_entities、seed）；在主歌生成后校验至少3个采样名词实际落词，未达标则触发重写迭代，不允许以“我很难过”类抽象句直接通过。
     import random
 
     nouns_path = Path(__file__).parent.parent.parent.parent / "data" / "visual_montage_nouns.json"
@@ -694,12 +932,48 @@ def _load_montage_nouns(n: int = 5) -> list[str]:
         data = json.loads(nouns_path.read_text(encoding="utf-8"))
         categories: dict[str, list[str]] = data.get("categories", {})
         pool: list[str] = []
+        category_names: list[str] = []
         for words in categories.values():
             pool.extend(words)
+        for k in categories.keys():
+            if isinstance(k, str):
+                category_names.append(k)
         if pool:
-            return random.sample(pool, min(n, len(pool)))
+            seed = int(time.time() * 1000) % 1_000_000
+            rng = random.Random(seed)
+            selected = rng.sample(pool, min(max(5, n), len(pool)))
+            _audit_emit(
+                audit_context,
+                event="[Montage Hit]",
+                step="load_montage_nouns",
+                attempt=0,
+                rule="montage_seed_sampling",
+                input_hash=_hash_payload({"section": section_tag, "n": n}),
+                decision="sampled",
+                reason_code="montage_sampled",
+                extra={
+                    "source": "visual_montage_nouns.json",
+                    "category": ",".join(category_names),
+                    "selected_entities": selected,
+                    "seed": seed,
+                    "section": section_tag,
+                },
+            )
+            return selected
     except Exception:
         pass
+
+    _audit_emit(
+        audit_context,
+        event="[Montage Hit]",
+        step="load_montage_nouns",
+        attempt=0,
+        rule="montage_seed_sampling",
+        input_hash=_hash_payload({"section": section_tag, "n": n}),
+        decision="failed",
+        reason_code="montage_data_unavailable",
+        extra={"source": "visual_montage_nouns.json", "section": section_tag},
+    )
     return []
 
 
@@ -713,6 +987,9 @@ def _generate_section_lines_with_llm(
     corpus_lines: list[str],
     forbidden_terms: set[str],
     reference_constraints: dict[str, object],
+    audit_context: dict[str, object] | None = None,
+    attempt: int = 1,
+    enforce_montage_hit_rate: bool = False,
 ) -> dict[str, object]:
     """Generate section lines via adapter callable."""
     if not callable(adapter_callable):
@@ -738,13 +1015,24 @@ def _generate_section_lines_with_llm(
     )
 
     # PROD-1: load rhythm grid — forces varied line lengths
-    pop_grid = _load_pop_grid(tag)
+    pop_grid = _load_pop_grid(tag, audit_context=audit_context)
+    if pop_grid is None:
+        return {
+            "ok": False,
+            "lines": [],
+            "error": "grid_asymmetry_required",
+            "detail": "no asymmetric grid available",
+        }
     grid_str = str(pop_grid) if pop_grid else str(sentence_lengths)
     line_count = len(pop_grid) if pop_grid else max(3, min(6, word_count // 10))
 
     # PROD-2: section-specific writing rules
     if is_verse:
-        montage_nouns = _load_montage_nouns(6)
+        montage_nouns = _load_montage_nouns(
+            6,
+            audit_context=audit_context,
+            section_tag=tag,
+        )
         nouns_str = "、".join(montage_nouns) if montage_nouns else "地铁、便利店、手机屏、窗台、钥匙、外卖袋"
         section_rules = (
             "【主歌写法（Verse）】\n"
@@ -814,7 +1102,7 @@ def _generate_section_lines_with_llm(
                 "error": "llm_error_401",
                 "detail": msg,
             }
-        return {"ok": False, "lines": [], "error": msg}
+        return {"ok": False, "lines": [], "error": msg, "detail": msg}
 
     if isinstance(out, dict):
         if out.get("ok") is False and isinstance(out.get("error"), str):
@@ -830,6 +1118,27 @@ def _generate_section_lines_with_llm(
                 str(x).strip() for x in lines if isinstance(x, str) and str(x).strip()
             ]
             if cleaned:
+                if enforce_montage_hit_rate and is_verse and montage_nouns:
+                    merged = "\n".join(cleaned)
+                    hits = [noun for noun in montage_nouns if noun in merged]
+                    if len(hits) < 3:
+                        _audit_emit(
+                            audit_context,
+                            event="[Montage Hit]",
+                            step="montage_hit_check",
+                            attempt=attempt,
+                            rule="verse_min_3_hits",
+                            input_hash=_hash_payload({"tag": tag, "lines": cleaned}),
+                            decision="rewrite",
+                            reason_code="montage_hit_rate_low",
+                            extra={"hits": hits, "required": 3, "selected": montage_nouns},
+                        )
+                        return {
+                            "ok": False,
+                            "lines": [],
+                            "error": "montage_hit_rate_low",
+                            "detail": f"hits={len(hits)} required=3",
+                        }
                 return {"ok": True, "lines": cleaned}
 
     if isinstance(out, list):
@@ -848,6 +1157,8 @@ def _generate_section_lines_with_llm(
 # Vowel classification for Chinese
 OPEN_VOWELS = {"a", "o", "e", "ai", "ao", "an", "ang", "en", "eng", "ou"}
 CLOSED_VOWELS = {"i", "u", "ü", "in", "ing", "un", "ong", "iu", "ui"}
+HARD_OPEN_YUNMU = {"a", "ai", "ao", "ang"}
+FUNCTION_WORD_BLOCKLIST = {"了", "啊", "吧", "吗", "呢", "啦", "呀", "嘛"}
 
 
 def _get_final_vowel(char: str) -> str:
@@ -867,9 +1178,43 @@ def _get_final_vowel(char: str) -> str:
     return ""
 
 
+def _load_shisanzhe_map() -> dict[str, object]:
+    target = Path(__file__).parent.parent.parent.parent / "data" / "shisanzhe_map.json"
+    try:
+        payload = json.loads(target.read_text(encoding="utf-8"))
+        if isinstance(payload, dict):
+            return payload
+    except Exception:
+        pass
+    return {"yunmu_to_zhe": {}}
+
+
+def _char_to_phonetic_info(char: str, zhe_map: dict[str, object]) -> tuple[str, str, str]:
+    try:
+        from pypinyin import pinyin, Style
+
+        py = pinyin(char, style=Style.NORMAL)
+        finals = pinyin(char, style=Style.FINALS)
+        pinyin_text = py[0][0] if py and py[0] else ""
+        yunmu = finals[0][0] if finals and finals[0] else ""
+    except Exception:
+        pinyin_text = ""
+        yunmu = ""
+
+    ymz = zhe_map.get("yunmu_to_zhe", {}) if isinstance(zhe_map, dict) else {}
+    zhe = ""
+    if isinstance(ymz, dict):
+        val = ymz.get(yunmu)
+        if isinstance(val, str):
+            zhe = val
+    return pinyin_text, yunmu, zhe
+
+
 def check_vowel_openness(
     lyrics: list[str],
     peak_positions: list[int],
+    rewrite_round: int = 0,
+    audit_context: dict[str, object] | None = None,
 ) -> dict[str, object]:
     """Check vowel openness at peak note positions.
 
@@ -883,12 +1228,16 @@ def check_vowel_openness(
     Returns:
         dict with ok, violations[], pass (bool).
     """
+    # TODO(PM_AUDIT): 严重级别 - 开口音拦截仍是软判定（本地集合），未对接 shisanzhe_map.json 的十三辙权威映射，且无 [Phonetic Check] 全透明日志。
+    # EXPECTED_FIX: 对每个副歌高音点执行“字->拼音->韵母->辙类->开口音判定”硬流程；若句尾不在 a/ai/ao/ang（或命中虚词如 了/啊/吧）则 quality_gate 必须物理切断并触发 llm_rewrite，直到命中或超过上限失败；每次判定输出 [Phonetic Check] 日志（target_char、pinyin、yunmu、zhe、pass/fail、rewrite_round）。
     if not lyrics:
         return {
             "ok": True,
             "violations": [],
             "pass": True,
         }
+
+    zhe_map = _load_shisanzhe_map()
 
     # Flatten lyrics to character list with position tracking
     char_positions: list[tuple[int, int, str]] = []  # (line_idx, char_idx, char)
@@ -903,28 +1252,45 @@ def check_vowel_openness(
             continue
 
         line_idx, char_idx, char = char_positions[peak_idx]
-        vowel = _get_final_vowel(char)
+        pinyin_text, vowel, zhe = _char_to_phonetic_info(char, zhe_map)
+        is_function_word = char in FUNCTION_WORD_BLOCKLIST
+        pass_flag = (vowel in HARD_OPEN_YUNMU) and (not is_function_word)
+        reason_code = "pass"
+        if is_function_word:
+            reason_code = "function_word_blocked"
+        elif vowel not in HARD_OPEN_YUNMU:
+            reason_code = "non_open_yunmu"
+
+        _audit_emit(
+            audit_context,
+            event="[Phonetic Check]",
+            step="check_vowel_openness",
+            attempt=0,
+            rule="open_yunmu_a_ai_ao_ang",
+            input_hash=_hash_payload({"char": char, "peak_idx": peak_idx}),
+            decision="pass" if pass_flag else "fail",
+            reason_code=reason_code,
+            extra={
+                "target_char": char,
+                "pinyin": pinyin_text,
+                "yunmu": vowel,
+                "zhe": zhe,
+                "rewrite_round": rewrite_round,
+            },
+        )
 
         # Check if vowel is closed
-        if vowel in CLOSED_VOWELS:
+        if not pass_flag:
             violations.append(
                 {
                     "line": line_idx,
                     "char": char_idx,
                     "character": char,
                     "vowel": vowel,
+                    "pinyin": pinyin_text,
+                    "zhe": zhe,
+                    "reason_code": reason_code,
                     "severity": "critical",
-                }
-            )
-        elif vowel not in OPEN_VOWELS:
-            # Unknown vowel - mark as warning
-            violations.append(
-                {
-                    "line": line_idx,
-                    "char": char_idx,
-                    "character": char,
-                    "vowel": vowel,
-                    "severity": "warning",
                 }
             )
 
@@ -1230,6 +1596,35 @@ def check_anti_cliche(
     }
 
 
+def emit_cliche_hit_audit(
+    audit_context: dict[str, object] | None,
+    *,
+    attempt: int,
+    violations: list[dict[str, object]],
+    before_lines: list[str],
+    after_lines: list[str],
+) -> None:
+    if not violations:
+        return
+    phrases = [str(v.get("phrase", "")) for v in violations if isinstance(v, dict)]
+    _audit_emit(
+        audit_context,
+        event="[Cliche Hit]",
+        step="check_anti_cliche",
+        attempt=attempt,
+        rule="cliche_density",
+        input_hash=_hash_payload({"before": before_lines}),
+        decision="rewrite",
+        reason_code="cliche_density_exceeded",
+        extra={
+            "hit_terms": [x for x in phrases if x],
+            "before_summary": " | ".join(before_lines[:2]),
+            "after_summary": " | ".join(after_lines[:2]),
+            "round": attempt,
+        },
+    )
+
+
 def check_anti_lexicon(
     lyrics: list[str],
     forbidden_terms: set[str],
@@ -1531,6 +1926,25 @@ def run(payload: ToolPayload) -> ToolResult:
     llm_base_url = str(llm_base_url_raw) if isinstance(llm_base_url_raw, str) else None
     llm_model = str(llm_model_raw) if isinstance(llm_model_raw, str) else None
     require_real_corpus = bool(payload.get("require_real_corpus", False))
+    enforce_montage_hit_rate = bool(payload.get("enforce_montage_hit_rate", False))
+    run_id_raw = payload.get("run_id")
+    trace_id_raw = payload.get("trace_id")
+    ledger_path_raw = payload.get("ledger_path")
+    max_section_retries_raw = payload.get("max_section_retries", 2)
+    max_section_retries = (
+        int(max_section_retries_raw)
+        if isinstance(max_section_retries_raw, (int, float))
+        else 2
+    )
+    audit_context: dict[str, object] = {
+        "run_id": str(run_id_raw) if isinstance(run_id_raw, str) and run_id_raw else uuid4().hex,
+        "trace_id": str(trace_id_raw)
+        if isinstance(trace_id_raw, str) and trace_id_raw
+        else uuid4().hex,
+        "trace": [],
+    }
+    if isinstance(ledger_path_raw, (str, Path)) and str(ledger_path_raw).strip():
+        audit_context["ledger_path"] = str(ledger_path_raw)
 
     # LLM-only invariant: no offline fallback mode.
     if not use_llm:
@@ -1541,7 +1955,8 @@ def run(payload: ToolPayload) -> ToolResult:
         }
 
     resolved_adapter = llm_adapter if callable(llm_adapter) else None
-    if resolved_adapter is None:
+    explicit_empty_api_key = isinstance(llm_api_key_raw, str) and not llm_api_key_raw.strip()
+    if resolved_adapter is None and not explicit_empty_api_key:
         resolved_adapter = _build_openai_adapter(
             api_key=llm_api_key,
             base_url=llm_base_url,
@@ -1707,13 +2122,45 @@ def run(payload: ToolPayload) -> ToolResult:
             llm_api_key=llm_api_key,
             llm_base_url=llm_base_url,
             llm_model=llm_model,
+            audit_context=audit_context,
+            max_section_retries=max_section_retries,
+            enforce_montage_hit_rate=enforce_montage_hit_rate,
         )
         if not draft_result.get("ok"):
+            draft_error = str(draft_result.get("error", "draft_generation_failed"))
+            draft_detail = str(draft_result.get("error_detail", ""))
+            _audit_emit(
+                audit_context,
+                event="[Draft Result]",
+                step="generate_draft",
+                attempt=attempt + 1,
+                rule="outer_rewrite_loop",
+                input_hash=_hash_payload({"intent": current_intent, "attempt": attempt}),
+                decision="retry" if draft_error in {"montage_hit_rate_low", "empty_or_invalid_llm_output", "invalid_output"} and attempt < max_rewrite_iterations else "fail",
+                reason_code=draft_error,
+                extra={"detail": draft_detail},
+            )
+            if draft_error in {
+                "montage_hit_rate_low",
+                "empty_or_invalid_llm_output",
+                "invalid_output",
+            } and attempt < max_rewrite_iterations:
+                cliche_fix_count += 1
+                current_intent = (
+                    intent
+                    + "\n[重写约束] 主歌必须命中不少于3个具象名词，禁止抽象空话。"
+                )
+                continue
             return {
                 "ok": False,
-                "error": str(draft_result.get("error", "draft_generation_failed")),
-                "error_detail": str(draft_result.get("error_detail", "")),
+                "error": "llm_generation_failed"
+                if draft_error.startswith("llm_error_")
+                else draft_error,
+                "error_detail": draft_detail,
                 "lyrics": None,
+                "trace": audit_context.get("trace", []),
+                "run_id": audit_context.get("run_id", ""),
+                "trace_id": audit_context.get("trace_id", ""),
             }
 
         draft_val = draft_result.get("draft", {})
@@ -1751,7 +2198,12 @@ def run(payload: ToolPayload) -> ToolResult:
             else derive_long_note_positions_from_dna(reference_dna, total_chars)
         )
 
-        vowel_result = check_vowel_openness(all_lines, effective_peak_positions)
+        vowel_result = check_vowel_openness(
+            all_lines,
+            effective_peak_positions,
+            rewrite_round=attempt,
+            audit_context=audit_context,
+        )
         tone_result = check_tone_collision(all_lines, effective_long_note_positions)
         cliche_result = check_anti_cliche(all_lines, blacklist=cliche_blacklist)
         anti_lexicon_result = check_anti_lexicon(all_lines, negative_lexicon)
@@ -1813,6 +2265,15 @@ def run(payload: ToolPayload) -> ToolResult:
             vowel_fix_count += 1
         if needs_cliche_fix:
             cliche_fix_count += 1
+            cliche_violations = cliche_result.get("violations", [])
+            if isinstance(cliche_violations, list):
+                emit_cliche_hit_audit(
+                    audit_context,
+                    attempt=attempt + 1,
+                    violations=cliche_violations,
+                    before_lines=all_lines,
+                    after_lines=[],
+                )
         if needs_anti_lexicon_fix:
             cliche_fix_count += 1
         if needs_line_length_fix:
@@ -2024,6 +2485,9 @@ def run(payload: ToolPayload) -> ToolResult:
             "lyrics": lyrics,
             "quality_gate": quality_gate,
             "output_path": str(output_path) if output_path else "",
+            "trace": audit_context.get("trace", []),
+            "run_id": audit_context.get("run_id", ""),
+            "trace_id": audit_context.get("trace_id", ""),
         }
 
     return {
@@ -2031,4 +2495,7 @@ def run(payload: ToolPayload) -> ToolResult:
         "lyrics": lyrics,
         "quality_gate": quality_gate,
         "output_path": str(output_path) if output_path else "",
+        "trace": audit_context.get("trace", []),
+        "run_id": audit_context.get("run_id", ""),
+        "trace_id": audit_context.get("trace_id", ""),
     }

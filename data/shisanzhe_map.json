@@ -1,0 +1,27 @@
+{
+  "version": "v1",
+  "comment": "Simplified shisanzhe mapping for open-vowel gating in lyric quality checks.",
+  "yunmu_to_zhe": {
+    "a": "发花辙",
+    "ia": "发花辙",
+    "ua": "发花辙",
+    "ai": "怀来辙",
+    "uai": "怀来辙",
+    "ao": "遥条辙",
+    "iao": "遥条辙",
+    "ang": "江阳辙",
+    "iang": "江阳辙",
+    "uang": "江阳辙",
+    "o": "梭波辙",
+    "e": "乜斜辙",
+    "i": "衣期辙",
+    "u": "姑苏辙",
+    "v": "居鱼辙",
+    "ou": "由求辙",
+    "en": "人辰辙",
+    "eng": "中东辙",
+    "an": "言前辙",
+    "in": "人辰辙",
+    "ing": "中东辙"
+  }
+}
