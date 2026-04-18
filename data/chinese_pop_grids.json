@@ -1,0 +1,45 @@
+{
+  "_comment": "华语流行长短句断句栅格。每个数组代表一段歌词的逐行字数模板，用于强制 LLM 输出参差不齐的节奏型句式。",
+  "grids": {
+    "verse_reflective": [
+      [5, 9, 4, 8],
+      [7, 4, 9, 5],
+      [6, 10, 5, 9],
+      [4, 8, 5, 11]
+    ],
+    "verse_narrative": [
+      [9, 5, 7, 4],
+      [11, 6, 4, 8],
+      [8, 4, 9, 6],
+      [5, 11, 4, 7]
+    ],
+    "chorus_hook": [
+      [5, 9, 5],
+      [4, 10, 4],
+      [6, 8, 6],
+      [5, 9, 4]
+    ],
+    "prechorus": [
+      [7, 5, 9, 4],
+      [5, 9, 4, 7],
+      [8, 4, 9, 5],
+      [6, 10, 4, 8]
+    ],
+    "bridge": [
+      [5, 4, 8, 5],
+      [9, 6, 4],
+      [7, 5, 9],
+      [4, 8, 4, 7]
+    ]
+  },
+  "tag_map": {
+    "verse 1": "verse_reflective",
+    "verse 2": "verse_narrative",
+    "verse": "verse_reflective",
+    "pre-chorus": "prechorus",
+    "prechorus": "prechorus",
+    "chorus": "chorus_hook",
+    "final chorus": "chorus_hook",
+    "bridge": "bridge"
+  }
+}

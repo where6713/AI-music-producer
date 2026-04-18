@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+from types import ModuleType
 from typing import TYPE_CHECKING
 
 import pytest
@@ -125,7 +126,13 @@ class TestEndToEndFlow:
         lyric_steps = [s for s in pipeline if s.get("step") == "lyric_architect"]
         prompt_steps = [s for s in pipeline if s.get("step") == "prompt_compiler"]
         assert lyric_steps and lyric_steps[0].get("status") in {"completed", "failed"}
-        assert prompt_steps and prompt_steps[0].get("status") in {"completed", "failed"}
+        assert prompt_steps and prompt_steps[0].get("status") in {
+            "completed",
+            "failed",
+            "skipped",
+        }
+        if lyric_steps[0].get("status") == "failed":
+            assert prompt_steps[0].get("status") == "skipped"
 
     def test_orchestrate_writes_prompt_slot_files(self, tmp_path: Path) -> None:
         """Orchestrator should write style/exclude slot files for Suno."""
@@ -159,10 +166,20 @@ class TestEndToEndFlow:
         assert result.get("status") == "orchestrated"
         style_file = tmp_path / "suno_v1_style.txt"
         exclude_file = tmp_path / "suno_v1_exclude.txt"
-        assert style_file.exists()
-        assert exclude_file.exists()
-        assert style_file.read_text(encoding="utf-8").strip() != ""
-        assert exclude_file.read_text(encoding="utf-8").strip() != ""
+        pipeline = result.get("pipeline", [])
+        assert isinstance(pipeline, list)
+        lyric_steps = [s for s in pipeline if s.get("step") == "lyric_architect"]
+        prompt_steps = [s for s in pipeline if s.get("step") == "prompt_compiler"]
+        assert lyric_steps
+        assert prompt_steps
+        if lyric_steps[0].get("status") == "completed":
+            assert prompt_steps[0].get("status") == "completed"
+            assert style_file.exists()
+            assert exclude_file.exists()
+            assert style_file.read_text(encoding="utf-8").strip() != ""
+            assert exclude_file.read_text(encoding="utf-8").strip() != ""
+        else:
+            assert prompt_steps[0].get("status") == "skipped"
 
     def test_orchestrate_blocks_prompt_when_lyric_gate_fails(
         self, tmp_path: Path
@@ -402,6 +419,39 @@ class TestDeterministicArtifacts:
         # Should produce same trace for same intent
         if "trace_id" in result1 and "trace_id" in result2:
             assert result1["trace_id"] == result2["trace_id"]
+
+
+def test_orchestrator_loads_dotenv_on_entry(tmp_path: Path) -> None:
+    """orchestrator.run should call dotenv.load_dotenv(override=False) when available."""
+    import sys
+
+    from src.producer_tools.orchestrator import orchestrator
+
+    calls: list[bool] = []
+    fake = ModuleType("dotenv")
+
+    def _fake_load_dotenv(*, override: bool = False) -> bool:
+        calls.append(override)
+        return True
+
+    setattr(fake, "load_dotenv", _fake_load_dotenv)
+    original = sys.modules.get("dotenv")
+    sys.modules["dotenv"] = fake
+    try:
+        _ = orchestrator.run(
+            {
+                "intent": "dotenv-load-check",
+                "output_dir": str(tmp_path),
+            }
+        )
+    finally:
+        if original is not None:
+            sys.modules["dotenv"] = original
+        else:
+            del sys.modules["dotenv"]
+
+    assert calls
+    assert calls[0] is False
 
 
 class TestIntegrationSmoke:

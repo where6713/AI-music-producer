@@ -623,39 +623,14 @@ def _apply_mastering(
 
 
 def run(payload: ToolPayload) -> ToolResult:
-    """Execute the post_processor tool.
+    """Execute the post_processor tool."""
+    try:
+        from dotenv import load_dotenv  # type: ignore[import-untyped]
 
-    PRD 5.6: Converts AI-generated audio to release-quality masters.
+        load_dotenv(override=False)
+    except Exception:
+        pass
 
-    Processing flow:
-    1. Demucs htdemucs_ft separation -> stems
-    2. Vocal de-AI-ification (de-essing + enhancement)
-    3. Alignment of stems
-    4. Vocal mix bus processing
-    5. Bus merge
-    6. Matchering mastering
-
-    Args:
-        payload: Must contain:
-            - input_path: Path to AI-generated audio (take_001.mp3, etc.)
-            - output_dir: Directory for all outputs
-
-        Optional:
-            - reference_master: Path to reference track for mastering
-            - skip_demucs: Skip stem extraction (use existing stems)
-            - stems: Existing stems dict (if skip_demucs=True)
-
-    Returns:
-        ToolResult containing:
-            - post_process_report: Dict with processing details
-            - stems_dir: Path to extracted stems
-            - master_wav: Path to 24-bit master
-            - master_mp3: Path to MP3 streaming version (if available)
-
-    Raises:
-        ValueError: If required fields are missing
-        FileNotFoundError: If input file doesn't exist
-    """
     # Validate required inputs
     input_path = _validate_input_path(payload)
     output_dir = _validate_output_dir(payload)

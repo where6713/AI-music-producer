@@ -1,0 +1,121 @@
+{
+  "ok": true,
+  "lyrics": {
+    "meta": {
+      "intent": "从压抑转为昂扬，副歌高点要有开口音，适合演唱爆发",
+      "structure_ref": "evidence_pack_sample_C",
+      "iterations": {
+        "draft": 1,
+        "vowel_fix": 1,
+        "cliche_fix": 0,
+        "line_length_fix": 0,
+        "line_length_autofix": 0
+      }
+    },
+    "sections": [
+      {
+        "tag": "Verse 1",
+        "lines": [
+          {
+            "text": "把黑夜推开我听见心口发烫",
+            "pinyin": "ba hei ye tui kai wo ting jian xin kou fa tang",
+            "final_vowel": "ang",
+            "openness": "open",
+            "tone_pattern": "3-1-4-1-1-1-4-1-3-3-4-4",
+            "cliche_hits": []
+          },
+          {
+            "text": "旧地图烧掉后我才看见远方",
+            "pinyin": "jiu di tu shao diao hou wo cai kan jian yuan fang",
+            "final_vowel": "ang",
+            "openness": "open",
+            "tone_pattern": "4-4-2-1-4-4-3-2-4-4-3-1",
+            "cliche_hits": []
+          },
+          {
+            "text": "风越大我越想把名字喊响",
+            "pinyin": "feng yue da wo yue xiang ba ming zi han xiang",
+            "final_vowel": "ang",
+            "openness": "open",
+            "tone_pattern": "1-4-4-3-4-3-3-2-4-3",
+            "cliche_hits": []
+          }
+        ]
+      },
+      {
+        "tag": "Pre-Chorus",
+        "lines": [
+          {
+            "text": "[breath] 抬头那秒我不再向后躲",
+            "pinyin": "tai tou na miao wo bu zai xiang hou duo",
+            "final_vowel": "uo",
+            "openness": "open",
+            "tone_pattern": "2-2-4-3-3-4-4-4-4-3",
+            "cliche_hits": []
+          },
+          {
+            "text": "把所有沉默换成一次大声唱 [inhale]",
+            "pinyin": "ba suo you chen mo huan cheng yi ci da sheng chang",
+            "final_vowel": "ang",
+            "openness": "open",
+            "tone_pattern": "3-3-3-2-4-4-2-4-4-4-1-4",
+            "cliche_hits": []
+          }
+        ]
+      },
+      {
+        "tag": "Chorus",
+        "lines": [
+          {
+            "text": "让天光落在肩上把昨天全部点亮",
+            "pinyin": "rang tian guang luo zai jian shang ba zuo tian quan bu dian liang",
+            "final_vowel": "ang",
+            "openness": "open",
+            "tone_pattern": "4-1-1-4-4-1-4-3-2-1-2-4-4-3-4",
+            "cliche_hits": []
+          },
+          {
+            "text": "高音一到我就把答案大声唱",
+            "pinyin": "gao yin yi dao wo jiu ba da an da sheng chang",
+            "final_vowel": "ang",
+            "openness": "open",
+            "tone_pattern": "1-1-1-4-3-4-3-4-4-4-1-4",
+            "cliche_hits": []
+          },
+          {
+            "text": "[sigh] 这一口气让我终于飞向远方",
+            "pinyin": "zhe yi kou qi rang wo zhong yu fei xiang yuan fang",
+            "final_vowel": "ang",
+            "openness": "open",
+            "tone_pattern": "4-1-3-4-4-3-1-2-1-4-3-1",
+            "cliche_hits": []
+          }
+        ]
+      }
+    ],
+    "warnings": [],
+    "stats": {
+      "vowel_openness_at_peak": "pass",
+      "cliche_density_pct": 0.0,
+      "tone_collision_pct": 0.0,
+      "line_length_violation_count": 0,
+      "vocal_cues_hit": [
+        "[breath]",
+        "[inhale]",
+        "[sigh]"
+      ]
+    }
+  },
+  "quality_gate": {
+    "pass": true,
+    "anti_lexicon_hits": [],
+    "sentence_completeness_violations": [],
+    "line_length_violations": [],
+    "max_line_length": 14,
+    "chorus_max_line_length": 12,
+    "autofix_mode": "llm_rewrite",
+    "groove_gate_pass": true,
+    "monotone_sections": []
+  },
+  "output_path": ""
+}
