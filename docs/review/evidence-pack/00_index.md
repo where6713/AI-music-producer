@@ -15,7 +15,8 @@
 - 样本 C: `docs/review/evidence-pack/02_samples/sample-C/`
 - 风险与非目标: `docs/review/evidence-pack/03_risks_and_non_goals.md`
 - 验证汇总: `docs/review/evidence-pack/04_verification.md`
+- 下一阶段修订计划: `docs/review/evidence-pack/05_next_phase_plan.md`
 
 ## 结论建议
-- 结论: 已完成 P0-1 ~ P0-4，申请 PM 复审。
-- 前提: 以本次推送后的最新 HEAD 与最新 `quality-gates` 结果为准。
+- 结论: PM 复审已给出 Go，可转 `Ready for review`。
+- 前提: 后续提交继续维持 `quality-gates` 绿灯并按 `05_next_phase_plan.md` 推进。

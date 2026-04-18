@@ -1,6 +1,6 @@
 ## CI
 - workflow: quality-gates
-- run URL: https://github.com/where6713/AI-music-producer/actions/runs/24595753165/job/71925325981
+- run URL: https://github.com/where6713/AI-music-producer/actions/runs/24597434364/job/71930095610
 - result: PASS
 
 ## Evidence P0 Delta (PM 二审整改)
