@@ -121,6 +121,26 @@ class TestCompileStyleField:
         assert "101 BPM" in result["style"]
         assert "D minor" in result["style"]
 
+    def test_style_field_enforces_tag_count_and_single_mood(self) -> None:
+        genre_seed = {"descriptors": ["neo-r&b", "urban pop", "late 2010s"]}
+        reference_dna = {
+            "key": "C# minor",
+            "tempo": 101,
+            "energy_curve": [0.2, 0.4, 0.8],
+            "instrumentation": {
+                "vocals": {"presence": True},
+                "bass": {"presence": True},
+                "keys": {"presence": True},
+                "drums": {"presence": True},
+            },
+        }
+        result = compile_style_field(genre_seed, reference_dna, {})
+
+        assert result["ok"] is True
+        tags = [x.strip() for x in result["style"].split(",") if x.strip()]
+        assert 4 <= len(tags) <= 7
+        assert any(x in result["style"] for x in ["intimate", "reflective", "driving", "high-energy"])
+
 
 class TestCompileLyricsField:
     """Test compile_lyrics_field function.
@@ -159,7 +179,7 @@ class TestCompileLyricsField:
         result = compile_lyrics_field(lyrics, reference_dna)
 
         assert result["ok"] is True
-        assert "[Verse 1]" in result["lyrics"]
+        assert "[Verse]" in result["lyrics"]
         assert "[Chorus]" in result["lyrics"]
         assert "便利店玻璃映着我没换的衬衫" in result["lyrics"]
 
@@ -202,6 +222,24 @@ class TestCompileLyricsField:
 
         assert result["ok"] is True
         assert "[Mood:" in result["lyrics"]
+
+    def test_lyrics_field_adds_chorus_energy_and_build_up(self) -> None:
+        lyrics = {
+            "sections": [
+                {"tag": "Verse 1", "lines": [{"text": "台灯照外卖订单"}]},
+                {"tag": "Chorus", "lines": [{"text": "地铁门开我还在等她"}]},
+            ]
+        }
+        reference_dna = {
+            "energy_curve": [0.3, 0.6, 0.85],
+            "instrumentation": {"emphasis": ["vocal", "bass"]},
+        }
+        result = compile_lyrics_field(lyrics, reference_dna)
+
+        assert result["ok"] is True
+        assert "[Energy: High]" in result["lyrics"]
+        assert "[Build-up]" in result["lyrics"]
+        assert "[whisper]" in result["lyrics"] or "[sigh]" in result["lyrics"] or "[breath]" in result["lyrics"]
 
     def test_lyrics_field_empty_sections(self) -> None:
         """Test lyrics field with empty sections."""
@@ -394,6 +432,71 @@ class TestBreathTags:
         assert result["ok"] is True
         # Should have some breath tags in the output
         # (implementation determines optimal placement)
+
+    def test_dynamic_cue_injection_uses_energy_curve_and_logs_decisions(self) -> None:
+        lyrics = {
+            "sections": [
+                {
+                    "tag": "Verse 1",
+                    "lines": [
+                        {"text": "站台灯暗后我把旧票折进衣袋"},
+                        {"text": "风停在袖口我学会慢慢松开"},
+                    ],
+                },
+                {
+                    "tag": "Chorus",
+                    "lines": [
+                        {"text": "把夜推开把心口大声点亮"},
+                        {"text": "让昨天散场把明天唱到天亮"},
+                    ],
+                },
+            ]
+        }
+        reference_dna = {
+            "energy_curve": [
+                {"time": 0.0, "energy": 0.25},
+                {"time": 6.0, "energy": 0.45},
+                {"time": 12.0, "energy": 0.82},
+                {"time": 18.0, "energy": 0.91},
+            ],
+            "musiccaps_events": ["whisper_start", "build_up"],
+        }
+
+        result = compile_lyrics_field(lyrics, reference_dna)
+
+        assert result["ok"] is True
+        text = result["lyrics"]
+        assert any(tag in text for tag in ["[breath]", "[inhale]", "[sigh]"])
+        source = result.get("source", {})
+        assert isinstance(source, dict)
+        logs = source.get("cue_decisions", [])
+        assert isinstance(logs, list)
+        assert len(logs) > 0
+        assert all("tag_source" in item for item in logs if isinstance(item, dict))
+
+    def test_dynamic_cue_injection_can_emit_whisper_and_build_up(self) -> None:
+        lyrics = {
+            "sections": [
+                {
+                    "tag": "Pre-Chorus",
+                    "lines": [
+                        {"text": "月台回声把旧答案推回来"},
+                        {"text": "我不再追问谁该先说离开"},
+                    ],
+                }
+            ]
+        }
+        reference_dna = {
+            "energy_curve": [0.2, 0.4, 0.7, 0.95],
+            "musiccaps_events": ["whisper_intro", "build_up"],
+        }
+
+        result = compile_lyrics_field(lyrics, reference_dna)
+
+        assert result["ok"] is True
+        text = result["lyrics"]
+        assert "[whisper]" in text
+        assert "[build-up]" in text
 
 
 class TestDifficultSyllableTiming:

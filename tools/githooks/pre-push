@@ -82,6 +82,17 @@ resolve_python_313() {
     fi
   fi
 
+  # Windows common install paths (Git Bash / MSYS2)
+  for _win_py in "/c/Python313/python.exe" "/c/Python313/python" \
+                  "/d/Python313/python.exe" "$LOCALAPPDATA/Programs/Python/Python313/python.exe"; do
+    if [ -x "$_win_py" ]; then
+      if "$_win_py" -c 'import sys; raise SystemExit(0 if sys.version_info[:2] == (3, 13) else 1)' >/dev/null 2>&1; then
+        echo "$_win_py"
+        return 0
+      fi
+    fi
+  done
+
   return 1
 }
 

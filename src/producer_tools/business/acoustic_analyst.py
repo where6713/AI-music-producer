@@ -73,13 +73,11 @@ def _extract_parselmouth_features(audio_path: Path) -> dict[str, object]:
     pitch = sound.to_pitch()
     selected_array = getattr(pitch, "selected_array", [])
     selected_any: Any = selected_array
-    getter = getattr(selected_any, "get", None)
-    if callable(getter):
-        try:
-            raw_frequency_values: Any = getter("frequency", selected_any)
-        except Exception:
-            raw_frequency_values = selected_any
-    else:
+    try:
+        # Primary path: parselmouth structured array access.
+        raw_frequency_values: Any = selected_any["frequency"]
+    except Exception:
+        # Fallback for iterable/list-like selected_array shapes.
         raw_frequency_values = selected_any
 
     if isinstance(raw_frequency_values, (str, bytes)):

@@ -435,6 +435,14 @@ def _orchestrate_full_pipeline(
             "corpus_registry_path": payload.get("corpus_registry_path"),
             "corpus_sources": payload.get("corpus_sources", []),
             "require_real_corpus": require_real_corpus,
+            "run_id": trace_id,
+            "trace_id": trace_id,
+            "ledger_path": str(output_dir / "ledger.jsonl"),
+            "max_rewrite_iterations": payload.get("max_rewrite_iterations", 4),
+            "max_section_retries": payload.get("max_section_retries", 2),
+            "peak_positions": payload.get("peak_positions", []),
+            "long_note_positions": payload.get("long_note_positions", []),
+            "enforce_montage_hit_rate": payload.get("enforce_montage_hit_rate", False),
         }
     )
     if lyric_result.get("ok"):
@@ -533,6 +541,11 @@ def _orchestrate_full_pipeline(
 
     results["pipeline"] = pipeline
     results["warnings"] = warnings
+    lyric_trace_val = lyric_result.get("trace", [])
+    results["run_id"] = trace_id
+    results["audit_trace"] = (
+        lyric_trace_val if isinstance(lyric_trace_val, list) else []
+    )
     results["status"] = "orchestrated_with_warnings" if warnings else "orchestrated"
     results["message"] = f"Pipeline orchestrated with trace_id={trace_id}"
 
@@ -557,6 +570,13 @@ def run(payload: ToolPayload) -> ToolResult:
             - pipeline: List of pipeline steps and their status
             - status: Overall pipeline status
     """
+    try:
+        from dotenv import load_dotenv  # type: ignore[import-untyped]
+
+        load_dotenv(override=False)
+    except Exception:
+        pass
+
     intent = _validate_intent(payload)
     output_dir = _get_output_dir(payload)
 

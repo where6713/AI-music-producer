@@ -451,3 +451,12 @@ def test_voice_profile_contains_all_prd_5_1_fields(tmp_path: Path) -> None:
 
     assert "embedding_clap" in vp
     assert isinstance(vp["embedding_clap"], list)
+
+
+def test_acoustic_run_loads_without_dotenv_side_effect(tmp_path: Path) -> None:
+    sample_path = tmp_path / "voice.wav"
+    sample_path.write_bytes(b"fake")
+
+    result = acoustic_analyst.run({"audio_path": str(sample_path)})
+
+    assert result["ok"] is True

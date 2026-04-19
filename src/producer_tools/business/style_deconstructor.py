@@ -72,6 +72,23 @@ def _is_librosa_available() -> bool:
     return importlib.util.find_spec("librosa") is not None
 
 
+def _load_audio_mono(input_path: Path) -> tuple[np.ndarray, int]:
+    """Prefer soundfile for FLAC/MP3 decode, fallback to librosa.load."""
+    import librosa
+
+    try:
+        import soundfile as sf
+
+        y, sr = sf.read(str(input_path), dtype="float32", always_2d=False)
+        if isinstance(y, np.ndarray) and y.ndim > 1:
+            y = np.mean(y, axis=1)
+        y_np = np.asarray(y, dtype=np.float32)
+        return y_np, int(sr)
+    except Exception:
+        y, sr = librosa.load(str(input_path), sr=None, mono=True)
+        return np.asarray(y, dtype=np.float32), int(sr)
+
+
 def _extract_tempo_key(input_path: Path) -> dict[str, object]:
     """Extract BPM, musical key, and song structure from audio."""
     beats_per_bar = 4
@@ -113,7 +130,7 @@ def _extract_tempo_key(input_path: Path) -> dict[str, object]:
     try:
         import librosa  # type: ignore[import-untyped]
 
-        y, sr = librosa.load(str(input_path), sr=None, mono=True)
+        y, sr = _load_audio_mono(input_path)
 
         if len(y) == 0:
             return default
@@ -255,7 +272,7 @@ def _extract_instrumentation(
             vocal_path = Path(vocal_path_str)
             if vocal_path.exists() and vocal_path.stat().st_size > 1000:
                 try:
-                    y, sr = librosa.load(str(vocal_path), sr=None, mono=True)
+                    y, sr = _load_audio_mono(vocal_path)
                     if len(y) > 0:
                         zcr = librosa.feature.zero_crossing_rate(y)
                         avg_zcr = float(np.mean(zcr))
@@ -282,7 +299,7 @@ def _extract_instrumentation(
                 stem_path = Path(stem_path_str)
                 if stem_path.exists() and stem_path.stat().st_size > 1000:
                     try:
-                        y, sr = librosa.load(str(stem_path), sr=None, mono=True)
+                        y, sr = _load_audio_mono(stem_path)
                         if len(y) > 0:
                             centroid = librosa.feature.spectral_centroid(y=y, sr=sr)
                             avg_centroid = float(np.mean(centroid))
@@ -318,7 +335,7 @@ def _extract_energy_curve(
     try:
         import librosa  # type: ignore[import-untyped]
 
-        y, sr = librosa.load(str(input_path), sr=None, mono=True)
+        y, sr = _load_audio_mono(input_path)
 
         if len(y) == 0:
             return []

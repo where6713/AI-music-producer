@@ -1,0 +1,19 @@
+file_path,prd_clause,change_summary,verification_type,verification_evidence,pass_fail
+src/producer_tools/business/lyric_architect.py,PRD 5.4,增加结构栅格规划与开口音拦截能力,pytest,tests/test_lyric_architect.py::test_structure_grid_planner_basic,PASS
+src/producer_tools/business/prompt_compiler.py,PRD 5.5,补充 Suno prompt 字段拼装与风格/禁用词编译,pytest,tests/test_prompt_compiler.py::TestCompileStyleField::test_basic_style_field,PASS
+src/producer_tools/business/style_deconstructor.py,PRD 5.2,增强参考曲节奏与结构信号提取稳定性,pytest,tests/test_style_deconstructor_bpm.py::test_bpm_extraction_returns_tempo_key_dict,PASS
+src/producer_tools/business/acoustic_analyst.py,PRD 5.1,新增预处理与输入约束以保证声学分析可用性,pytest,tests/test_acoustic_analyst_preprocess.py::test_missing_audio_path_returns_error,PASS
+src/producer_tools/business/friction_calculator.py,PRD 5.3,完善摩擦度计算分项与聚合输出,pytest,tests/test_friction_calculator.py::test_friction_calculator_returns_hard_constraints_score,PASS
+src/producer_tools/business/post_processor.py,PRD 5.6,补齐后期处理链条中的错误处理与参数落盘,pytest,tests/test_post_processor.py::TestExtractStems::test_extract_stems_returns_stem_paths,PASS
+src/producer_tools/orchestrator/orchestrator.py,PRD 10,串联全链路并在质量门失败时阻断下游 prompt 编译,pytest,tests/test_orchestrator.py::TestEndToEndFlow::test_orchestrate_blocks_prompt_when_lyric_gate_fails,PASS
+apps/cli/main.py,PRD 4.1,补充 CLI 上下文与编排入口参数传递,pytest,tests/test_cli_context.py::test_cli_context_command_outputs_summary,PASS
+.github/workflows/quality-gates.yml,PRD 4.1,修复 CI 质量门依赖安装缺口避免采集阶段失败,github-actions,https://github.com/where6713/AI-music-producer/actions/runs/24595753165/job/71925325981,PASS
+src/producer_tools/business/lyric_architect.py,PRD 5.4,提交e7579c6引入可审计重试熔断与四类审计日志并接入开口音硬判定,pytest,tests/test_lyric_architect.py::test_run_retries_rate_limit_and_writes_ledger,PASS
+src/producer_tools/business/prompt_compiler.py,PRD 5.5,提交e7579c6实现基于energy_curve/musiccaps_events的动态呼吸标签注入决策日志,pytest,tests/test_prompt_compiler.py::TestBreathTags::test_dynamic_cue_injection_uses_energy_curve_and_logs_decisions,PASS
+data/shisanzhe_map.json,PRD 5.4,提交e7579c6新增十三辙映射数据源用于副歌高点开口音硬门禁,pytest,tests/test_lyric_architect.py::test_check_vowel_openness_blocks_function_words_and_logs,PASS
+src/producer_tools/business/lyric_architect.py,PRD 5.4,提交6803665强化重写意图约束以提升真实E2E下开口音与句尾完整性通过率,pytest,tests/test_lyric_architect.py::test_run_llm_mode_rewrites_when_cliche_density_high,PASS
+docs/pm/OUTPUT_DEMO_PROMPT.md,PRD 10,提交5d90511固化真实资产E2E输出证据与run_id追溯,manual-evidence,.tmp/pm-real-e2e-20260418-ppchat-9/run_result.json,PASS
+tools/scripts/summarize_e2e_evidence.py,PRD 10,新增自动汇总run_id/score/四类审计日志固定证据文件,pytest,tests/test_e2e_evidence_summary.py::test_summarize_e2e_evidence_writes_expected_fields,PASS
+src/producer_tools/business/prompt_compiler.py,PRD 5.5,Style Box补齐Genre/Tempo/Instrumentation/Vocal/Mood并限制4-7标签,pytest,tests/test_prompt_compiler.py::TestCompileStyleField::test_style_field_enforces_tag_count_and_single_mood,PASS
+src/producer_tools/business/prompt_compiler.py,PRD 5.5,Lyrics Box副歌强制插入[Energy: High]/[Build-up]及动态气口控制,pytest,tests/test_prompt_compiler.py::TestCompileLyricsField::test_lyrics_field_adds_chorus_energy_and_build_up,PASS
+src/producer_tools/business/lyric_architect.py,PRD 5.4,新增[Blocked]混沌阻断日志并落盘cliche_blacklist强阻断证据,pytest,tests/test_lyric_audit_blocked_log.py::test_blocked_log_emitted_on_cliche_blacklist_hit,PASS

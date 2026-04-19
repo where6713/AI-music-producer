@@ -55,38 +55,471 @@
 
 **显式废弃**：`chinese-poetry` 的唐诗宋词（v1.0 的错误决策，流行乐不用）。
 
-### 2.3 纯数据资产路由（v1.2 补充条款）
+### 2.3 纯数据资产路由（v1.3 最终定稿）
 
-为满足"零复杂度、高精准度"，填词主链升级为纯 JSON 查表路由：
+为满足"零复杂度、高精准度、可审计"，填词主链升级为 **Schema 1 + Schema 2 双 JSON 资产**。
+本节为唯一生产规范：
 
-1. `visual_montage_nouns.json`（THUOCL 提取）
-   - 来源：`THUOCL_animal.txt` / `THUOCL_food.txt` / `THUOCL_medical.txt` / `THUOCL_car.txt`
-   - 用途：主歌/副歌场景构建，强制至少 2 个具象名词
+- 禁止在 JSON 中存放 `eval()` 字符串表达式；
+- 禁止实时向量检索（CLAP top-K / NumPy 索引）参与名词抽样；
+- 禁止 LLM 输出任何 QC 统计；QC 由后端程序物理扫描产生。
 
-2. `cliche_blacklist.json`（funNLP 提取）
-   - 来源：`常见中文网络流行语.txt` + `中文褒贬义词典.txt`
-   - 用途：命中即重写拦截，禁止抽象空话
+---
 
-3. `shisanzhe_map.json`（本地定义）
-   - 来源：本地小脚本 + `pypinyin` 韵母集合
-   - 用途：句尾押韵判断 + 副歌高点开口音判断
+#### Schema 1 / `audio_to_prompt_mapper.json`
 
-4. `chinese_pop_grids.json`（本地脱水）
-   - 来源：`Chinese_Lyrics` 指定歌手子集
-   - 方法：正则脱水，仅保留字数与标点位置，不做词性标注
-   - 用途：填词模具唯一来源
+**职责**：消费 `reference_dna.json` → 产出 `prompt_constraints` 对象（一组自然语言字符串），供 Schema 2 注入。
 
-5. `modern_literary_lexicon.json`
-   - 用途：高文采模式下的现代意象强制抽词
+```json
+{
+  "$schema": "music-producer/audio_to_prompt_mapper/v1.3",
 
-6. `emotion_acoustic_router.json`
-   - 用途：悲伤/欢快等意图的 BPM/调式/排除乐器硬锁定
+  "bpm_bands": [
+    {
+      "label": "largo",
+      "range_bpm": [40, 80],
+      "output": {
+        "line_length_instruction": "主歌每行 9-13 字，允许含一处标点停顿；副歌每行 7-9 字。最长单行不超过 16 字。句子内部必须有一次气口停顿位，给歌手换气与表情空间。",
+        "rhythm_instruction": "节拍极慢，每个汉字可拉长至 1.5-2 拍。句子偏长且散文化，内部有停顿分组（如 3+4 或 4+5 字组）。副歌句尾字必须是可拖腔的开口长音。",
+        "breath_marker_density": "每 3 行插入 1 个 [breath]；Bridge 可加 [sigh] 或 [whisper]；Pre-Chorus 末行加 [inhale]。"
+      }
+    },
+    {
+      "label": "andante",
+      "range_bpm": [81, 95],
+      "output": {
+        "line_length_instruction": "主歌每行 8-11 字；副歌每行 7-9 字。标准华语流行句式，适合 2+3 或 4+4 字组。",
+        "rhythm_instruction": "节拍适中，每字约 1 拍，副歌可轻微紧缩至 0.75 拍/字以制造推进感。句尾必须有自然收尾，不做硬切。",
+        "breath_marker_density": "每 2 行插入 1 个 [breath]；Chorus 开头加 [breath]；Pre-Chorus 末行加 [inhale]。"
+      }
+    },
+    {
+      "label": "moderato",
+      "range_bpm": [96, 112],
+      "output": {
+        "line_length_instruction": "主歌每行 7-9 字；副歌每行 6-8 字。句式紧凑，不允许散文长句。每行需在一个呼气内完成。",
+        "rhythm_instruction": "每字约 0.75-1 拍，副歌可跳音处理（0.5 拍/字）。句内分组宜为 2+3、3+3 或 3+4 字组。",
+        "breath_marker_density": "每 2 行 1 个 [breath]；Chorus 每段开头加 [breath]。"
+      }
+    },
+    {
+      "label": "allegro",
+      "range_bpm": [113, 132],
+      "output": {
+        "line_length_instruction": "主歌每行 5-8 字；副歌每行 5-7 字。短促有力，句式以 3+3 或 4+3 字组为主。",
+        "rhythm_instruction": "节奏密集，字与字之间几乎无拖拍。副歌以短音节爆破为主，每句末尾尽量是爆破音或开口宽元音。",
+        "breath_marker_density": "每行末均可加 [breath]；Chorus 加 [Energy: High]；Pre-Chorus 末加 [Build-up]。"
+      }
+    },
+    {
+      "label": "presto",
+      "range_bpm": [133, 220],
+      "output": {
+        "line_length_instruction": "主歌每行 4-7 字；副歌每行 4-6 字。极短换行，句式碎片化允许不完整语法单元。",
+        "rhythm_instruction": "每字约 0.5 拍，连续说唱式密度。副歌可用单字或双字的重复锤击感。",
+        "breath_marker_density": "Verse 每 3 行加 [breath]；Chorus 全段加 [Energy: High]。"
+      }
+    }
+  ],
+
+  "modal_profiles": [
+    {
+      "modes": ["major", "ionian"],
+      "output": {
+        "emotional_register_instruction": "情绪基调偏向肯定、怀念、感恩、温暖或轻盈的感伤。即便写离别，也带有接受或释然的底色，而非纯粹的绝望。",
+        "imagery_register_instruction": "意象偏向明亮具象：日光、玻璃透光、白色物件、晴天细节。可用都市明亮场景（咖啡香气、书页翻动、窗台阳光）。避免墨色、夜雨、废墟、破败意象。",
+        "verb_bias_instruction": "动词偏向主动肯定：留住、走过、拥抱、回头，而非失去、沉溺、逃开。"
+      }
+    },
+    {
+      "modes": ["minor", "aeolian", "natural_minor"],
+      "output": {
+        "emotional_register_instruction": "情绪基调偏向遗憾、失落、内省、未竟之意。不要写成泣不成声的崩溃，而是明白了但还是心疼的成人式遗憾。",
+        "imagery_register_instruction": "意象偏向暗调具象：深夜的光、玻璃上的水痕、旧物、行进中的交通工具内部。允许使用都市孤独场景（空荡月台、关灯前的房间、走廊灯）。",
+        "verb_bias_instruction": "动词偏向被动或静止：停在、压着、映出、留下、掀起，制造凝固感。"
+      }
+    },
+    {
+      "modes": ["dorian", "phrygian", "mixolydian", "modal"],
+      "output": {
+        "emotional_register_instruction": "情绪基调游离、迷幻或内省。允许叙事视角的不稳定性（第一人称与第三人称混用），制造距离感。",
+        "imagery_register_instruction": "意象允许融合：古典意象（石阶、水面倒影、远山）可与现代场景（霓虹、玻璃幕墙）并置。鼓励意象跨时代接触。",
+        "verb_bias_instruction": "动词以感知为主：听见、触到、像是、仿佛，模糊主客体边界。"
+      }
+    }
+  ],
+
+  "instrumentation_profiles": [
+    {
+      "dominant_instrument": "piano",
+      "presence_threshold": 0.65,
+      "co_requirements": [],
+      "exclude_conditions": [],
+      "output": {
+        "texture_era_instruction": "乐器底色是钢琴主导的室内感，词的质感应有书写感或独白感。句子可以略长且含反问结构。允许使用偏文学性的词汇。"
+      }
+    },
+    {
+      "dominant_instrument": "guitar",
+      "presence_threshold": 0.60,
+      "co_requirements": [],
+      "exclude_conditions": [
+        { "instrument": "piano", "operator": ">=", "value": 0.40 }
+      ],
+      "output": {
+        "texture_era_instruction": "吉他主导，词的质感偏向口语化的真实陈述。句子结构朴素，动词靠前，少用从句。允许大白话，但每段至少有一句需要有意象的升华。"
+      }
+    },
+    {
+      "dominant_instrument": "synth",
+      "presence_threshold": 0.50,
+      "co_requirements": [],
+      "exclude_conditions": [],
+      "output": {
+        "texture_era_instruction": "合成器主导，词的质感偏都市电子感。允许科技词汇与自然意象的对置（如信号灯红了、Wi-Fi 断线了），但需有情感锚点，不能变成科技清单。"
+      }
+    },
+    {
+      "dominant_instrument": "drums",
+      "presence_threshold": 0.65,
+      "co_requirements": [
+        {
+          "any_of": [
+            { "instrument": "guitar", "operator": ">=", "value": 0.40 },
+            { "instrument": "synth", "operator": ">=", "value": 0.40 }
+          ]
+        }
+      ],
+      "exclude_conditions": [],
+      "output": {
+        "texture_era_instruction": "节奏主导，词的质感偏向宣泄和对抗。副歌允许重复 1-2 个核心词语形成锤击感，但每次重复必须带来语义的微量升级，不允许纯粹重复无变化。"
+      }
+    },
+    {
+      "dominant_instrument": "other",
+      "presence_threshold": 0.50,
+      "co_requirements": [],
+      "exclude_conditions": [
+        { "instrument": "drums", "operator": ">=", "value": 0.30 }
+      ],
+      "output": {
+        "texture_era_instruction": "民族乐器或弦乐主导，词的质感偏向古典渗透。允许使用来自 {chengyu_classical_pool} 的成语化典。每段至少触及一次与主轴意象相关的自然意象。"
+      }
+    }
+  ],
+
+  "energy_arc_profiles": [
+    {
+      "shape": "valley",
+      "description": "low start -> dip -> peak -> resolution",
+      "output": {
+        "narrative_arc_instruction": "叙事结构：主歌铺陈具体场景（避免情绪词），Pre-Chorus 开始堆积矛盾，Chorus 全力爆发，Bridge 视角转移制造疏离感，尾副歌在原词基础上追加一个意象层。整首词有起承转合，不允许全程平铺。"
+      }
+    },
+    {
+      "shape": "monotonic_rise",
+      "description": "low start -> steady climb -> sustained peak",
+      "output": {
+        "narrative_arc_instruction": "叙事结构：每一段都比上一段更近一步，情绪和意象密度递进。主歌以远景或旁观视角开始，逐渐拉近到第一人称核心，Chorus 是近景特写。不允许在副歌之后设置低能量段落。"
+      }
+    },
+    {
+      "shape": "peak",
+      "description": "quick rise -> early peak -> gradual resolve",
+      "output": {
+        "narrative_arc_instruction": "叙事结构：开头即入戏，第一行就是核心冲突或核心意象。主歌不做长篇铺垫，而是直接展开情境。Bridge 做情绪沉淀，尾声收尾要有留白，不需要强解答。"
+      }
+    },
+    {
+      "shape": "flat",
+      "description": "consistent low to medium energy throughout",
+      "output": {
+        "narrative_arc_instruction": "叙事结构：不追求爆发点，整体是缓慢流动的沉思状态。句子与句子之间有逻辑的微量推进，但不形成戏剧冲突。允许一首词只讲述一件事的不同侧面，没有转折，只有深入。"
+      }
+    }
+  ],
+
+  "compound_rhyme_selector": {
+    "description": "根据 BPM band x modal profile 的组合，选择最适合的十三辙。系统优先匹配 primary，fallback 为 secondary。",
+    "matrix": [
+      {
+        "bpm_band": "largo",
+        "mode_group": "major",
+        "primary_rhyme": { "name": "发花辙", "chars": "a / ia / ua", "feel": "明亮宽广" },
+        "secondary_rhyme": { "name": "梭波辙", "chars": "o / e / uo / ou", "feel": "温暖圆润" }
+      },
+      {
+        "bpm_band": "largo",
+        "mode_group": "minor",
+        "primary_rhyme": { "name": "言前辙", "chars": "an / en / ian / uan", "feel": "悠长内敛" },
+        "secondary_rhyme": { "name": "人辰辙", "chars": "en / in / un", "feel": "内省现代" }
+      },
+      {
+        "bpm_band": "largo",
+        "mode_group": "modal",
+        "primary_rhyme": { "name": "乜斜辙", "chars": "ie / ue", "feel": "典雅飘逸" },
+        "secondary_rhyme": { "name": "梭波辙", "chars": "o / e", "feel": "温润" }
+      },
+      {
+        "bpm_band": "andante",
+        "mode_group": "major",
+        "primary_rhyme": { "name": "江阳辙", "chars": "ang / iang / uang", "feel": "开阔有力" },
+        "secondary_rhyme": { "name": "发花辙", "chars": "a / ia / ua", "feel": "明亮" }
+      },
+      {
+        "bpm_band": "andante",
+        "mode_group": "minor",
+        "primary_rhyme": { "name": "人辰辙", "chars": "en / in / un", "feel": "现代内省" },
+        "secondary_rhyme": { "name": "灰堆辙", "chars": "ei / ui", "feel": "略带锐感" }
+      },
+      {
+        "bpm_band": "andante",
+        "mode_group": "modal",
+        "primary_rhyme": { "name": "中东辙", "chars": "ong / iong / eng / ing", "feel": "共鸣稳健" },
+        "secondary_rhyme": { "name": "人辰辙", "chars": "en / in", "feel": "内敛" }
+      },
+      {
+        "bpm_band": "moderato",
+        "mode_group": "major",
+        "primary_rhyme": { "name": "发花辙", "chars": "a / ia / ua", "feel": "明亮爽朗" },
+        "secondary_rhyme": { "name": "江阳辙", "chars": "ang / iang", "feel": "开阔" }
+      },
+      {
+        "bpm_band": "moderato",
+        "mode_group": "minor",
+        "primary_rhyme": { "name": "中东辙", "chars": "ong / eng / ing", "feel": "共鸣沉稳" },
+        "secondary_rhyme": { "name": "由求辙", "chars": "ou / iu", "feel": "流动" }
+      },
+      {
+        "bpm_band": "moderato",
+        "mode_group": "modal",
+        "primary_rhyme": { "name": "人辰辙", "chars": "en / in", "feel": "现代游离" },
+        "secondary_rhyme": { "name": "中东辙", "chars": "ong / eng", "feel": "稳健" }
+      },
+      {
+        "bpm_band": "allegro",
+        "mode_group": "major",
+        "primary_rhyme": { "name": "江阳辙", "chars": "ang / iang", "feel": "爆破有力" },
+        "secondary_rhyme": { "name": "由求辙", "chars": "ou / iu", "feel": "流动快感" }
+      },
+      {
+        "bpm_band": "allegro",
+        "mode_group": "minor",
+        "primary_rhyme": { "name": "姑苏辙", "chars": "u / v", "feel": "黑暗内敛" },
+        "secondary_rhyme": { "name": "中东辙", "chars": "ong / ing", "feel": "共鸣" }
+      },
+      {
+        "bpm_band": "allegro",
+        "mode_group": "modal",
+        "primary_rhyme": { "name": "中东辙", "chars": "ong / eng / ing", "feel": "稳定共鸣" },
+        "secondary_rhyme": { "name": "姑苏辙", "chars": "u", "feel": "暗色" }
+      },
+      {
+        "bpm_band": "presto",
+        "mode_group": "major",
+        "primary_rhyme": { "name": "由求辙", "chars": "ou / iu", "feel": "快感滚动" },
+        "secondary_rhyme": { "name": "中东辙", "chars": "ong / ing", "feel": "锤击" }
+      },
+      {
+        "bpm_band": "presto",
+        "mode_group": "minor",
+        "primary_rhyme": { "name": "姑苏辙", "chars": "u / v", "feel": "压抑爆破" },
+        "secondary_rhyme": { "name": "中东辙", "chars": "ong", "feel": "共鸣" }
+      },
+      {
+        "bpm_band": "presto",
+        "mode_group": "modal",
+        "primary_rhyme": { "name": "中东辙", "chars": "ong / eng / ing", "feel": "密集锤击" },
+        "secondary_rhyme": { "name": "由求辙", "chars": "ou / iu", "feel": "滚动" }
+      }
+    ],
+    "rhyme_application_rules": {
+      "chorus_tail_rhyme": "严格入韵，每行末字韵母必须属于 primary_rhyme.chars",
+      "verse_rhyme": "偶数行末字押韵，奇数行可不入韵",
+      "pre_chorus_rhyme": "末行押韵，承接 Chorus 韵辙",
+      "bridge_rhyme": "允许换辙 1 次以制造色彩变化，尾行回归主韵"
+    }
+  },
+
+  "hook_vocal_peak_instruction_template": "副歌最高音落点（由 reference_dna.vocal_pitch_range_midi 上限估算）处的汉字韵母，必须属于以下开口音集合：a / ai / ao / ang / e / en / o。当你写出该位置的词之后，立刻在心中试唱：如果嘴无法张开超过 45 度，说明这个字是闭口音，必须替换。该规则优先级高于一切其他约束。"
+}
+```
+
+---
+
+#### Schema 2 / `local_asset_injected_prompt.json`
+
+**职责**：定义最终 System Prompt 的模板结构，所有 `{变量}` 在运行时由系统注入。
+
+```json
+{
+  "$schema": "music-producer/local_asset_injected_prompt/v1.3",
+
+  "assembly_order": [
+    "role_definition",
+    "acoustic_context",
+    "motif_anchor_instruction",
+    "forced_assets_injection",
+    "vocal_physics_rules",
+    "negative_constraints",
+    "structure_and_groove",
+    "output_format_rules"
+  ],
+
+  "library_sampling_config": {
+    "chengyu_pool": {
+      "source_repo": "pwxcoo/chinese-xinhua OR kaienfr/Chinese-Idioms",
+      "local_path": "data/chengyu_pool.json",
+      "sampling_count": 3,
+      "filter_rule": "exclude_entries_in: cliche_blacklist.json; prefer_entries_with_concrete_object_in_definition: true",
+      "register_affinity_filter": "{imagery_register_instruction_keyword}",
+      "fallback_if_empty": "skip this block"
+    },
+    "concrete_noun_pool": {
+      "source_repo": "thunlp/THUOCL (food + animal + chengyu 子集) + local curated noun pool",
+      "local_path": "data/concrete_noun_pool.json",
+      "sampling_count": 5,
+      "filter_rule": "exclude_entries_in: cliche_blacklist.json; exclude_entries_in: motif.forbidden_co_occurrence",
+      "static_tag_router": {
+        "tag_vocab": ["都市", "古典", "自然"],
+        "mode_to_tagset": {
+          "major": ["都市", "自然"],
+          "minor": ["都市", "古典"],
+          "modal": ["古典", "自然"]
+        },
+        "sampling_method": "python_random_sample",
+        "sampling_impl": "random.sample(filtered_candidates, sampling_count)"
+      }
+    }
+  },
+
+  "sections": {
+
+    "role_definition": {
+      "template": "你是一位华语流行乐资深作词人，曾为顶尖歌手操刀多首白金销量主打单曲。\n你的核心写作法则严格如下：\n\n【意象引力法则】每首词有且只有一个引力中心意象，它由系统在 [主轴意象指令] 中指定。全曲所有段落的词句必须向这个意象聚拢，即便写的是与之相距的场景，也要从那个场景的角度望向核心意象。引力中心以外的意象只能是卫星，不能喧宾夺主。\n\n【动词驱动法则】情绪由动词驱动，绝非情绪名词。掀、压、刮、绊住、贴着远比心碎、思念、孤独更有画面感和唱感。每个段落至少有 2 个有力动词。\n\n【语义越界法则】每首词在任意一处必须有一个语义越界，一个违反物理常识但心理上完全成立的意象接合。这一处越界是全词的文学峰值，必须出现且只允许出现 1 次。\n\n【禁区法则】见 [绝对禁用词] 部分。",
+      "variables": []
+    },
+
+    "acoustic_context": {
+      "template": "【声学语境指令】\n本次填词的参考曲声学特征已分析完毕，以下是你必须遵守的声学适配规则：\n\n字数与断句：{line_length_instruction}\n\n节拍与演唱韵律：{rhythm_instruction}\n\n情绪基调：{emotional_register_instruction}\n\n意象色调：{imagery_register_instruction}\n\n动词倾向：{verb_bias_instruction}\n\n叙事弧线：{narrative_arc_instruction}\n\n织体与时代感：{texture_era_instruction}\n\n换气口密度：{breath_marker_density}",
+      "variables": [
+        "line_length_instruction",
+        "rhythm_instruction",
+        "emotional_register_instruction",
+        "imagery_register_instruction",
+        "verb_bias_instruction",
+        "narrative_arc_instruction",
+        "texture_era_instruction",
+        "breath_marker_density"
+      ],
+      "variable_source": "audio_to_prompt_mapper.json 运行时输出"
+    },
+
+    "motif_anchor_instruction": {
+      "template": "【主轴意象指令】\n本次填词的引力中心意象为：{motif_core_images}（系统从 reference_dna 调式 + 本地静态标签名词池自动匹配）。\n\n你必须在以下段落中明确触及主轴意象：Verse 1（以之开场或收场）、Chorus（作为视觉焦点）、Bridge（从不同角度重新审视它）。\n\n卫星意象池（可选用 3-5 个，不得超出以下范围）：{motif_satellite_images}\n\n严禁在同一首词中同时出现以下意象组合（互斥对）：{motif_forbidden_combos}",
+      "variables": [
+        "motif_core_images",
+        "motif_satellite_images",
+        "motif_forbidden_combos"
+      ],
+      "variable_source": "mode_to_tagset + local concrete_noun_pool + cliche_blacklist 过滤"
+    },
+
+    "forced_assets_injection": {
+      "template": "【强制弹药注入】\n系统已从本地开源词库中为你抽取了以下素材，你必须在全词中使用其中至少 {min_chengyu_used} 个成语和至少 {min_noun_used} 个具象名词（不得虚假填入，必须真实融入句子逻辑）：\n\n- 可用成语（用哪个、怎么用、甚至反用或化用，你来决定）：\n{injected_chengyu_list}\n\n- 可用具象名词（必须出现在主歌或 Bridge 中，而非纯粹用在过渡句）：\n{injected_concrete_nouns}\n\n上述素材的使用方式不限于字面意思，拆字、化用、反讽皆可，但不允许为了用而用的机械嵌入。",
+      "variables": [
+        "min_chengyu_used",
+        "min_noun_used",
+        "injected_chengyu_list",
+        "injected_concrete_nouns"
+      ],
+      "variable_defaults": {
+        "min_chengyu_used": 1,
+        "min_noun_used": 3
+      },
+      "variable_source": "library_sampling_config 运行时采样"
+    },
+
+    "vocal_physics_rules": {
+      "template": "【声乐物理硬约束】这是优先级最高的规则，任何文学性考量都不得凌驾于此。\n\n① 高音开口音规则：副歌中演唱音高最高处（通常是 Chorus 的情绪爆点句）的汉字，韵母必须属于以下开口音集：a / ai / ao / ang / e / en / o。若你写出该位置时，字的韵母是 i / u / v / ing / un，你必须立刻寻找意思相近但韵母开口的替换词，然后再继续往下写。\n\n② 句尾平声规则：每个段落的最后一句，末字声调必须为一声（阴平）或二声（阳平）。三声和四声字在拖长音位置会产生倒字和咬合涩，禁止放在句尾长音位置。\n\n③ 十三辙押韵规则：本首词的主要韵辙为 {rhyme_class_name}（韵母范围：{rhyme_chars}，风格感：{rhyme_feel}）。\n   - Chorus 每行末字：严格入韵\n   - Verse 偶数行末字：入韵\n   - Verse 奇数行末字：不强制\n   - Bridge：允许换辙一次，尾行回归主韵\n   - 换韵规则：一首词只允许在 Bridge 出现一次主动换辙\n\n④ 声调层碰撞规则：全曲咬合风险（相邻句尾同为三声或同为四声的情况）不超过 10%。Chorus hook 句尾两字的声调碰撞率为零容忍。",
+      "variables": [
+        "rhyme_class_name",
+        "rhyme_chars",
+        "rhyme_feel"
+      ],
+      "variable_source": "audio_to_prompt_mapper.json compound_rhyme_selector 输出"
+    },
+
+    "negative_constraints": {
+      "template": "【绝对禁用词与禁止行为】\n以下词汇及其同义改写形式，在任何情况下均不得出现。系统会在输出后做扫描，命中即重写。\n\n- 烂梗黑名单（节选，完整版由系统注入）：{cliche_blacklist_excerpt}\n\n除上述词汇外，还禁止以下行为：\n① 禁止将任何制作指令、调式标注（如 C# 高能段、重复三遍）写入歌词正文。\n② 禁止使用纯情绪名词而不配任何具象画面（如心碎了不配任何场景即是无效表达）。\n③ 禁止在一首词中使用超过 4 种不同场景域的意象（意象贪多 = 收据清单 = 失败）。\n④ 禁止副歌使用完全相同的文字重复超过 2 次，每次重复必须带来至少一个词的语义或情感层级的变化。",
+      "variables": [
+        "cliche_blacklist_excerpt"
+      ],
+      "variable_source": "data/cliche_blacklist.json 取前 60 条高频词"
+    },
+
+    "structure_and_groove": {
+      "template": "【段落结构与输出格式】\n你的输出必须严格按以下结构标签组织，Suno/MiniMax 依赖这些标签进行音频生成：\n\n合法段落标签（只能使用以下标签，不得自创）：\n[Intro] [Verse 1] [Pre-Chorus] [Chorus] [Verse 2] [Bridge] [Final Chorus] [Outro]\n\n合法动态标签（附加在段落标签后，用空格隔开）：\n[Energy: High] [Build-up] [intimate] [moody] [explosive release] [reflection] [tonal shift]\n\n合法气口标记（嵌入歌词行内，在需要换气的位置）：\n[breath] [inhale] [sigh] [whisper]\n使用规则：{breath_marker_density}\n\n本次词的目标段落结构：\n{song_structure_template}\n\n段落分配原则：\n- [Verse 1]：铺陈具体场景（具象名词密度最高，禁止情绪词）\n- [Pre-Chorus]：开始累积矛盾（至少 1 次递进结构）\n- [Chorus]：情绪爆发（主轴意象强制出现，高音开口音规则严格执行）\n- [Verse 2]：引入新的次级意象，并对 Verse 1 的意象做回望\n- [Bridge]：视角切换（从第一人称切至第二人称或旁观视角）；此段允许也鼓励使用成语化典\n- [Final Chorus]：复用 Chorus 核心句，并追加至少一个新的意象层",
+      "variables": [
+        "breath_marker_density",
+        "song_structure_template"
+      ],
+      "variable_defaults": {
+        "song_structure_template": "[Intro]\\n[Verse 1]\\n[Pre-Chorus]\\n[Chorus]\\n[Verse 2]\\n[Bridge]\\n[Final Chorus]\\n[Outro]"
+      },
+      "variable_source": "acoustic_context 运行时组装"
+    },
+
+    "output_format_rules": {
+      "template": "【输出规范】\n① 只输出歌词正文（含段落标签和气口标记），不输出任何解释、注释、元评价、质量报告。\n② 不在歌词正文中出现任何调式名称、音符标注、制作备注（如 C# 段、重复两次、感情需饱满）。\n③ 每行结尾不加标点（气口标记除外），句内停顿可用逗号，但末尾保持干净。\n④ 成语和注入名词的使用不需注明来源，直接融入词句。",
+      "variables": []
+    }
+  },
+
+  "runtime_assembly_spec": {
+    "description": "系统在每次调用前，按 assembly_order 顺序拼接各 section.template，填入变量值，生成最终 system_prompt.txt。",
+    "separator": "\\n\\n---\\n\\n",
+    "variable_injection_order": [
+      "Step 1: 运行 audio_to_prompt_mapper.json，输入 reference_dna.json，产出 prompt_constraints 对象",
+      "Step 2: 运行 library_sampling_config，采样成语和具象名词",
+      "Step 3: 按 reference_dna.key.mode 选择 static_tag_router.mode_to_tagset，并使用 random.sample 抽取 motif_core_images 和 motif_satellite_images",
+      "Step 4: 从 compound_rhyme_selector 读取韵辙",
+      "Step 5: 将以上所有变量填入 sections 的各 template",
+      "Step 6: 按 assembly_order 拼接，输出 system_prompt.txt"
+    ],
+    "estimated_final_prompt_length": "1200-1800 字（中文），在 GPT-4o / Claude 的 system prompt 合理范围内"
+  }
+}
+```
+
+---
+
+#### 运行时变量流转示意
+
+```
+reference_dna.json
+       │
+       ├──→ audio_to_prompt_mapper.json
+       │              └──→ line_length / rhythm / register / arc / rhyme 等字符串
+       │
+       ├──→ library_sampling_config (static_tag_router)
+       │              └──→ injected_chengyu_list / injected_concrete_nouns / motif_core_images
+       │
+       └──→ local_asset_injected_prompt.json
+                      └──→ system_prompt.txt → LLM
+
+LLM 输出歌词正文
+       │
+       └──→ backend_qc_scanner.py（re.finditer 物理扫描）
+                      └──→ cliche_hits / chengyu_count / tone_collision / vowel_peak_report
+```
 
 红线：
 - 不引入 POS 校验；
 - 不以英文 ChordPro 作为华语主链模板；
 - 不使用平水韵作为现代流行主链；
-- 不新增中间件与模型训练步骤。
+- 不新增中间件与模型训练步骤；
+- 不允许 LLM 输出 QC 统计行。
 
 ### 2.2 显式拒绝清单
 
@@ -233,65 +666,77 @@
 
 ---
 
-### 5.4 工具四：`lyric_architect` 填词架构师 ★ **(v1.1 新增核心 IP)**
+### 5.4 工具四：`lyric_architect` 填词架构师 ★ **(v1.3 生产版核心 IP)**
 
-**职责**：用户意图 + 本地模板骨架 → 高质量中文歌词。LLM 仅做 slot 填充，不得改写骨架。
+**职责**：用户意图 + `reference_dna.json` + 双 Schema 资产路由 → 高质量中文歌词。
 
-**设计背景**：AI 写中文词的三大硬伤：
-1. **高音憋死**：副歌最高音填了"哭/你/一"（闭口音），物理上唱不开
-2. **倒字**：旋律下行配去声→平声，听感怪异
-3. **AI 味烂梗**："星辰大海"、"孤独灵魂"、"追寻梦想"、"时光沙漏"
-
-传统做法是反复 retry 大模型，既贵又不稳。正确做法是**流水线式拦截**。
+**系统定位**：
+- LLM 负责创作；
+- JSON 负责约束；
+- 后端程序负责审计；
+- 三者分权，禁止混权。
 
 #### 5.4.1 输入
 
 ```json
 {
-  "intent": "用我的嗓子唱一首失恋 R&B,碎碎念风格",
+  "intent": "用我的嗓子唱一首失恋 R&B，碎碎念风格",
   "friction_report_path": "./friction_report.json",
   "reference_dna_path": "./reference_dna.json",
+  "audio_to_prompt_mapper_path": "./data/audio_to_prompt_mapper.json",
+  "prompt_template_path": "./data/local_asset_injected_prompt.json",
   "structure_template": null
 }
 ```
 
-#### 5.4.2 内部五步流水线
+#### 5.4.2 运行流水线（唯一生产流程）
 
 ```
-[Step 1] 结构栅格生成 (Plot Planner)
-  │ 输入: 用户意图 + reference_dna 的 structure
-  │ 处理: OpenAI 结构化输出 (JSON mode) 生成叙事大纲
-  │ 约束: 模板骨架为唯一事实源（章节、句长、重音位）
-  │      不允许 LLM 增删章节或改写骨架规则
-  ▼
-[Step 2] 草稿生成 (Draft Writer)
-  │ 基于模板骨架, 分段让 LLM 填充内容 slot
-  │ 语料注册表仅提供词汇/语气参考，不提供结构决策
-  │ 所有输出先过骨架一致性校验，再进入后续拦截
-  ▼
-[Step 3] 物理层拦截 (Vowel Openness Check)
-  │ pypinyin 把每一句转成带声调的拼音
-  │ 定位 reference_dna 里副歌最高音的时间位置 → 映射到对应歌词字
-  │ 规则: 最高音 (MIDI > 69 或用户绝对上限附近) 必须是开口音
-  │      开口音: a / ai / ao / ang / e / en / o
-  │      闭口音: i / u / ü / ing / un  → 命中 = CRITICAL
-  │ 违规 → 调 LLM 改写: "把 X 字换成意思相近但韵母为 a/ai/ao 的字"
-  ▼
-[Step 4] 声调层拦截 (Tonal Collision Check)
-  │ 规则: 乐句结尾的长音字, 优先使用平声 (1/2 声)
-  │      命中 3/4 声的长音 → 标记为"咬合风险"
-  │ 阈值: 全曲咬合风险 > 15% → 触发 LLM 二次改写
-  ▼
-[Step 5] 语义层拦截 (Anti-Cliché Engine)
-  │ 纯词表匹配(不做 POS): 命中 cliche_blacklist.json 计数
-  │ 阈值: 烂梗率 > 5% (每 100 字 >5 个烂梗词) → 触发重写
-  │ 重写 Prompt: "禁止抽象情绪词，必须从 visual_montage_nouns.json 抽取具象名词"
-  │ 迭代上限: 3 次。第 3 次仍超标则失败返回，不做灰度放行
-  ▼
-输出 lyrics.json
+[Step 1] 声学约束映射
+  输入: reference_dna.json + audio_to_prompt_mapper.json
+  输出: prompt_constraints (line_length / rhythm / register / arc / rhyme)
+
+[Step 2] 本地词库抽样
+  输入: library_sampling_config
+  规则: concrete_noun_pool 使用 static_tag_router + random.sample
+  输出: injected_chengyu_list / injected_concrete_nouns / motif_core_images
+
+[Step 3] System Prompt 组装
+  输入: local_asset_injected_prompt.json + Step1/Step2 变量
+  输出: system_prompt.txt
+
+[Step 4] LLM 生成歌词正文
+  约束: 只输出歌词，不输出 QC，不输出解释，不输出制作备注
+
+[Step 5] 后端物理审计（剥夺 LLM 审计权）
+  工具: backend_qc_scanner.py
+  方法: re.finditer 扫描烂梗、成语、禁词、制作备注残留；pypinyin 扫描句尾声调与高音开口音
+  策略: 任一硬约束失败 -> 自动重写；超过迭代上限 -> fail-fast 返回
 ```
 
-#### 5.4.3 输出 `lyrics.json`
+#### 5.4.3 后端 QC 实现契约（必须执行）
+
+```python
+import re
+
+def scan_cliche_hits(text: str, blacklist: list[str]) -> list[tuple[int, str]]:
+    hits: list[tuple[int, str]] = []
+    for token in blacklist:
+        for m in re.finditer(re.escape(token), text):
+            hits.append((m.start(), token))
+    return hits
+
+def scan_chengyu_hits(text: str, chengyu_pool: list[str]) -> list[tuple[int, str]]:
+    hits: list[tuple[int, str]] = []
+    for token in chengyu_pool:
+        for m in re.finditer(re.escape(token), text):
+            hits.append((m.start(), token))
+    return hits
+```
+
+审计结果由程序写入 `lyrics.json.stats` 与 `ledger.jsonl`，不得由 LLM 自报。
+
+#### 5.4.4 输出 `lyrics.json`
 
 ```json
 {
@@ -315,14 +760,7 @@
       ]
     }
   ],
-  "warnings": [
-    {
-      "line_index": 14,
-      "type": "tone_collision",
-      "severity": "medium",
-      "human": "副歌最后一句'走'(3声)落在长音上,咬合略涩。接受或让我再改?"
-    }
-  ],
+  "warnings": [],
   "stats": {
     "vowel_openness_at_peak": "pass",
     "cliche_density_pct": 1.8,
@@ -331,7 +769,7 @@
 }
 ```
 
-#### 5.4.4 给用户的翻译版
+#### 5.4.5 给用户的翻译版
 
 ```
 [制片人] 草稿出来了,但我的填词架构师拦了两个雷:

@@ -32,6 +32,74 @@ ENERGY_MOOD_MAP = {
 }
 
 
+def _extract_energy_points(reference_dna: dict[str, object]) -> list[float]:
+    curve = reference_dna.get("energy_curve", [])
+    if not isinstance(curve, list):
+        return []
+    out: list[float] = []
+    for item in curve:
+        if isinstance(item, (int, float)):
+            out.append(float(item))
+        elif isinstance(item, dict):
+            val = item.get("energy")
+            if isinstance(val, (int, float)):
+                out.append(float(val))
+    return out
+
+
+def _build_dynamic_cues(
+    *,
+    section_tag: str,
+    section_idx: int,
+    total_sections: int,
+    energy_points: list[float],
+    musiccaps_events: list[str],
+) -> tuple[list[str], list[dict[str, object]]]:
+    cues: list[str] = []
+    logs: list[dict[str, object]] = []
+    tag_lower = section_tag.strip().lower()
+
+    section_energy = 0.0
+    if energy_points:
+        pos = min(max(section_idx, 0), len(energy_points) - 1)
+        section_energy = energy_points[pos]
+
+    def _add(tag: str, source: str, reason: str) -> None:
+        cues.append(tag)
+        logs.append(
+            {
+                "tag": tag,
+                "tag_source": source,
+                "time_anchor": section_idx,
+                "decision_reason": reason,
+            }
+        )
+
+    if section_energy <= 0.35:
+        _add("[breath]", "energy_curve", "low_energy_phrase_break")
+    if "pre" in tag_lower and section_energy >= 0.5:
+        _add("[inhale]", "energy_curve", "pre_chorus_tension_build")
+    if "bridge" in tag_lower or section_energy >= 0.85:
+        _add("[sigh]", "energy_curve", "high_energy_release")
+
+    normalized_events = [e.lower() for e in musiccaps_events if isinstance(e, str)]
+    if any("whisper" in e for e in normalized_events):
+        _add("[whisper]", "musiccaps_events", "event_whisper_detected")
+    if any("build" in e for e in normalized_events):
+        _add("[build-up]", "musiccaps_events", "event_build_up_detected")
+
+    if section_idx == 0 and "[breath]" not in cues:
+        _add("[breath]", "fallback", "first_section_default")
+    if section_idx == total_sections - 1 and "[sigh]" not in cues:
+        _add("[sigh]", "fallback", "last_section_release")
+
+    uniq: list[str] = []
+    for c in cues:
+        if c not in uniq:
+            uniq.append(c)
+    return uniq, logs
+
+
 def _extract_bpm(reference_dna: dict[str, object]) -> float:
     """Extract BPM from normalized or legacy style_deconstructor fields."""
     bpm = reference_dna.get("bpm")
@@ -85,6 +153,20 @@ def _extract_energy_head(reference_dna: dict[str, object]) -> float:
     return 0.0
 
 
+def _derive_single_mood(reference_dna: dict[str, object]) -> str:
+    points = _extract_energy_points(reference_dna)
+    if not points:
+        return "intimate"
+    avg = sum(points) / len(points)
+    if avg >= 0.75:
+        return "high-energy"
+    if avg >= 0.5:
+        return "driving"
+    if avg >= 0.35:
+        return "reflective"
+    return "intimate"
+
+
 def compile_style_field(
     genre_seed: dict[str, object],
     reference_dna: dict[str, object],
@@ -107,21 +189,30 @@ def compile_style_field(
     try:
         parts: list[str] = []
 
-        # 1. Genre descriptors
+        # 1. Genre/Decade descriptors
         descriptors = genre_seed.get("descriptors", [])
+        genre_tags: list[str] = []
         if isinstance(descriptors, list):
             for d in descriptors:
                 if isinstance(d, str) and d:
-                    parts.append(d)
+                    genre_tags.append(d)
+        if not genre_tags:
+            genre_tags = ["urban pop"]
+        if len(genre_tags) >= 3:
+            # Keep first two + last to retain diversity (e.g. R&B, soul, urban)
+            parts.extend([genre_tags[0], genre_tags[1], genre_tags[-1]])
+        else:
+            parts.extend(genre_tags[:2])
 
-        # 2. Target key
+        # 2) Key + BPM as one compact style tag
         key = reference_dna.get("key", "")
-        if isinstance(key, str) and key:
-            parts.append(key)
-
-        # 3. BPM
+        key_text = key if isinstance(key, str) and key else ""
         bpm = _extract_bpm(reference_dna)
-        if bpm > 0:
+        if key_text and bpm > 0:
+            parts.append(f"{key_text} {int(bpm)} BPM")
+        elif key_text:
+            parts.append(key_text)
+        elif bpm > 0:
             parts.append(f"{int(bpm)} BPM")
 
         # 4. Vocal style from timbre brightness
@@ -136,9 +227,24 @@ def compile_style_field(
                 else:
                     parts.append("deep vocal")
 
-        # 5. Instrumentation emphasis
-        for inst in _extract_emphasis_instruments(reference_dna):
-            parts.append(inst)
+        # 5. Instrumentation emphasis (2-3 core stems, compact token)
+        emphasis = _extract_emphasis_instruments(reference_dna)
+        if not emphasis:
+            emphasis = ["vocal", "soft drums", "synth pad"]
+        instrument_token = " + ".join(str(x) for x in emphasis[:3])
+        if instrument_token:
+            parts.append(instrument_token)
+
+        # 6. Single mood token (no contradictions)
+        mood_token = _derive_single_mood(reference_dna)
+        parts.append(mood_token)
+
+        # keep style tag count compact: 4-7 tags
+        if len(parts) > 7:
+            trimmed = parts[:7]
+            if mood_token not in trimmed:
+                trimmed[-1] = mood_token
+            parts = trimmed
 
         style = ", ".join(parts)
 
@@ -198,6 +304,8 @@ def compile_lyrics_field(
                 lines.append("[Mood: reflective]")
             else:
                 lines.append("[Mood: intimate]")
+        else:
+            lines.append("[Mood: intimate]")
 
         emphasis = _extract_emphasis_instruments(reference_dna)
         if emphasis:
@@ -207,34 +315,108 @@ def compile_lyrics_field(
         else:
             lines.append("[Instrument: vocal, soft drums, synth pad]")
 
+        # Suno/MiniMax section tag mapping (PROD-3)
+        _SUNO_TAG_MAP = {
+            "verse 1": "[Verse]",
+            "verse 2": "[Verse]",
+            "verse": "[Verse]",
+            "pre-chorus": "[Pre-Chorus]",
+            "prechorus": "[Pre-Chorus]",
+            "chorus": "[Chorus]",
+            "final chorus": "[Chorus]",
+            "bridge": "[Bridge]",
+            "intro": "[Intro]",
+            "outro": "[Outro]",
+        }
+
+        # Dynamic cue injection based on energy curve + optional MusicCaps events.
+        def _suno_tag(tag: str) -> str:
+            return _SUNO_TAG_MAP.get(tag.strip().lower(), f"[{tag}]")
+
+        is_first_section = True
+        cue_logs: list[dict[str, object]] = []
+        energy_points = _extract_energy_points(reference_dna)
+        events_raw = reference_dna.get("musiccaps_events", [])
+        musiccaps_events = events_raw if isinstance(events_raw, list) else []
+        total_sections = len([s for s in sections if isinstance(s, dict)])
+
         # Section content
-        for section in sections:
+        for sec_idx, section in enumerate(sections):
             if not isinstance(section, dict):
                 continue
 
             tag = section.get("tag", "Verse")
             section_lines = section.get("lines", [])
-
             if not isinstance(section_lines, list):
                 section_lines = []
 
-            # Add section header with mood
+            tag_lower = tag.strip().lower()
+            suno_header = _suno_tag(tag)
             mood = _get_mood_for_tag(tag)
-            lines.append(f"\n[{tag}] [{mood}]")
+
+            # Intro marker before first section
+            if is_first_section:
+                lines.append("\n[Intro]")
+                is_first_section = False
+
+            lines.append(f"\n{suno_header}")
+
+            if "chorus" in tag_lower:
+                lines.append("[Energy: High]")
+                lines.append("[Build-up]")
+
+            dynamic_cues, decision_logs = _build_dynamic_cues(
+                section_tag=str(tag),
+                section_idx=sec_idx,
+                total_sections=max(1, total_sections),
+                energy_points=energy_points,
+                musiccaps_events=musiccaps_events,
+            )
+            cue_logs.extend(decision_logs)
+            for cue in dynamic_cues:
+                lines.append(cue)
+
+            if "bridge" in tag_lower and "[whisper]" not in dynamic_cues:
+                lines.append("[whisper]")
+                cue_logs.append(
+                    {
+                        "tag": "[whisper]",
+                        "tag_source": "fallback",
+                        "time_anchor": sec_idx,
+                        "decision_reason": "bridge_texture_control",
+                    }
+                )
 
             # Add lyrics text
+            text_lines: list[str] = []
             for line_data in section_lines:
                 if isinstance(line_data, dict):
                     text = line_data.get("text", "")
                     if isinstance(text, str) and text:
-                        # Check for tone collision warnings (difficult syllable timing)
-                        warnings = line_data.get("warnings", [])
-                        if isinstance(warnings, list) and "tone_collision" in warnings:
-                            # Mark last character for timing adjustment
-                            text = text[:-1] + "~" + text[-1] if len(text) > 1 else text
-                        lines.append(text)
-                elif isinstance(line_data, str):
-                    lines.append(line_data)
+                        text_lines.append(text)
+                elif isinstance(line_data, str) and line_data:
+                    text_lines.append(line_data)
+
+            for t_idx, text in enumerate(text_lines):
+                lines.append(text)
+                # Retain explicit inhale on pre-chorus boundary when not already injected.
+                if (
+                    "pre" in tag_lower
+                    and t_idx == len(text_lines) - 1
+                    and "[inhale]" not in dynamic_cues
+                ):
+                    lines.append("[inhale]")
+                    cue_logs.append(
+                        {
+                            "tag": "[inhale]",
+                            "tag_source": "fallback",
+                            "time_anchor": sec_idx,
+                            "decision_reason": "pre_chorus_line_end",
+                        }
+                    )
+
+        # Outro marker at the end
+        lines.append("\n[Outro]")
 
         lyrics_text = "\n".join(lines)
 
@@ -245,6 +427,7 @@ def compile_lyrics_field(
                 "structure": "lyrics.sections",
                 "mood": "derived_from_energy_curve",
                 "timing_adjustments": "lyric_architect.warnings",
+                "cue_decisions": cue_logs,
             },
         }
 
@@ -352,10 +535,14 @@ def validate_prompt_semantics(
         violations.append("lyrics_missing_mood_tag")
     if "[Instrument:" not in lyrics_text:
         violations.append("lyrics_missing_instrument_tag")
-    if "[Verse 1]" not in lyrics_text:
+    if "[Verse]" not in lyrics_text and "[Verse 1]" not in lyrics_text:
         violations.append("lyrics_missing_verse1")
-    if "[Chorus" not in lyrics_text:
+    if "[Chorus]" not in lyrics_text and "[Chorus" not in lyrics_text:
         violations.append("lyrics_missing_chorus")
+    if "[breath]" not in lyrics_text:
+        violations.append("lyrics_missing_breath_tag")
+    if "[Outro]" not in lyrics_text:
+        violations.append("lyrics_missing_outro")
 
     if not exclude_text.strip():
         violations.append("exclude_missing")
