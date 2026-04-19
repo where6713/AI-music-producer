@@ -295,13 +295,6 @@ def _coerce_path(value: object) -> Path | None:
 
 def run(payload: ToolPayload) -> ToolResult:
     """Execute minimal preprocessing for acoustic_analyst."""
-    try:
-        from dotenv import load_dotenv  # type: ignore[import-untyped]
-
-        load_dotenv(override=False)
-    except Exception:
-        pass
-
     # Backward-compatible key bridge:
     # prefer audio_path, fallback to legacy dry_vocal_path.
     audio_path_value = payload.get("audio_path")

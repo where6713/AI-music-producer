@@ -318,13 +318,6 @@ def run(payload: ToolPayload) -> ToolResult:
     Returns:
         ToolResult with ok, friction_report, and optional output_path.
     """
-    try:
-        from dotenv import load_dotenv  # type: ignore[import-untyped]
-
-        load_dotenv(override=False)
-    except Exception:
-        pass
-
     voice_profile = payload.get("voice_profile")
     reference_dna = payload.get("reference_dna")
 

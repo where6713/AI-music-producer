@@ -49,12 +49,12 @@ def _audit_emit(
         "run_id": str(audit_context.get("run_id", "")),
         "trace_id": str(audit_context.get("trace_id", "")),
         "event": event,
-        "step": step,
-        "attempt": int(attempt),
         "rule": rule,
-        "input_hash": input_hash,
         "decision": decision,
         "reason_code": reason_code,
+        "step": step,
+        "attempt": int(attempt),
+        "input_hash": input_hash,
         "timestamp": _now_iso(),
     }
     if isinstance(extra, dict):
@@ -1900,13 +1900,6 @@ def run(payload: ToolPayload) -> ToolResult:
     Returns:
         dict with ok, lyrics (meta/sections/warnings/stats)
     """
-    try:
-        from dotenv import load_dotenv  # type: ignore[import-untyped]
-
-        load_dotenv(override=False)
-    except Exception:
-        pass
-
     intent_val = payload.get("intent", "")
     intent = str(intent_val) if isinstance(intent_val, str) else ""
     reference_dna_val = payload.get("reference_dna", {})

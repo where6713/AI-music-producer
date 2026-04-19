@@ -376,13 +376,6 @@ def _extract_energy_curve(
 
 def run(payload: ToolPayload) -> ToolResult:
     """Execute the style_deconstructor decomposition pipeline."""
-    try:
-        from dotenv import load_dotenv  # type: ignore[import-untyped]
-
-        load_dotenv(override=False)
-    except Exception:
-        pass
-
     audio_path_value = payload.get("reference_audio_path")
     audio_path = _coerce_path(audio_path_value)
     input_path = audio_path.expanduser().resolve() if audio_path else None

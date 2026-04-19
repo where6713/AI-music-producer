@@ -624,13 +624,6 @@ def _apply_mastering(
 
 def run(payload: ToolPayload) -> ToolResult:
     """Execute the post_processor tool."""
-    try:
-        from dotenv import load_dotenv  # type: ignore[import-untyped]
-
-        load_dotenv(override=False)
-    except Exception:
-        pass
-
     # Validate required inputs
     input_path = _validate_input_path(payload)
     output_dir = _validate_output_dir(payload)
