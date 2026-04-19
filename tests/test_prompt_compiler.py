@@ -121,6 +121,26 @@ class TestCompileStyleField:
         assert "101 BPM" in result["style"]
         assert "D minor" in result["style"]
 
+    def test_style_field_enforces_tag_count_and_single_mood(self) -> None:
+        genre_seed = {"descriptors": ["neo-r&b", "urban pop", "late 2010s"]}
+        reference_dna = {
+            "key": "C# minor",
+            "tempo": 101,
+            "energy_curve": [0.2, 0.4, 0.8],
+            "instrumentation": {
+                "vocals": {"presence": True},
+                "bass": {"presence": True},
+                "keys": {"presence": True},
+                "drums": {"presence": True},
+            },
+        }
+        result = compile_style_field(genre_seed, reference_dna, {})
+
+        assert result["ok"] is True
+        tags = [x.strip() for x in result["style"].split(",") if x.strip()]
+        assert 4 <= len(tags) <= 7
+        assert any(x in result["style"] for x in ["intimate", "reflective", "driving", "high-energy"])
+
 
 class TestCompileLyricsField:
     """Test compile_lyrics_field function.
@@ -202,6 +222,24 @@ class TestCompileLyricsField:
 
         assert result["ok"] is True
         assert "[Mood:" in result["lyrics"]
+
+    def test_lyrics_field_adds_chorus_energy_and_build_up(self) -> None:
+        lyrics = {
+            "sections": [
+                {"tag": "Verse 1", "lines": [{"text": "台灯照外卖订单"}]},
+                {"tag": "Chorus", "lines": [{"text": "地铁门开我还在等她"}]},
+            ]
+        }
+        reference_dna = {
+            "energy_curve": [0.3, 0.6, 0.85],
+            "instrumentation": {"emphasis": ["vocal", "bass"]},
+        }
+        result = compile_lyrics_field(lyrics, reference_dna)
+
+        assert result["ok"] is True
+        assert "[Energy: High]" in result["lyrics"]
+        assert "[Build-up]" in result["lyrics"]
+        assert "[whisper]" in result["lyrics"] or "[sigh]" in result["lyrics"] or "[breath]" in result["lyrics"]
 
     def test_lyrics_field_empty_sections(self) -> None:
         """Test lyrics field with empty sections."""

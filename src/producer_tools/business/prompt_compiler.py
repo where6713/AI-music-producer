@@ -153,6 +153,20 @@ def _extract_energy_head(reference_dna: dict[str, object]) -> float:
     return 0.0
 
 
+def _derive_single_mood(reference_dna: dict[str, object]) -> str:
+    points = _extract_energy_points(reference_dna)
+    if not points:
+        return "intimate"
+    avg = sum(points) / len(points)
+    if avg >= 0.75:
+        return "high-energy"
+    if avg >= 0.5:
+        return "driving"
+    if avg >= 0.35:
+        return "reflective"
+    return "intimate"
+
+
 def compile_style_field(
     genre_seed: dict[str, object],
     reference_dna: dict[str, object],
@@ -175,21 +189,30 @@ def compile_style_field(
     try:
         parts: list[str] = []
 
-        # 1. Genre descriptors
+        # 1. Genre/Decade descriptors
         descriptors = genre_seed.get("descriptors", [])
+        genre_tags: list[str] = []
         if isinstance(descriptors, list):
             for d in descriptors:
                 if isinstance(d, str) and d:
-                    parts.append(d)
+                    genre_tags.append(d)
+        if not genre_tags:
+            genre_tags = ["urban pop"]
+        if len(genre_tags) >= 3:
+            # Keep first two + last to retain diversity (e.g. R&B, soul, urban)
+            parts.extend([genre_tags[0], genre_tags[1], genre_tags[-1]])
+        else:
+            parts.extend(genre_tags[:2])
 
-        # 2. Target key
+        # 2) Key + BPM as one compact style tag
         key = reference_dna.get("key", "")
-        if isinstance(key, str) and key:
-            parts.append(key)
-
-        # 3. BPM
+        key_text = key if isinstance(key, str) and key else ""
         bpm = _extract_bpm(reference_dna)
-        if bpm > 0:
+        if key_text and bpm > 0:
+            parts.append(f"{key_text} {int(bpm)} BPM")
+        elif key_text:
+            parts.append(key_text)
+        elif bpm > 0:
             parts.append(f"{int(bpm)} BPM")
 
         # 4. Vocal style from timbre brightness
@@ -204,9 +227,24 @@ def compile_style_field(
                 else:
                     parts.append("deep vocal")
 
-        # 5. Instrumentation emphasis
-        for inst in _extract_emphasis_instruments(reference_dna):
-            parts.append(inst)
+        # 5. Instrumentation emphasis (2-3 core stems, compact token)
+        emphasis = _extract_emphasis_instruments(reference_dna)
+        if not emphasis:
+            emphasis = ["vocal", "soft drums", "synth pad"]
+        instrument_token = " + ".join(str(x) for x in emphasis[:3])
+        if instrument_token:
+            parts.append(instrument_token)
+
+        # 6. Single mood token (no contradictions)
+        mood_token = _derive_single_mood(reference_dna)
+        parts.append(mood_token)
+
+        # keep style tag count compact: 4-7 tags
+        if len(parts) > 7:
+            trimmed = parts[:7]
+            if mood_token not in trimmed:
+                trimmed[-1] = mood_token
+            parts = trimmed
 
         style = ", ".join(parts)
 
@@ -266,6 +304,8 @@ def compile_lyrics_field(
                 lines.append("[Mood: reflective]")
             else:
                 lines.append("[Mood: intimate]")
+        else:
+            lines.append("[Mood: intimate]")
 
         emphasis = _extract_emphasis_instruments(reference_dna)
         if emphasis:
@@ -321,6 +361,10 @@ def compile_lyrics_field(
 
             lines.append(f"\n{suno_header}")
 
+            if "chorus" in tag_lower:
+                lines.append("[Energy: High]")
+                lines.append("[Build-up]")
+
             dynamic_cues, decision_logs = _build_dynamic_cues(
                 section_tag=str(tag),
                 section_idx=sec_idx,
@@ -331,6 +375,17 @@ def compile_lyrics_field(
             cue_logs.extend(decision_logs)
             for cue in dynamic_cues:
                 lines.append(cue)
+
+            if "bridge" in tag_lower and "[whisper]" not in dynamic_cues:
+                lines.append("[whisper]")
+                cue_logs.append(
+                    {
+                        "tag": "[whisper]",
+                        "tag_source": "fallback",
+                        "time_anchor": sec_idx,
+                        "decision_reason": "bridge_texture_control",
+                    }
+                )
 
             # Add lyrics text
             text_lines: list[str] = []

@@ -2278,6 +2278,22 @@ def run(payload: ToolPayload) -> ToolResult:
                 )
         if needs_anti_lexicon_fix:
             cliche_fix_count += 1
+            anti_hits = anti_lexicon_result.get("hits", [])
+            if isinstance(anti_hits, list) and anti_hits:
+                _audit_emit(
+                    audit_context,
+                    event="[Blocked]",
+                    step="anti_lexicon_gate",
+                    attempt=attempt + 1,
+                    rule="cliche_blacklist.json",
+                    input_hash=_hash_payload({"hits": anti_hits, "lines": all_lines}),
+                    decision="blocked",
+                    reason_code="cliche_blacklist_blocked",
+                    extra={
+                        "message": "触发 cliche_blacklist.json 违禁词，强行阻断并退回重构",
+                        "hits": anti_hits,
+                    },
+                )
         if needs_line_length_fix:
             line_length_fix_count += 1
 
