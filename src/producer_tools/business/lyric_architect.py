@@ -2206,6 +2206,15 @@ def run(payload: ToolPayload) -> ToolResult:
         )
         tone_result = check_tone_collision(all_lines, effective_long_note_positions)
         cliche_result = check_anti_cliche(all_lines, blacklist=cliche_blacklist)
+        cliche_violations_log = cliche_result.get("violations", [])
+        if isinstance(cliche_violations_log, list) and cliche_violations_log:
+            emit_cliche_hit_audit(
+                audit_context,
+                attempt=max(1, draft_iterations),
+                violations=cliche_violations_log,
+                before_lines=all_lines,
+                after_lines=[],
+            )
         anti_lexicon_result = check_anti_lexicon(all_lines, negative_lexicon)
         completeness_result = check_sentence_completeness(all_lines)
         if has_line_length_limits:
@@ -2286,6 +2295,7 @@ def run(payload: ToolPayload) -> ToolResult:
             + "\n- 长音位置尽量使用更顺口字。"
             + "\n- 避免重复句式与重复关键词。"
             + "\n- 句子必须完整，禁止半截句、禁止以虚词或介词收尾。"
+            + "\n- 每行最后一个字必须是实词（名词/动词/形容词），禁止以'的/着/把/被/和/跟/与/及/就/再/还/都/又/也/在/到/向/给/对/从/了/吗/呢/吧'等虚词或介词结尾。"
             + (
                 "\n- 严格短句：普通段落每行不超过"
                 + str(max_line_length)
@@ -2304,6 +2314,15 @@ def run(payload: ToolPayload) -> ToolResult:
                 else ""
             )
         )
+        if needs_vowel_fix:
+            current_intent += (
+                "\n- 副歌（Chorus）每一句的最后一个字，拼音韵母必须是 a/ai/ao/ang 之一，"
+                "这是硬性要求，不得违反。"
+            )
+        if needs_completeness_fix:
+            current_intent += (
+                "\n- 所有句子末尾必须是完整语义收束，不能留有任何未完结的语气词、介词或连词。"
+            )
 
     # Build warnings list
     warnings: list[dict[str, object]] = []
