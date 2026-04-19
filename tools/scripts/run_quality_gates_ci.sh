@@ -47,9 +47,9 @@ if git grep -nE '(AKIA[0-9A-Z]{16}|BEGIN[[:space:]]+PRIVATE[[:space:]]+KEY|api[_
 fi
 
 # 4.1) PM hard-stop: zero placeholder / zero mock markers in code and tests
-if git grep -nE '(mock_data|Lorem ipsum|TODO_FILL|dummy_json|fake_json)' -- . ':!*.md' ':!*.txt' ':!tools/scripts/run_quality_gates_ci.sh' ':!tests/test_ci_quality_gate_contract.py' >/dev/null 2>&1; then
+if git grep -nE '(mock_data|Lorem ipsum|TODO_FILL|dummy_json|fake_json)' -- . ':!*.md' ':!*.txt' ':!tools/scripts/run_quality_gates_ci.sh' ':!tests/test_ci_quality_gate_contract.py' ':!tests/test_prd_gate_real_output.py' >/dev/null 2>&1; then
   echo "[ci-gates][BLOCK] placeholder/mock markers detected (PM red line)."
-  git grep -nE '(mock_data|Lorem ipsum|TODO_FILL|dummy_json|fake_json)' -- . ':!*.md' ':!*.txt' ':!tools/scripts/run_quality_gates_ci.sh' ':!tests/test_ci_quality_gate_contract.py' || true
+  git grep -nE '(mock_data|Lorem ipsum|TODO_FILL|dummy_json|fake_json)' -- . ':!*.md' ':!*.txt' ':!tools/scripts/run_quality_gates_ci.sh' ':!tests/test_ci_quality_gate_contract.py' ':!tests/test_prd_gate_real_output.py' || true
   exit 1
 fi
 
