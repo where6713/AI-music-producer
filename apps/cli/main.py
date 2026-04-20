@@ -8,6 +8,7 @@ import typer
 
 from apps.cli.memory import get_project_memory_context
 from apps.cli.translation import translate_result
+from src.producer_tools.self_check.gate_g0 import check_gate_g0
 
 app = typer.Typer(
     help="AI music producer CLI",
@@ -63,6 +64,31 @@ def context() -> None:
         typer.echo(summary)
         return
     typer.echo(translate_result("context_empty", "ok"))
+
+
+@app.command("self-check")
+def self_check(
+    gate: str = typer.Argument(..., help="Gate name, currently supports: g0"),
+    strict_hooks_path: bool = typer.Option(
+        True,
+        "--strict-hooks-path",
+        help="Fail when core.hooksPath is not tools/githooks.",
+    ),
+) -> None:
+    gate_name = gate.strip().lower()
+    if gate_name != "g0":
+        typer.echo(f"Unsupported gate: {gate}")
+        raise typer.Exit(code=2)
+
+    result = check_gate_g0(Path.cwd(), strict_hooks_path=strict_hooks_path)
+    if result.get("status") == "pass":
+        typer.echo("G0 PASS")
+        return
+
+    typer.echo("G0 FAIL")
+    for warning in result.get("warnings", []):
+        typer.echo(f"- {warning}")
+    raise typer.Exit(code=1)
 
 
 def enforce_plan_first(plan_path: Path | None, plan_step: str | None) -> None:

@@ -168,3 +168,16 @@ def test_cli_produce_resume_with_existing_checkpoint() -> None:
 
     assert result.returncode == 0
     assert "Resuming from checkpoint" in result.stdout
+
+
+def test_cli_self_check_g0_reports_pass() -> None:
+    result = subprocess.run(
+        [sys.executable, "-m", "apps.cli.main", "self-check", "g0"],
+        capture_output=True,
+        text=False,
+        check=False,
+    )
+
+    stdout = result.stdout.decode("utf-8", errors="replace")
+    assert result.returncode == 0
+    assert "G0 PASS" in stdout
