@@ -181,3 +181,25 @@ def test_cli_self_check_g0_reports_pass() -> None:
     stdout = result.stdout.decode("utf-8", errors="replace")
     assert result.returncode == 0
     assert "G0 PASS" in stdout
+
+
+def test_cli_failure_evidence_check_reports_pass() -> None:
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "apps.cli.main",
+            "failure-evidence-check",
+            "ModuleNotFoundError in test collection",
+            "py -3.13 -m pytest -q tests/test_gate_g2_failure_evidence.py",
+            "missing module implementation",
+            "py -3.13 -m pytest -q tests/test_gate_g2_failure_evidence.py",
+        ],
+        capture_output=True,
+        text=False,
+        check=False,
+    )
+
+    stdout = result.stdout.decode("utf-8", errors="replace")
+    assert result.returncode == 0
+    assert "G2 FAILURE-EVIDENCE PASS" in stdout

@@ -9,6 +9,7 @@ import typer
 from apps.cli.memory import get_project_memory_context
 from apps.cli.translation import translate_result
 from src.producer_tools.self_check.gate_g0 import check_gate_g0
+from src.producer_tools.self_check.gate_g2 import validate_failure_evidence
 
 app = typer.Typer(
     help="AI music producer CLI",
@@ -88,6 +89,35 @@ def self_check(
     typer.echo("G0 FAIL")
     for warning in result.get("warnings", []):
         typer.echo(f"- {warning}")
+    raise typer.Exit(code=1)
+
+
+@app.command("failure-evidence-check")
+def failure_evidence_check(
+    symptom: str = typer.Argument(..., help="Observed failure symptom."),
+    trigger_condition: str = typer.Argument(
+        ..., help="How the failure is triggered."
+    ),
+    root_cause: str = typer.Argument(..., help="Analyzed root cause."),
+    failure_command: str = typer.Argument(
+        ..., help="Command that reproduces the failure."
+    ),
+) -> None:
+    result = validate_failure_evidence(
+        {
+            "symptom": symptom,
+            "trigger_condition": trigger_condition,
+            "root_cause": root_cause,
+            "failure_command": failure_command,
+        }
+    )
+    if result["status"] == "pass":
+        typer.echo("G2 FAILURE-EVIDENCE PASS")
+        return
+
+    typer.echo("G2 FAILURE-EVIDENCE FAIL")
+    missing = ", ".join(result["missing_fields"])
+    typer.echo(f"missing_fields: {missing}")
     raise typer.Exit(code=1)
 
 
