@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 # OOST pre-commit hook
-# 对齐文档：one law.md / 开发清单.md / 目录框架规范.md
+# 对齐文档：one law.md / 目录框架规范.md / docs/映月工厂_极简歌词工坊_PRD_v2.0.json
 
 set -eu
 
@@ -38,10 +38,11 @@ fi
 
 # 3) 根目录反杂乱（RULE-15）
 # 允许的根目录文件白名单（可按需扩展）
-if printf '%s\n' "$staged_files" | grep -Eq '^[^/]+$'; then
-  root_files="$(printf '%s\n' "$staged_files" | grep -E '^[^/]+$' || true)"
+staged_root_candidates="$(git diff --cached --name-only --diff-filter=ACMR | grep -E '^[^/]+$' || true)"
+if [ -n "$staged_root_candidates" ]; then
+  root_files="$staged_root_candidates"
   if [ -n "$root_files" ]; then
-    disallowed_root="$(printf '%s\n' "$root_files" | grep -Ev '^(AI-music-producer PRD_v1\.1\.md|one law\.md|开发清单\.md|目录框架规范\.md|README\.md|LICENSE|CHANGELOG\.md|\.gitignore|OUTPUT_DEMO_PROMPT\.md|PM_AUDIT_REPORT\.md)$' || true)"
+    disallowed_root="$(printf '%s\n' "$root_files" | grep -Ev '^(one law\.md|目录框架规范\.md|README\.md|LICENSE|CHANGELOG\.md|\.gitignore|\.env|pyproject\.toml)$' || true)"
     if [ -n "$disallowed_root" ]; then
       echo "[pre-commit][BLOCK] 根目录出现非核心入口文件（违反 RULE-15）："
       printf '%s\n' "$disallowed_root"

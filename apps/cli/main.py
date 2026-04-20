@@ -168,13 +168,14 @@ def docs_alignment_check(
     pm_rules_path: str = typer.Argument(..., help="PM rules path."),
     delivery_file_1: str = typer.Argument(..., help="Delivery file path 1."),
     delivery_file_2: str = typer.Argument(..., help="Delivery file path 2."),
+    delivery_file_3: str = typer.Argument(..., help="Delivery file path 3."),
 ) -> None:
     result = validate_docs_alignment(
         {
             "prd_path": prd_path,
             "pm_role_path": pm_role_path,
             "pm_rules_path": pm_rules_path,
-            "delivery_files": [delivery_file_1, delivery_file_2],
+            "delivery_files": [delivery_file_1, delivery_file_2, delivery_file_3],
             "field_name_conflicts": [],
         }
     )

@@ -8,12 +8,13 @@ def test_gate_g4_detects_invalid_delivery_path() -> None:
 
     result = validate_docs_alignment(
         {
-            "prd_path": "AI-music-producer PRD_v1.1.md",
-            "pm_role_path": "docs/pm/PM_ROLE.md",
-            "pm_rules_path": "docs/pm/PM_RULES.md",
+            "prd_path": "docs/映月工厂_极简歌词工坊_PRD_v2.0.json",
+            "pm_role_path": "one law.md",
+            "pm_rules_path": "目录框架规范.md",
             "delivery_files": [
-                "docs/OUTPUT_DEMO_PROMPT.md",
-                "PM_AUDIT_REPORT.md",
+                "out/lyrics.txt",
+                "out/style.txt",
+                "docs/out/exclude.txt",
             ],
             "field_name_conflicts": [],
         }
@@ -28,12 +29,13 @@ def test_gate_g4_passes_for_current_doc_contract() -> None:
 
     result = validate_docs_alignment(
         {
-            "prd_path": "AI-music-producer PRD_v1.1.md",
-            "pm_role_path": "docs/pm/PM_ROLE.md",
-            "pm_rules_path": "docs/pm/PM_RULES.md",
+            "prd_path": "docs/映月工厂_极简歌词工坊_PRD_v2.0.json",
+            "pm_role_path": "one law.md",
+            "pm_rules_path": "目录框架规范.md",
             "delivery_files": [
-                "OUTPUT_DEMO_PROMPT.md",
-                "PM_AUDIT_REPORT.md",
+                "out/lyrics.txt",
+                "out/style.txt",
+                "out/exclude.txt",
             ],
             "field_name_conflicts": [],
         }

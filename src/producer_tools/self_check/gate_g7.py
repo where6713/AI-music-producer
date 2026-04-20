@@ -101,10 +101,14 @@ def _run_g3_check() -> dict[str, Any]:
 def _run_g4_check() -> dict[str, Any]:
     return validate_docs_alignment(
         {
-            "prd_path": "AI-music-producer PRD_v1.1.md",
-            "pm_role_path": "docs/pm/PM_ROLE.md",
-            "pm_rules_path": "docs/pm/PM_RULES.md",
-            "delivery_files": ["OUTPUT_DEMO_PROMPT.md", "PM_AUDIT_REPORT.md"],
+            "prd_path": "docs/映月工厂_极简歌词工坊_PRD_v2.0.json",
+            "pm_role_path": "one law.md",
+            "pm_rules_path": "目录框架规范.md",
+            "delivery_files": [
+                "out/lyrics.txt",
+                "out/style.txt",
+                "out/exclude.txt",
+            ],
             "field_name_conflicts": [],
         }
     )
@@ -124,50 +128,7 @@ def run_minimal_e2e_proof(workspace_root: Path, output_dir: Path) -> dict[str, A
         "voice_audio_path": r"F:\Onedrive\桌面\干音模板.mp3",
         "use_demucs": False,
         "use_llm": True,
-        "require_real_corpus": True,
-        "corpus_sources": [
-            str(
-                (
-                    workspace_root
-                    / ".tmp"
-                    / "pm-real-e2e-20260419-pmfix-1"
-                    / "lyrics.json"
-                ).resolve()
-            ),
-            str(
-                (
-                    workspace_root
-                    / "docs"
-                    / "review"
-                    / "evidence-pack"
-                    / "02_samples"
-                    / "sample-A"
-                    / "output_lyrics.json"
-                ).resolve()
-            ),
-            str(
-                (
-                    workspace_root
-                    / "docs"
-                    / "review"
-                    / "evidence-pack"
-                    / "02_samples"
-                    / "sample-B"
-                    / "output_lyrics.json"
-                ).resolve()
-            ),
-            str(
-                (
-                    workspace_root
-                    / "docs"
-                    / "review"
-                    / "evidence-pack"
-                    / "02_samples"
-                    / "sample-C"
-                    / "output_lyrics.json"
-                ).resolve()
-            ),
-        ],
+        "require_real_corpus": False,
         "cliche_blacklist_path": str(
             (workspace_root / "data" / "cliche_blacklist.json").resolve()
         ),
@@ -229,6 +190,7 @@ def run_minimal_e2e_proof(workspace_root: Path, output_dir: Path) -> dict[str, A
         workspace_root / ".tmp" / "pm-real-e2e-20260419-nolianxi-4",
         workspace_root / ".tmp" / "pm-real-e2e-20260419-pmfix-1",
         workspace_root / ".tmp" / "pm-real-e2e-20260418-ppchat-9",
+        workspace_root / ".tmp" / "g7-minimal-proof",
     ]
     for candidate in replay_candidates:
         replay = _validate_proof_dir(candidate)

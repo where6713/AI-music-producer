@@ -1,38 +1,53 @@
 # AI-music-producer
 
-Windows 11 原生 CLI 的 AI 制片人系统（开发中）。
+映月工厂 v2.0 极简歌词工坊：一个 CLI 命令 + 一份 SKILL + 单次 Claude 调用 + Python lint，产出 Suno 可粘贴三件套。
 
-## 当前仓库状态
-- 已创建 GitHub 远程仓库并绑定 `origin`
-- 已启用本地 hooks 路径：`tools/githooks`
-- 已建立治理文档与 Gate 体系（G0-G8）
+## Single Source of Truth
 
-## 关键文档
-- `AI-music-producer PRD_v1.1.md`
-- `one law.md`
-- `开发清单.md`
-- `目录框架规范.md`
+- 产品规范：`docs/映月工厂_极简歌词工坊_PRD_v2.0.json`
+- 工程法则：`one law.md`
+- 目录规则：`目录框架规范.md`
+- 文档归属：`docs/ai_doc_manifest.json`
 
-## 治理文档
-- `docs/governance/gates.md`
-- `docs/governance/ci-sync-checklist.md`
-- `docs/governance/evidence-spec.md`
-- `docs/governance/audit-schedule.md`
-- `docs/governance/dev-board.md`（唯一看板）
+## Quick Start
 
-## 开发约束（摘要）
-1. 先法则，后 Hook
-2. 先测试，后实现
-3. 先通过 Hook，再允许流程扩张
+1) 安装依赖并完成基础检查：
 
-## 快速启动（可复现）
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File "tools/scripts/bootstrap.ps1" -InstallDeps
 ```
 
-说明：该命令会安装 Hook、按需安装依赖，并默认执行启动健康检查。
+2) 配置环境变量（保留根目录 `.env`）：
 
-仅执行健康检查：
+```env
+ANTHROPIC_API_KEY=...
+```
+
+3) 运行主命令（示例）：
+
+```powershell
+music-producer "失恋三个月想联系但知道不能"
+```
+
+## Output Contract
+
+默认输出目录 `out/`：
+
+- `out/lyrics.txt`：粘贴到 Suno Lyrics
+- `out/style.txt`：粘贴到 Suno Style
+- `out/exclude.txt`：负向标签
+- `out/lyric_payload.json`：结构化调试产物
+- `out/trace.json`：调用与耗时追踪
+
+## v2.0 Red Lines
+
+- 不做 Wide Sampling（N=12）
+- 不做 LLM-as-Judge 评分
+- 不引入 Motif/DMR/SVO 中间件
+- 不做 Web UI（CLI-only）
+
+## Health Check
+
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File "tools/scripts/startup_health_check.ps1"
 ```

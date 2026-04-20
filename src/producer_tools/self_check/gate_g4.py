@@ -1,18 +1,18 @@
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Any
 
 
 REQUIRED_DOC_PATHS = {
-    "prd_path": "AI-music-producer PRD_v1.1.md",
-    "pm_role_path": "docs/pm/PM_ROLE.md",
-    "pm_rules_path": "docs/pm/PM_RULES.md",
+    "prd_path": "docs/映月工厂_极简歌词工坊_PRD_v2.0.json",
+    "pm_role_path": "one law.md",
+    "pm_rules_path": "目录框架规范.md",
 }
 
-REQUIRED_ROOT_DELIVERABLES = {
-    "OUTPUT_DEMO_PROMPT.md",
-    "PM_AUDIT_REPORT.md",
+REQUIRED_OUTPUT_DELIVERABLES = {
+    "out/lyrics.txt",
+    "out/style.txt",
+    "out/exclude.txt",
 }
 
 
@@ -43,10 +43,8 @@ def validate_docs_alignment(payload: dict[str, Any]) -> dict[str, Any]:
             if isinstance(item, str) and _normalize_path(item)
         ]
 
-    root_delivery_names = {
-        Path(item).name for item in delivery_files if "/" not in item and item
-    }
-    if not REQUIRED_ROOT_DELIVERABLES.issubset(root_delivery_names):
+    delivery_paths = {item for item in delivery_files if item}
+    if not REQUIRED_OUTPUT_DELIVERABLES.issubset(delivery_paths):
         failed_checks.append("delivery_files")
 
     field_name_conflicts = payload.get("field_name_conflicts", [])
@@ -58,13 +56,13 @@ def validate_docs_alignment(payload: dict[str, Any]) -> dict[str, Any]:
     status = "pass" if not failed_checks else "fail"
     if status == "fail" and "delivery_files" in failed_checks:
         warnings.append(
-            "Root delivery files must include OUTPUT_DEMO_PROMPT.md and PM_AUDIT_REPORT.md"
+            "Delivery files must include out/lyrics.txt, out/style.txt, and out/exclude.txt"
         )
 
     return {
         "status": status,
         "required_doc_paths": REQUIRED_DOC_PATHS,
-        "required_root_deliverables": sorted(REQUIRED_ROOT_DELIVERABLES),
+        "required_output_deliverables": sorted(REQUIRED_OUTPUT_DELIVERABLES),
         "failed_checks": failed_checks,
         "warnings": warnings,
         "payload": payload,

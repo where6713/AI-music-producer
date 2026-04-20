@@ -31,7 +31,7 @@ fi
 # 3) root clutter guard (RULE-15)
 root_files="$(git -c core.quotePath=false ls-files | grep -E '^[^/]+$' || true)"
 if [ -n "$root_files" ]; then
-  disallowed_root="$(printf '%s\n' "$root_files" | grep -Ev '^(AI-music-producer PRD_v1\.1\.md|one law\.md|开发清单\.md|目录框架规范\.md|README\.md|LICENSE|CHANGELOG\.md|\.gitignore|OUTPUT_DEMO_PROMPT\.md|PM_AUDIT_REPORT\.md)$' || true)"
+    disallowed_root="$(printf '%s\n' "$root_files" | grep -Ev '^(one law\.md|目录框架规范\.md|README\.md|LICENSE|CHANGELOG\.md|\.gitignore|\.env|pyproject\.toml)$' || true)"
   if [ -n "$disallowed_root" ]; then
     echo "[ci-gates][BLOCK] non-whitelisted root files detected:"
     printf '%s\n' "$disallowed_root"

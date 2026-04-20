@@ -1,0 +1,428 @@
+{
+  "$schema": "music-producer/prd/v2.0_radical_simplification",
+  "codename": "映月工厂 · 极简歌词工坊 (Lyric Craftsman)",
+  "version": "v2.0",
+  "supersedes": "AI-music-producer_PRD_v1.1.md",
+  "issued_date": "2026-04-20",
+  "issued_by": "顶级 AI 音乐产品经理 / 第三方架构审视者",
+
+  "one_liner": "一个 CLI 命令 + 一份 SKILL.md + 一次 Claude Opus 4.7 调用 + 一段 50 行 Python lint = 一组可直接粘贴到 Suno/MiniMax 的发行级歌词三件套。",
+
+  "core_thesis": {
+    "v1.1_的真正病灶": "v1.1 不是技术不足，而是『系统性地不信任大模型』。它用 N=12 的暴力采样、LLM-as-Judge 的二次评审、SVO Engine 等中间件去对冲『模型可能输出垃圾』的恐惧。但 2024 年的对冲手段在 2026 年已经是冗余成本——Claude Opus 4.7 + Anthropic Skills (2025年12月开放为行业标准) 让模型本身就能成为受约束的工程组件。",
+    "本次重构的唯一目的": "把所有『为模型擦屁股』的中间件全部砍掉，把约束前置到 Skill 文档，把校验降级为静默 Linter，把人类裁判压缩到一次 copy-paste 之前的 5 秒目视检查。",
+    "范围锁死": "本系统只负责歌词工程。音频生成 100% 交给 Suno v5 / MiniMax。我们的全部产出就是三个可粘贴的 .txt 文件。"
+  },
+
+  "三条不可让步的红线": {
+    "红线_1_绝不造轮子": "中文音韵用 pypinyin、分词用 jieba、模糊匹配用 rapidfuzz、CLI 用 typer、JSON 校验用 pydantic、API 用 anthropic-sdk-python。GitHub 上有验证过 1000+ stars 的工具就用现成的。",
+    "红线_2_绝不重复请求模型做同一件事": "v1.1 的 N=12 采样本质是『让模型重复 12 次同一件事，再让另一个模型评分』。这是赌徒思维。新方案：单次高约束生成 + 至多 1 次定向重写 = 最多 2 次 LLM 调用。",
+    "红线_3_绝不发明新概念": "Suno 元标签只用社区已认证的（[Verse]/[Chorus]/[Bridge] 等）。绝不发明 [My Special Section] 这种 Suno 不识别的自创标签。"
+  },
+
+  "v1.1_全量废弃清单": {
+    "彻底删除（不留任何残骸）": [
+      {
+        "对象": "Step 3 Wide Sampling (N=12 并行采样)",
+        "理由": "模型能力 + Skill 约束已经能在单次调用产出可用稿。N=12 是 2024 年对冲手段，在 Claude Opus 4.7 时代是 12 倍的 API 浪费。"
+      },
+      {
+        "对象": "Step 4 Holistic Scorer (LLM-as-Judge)",
+        "理由": "LLM 评分有 verbosity bias 和 position bias，且贵。2026 年的最佳实践是『前置 Skill 约束 + 后置 Python 硬校验 + 人类 5 秒目视』。"
+      },
+      {
+        "对象": "Motif Atlas / DMR (Dynamic Motif Router) / SVO Engine",
+        "理由": "这套是为了『辅助模型选词』而存在的中间件。Claude Opus 4.7 自己的语义空间就够了，不需要外挂一个手工词库做向量偏移。"
+      },
+      {
+        "对象": "Soft Brief (原 PCG) 中的 motif_anchor / narrative_pov_arc / global_soft_preferences",
+        "理由": "这些是给『不太聪明的模型』看的脚手架。聪明模型读懂用户原始 intent + Skill 约束就能自己规划。"
+      },
+      {
+        "对象": "wide_sampling_config.json / holistic_scorer_config.json",
+        "理由": "整个文件不再需要。"
+      },
+      {
+        "对象": "shisanzhe_map.json / pop_pos_skeleton_library.json / cliche_blacklist.json (作为独立资产)",
+        "理由": "这些知识全部内化到 SKILL.md 中。Skill 是 2026 年知识封装的正确形态，而不是散落的 JSON 数据文件。"
+      }
+    ],
+    "保留并简化": [
+      {
+        "对象": "Step 0 Emotion Distiller",
+        "处置": "降级为 Skill 内部的『Phase 1 思考步骤』，不再是独立的 LLM 调用。Claude 在单次调用内自己完成蒸馏 → 规划 → 生成 → 自检。",
+        "理由": "蒸馏是好思路，但单独调用浪费 latency。Claude Opus 4.7 在思考阶段自然会做。"
+      },
+      {
+        "对象": "forbidden_literal_phrases 机制",
+        "处置": "保留。作为 Python lint 的硬门，零容忍。",
+        "理由": "用户原话防复读是产品价值，必须硬兜底。"
+      },
+      {
+        "对象": "hook_acoustic_compliance (副歌 hook 第 1 行尾字开口音 + 平声)",
+        "处置": "保留。作为 Python lint 的第二道硬门。",
+        "理由": "这是唯一一条无法被『艺术性』绕过的硬规则——Suno 的声学引擎对开口音的延音处理就是更好。"
+      }
+    ]
+  },
+
+  "新架构_全景图": {
+    "name": "Skill-Driven Single-Pass Generation with Surgical Lint",
+    "pipeline_steps": 3,
+    "max_llm_calls_per_run": 2,
+    "expected_llm_calls_per_run": 1.1,
+    "成本对比_v1.1_vs_v2.0": {
+      "v1.1_单次成本估算": "12 (Wide Sampling) + 1 (Distiller) + 1 (Holistic Scorer) ≈ 14 次 LLM 调用",
+      "v2.0_单次成本估算": "1 次 LLM 调用 (90% 场景) / 2 次 LLM 调用 (10% lint 失败重写)",
+      "成本下降比": "约 12-14 倍",
+      "延迟下降比": "约 8-10 倍 (因为 v1.1 的并行采样不是真并行受 API 并发限制)"
+    },
+    "pipeline": [
+      {
+        "step": 1,
+        "name": "Skill-Driven Craft (单次 LLM 调用)",
+        "actor": "Claude Opus 4.7 + lyric-craftsman SKILL (自动加载)",
+        "input": "用户原始 intent (一句话或一段话) + 可选风格 hint",
+        "internal_phases_inside_one_call": [
+          "Phase A: 阅读 SKILL.md 中的全部约束清单",
+          "Phase B: 把用户原始 intent 蒸馏为情感核（提取要拉黑的字面短语）",
+          "Phase C: 规划段落结构 (Intro/Verse/Chorus/Bridge/Outro) + Hook 位置",
+          "Phase D: 在结构内填词，每行检查 Skill 中的 13 项规则",
+          "Phase E: 自检并以 lyric_payload.json 格式输出"
+        ],
+        "output": "lyric_payload.json (符合 schema)",
+        "duration_estimate": "15-30 秒"
+      },
+      {
+        "step": 2,
+        "name": "Surgical Lint (纯 Python，无 LLM)",
+        "actor": "lint.py (50 行内)",
+        "checks": [
+          "forbidden_literal_phrases 零命中 (rapidfuzz 模糊匹配，阈值 92)",
+          "副歌 Hook 第 1 行尾字必须开口音 + 平声 (pypinyin 验证)",
+          "段落结构标签合法 ([Verse]/[Chorus]/[Bridge]/[Pre-Chorus]/[Intro]/[Outro] 在 Suno 白名单内)",
+          "任意单一具象名词出现次数 ≤ 3 (jieba 分词 + 计数)",
+          "每行字符数在 brief 范围内 ±2"
+        ],
+        "failure_action": "把失败原因结构化为 lint_report.json，触发 Step 3",
+        "success_action": "直接进入 Step 4 编译输出",
+        "duration_estimate": "<1 秒"
+      },
+      {
+        "step": 3,
+        "name": "Targeted Revise (条件触发，至多 1 次)",
+        "actor": "Claude Opus 4.7 + SKILL + lint_report.json",
+        "trigger_condition": "Step 2 lint 失败",
+        "input": "原 lyric_payload.json + lint_report.json (告诉模型具体哪行哪条规则违规)",
+        "behavior": "模型只重写违规的那几行，其余原封不动",
+        "max_retries": 1,
+        "if_still_fails": "输出最佳草稿 + warning_report.md，让人类决定是否手动修一两个字",
+        "duration_estimate": "10-20 秒"
+      },
+      {
+        "step": 4,
+        "name": "Compile to Suno Triplet (纯 Python)",
+        "actor": "compile.py",
+        "output": [
+          "lyrics.txt (粘贴到 Suno Lyrics 框，带 [Verse]/[Chorus] 元标签 + 圆括号和声 + 必要的 Voice 标签)",
+          "style.txt (粘贴到 Suno Style 框，4-8 个 GMIV 风格标签)",
+          "exclude.txt (Suno 负向提示词，放在 style 末尾)"
+        ]
+      }
+    ]
+  },
+
+  "skill_document_完整规范": {
+    "标准遵循": "Anthropic Agent Skills 开放标准 (2025-12-18 发布)",
+    "filepath_personal": "~/.claude/skills/lyric-craftsman/SKILL.md",
+    "filepath_project": ".claude/skills/lyric-craftsman/SKILL.md",
+    "也可以走_API": "通过 Claude API /v1/skills 端点上传，绑定到具体应用",
+
+    "yaml_frontmatter": {
+      "name": "lyric-craftsman",
+      "description": "为 Suno v5 / MiniMax 等主流 AI 音乐生成平台撰写可直接粘贴的中文/英文歌词三件套。当用户提供一段情感 intent 或叙事素材，且明确意图是『生成歌词供 AI 音乐平台使用』时触发。输出包括 lyrics.txt（带元标签）、style.txt（GMIV 风格标签）、exclude.txt（负向提示词）。"
+    },
+
+    "skill_content_sections": {
+      "Section_1_使命与边界": [
+        "你的产出是 lyric_payload.json，不是闲聊文本",
+        "你只写歌词，不写编曲、不写制作注释、不写解释",
+        "你的所有输出最终会被复制粘贴到 Suno v5 或 MiniMax，因此必须 100% 符合这些平台的元标签语法"
+      ],
+
+      "Section_2_思考流程_必须按顺序执行": [
+        "Phase A 蒸馏: 从用户 raw_intent 中提取『emotional_register / time_frame / core_tension / valence / arousal / dominant_motion_verbs / dominant_sensation』。同时把 raw_intent 中长度 ≥ 3 字的字面短语全部加入 forbidden_literal_phrases",
+        "Phase B 规划: 决定段落结构 (默认 Intro/Verse/Pre-Chorus/Chorus/Verse/Bridge/Final-Chorus/Outro)，标注 Hook 位置 (默认 Chorus 第 1 行)",
+        "Phase C 填词: 按结构填入歌词正文",
+        "Phase D 自检: 逐行对照 Section 3 的 13 项规则",
+        "Phase E 输出: 严格按 lyric_payload.json schema 输出"
+      ],
+
+      "Section_3_歌词质量_13条硬规则": [
+        "R01 副歌 Hook 第 1 行尾字必须是开口音韵母 (a/ang/ai/ao/ou) 且平声 (1/2 声)",
+        "R02 任意单一具象名词在全曲出现次数 ≤ 3",
+        "R03 不得使用用户 raw_intent 的字面短语 (允许意译/重组)",
+        "R04 不得使用 AI-cliché 黑名单词组 (见 Section 4)",
+        "R05 每段歌词字符数与本段平均值偏差 ≤ ±2 字",
+        "R06 段落标签只能用 Suno v5 白名单 (见 Section 5)",
+        "R07 视角 (POV) 在每段内一致；跨段允许切换但需有逻辑动机",
+        "R08 动词密度 ≥ 2.0 / 句 (避免名词堆砌)",
+        "R09 抽象名词 (如『梦想/孤独/希望』) 每段 ≤ 2 个",
+        "R10 不得跨语言混用 (中文歌就全中文，除非用户明确要求 Chinglish)",
+        "R11 副歌 Hook 行需在前 30 秒可被记住 (≤ 11 字 + 押韵)",
+        "R12 桥段 (Bridge) 必须在情感曲线上提供『翻转』或『升华』，不能是 Verse 的复述",
+        "R13 最后一句尾字音响必须能拖长 (开口音或带鼻音韵母)"
+      ],
+
+      "Section_4_AI_cliché_黑名单_严禁出现": {
+        "中文": ["霓虹", "天际", "心脏的鼓点", "破碎的心", "电流划过", "梦想的翅膀", "孤独的夜", "燃烧的灵魂", "璀璨星河", "时光的洪流", "永恒的瞬间", "命运的齿轮"],
+        "英文": ["neon skies", "electric hearts", "shattered dreams", "burning soul", "endless night", "broken pieces", "fading memories", "rising tide", "wings of dreams", "river of time"]
+      },
+
+      "Section_5_Suno_v5_元标签白名单_仅用这些": {
+        "结构标签_必须方括号包裹_必须独占一行": [
+          "[Intro]", "[Verse]", "[Verse 1]", "[Verse 2]", "[Pre-Chorus]", "[Chorus]", "[Post-Chorus]", "[Bridge]", "[Outro]", "[Hook]", "[Drop]", "[Build-up]", "[Breakdown]", "[Instrumental]"
+        ],
+        "Voice_动态标签_可独占一行或行内": [
+          "[Whispered]", "[Belted]", "[Spoken]", "[Falsetto]", "[Powerful]", "[Soft]", "[Building]", "[Layered Harmonies]"
+        ],
+        "和声_用圆括号_行内": "副歌可加 (oh-oh-oh) (yeah) (背景吟唱) 等",
+        "Style_box_GMIV_4到8个标签_用逗号分隔": {
+          "Genre": "选 1 个具体子流派 (如 'lo-fi indie folk' 而非 'pop')",
+          "Mood": "选 1-2 个 ('melancholic', 'introspective')",
+          "Instruments": "选 2-3 个 ('acoustic guitar', 'soft percussion', 'subtle strings')",
+          "Vocals": "选 1-2 个 ('intimate male vocals', 'warm female vocals')",
+          "Production": "选 1 个可选 ('lo-fi warmth', 'studio polish')"
+        },
+        "exclude_负向标签_放_style_末尾": "(autotune, drum machine, EDM, robotic vocals)"
+      },
+
+      "Section_6_自检_输出前必查": [
+        "重新读一遍 lyrics 全文，问自己『我能在 5 秒内被打动吗？』",
+        "对照 Phase A 蒸馏出的 forbidden_literal_phrases 全文搜索，确认零命中",
+        "对照 Section 5 白名单，确认所有方括号标签都在白名单内",
+        "对照 R01，副歌 Hook 第 1 行尾字读出来是不是 a/ang/ai/ao/ou + 1/2 声"
+      ],
+
+      "Section_7_输出格式_严格JSON": "见本 PRD 的 data_schemas.lyric_payload"
+    }
+  },
+
+  "data_schemas": {
+    "user_input": {
+      "$id": "user_input/v1",
+      "fields": {
+        "raw_intent": {"type": "string", "required": true, "example": "失恋三个月想联系但知道不能"},
+        "language": {"type": "enum", "values": ["zh-CN", "en-US"], "default": "zh-CN"},
+        "genre_hint": {"type": "string", "required": false, "example": "lo-fi R&B"},
+        "mood_hint": {"type": "string", "required": false, "example": "克制 / 余震期"},
+        "vocal_gender_hint": {"type": "enum", "values": ["male", "female", "any"], "default": "any"}
+      }
+    },
+
+    "lyric_payload": {
+      "$id": "lyric_payload/v2",
+      "fields": {
+        "schema_version": "v2.0",
+        "generation_id": "uuid",
+        "model_used": "claude-opus-4-7",
+        "skill_used": "lyric-craftsman@v1.0",
+        "distillation": {
+          "emotional_register": "string",
+          "core_tension": "string",
+          "valence": "enum[positive/negative/mixed]",
+          "arousal": "enum[low/medium/high]",
+          "forbidden_literal_phrases": ["array", "of", "user_phrases_to_lockout"]
+        },
+        "structure": {
+          "section_order": ["[Intro]", "[Verse 1]", "[Pre-Chorus]", "[Chorus]", "[Verse 2]", "[Pre-Chorus]", "[Chorus]", "[Bridge]", "[Final Chorus]", "[Outro]"],
+          "hook_section": "[Chorus]",
+          "hook_line_index": 1
+        },
+        "lyrics_by_section": [
+          {
+            "tag": "[Verse 1]",
+            "voice_tags_inline": ["[Whispered]"],
+            "lines": [
+              {
+                "primary": "string",
+                "backing": "string (optional, 编译时变 (text))",
+                "tail_pinyin": "string (e.g., 'liang3')",
+                "char_count": "integer"
+              }
+            ]
+          }
+        ],
+        "style_tags": {
+          "genre": ["string"],
+          "mood": ["string"],
+          "instruments": ["string"],
+          "vocals": ["string"],
+          "production": ["string"]
+        },
+        "exclude_tags": ["string"]
+      }
+    }
+  },
+
+  "directory_structure": {
+    "项目根目录": "music-producer/",
+    "tree": {
+      "music-producer/": {
+        "src/": {
+          "main.py": "CLI 入口 (typer)",
+          "claude_client.py": "anthropic-sdk-python 封装",
+          "lint.py": "50 行 Python lint (pypinyin + jieba + rapidfuzz)",
+          "compile.py": "lyric_payload.json → suno triplet (lyrics/style/exclude)",
+          "schemas.py": "pydantic 数据模型"
+        },
+        ".claude/skills/lyric-craftsman/": {
+          "SKILL.md": "全部约束知识 (本 PRD Section 5 的内容)"
+        },
+        "out/": {
+          "lyrics.txt": "粘贴到 Suno Lyrics 框",
+          "style.txt": "粘贴到 Suno Style 框",
+          "exclude.txt": "粘贴到 Suno 负向提示框",
+          "lyric_payload.json": "完整结构化数据 (debug 用)",
+          "trace.json": "运行轨迹 (含 LLM 调用次数和耗时)"
+        },
+        "pyproject.toml": "依赖声明",
+        "README.md": "三行说明"
+      }
+    },
+    "明确不要的目录": ["motif_atlas/", "drafts/", "scorer_output/", "soft_brief/ (这些 v1.1 残留全部不要)"]
+  },
+
+  "github_dependencies_零造轮子": {
+    "llm": {
+      "package": "anthropic",
+      "github": "https://github.com/anthropics/anthropic-sdk-python",
+      "用途": "调用 Claude Opus 4.7 + 自动加载 SKILL"
+    },
+    "中文音韵": {
+      "package": "pypinyin",
+      "github": "https://github.com/mozillazg/python-pinyin",
+      "stars": "5k+",
+      "用途": "Hook 行尾字开口音 + 平声验证"
+    },
+    "中文分词": {
+      "package": "jieba",
+      "github": "https://github.com/fxsjy/jieba",
+      "stars": "33k+",
+      "用途": "具象名词频次统计 (R02 规则)"
+    },
+    "模糊匹配": {
+      "package": "rapidfuzz",
+      "github": "https://github.com/rapidfuzz/RapidFuzz",
+      "stars": "3k+",
+      "用途": "forbidden_literal_phrases 模糊检测 (阈值 92)"
+    },
+    "数据校验": {
+      "package": "pydantic",
+      "github": "https://github.com/pydantic/pydantic",
+      "stars": "22k+",
+      "用途": "lyric_payload.json schema 校验"
+    },
+    "CLI": {
+      "package": "typer",
+      "github": "https://github.com/tiangolo/typer",
+      "stars": "16k+",
+      "用途": "music-producer 命令行入口"
+    },
+    "终端美化": {
+      "package": "rich",
+      "github": "https://github.com/Textualize/rich",
+      "stars": "50k+",
+      "用途": "彩色进度 + 错误高亮"
+    },
+    "总依赖数": 7,
+    "预估安装时间": "<60 秒",
+    "预估开发时间_单人": "1.5 个工作日 (代码) + 0.5 天 (SKILL.md 微调) = 2 天"
+  },
+
+  "cli_interface_设计": {
+    "主命令": "music-producer \"<raw_intent>\"",
+    "完整示例": [
+      "music-producer \"失恋三个月想联系但知道不能\"",
+      "music-producer \"光福寺禅意，茶汤雾起\" --genre \"ambient classical chinese\" --vocal female",
+      "music-producer \"创业第三年，团队从 5 人到 50 人\" --genre \"indie pop\" --mood \"hopeful melancholy\""
+    ],
+    "可选参数": {
+      "--genre": "GMIV Genre hint (传给 Skill)",
+      "--mood": "情绪 hint",
+      "--vocal": "male / female / any (默认 any)",
+      "--lang": "zh-CN / en-US (默认 zh-CN)",
+      "--out-dir": "输出目录 (默认 ./out)",
+      "--verbose": "打印 distillation + 段落规划详情",
+      "--dry-run": "只跑到 lint 不写文件"
+    },
+    "成功输出": "✓ 已生成 ./out/lyrics.txt | ./out/style.txt | ./out/exclude.txt\n→ 拷贝到 Suno v5 即可生成",
+    "失败输出": "⚠ Lint 触发 1 次重写 / 仍未通过 R03 (字面短语命中) / 已输出最佳草稿 + warning_report.md，请人工修改第 8、12 行"
+  },
+
+  "human_in_the_loop_极简化": {
+    "philosophy": "v1.1 的 LLM-as-Judge 是机器评机器，废。v2.0 的 HITL 就是『人类用 5 秒目视 + 复制粘贴』。",
+    "工作流": [
+      "Step 1: 跑完 CLI，打开 ./out/lyrics.txt 用肉眼扫一遍 (5 秒)",
+      "Step 2: 觉得灵魂对了 → 直接复制三件套到 Suno → 抽卡",
+      "Step 3: 觉得某段平庸 → 直接在 .txt 里手改两个词 → 复制 → 抽卡",
+      "Step 4: 整体跑偏 → music-producer 重新跑一次 (因为单次成本极低，重跑无心理负担)"
+    ],
+    "刻意不做": [
+      "不做 Web UI / GUI",
+      "不做 LLM 自动评分",
+      "不做模型生成两稿让你二选一 (这是 Suno 自己做的事)"
+    ]
+  },
+
+  "acceptance_criteria_验收标准": {
+    "功能性": [
+      "AC-01 同一 intent 跑 3 次独立 run，每次平均 LLM 调用次数 ≤ 1.3",
+      "AC-02 任意单次产出中，重复 ≥ 4 次的具象名词数 = 0",
+      "AC-03 任意单次产出中，forbidden_literal_phrases 命中数 = 0",
+      "AC-04 任意单次产出中，副歌 Hook 第 1 行尾字符合开口音 + 平声",
+      "AC-05 lyrics.txt 中所有方括号标签 100% 在 Suno v5 白名单内",
+      "AC-06 style.txt 标签数在 4-8 之间",
+      "AC-07 三件套粘贴到 Suno v5 后，能在不报错的情况下完整生成歌曲"
+    ],
+    "质量性_盲评": [
+      "AC-08 3 次产出中至少 2 次通过『比裸 Claude 单次输出好』的人工盲评",
+      "AC-09 3 次产出之间，主题名词重合率 ≤ 40%"
+    ],
+    "工程性": [
+      "AC-10 单次 run 端到端耗时 ≤ 35 秒 (P50) / ≤ 60 秒 (P95)",
+      "AC-11 单次 run API 成本 ≤ $0.05 (Claude Opus 4.7)",
+      "AC-12 任意 acceptance criteria 不满足 = 不可交付"
+    ]
+  },
+
+  "迁移路径_从v1.1到v2.0": {
+    "Day_1_上午": "新建 .claude/skills/lyric-craftsman/SKILL.md，把本 PRD 的 skill_document_完整规范.skill_content_sections 拷贝进去",
+    "Day_1_下午": "写 src/main.py + claude_client.py + schemas.py (typer + pydantic + anthropic)",
+    "Day_2_上午": "写 src/lint.py (50 行内) + compile.py",
+    "Day_2_下午": "跑 AC-01 到 AC-07 自动测试",
+    "Day_3": "盲评 + Skill 微调，达到 AC-08 / AC-09",
+    "v1.1_老代码处置": "全部移到 archive/v1.1/，不删不改，永不回望"
+  },
+
+  "对未来的限制_产品经理的态度": {
+    "永不重新引入_即使有人提": [
+      "Wide Sampling N=12 (任何形式的盲采样都拒绝)",
+      "LLM-as-Judge (任何让模型评模型的设计都拒绝)",
+      "复杂 Motif 词库 (任何手工维护的语义中间件都拒绝)",
+      "Web UI (CLI 就是终极形态)"
+    ],
+    "唯一允许的演进方向": [
+      "SKILL.md 内容微调 (这是唯一应该被持续打磨的资产)",
+      "新增小语种支持 (粤语 / 日语 / 韩语)，每语种新增一个 SKILL.md",
+      "对接 Suno API 自动抽卡 (但这是 v3.0 才考虑的事，v2.0 死守 copy-paste)"
+    ]
+  },
+
+  "签字": {
+    "结论": "把 14 次 LLM 调用压缩到 1.1 次。把 6 个中间件压缩到 1 个 SKILL.md + 50 行 lint。把 3 个数据库压缩到 0 个。把开发周期从『迭代 4 个月』压缩到『2 个工作日』。这才是 2026 年的样子。",
+    "issued_by": "顶级 AI 音乐产品经理",
+    "date": "2026-04-20",
+    "status": "可直接进入开发与验收"
+  }
+}
