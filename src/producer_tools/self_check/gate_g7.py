@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 import json
 import re
+import subprocess
 
 from src.producer_tools.self_check.gate_g0 import check_gate_g0
 from src.producer_tools.self_check.gate_g2 import validate_failure_evidence
@@ -14,30 +15,53 @@ from src.producer_tools.self_check.gate_g6 import check_gate_g6
 from src.producer_tools.orchestrator import orchestrator
 
 
+def _latest_commit_subjects(workspace_root: Path, count: int = 3) -> list[str]:
+    try:
+        raw = subprocess.check_output(
+            ["git", "log", f"-{count}", "--pretty=%s"],
+            cwd=str(workspace_root),
+            text=True,
+            stderr=subprocess.DEVNULL,
+        )
+    except Exception:
+        return []
+    return [line.strip() for line in raw.splitlines() if line.strip()]
+
+
 def _run_g1_check(workspace_root: Path) -> dict[str, Any]:
     git_dir = workspace_root / ".git"
     head_path = git_dir / "HEAD"
     if not head_path.exists():
         return {"status": "fail", "reason": "git_head_missing"}
 
-    # Lightweight G1 contract: latest commit message follows type(scope): summary.
-    # pre-commit/commit-msg hooks already enforce this; this check summarizes state.
-    import subprocess
-
-    try:
-        msg = subprocess.check_output(
-            ["git", "log", "-1", "--pretty=%s"],
-            cwd=str(workspace_root),
-            text=True,
-            stderr=subprocess.DEVNULL,
-        ).strip()
-    except Exception:
+    # Lightweight G1 contract: head branch commits follow type(scope): summary.
+    # In PR CI, HEAD can be a synthetic merge commit. Accept merge head when
+    # the next available subject in history is compliant.
+    subjects = _latest_commit_subjects(workspace_root, count=4)
+    if not subjects:
         return {"status": "fail", "reason": "git_log_unavailable"}
 
-    if re.match(r"^(feat|fix|docs|refactor|test|chore|build|ci|perf|revert)\([a-z0-9._/-]+\): .+", msg):
-        return {"status": "pass", "latest_subject": msg}
+    pattern = re.compile(
+        r"^(feat|fix|docs|refactor|test|chore|build|ci|perf|revert)\([a-z0-9._/-]+\): .+"
+    )
+    head_subject = subjects[0]
+    if pattern.match(head_subject):
+        return {"status": "pass", "latest_subject": head_subject}
 
-    return {"status": "fail", "reason": "commit_subject_format_invalid", "latest_subject": msg}
+    if head_subject.startswith("Merge "):
+        for s in subjects[1:]:
+            if pattern.match(s):
+                return {
+                    "status": "pass",
+                    "latest_subject": s,
+                    "context": "merge_commit_head",
+                }
+
+    return {
+        "status": "fail",
+        "reason": "commit_subject_format_invalid",
+        "latest_subject": head_subject,
+    }
 
 
 def _run_g2_check() -> dict[str, Any]:

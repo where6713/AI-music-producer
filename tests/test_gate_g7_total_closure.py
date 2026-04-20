@@ -27,3 +27,21 @@ def test_gate_g7_reports_pass_when_all_previous_gates_pass() -> None:
     assert result["failed_gates"] == []
     assert result["proof"]["status"] == "skipped"
     assert result["gate_summary"]["G1"] == "pass"
+
+
+def test_gate_g1_accepts_merge_head_when_next_subject_is_compliant(monkeypatch) -> None:
+    from src.producer_tools.self_check import gate_g7
+
+    monkeypatch.setattr(
+        gate_g7,
+        "_latest_commit_subjects",
+        lambda _workspace_root, count=4: [
+            "Merge 963b4035a0cffd9b36a065f81d7a1d9583d33ba5 into 905c79f1b4425366b455ca0bb0ba9d6672ef24d4",
+            "feat(g7): add total-closure validator and gate-check all",
+        ],
+    )
+
+    result = gate_g7._run_g1_check(Path.cwd())
+
+    assert result["status"] == "pass"
+    assert result.get("context") == "merge_commit_head"
