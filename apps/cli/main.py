@@ -10,6 +10,7 @@ from apps.cli.memory import get_project_memory_context
 from apps.cli.translation import translate_result
 from src.producer_tools.self_check.gate_g0 import check_gate_g0
 from src.producer_tools.self_check.gate_g2 import validate_failure_evidence
+from src.producer_tools.self_check.gate_g3 import validate_pass_evidence
 
 app = typer.Typer(
     help="AI music producer CLI",
@@ -118,6 +119,41 @@ def failure_evidence_check(
     typer.echo("G2 FAILURE-EVIDENCE FAIL")
     missing = ", ".join(result["missing_fields"])
     typer.echo(f"missing_fields: {missing}")
+    raise typer.Exit(code=1)
+
+
+@app.command("pass-evidence-check")
+def pass_evidence_check(
+    local_command: str = typer.Argument(..., help="Local verification command."),
+    local_result: str = typer.Argument(..., help="Local result status."),
+    ci_result: str = typer.Argument(..., help="CI result status."),
+    ci_run_url: str = typer.Argument(..., help="CI run URL."),
+    reproducible_command_1: str = typer.Argument(..., help="Repro command 1."),
+    reproducible_command_2: str = typer.Argument(..., help="Repro command 2."),
+) -> None:
+    result = validate_pass_evidence(
+        {
+            "local_command": local_command,
+            "local_result": local_result,
+            "ci_result": ci_result,
+            "ci_run_url": ci_run_url,
+            "reproducible_commands": [
+                reproducible_command_1,
+                reproducible_command_2,
+            ],
+        }
+    )
+
+    if result["status"] == "pass":
+        typer.echo("G3 PASS-EVIDENCE PASS")
+        return
+
+    typer.echo("G3 PASS-EVIDENCE FAIL")
+    missing = ", ".join(result["missing_fields"])
+    if missing:
+        typer.echo(f"missing_fields: {missing}")
+    for warning in result.get("warnings", []):
+        typer.echo(f"- {warning}")
     raise typer.Exit(code=1)
 
 

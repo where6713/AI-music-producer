@@ -203,3 +203,27 @@ def test_cli_failure_evidence_check_reports_pass() -> None:
     stdout = result.stdout.decode("utf-8", errors="replace")
     assert result.returncode == 0
     assert "G2 FAILURE-EVIDENCE PASS" in stdout
+
+
+def test_cli_pass_evidence_check_reports_pass() -> None:
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "apps.cli.main",
+            "pass-evidence-check",
+            "py -3.13 -m pytest -q",
+            "pass",
+            "success",
+            "https://github.com/where6713/AI-music-producer/actions/runs/24644826851/job/72055436125",
+            "py -3.13 -m pytest -q",
+            "bash tools/scripts/run_quality_gates_ci.sh",
+        ],
+        capture_output=True,
+        text=False,
+        check=False,
+    )
+
+    stdout = result.stdout.decode("utf-8", errors="replace")
+    assert result.returncode == 0
+    assert "G3 PASS-EVIDENCE PASS" in stdout
