@@ -45,3 +45,20 @@ def test_gate_g1_accepts_merge_head_when_next_subject_is_compliant(monkeypatch) 
 
     assert result["status"] == "pass"
     assert result.get("context") == "merge_commit_head"
+
+
+def test_gate_g1_accepts_shallow_merge_head_without_history(monkeypatch) -> None:
+    from src.producer_tools.self_check import gate_g7
+
+    monkeypatch.setattr(
+        gate_g7,
+        "_latest_commit_subjects",
+        lambda _workspace_root, count=4: [
+            "Merge 9cd3d350e3872bfab893113fdf1f2fcc2484f708 into 905c79f1b4425366b455ca0bb0ba9d6672ef24d4",
+        ],
+    )
+
+    result = gate_g7._run_g1_check(Path.cwd())
+
+    assert result["status"] == "pass"
+    assert result.get("context") == "merge_commit_head_shallow"
