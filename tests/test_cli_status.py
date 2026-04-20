@@ -276,3 +276,19 @@ def test_cli_ci_gate_check_g6_reports_pass() -> None:
     stdout = result.stdout.decode("utf-8", errors="replace")
     assert result.returncode == 0
     assert "G6 CI-GATE PASS" in stdout
+
+
+def test_cli_gate_check_all_reports_pass() -> None:
+    result = subprocess.run(
+        [sys.executable, "-m", "apps.cli.main", "gate-check", "--all"],
+        capture_output=True,
+        text=False,
+        check=False,
+    )
+
+    stdout = result.stdout.decode("utf-8", errors="replace")
+    assert result.returncode == 0
+    assert "G7 TOTAL-CLOSURE PASS" in stdout
+    assert "G0=pass" in stdout
+    assert "G1=pass" in stdout
+    assert "G6=pass" in stdout

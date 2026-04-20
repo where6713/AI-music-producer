@@ -14,6 +14,7 @@ from src.producer_tools.self_check.gate_g3 import validate_pass_evidence
 from src.producer_tools.self_check.gate_g4 import validate_docs_alignment
 from src.producer_tools.self_check.gate_g5 import check_gate_g5
 from src.producer_tools.self_check.gate_g6 import check_gate_g6
+from src.producer_tools.self_check.gate_g7 import check_gate_g7
 
 app = typer.Typer(
     help="AI music producer CLI",
@@ -231,6 +232,46 @@ def ci_gate_check(
     typer.echo(f"failed_checks: {failed}")
     for warning in result.get("warnings", []):
         typer.echo(f"- {warning}")
+    raise typer.Exit(code=1)
+
+
+@app.command(
+    "gate-check",
+    context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
+)
+def gate_check() -> None:
+    args = list(click.get_current_context().args)
+    all_mode = "--all" in args
+    run_proof = "--run-proof" in args
+
+    if not all_mode:
+        typer.echo("Use --all for G7 total closure check")
+        raise typer.Exit(code=2)
+
+    result = check_gate_g7(Path.cwd(), run_proof=run_proof)
+    summary = result.get("gate_summary", {})
+    summary_line = " ".join([f"{k}={v}" for k, v in summary.items()])
+
+    if result["status"] == "pass":
+        typer.echo("G7 TOTAL-CLOSURE PASS")
+        typer.echo(summary_line)
+        if run_proof:
+            proof = result.get("proof", {})
+            typer.echo(
+                f"proof run_id={proof.get('run_id','')} trace_id={proof.get('trace_id','')}"
+            )
+            typer.echo(f"proof output_dir={proof.get('output_dir','')}")
+        return
+
+    typer.echo("G7 TOTAL-CLOSURE FAIL")
+    typer.echo(summary_line)
+    failed = ", ".join(result.get("failed_gates", []))
+    if failed:
+        typer.echo(f"failed_gates: {failed}")
+    proof = result.get("proof", {})
+    if run_proof and proof.get("status") != "pass":
+        missing = ", ".join(proof.get("missing_files", []))
+        typer.echo(f"proof_failed_missing_files: {missing}")
     raise typer.Exit(code=1)
 
 
