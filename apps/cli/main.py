@@ -13,6 +13,7 @@ from src.producer_tools.self_check.gate_g2 import validate_failure_evidence
 from src.producer_tools.self_check.gate_g3 import validate_pass_evidence
 from src.producer_tools.self_check.gate_g4 import validate_docs_alignment
 from src.producer_tools.self_check.gate_g5 import check_gate_g5
+from src.producer_tools.self_check.gate_g6 import check_gate_g6
 
 app = typer.Typer(
     help="AI music producer CLI",
@@ -204,6 +205,28 @@ def hook_check(
         return
 
     typer.echo("G5 HOOK-CHECK FAIL")
+    failed = ", ".join(result["failed_checks"])
+    typer.echo(f"failed_checks: {failed}")
+    for warning in result.get("warnings", []):
+        typer.echo(f"- {warning}")
+    raise typer.Exit(code=1)
+
+
+@app.command("ci-gate-check")
+def ci_gate_check(
+    gate: str = typer.Argument(..., help="Gate name, currently supports: g6"),
+) -> None:
+    gate_name = gate.strip().lower()
+    if gate_name != "g6":
+        typer.echo(f"Unsupported gate: {gate}")
+        raise typer.Exit(code=2)
+
+    result = check_gate_g6(Path.cwd())
+    if result["status"] == "pass":
+        typer.echo("G6 CI-GATE PASS")
+        return
+
+    typer.echo("G6 CI-GATE FAIL")
     failed = ", ".join(result["failed_checks"])
     typer.echo(f"failed_checks: {failed}")
     for warning in result.get("warnings", []):

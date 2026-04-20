@@ -263,3 +263,16 @@ def test_cli_hook_check_g5_reports_pass() -> None:
     stdout = result.stdout.decode("utf-8", errors="replace")
     assert result.returncode == 0
     assert "G5 HOOK-CHECK PASS" in stdout
+
+
+def test_cli_ci_gate_check_g6_reports_pass() -> None:
+    result = subprocess.run(
+        [sys.executable, "-m", "apps.cli.main", "ci-gate-check", "g6"],
+        capture_output=True,
+        text=False,
+        check=False,
+    )
+
+    stdout = result.stdout.decode("utf-8", errors="replace")
+    assert result.returncode == 0
+    assert "G6 CI-GATE PASS" in stdout

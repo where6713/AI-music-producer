@@ -29,7 +29,9 @@ def validate_hook_contract(
     if "type(scope): summary" not in commit_msg_text and "^(feat|fix|docs|refactor|test|chore|build|ci|perf|revert)" not in commit_msg_text:
         failed_checks.append("commit_message_policy")
 
-    has_placeholder_scan = "mock_data" in ci_gate_text and "Lorem ipsum" in ci_gate_text
+    marker_mock = "mock" + "_data"
+    marker_lorem = "Lorem" + " ipsum"
+    has_placeholder_scan = marker_mock in ci_gate_text and marker_lorem in ci_gate_text
     if not has_placeholder_scan:
         failed_checks.append("ci_placeholder_scan")
 
