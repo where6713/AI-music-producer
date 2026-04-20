@@ -227,3 +227,26 @@ def test_cli_pass_evidence_check_reports_pass() -> None:
     stdout = result.stdout.decode("utf-8", errors="replace")
     assert result.returncode == 0
     assert "G3 PASS-EVIDENCE PASS" in stdout
+
+
+def test_cli_docs_alignment_check_reports_pass() -> None:
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "apps.cli.main",
+            "docs-alignment-check",
+            "AI-music-producer PRD_v1.1.md",
+            "docs/pm/PM_ROLE.md",
+            "docs/pm/PM_RULES.md",
+            "OUTPUT_DEMO_PROMPT.md",
+            "PM_AUDIT_REPORT.md",
+        ],
+        capture_output=True,
+        text=False,
+        check=False,
+    )
+
+    stdout = result.stdout.decode("utf-8", errors="replace")
+    assert result.returncode == 0
+    assert "G4 DOCS-ALIGNMENT PASS" in stdout

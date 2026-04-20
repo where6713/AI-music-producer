@@ -11,6 +11,7 @@ from apps.cli.translation import translate_result
 from src.producer_tools.self_check.gate_g0 import check_gate_g0
 from src.producer_tools.self_check.gate_g2 import validate_failure_evidence
 from src.producer_tools.self_check.gate_g3 import validate_pass_evidence
+from src.producer_tools.self_check.gate_g4 import validate_docs_alignment
 
 app = typer.Typer(
     help="AI music producer CLI",
@@ -152,6 +153,36 @@ def pass_evidence_check(
     missing = ", ".join(result["missing_fields"])
     if missing:
         typer.echo(f"missing_fields: {missing}")
+    for warning in result.get("warnings", []):
+        typer.echo(f"- {warning}")
+    raise typer.Exit(code=1)
+
+
+@app.command("docs-alignment-check")
+def docs_alignment_check(
+    prd_path: str = typer.Argument(..., help="PRD path."),
+    pm_role_path: str = typer.Argument(..., help="PM role path."),
+    pm_rules_path: str = typer.Argument(..., help="PM rules path."),
+    delivery_file_1: str = typer.Argument(..., help="Delivery file path 1."),
+    delivery_file_2: str = typer.Argument(..., help="Delivery file path 2."),
+) -> None:
+    result = validate_docs_alignment(
+        {
+            "prd_path": prd_path,
+            "pm_role_path": pm_role_path,
+            "pm_rules_path": pm_rules_path,
+            "delivery_files": [delivery_file_1, delivery_file_2],
+            "field_name_conflicts": [],
+        }
+    )
+
+    if result["status"] == "pass":
+        typer.echo("G4 DOCS-ALIGNMENT PASS")
+        return
+
+    typer.echo("G4 DOCS-ALIGNMENT FAIL")
+    failed = ", ".join(result["failed_checks"])
+    typer.echo(f"failed_checks: {failed}")
     for warning in result.get("warnings", []):
         typer.echo(f"- {warning}")
     raise typer.Exit(code=1)
