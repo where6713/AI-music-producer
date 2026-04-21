@@ -21,6 +21,26 @@
       ]
     },
     {
+      "topic_id": "pm_role_rules",
+      "owner_file": "docs/🎵 AI 音乐生成系统产品经理 (PM) Role & Rule.md",
+      "owner_marker": "### 🎵 AI 音乐生成系统产品经理 (PM) Role & Rule",
+      "forbidden_fulltext_outside_owner": [
+        "开发审计补充铁律",
+        "禁止旁路生成，必须走产品主链路",
+        "v2.1 关键字段缺失即一票否决"
+      ]
+    },
+    {
+      "topic_id": "dev_remediation_checklist",
+      "owner_file": "docs/开发整改事项清单.md",
+      "owner_marker": "# 开发整改事项清单（PM 强制执行）",
+      "forbidden_fulltext_outside_owner": [
+        "最高优先级（P0，必须先完成）",
+        "打通模型提供方适配层（Anthropic / OpenAI-compatible）",
+        "建立“禁止旁路生成”守卫"
+      ]
+    },
+    {
       "topic_id": "one_law",
       "owner_file": "one law.md",
       "owner_marker": "## 唯一法则",
