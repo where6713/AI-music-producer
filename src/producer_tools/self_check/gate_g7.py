@@ -19,6 +19,7 @@ def _run_g2_check() -> dict[str, Any]:
             "trigger_condition": "pytest -q tests/test_v2_schemas.py::test_payload_schema_invalid",
             "root_cause": "invalid tag and missing fields",
             "failure_command": "pytest -q tests/test_v2_schemas.py::test_payload_schema_invalid",
+            "failure_output": "ValidationError: required fields missing",
         }
     )
 

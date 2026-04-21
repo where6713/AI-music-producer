@@ -71,6 +71,7 @@ def failure_evidence_check(
     trigger_condition: str = typer.Argument(...),
     root_cause: str = typer.Argument(...),
     failure_command: str = typer.Argument(...),
+    failure_output: str = typer.Argument(...),
 ) -> None:
     result = validate_failure_evidence(
         {
@@ -78,6 +79,7 @@ def failure_evidence_check(
             "trigger_condition": trigger_condition,
             "root_cause": root_cause,
             "failure_command": failure_command,
+            "failure_output": failure_output,
         }
     )
     if result["status"] == "pass":
