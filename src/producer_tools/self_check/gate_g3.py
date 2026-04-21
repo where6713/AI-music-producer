@@ -9,6 +9,8 @@ REQUIRED_PASS_FIELDS = [
     "ci_result",
     "ci_run_url",
     "reproducible_commands",
+    "local_output",
+    "ci_output",
 ]
 
 
@@ -23,6 +25,7 @@ def _normalize(value: str) -> str:
 
 def validate_pass_evidence(payload: dict[str, Any]) -> dict[str, Any]:
     missing_fields: list[str] = []
+    failed_checks: list[str] = []
     for field in REQUIRED_PASS_FIELDS:
         value = payload.get(field)
         if field == "reproducible_commands":
@@ -35,14 +38,25 @@ def validate_pass_evidence(payload: dict[str, Any]) -> dict[str, Any]:
     local = _normalize(str(payload.get("local_result", "")))
     ci = _normalize(str(payload.get("ci_result", "")))
     consistent = bool(local and ci and local == ci)
+    local_output = str(payload.get("local_output", "")).strip().lower()
+    ci_output = str(payload.get("ci_output", "")).strip().lower()
+
+    if local_output and ci_output:
+        local_ok = "pass" in local_output or "success" in local_output
+        ci_ok = "pass" in ci_output or "success" in ci_output
+        if local_ok != ci_ok:
+            failed_checks.append("local_ci_output_consistency")
 
     warnings: list[str] = []
     if not missing_fields and not consistent:
         warnings.append("local_result and ci_result are inconsistent")
 
     return {
-        "status": "pass" if (not missing_fields and consistent) else "fail",
+        "status": "pass"
+        if (not missing_fields and consistent and not failed_checks)
+        else "fail",
         "missing_fields": missing_fields,
+        "failed_checks": failed_checks,
         "required_fields": REQUIRED_PASS_FIELDS,
         "consistent": consistent,
         "warnings": warnings,

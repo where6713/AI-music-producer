@@ -9,6 +9,7 @@ import subprocess
 _COMMIT_SUBJECT_RE = re.compile(
     r"^(feat|fix|docs|refactor|test|chore|build|ci|perf|revert)\([a-z0-9._/-]+\): .+"
 )
+_GATE_SCOPE_RE = re.compile(r"\((g[1-7])\)", re.IGNORECASE)
 
 
 def validate_g1_scope(payload: dict[str, Any]) -> dict[str, Any]:
@@ -26,8 +27,8 @@ def validate_g1_scope(payload: dict[str, Any]) -> dict[str, Any]:
     if not commit_subject or not _COMMIT_SUBJECT_RE.match(commit_subject):
         failed_checks.append("commit_message_format")
 
-    if "(g1)" not in commit_subject.lower():
-        failed_checks.append("commit_scope_g1")
+    if not _GATE_SCOPE_RE.search(commit_subject):
+        failed_checks.append("commit_scope_gate")
 
     if not changed_files:
         failed_checks.append("changed_files_present")

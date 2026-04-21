@@ -82,3 +82,28 @@ def test_cli_failure_evidence_check_requires_failure_output() -> None:
     stdout = result.stdout.decode("utf-8", errors="replace")
     assert result.returncode == 0
     assert "G2 FAILURE-EVIDENCE PASS" in stdout
+
+
+def test_cli_pass_evidence_check_requires_outputs() -> None:
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "apps.cli.main",
+            "pass-evidence-check",
+            "pytest -q",
+            "pass",
+            "success",
+            "https://github.com/where6713/AI-music-producer/actions/runs/1",
+            "pytest -q",
+            "python -m apps.cli.main gate-check --all",
+            "25 passed",
+            "ci-quality-gates: success",
+        ],
+        capture_output=True,
+        text=False,
+        check=False,
+    )
+    stdout = result.stdout.decode("utf-8", errors="replace")
+    assert result.returncode == 0
+    assert "G3 PASS-EVIDENCE PASS" in stdout

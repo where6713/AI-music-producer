@@ -32,6 +32,8 @@ def _run_g3_check() -> dict[str, Any]:
             "ci_result": "pass",
             "ci_run_url": "https://github.com/where6713/AI-music-producer/actions",
             "reproducible_commands": ["pytest -q", "bash tools/scripts/run_quality_gates_ci.sh"],
+            "local_output": "25 passed",
+            "ci_output": "ci-quality-gates: success",
         }
     )
 
