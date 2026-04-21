@@ -4,19 +4,12 @@ from pathlib import Path
 from typing import Any
 
 from src.producer_tools.self_check.gate_g0 import check_gate_g0
+from src.producer_tools.self_check.gate_g1 import check_gate_g1
 from src.producer_tools.self_check.gate_g2 import validate_failure_evidence
 from src.producer_tools.self_check.gate_g3 import validate_pass_evidence
 from src.producer_tools.self_check.gate_g4 import validate_docs_alignment
 from src.producer_tools.self_check.gate_g5 import check_gate_g5
 from src.producer_tools.self_check.gate_g6 import check_gate_g6
-
-
-def _run_g1_check(workspace_root: Path) -> dict[str, Any]:
-    prd = workspace_root / "docs" / "映月工厂_极简歌词工坊_PRD.json"
-    skill = workspace_root / ".claude" / "skills" / "lyric-craftsman" / "SKILL.md"
-    if prd.exists() and skill.exists():
-        return {"status": "pass"}
-    return {"status": "fail", "reason": "v2_core_docs_missing"}
 
 
 def _run_g2_check() -> dict[str, Any]:
@@ -76,7 +69,7 @@ def _proof_check(workspace_root: Path) -> dict[str, Any]:
 def check_gate_g7(workspace_root: Path, *, run_proof: bool = False) -> dict[str, Any]:
     gates = {
         "G0": check_gate_g0(workspace_root, strict_hooks_path=False),
-        "G1": _run_g1_check(workspace_root),
+        "G1": check_gate_g1(workspace_root),
         "G2": _run_g2_check(),
         "G3": _run_g3_check(),
         "G4": _run_g4_check(),
