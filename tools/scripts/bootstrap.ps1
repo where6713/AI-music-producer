@@ -31,13 +31,13 @@ function Get-Python313Command {
 }
 
 $repoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-$requirementsPath = Join-Path $repoRoot 'apps/cli/requirements.txt'
+$projectTomlPath = Join-Path $repoRoot 'pyproject.toml'
 $hookScript = Join-Path $repoRoot 'tools/scripts/install_hook_chain.ps1'
 $startupCheckScript = Join-Path $repoRoot 'tools/scripts/startup_health_check.ps1'
 $evidenceDir = Join-Path $repoRoot '.sisyphus/evidence'
 
-if (-not (Test-Path $requirementsPath)) {
-  Write-Host "[bootstrap][BLOCK] Missing requirements.txt: $requirementsPath"
+if (-not (Test-Path $projectTomlPath)) {
+  Write-Host "[bootstrap][BLOCK] Missing pyproject.toml: $projectTomlPath"
   exit 1
 }
 
@@ -75,8 +75,8 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 if ($InstallDeps) {
-  Write-Host "[bootstrap] installing dependencies from apps/cli/requirements.txt"
-  & $pythonExe @pythonPrefix -m pip install -r $requirementsPath
+  Write-Host "[bootstrap] installing dependencies from pyproject.toml"
+  & $pythonExe @pythonPrefix -m pip install .
   if ($LASTEXITCODE -ne 0) {
     Write-Host "[bootstrap][BLOCK] Dependency install failed"
     exit 1

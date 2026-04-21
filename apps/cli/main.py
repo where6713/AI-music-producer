@@ -1,144 +1,226 @@
+from __future__ import annotations
+
 from pathlib import Path
-import json
+import sys
 
 import click
 import typer
 
-from apps.cli.memory import get_project_memory_context
-from apps.cli.translation import translate_result
+from src.main import produce as produce_v2
+from src.producer_tools.self_check.gate_g0 import check_gate_g0
+from src.producer_tools.self_check.gate_g2 import validate_failure_evidence
+from src.producer_tools.self_check.gate_g3 import validate_pass_evidence
+from src.producer_tools.self_check.gate_g4 import validate_docs_alignment
+from src.producer_tools.self_check.gate_g5 import check_gate_g5
+from src.producer_tools.self_check.gate_g6 import check_gate_g6
+from src.producer_tools.self_check.gate_g7 import check_gate_g7
+
 
 app = typer.Typer(
-    help="AI music producer CLI",
+    help="AI music producer CLI (PRD v2.0)",
     rich_markup_mode=None,
     context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
 )
 
 
-@app.callback()
-def cli() -> None:
-    """Root command group."""
+def _ensure_utf8_output() -> None:
+    stdout_reconf = getattr(sys.stdout, "reconfigure", None)
+    if callable(stdout_reconf):
+        try:
+            stdout_reconf(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
 
 
 @app.command()
 def status() -> None:
-    typer.echo(translate_result("status_ready", "ok"))
+    typer.echo("AI music producer ready")
 
 
-@app.command()
-def context() -> None:
-    summary = get_project_memory_context()
-    if summary:
-        typer.echo(summary)
+@app.command("self-check")
+def self_check(
+    gate: str = typer.Argument(..., help="Gate name, currently supports: g0"),
+    strict_hooks_path: bool = typer.Option(
+        True,
+        "--strict-hooks-path",
+        help="Fail when core.hooksPath is not tools/githooks.",
+    ),
+) -> None:
+    if gate.strip().lower() != "g0":
+        typer.echo(f"Unsupported gate: {gate}")
+        raise typer.Exit(code=2)
+
+    result = check_gate_g0(Path.cwd(), strict_hooks_path=strict_hooks_path)
+    if result["status"] == "pass":
+        typer.echo("G0 PASS")
         return
-    typer.echo(translate_result("context_empty", "ok"))
+    typer.echo("G0 FAIL")
+    missing_hooks = result.get("missing_hooks", [])
+    missing_docs = result.get("missing_docs", [])
+    if missing_hooks:
+        typer.echo("missing_hooks: " + ", ".join(missing_hooks))
+    if missing_docs:
+        typer.echo("missing_docs: " + ", ".join(missing_docs))
+    raise typer.Exit(code=1)
 
 
-def enforce_plan_first(plan_path: Path | None, plan_step: str | None) -> None:
-    if plan_path is None or plan_step is None or not plan_step.strip():
-        typer.echo(translate_result("plan_required", "error"))
-        raise typer.Exit(code=1)
-    if not plan_path.exists():
-        typer.echo(
-            translate_result(
-                "plan_missing",
-                "error",
-                {"plan_path": plan_path},
-            )
-        )
-        raise typer.Exit(code=1)
+@app.command("failure-evidence-check")
+def failure_evidence_check(
+    symptom: str = typer.Argument(...),
+    trigger_condition: str = typer.Argument(...),
+    root_cause: str = typer.Argument(...),
+    failure_command: str = typer.Argument(...),
+) -> None:
+    result = validate_failure_evidence(
+        {
+            "symptom": symptom,
+            "trigger_condition": trigger_condition,
+            "root_cause": root_cause,
+            "failure_command": failure_command,
+        }
+    )
+    if result["status"] == "pass":
+        typer.echo("G2 FAILURE-EVIDENCE PASS")
+        return
+    typer.echo("G2 FAILURE-EVIDENCE FAIL")
+    raise typer.Exit(code=1)
 
 
-def load_checkpoint(path: Path) -> dict[str, object] | None:
-    if not path.exists():
-        return None
-    with path.open("r", encoding="utf-8") as handle:
-        data = json.load(handle)
-    if not isinstance(data, dict):
-        return None
-    return data
+@app.command("pass-evidence-check")
+def pass_evidence_check(
+    local_command: str = typer.Argument(...),
+    local_result: str = typer.Argument(...),
+    ci_result: str = typer.Argument(...),
+    ci_run_url: str = typer.Argument(...),
+    reproducible_command_1: str = typer.Argument(...),
+    reproducible_command_2: str = typer.Argument(...),
+) -> None:
+    result = validate_pass_evidence(
+        {
+            "local_command": local_command,
+            "local_result": local_result,
+            "ci_result": ci_result,
+            "ci_run_url": ci_run_url,
+            "reproducible_commands": [reproducible_command_1, reproducible_command_2],
+        }
+    )
+    if result["status"] == "pass":
+        typer.echo("G3 PASS-EVIDENCE PASS")
+        return
+    typer.echo("G3 PASS-EVIDENCE FAIL")
+    raise typer.Exit(code=1)
 
 
-def save_checkpoint(path: Path, data: dict[str, object]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as handle:
-        json.dump(data, handle, ensure_ascii=True, indent=2)
+@app.command("docs-alignment-check")
+def docs_alignment_check(
+    prd_path: str = typer.Argument(...),
+    pm_role_path: str = typer.Argument(...),
+    pm_rules_path: str = typer.Argument(...),
+    delivery_file_1: str = typer.Argument(...),
+    delivery_file_2: str = typer.Argument(...),
+    delivery_file_3: str = typer.Argument(...),
+) -> None:
+    result = validate_docs_alignment(
+        {
+            "prd_path": prd_path,
+            "pm_role_path": pm_role_path,
+            "pm_rules_path": pm_rules_path,
+            "delivery_files": [delivery_file_1, delivery_file_2, delivery_file_3],
+            "field_name_conflicts": [],
+        }
+    )
+    if result["status"] == "pass":
+        typer.echo("G4 DOCS-ALIGNMENT PASS")
+        return
+    typer.echo("G4 DOCS-ALIGNMENT FAIL")
+    raise typer.Exit(code=1)
+
+
+@app.command("hook-check")
+def hook_check(gate: str = typer.Argument(...)) -> None:
+    if gate.strip().lower() != "g5":
+        typer.echo(f"Unsupported gate: {gate}")
+        raise typer.Exit(code=2)
+    result = check_gate_g5(Path.cwd())
+    if result["status"] == "pass":
+        typer.echo("G5 HOOK-CHECK PASS")
+        return
+    typer.echo("G5 HOOK-CHECK FAIL")
+    raise typer.Exit(code=1)
+
+
+@app.command("ci-gate-check")
+def ci_gate_check(gate: str = typer.Argument(...)) -> None:
+    if gate.strip().lower() != "g6":
+        typer.echo(f"Unsupported gate: {gate}")
+        raise typer.Exit(code=2)
+    result = check_gate_g6(Path.cwd())
+    if result["status"] == "pass":
+        typer.echo("G6 CI-GATE PASS")
+        return
+    typer.echo("G6 CI-GATE FAIL")
+    raise typer.Exit(code=1)
 
 
 @app.command(
-    context_settings={"allow_extra_args": True, "ignore_unknown_options": True}
+    "gate-check",
+    context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
 )
-def produce(
-    plan: Path = typer.Argument(..., help="Path to plan file for long-running action."),
-    plan_step: str = typer.Argument(
-        ..., help="Plan step identifier required before execution."
-    ),
-) -> None:
-    """Run a long-running production action (plan-first guarded)."""
-    enforce_plan_first(plan, plan_step)
-    checkpoint_path = Path(".sisyphus/runtime/producer_state.json")
-    resume = False
-
+def gate_check() -> None:
     args = list(click.get_current_context().args)
-    index = 0
-    while index < len(args):
-        token = args[index]
-        if token == "--resume":
-            resume = True
-            index += 1
-            continue
-        if token == "--checkpoint":
-            if index + 1 >= len(args):
-                typer.echo(translate_result("checkpoint_required", "error"))
-                raise typer.Exit(code=1)
-            checkpoint_path = Path(args[index + 1])
-            index += 2
-            continue
-        if token.startswith("--checkpoint="):
-            checkpoint_path = Path(token.split("=", 1)[1])
-            index += 1
-            continue
-        index += 1
+    all_mode = "--all" in args
+    run_proof = "--run-proof" in args
 
-    if resume:
-        state = load_checkpoint(checkpoint_path)
-        if state is None:
-            typer.echo(
-                translate_result(
-                    "checkpoint_missing",
-                    "error",
-                    {"checkpoint_path": checkpoint_path},
-                )
-            )
-            raise typer.Exit(code=1)
-        resumed_step = state.get("step", plan_step)
-        typer.echo(translate_result("resume", "ok", {"step": resumed_step}))
-    else:
-        save_checkpoint(
-            checkpoint_path,
-            {"plan": str(plan), "step": plan_step, "status": "started"},
-        )
+    if not all_mode:
+        typer.echo("Use --all for G7 total closure check")
+        raise typer.Exit(code=2)
 
-    typer.echo(
-        translate_result(
-            "plan_acknowledged",
-            "ok",
-            {"plan_step": plan_step},
-        )
-    )
-    save_checkpoint(
-        checkpoint_path,
-        {"plan": str(plan), "step": plan_step, "status": "completed"},
-    )
-    typer.echo(
-        translate_result(
-            "production_completed",
-            "ok",
-            {"checkpoint_path": checkpoint_path},
-        )
+    result = check_gate_g7(Path.cwd(), run_proof=run_proof)
+    summary = result.get("gate_summary", {})
+    typer.echo(" ".join([f"{k}={v}" for k, v in summary.items()]))
+    if result["status"] == "pass":
+        typer.echo("G7 TOTAL-CLOSURE PASS")
+        return
+    typer.echo("G7 TOTAL-CLOSURE FAIL")
+    raise typer.Exit(code=1)
+
+
+@app.command("pm-audit")
+def pm_audit() -> None:
+    result = check_gate_g7(Path.cwd(), run_proof=True)
+    if result["status"] != "pass":
+        typer.echo("PM AUDIT FAIL")
+        typer.echo(str(result))
+        raise typer.Exit(code=1)
+    typer.echo("PM AUDIT PASS")
+    typer.echo(str(result))
+
+
+@app.command("produce")
+def produce_command(
+    raw_intent: str = typer.Argument(...),
+    genre: str = typer.Option("", "--genre"),
+    mood: str = typer.Option("", "--mood"),
+    vocal: str = typer.Option("any", "--vocal"),
+    lang: str = typer.Option("zh-CN", "--lang"),
+    out_dir: str = typer.Option("out", "--out-dir"),
+    verbose: bool = typer.Option(False, "--verbose"),
+    dry_run: bool = typer.Option(False, "--dry-run"),
+) -> None:
+    produce_v2(
+        raw_intent=raw_intent,
+        genre=genre,
+        mood=mood,
+        vocal=vocal,
+        lang=lang,
+        out_dir=out_dir,
+        verbose=verbose,
+        dry_run=dry_run,
     )
 
 
 def main() -> None:
+    _ensure_utf8_output()
     app()
 
 
