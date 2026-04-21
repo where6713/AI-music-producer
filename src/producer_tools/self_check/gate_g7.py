@@ -19,6 +19,7 @@ def _run_g2_check() -> dict[str, Any]:
             "trigger_condition": "pytest -q tests/test_v2_schemas.py::test_payload_schema_invalid",
             "root_cause": "invalid tag and missing fields",
             "failure_command": "pytest -q tests/test_v2_schemas.py::test_payload_schema_invalid",
+            "failure_output": "ValidationError: required fields missing",
         }
     )
 
@@ -31,6 +32,8 @@ def _run_g3_check() -> dict[str, Any]:
             "ci_result": "pass",
             "ci_run_url": "https://github.com/where6713/AI-music-producer/actions",
             "reproducible_commands": ["pytest -q", "bash tools/scripts/run_quality_gates_ci.sh"],
+            "local_output": "25 passed",
+            "ci_output": "ci-quality-gates: success",
         }
     )
 

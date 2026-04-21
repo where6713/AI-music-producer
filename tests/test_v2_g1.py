@@ -34,13 +34,25 @@ def test_validate_g1_scope_fail_for_invalid_commit_format() -> None:
 def test_validate_g1_scope_fail_for_non_g1_scope() -> None:
     result = gate_g1.validate_g1_scope(
         {
-            "commit_subject": "feat(g2): add failure evidence checker",
+            "commit_subject": "feat(core): add failure evidence checker",
             "changed_files": ["src/producer_tools/self_check/gate_g1.py"],
         }
     )
 
     assert result["status"] == "fail"
-    assert "commit_scope_g1" in result["failed_checks"]
+    assert "commit_scope_gate" in result["failed_checks"]
+
+
+def test_validate_g1_scope_pass_for_later_gate_scope() -> None:
+    result = gate_g1.validate_g1_scope(
+        {
+            "commit_subject": "feat(g3): tighten pass evidence contract",
+            "changed_files": ["src/producer_tools/self_check/gate_g3.py"],
+        }
+    )
+
+    assert result["status"] == "pass"
+    assert result["failed_checks"] == []
 
 
 def test_validate_g1_scope_fail_when_mixed_gitkeep_cleanup() -> None:

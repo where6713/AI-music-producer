@@ -71,6 +71,7 @@ def failure_evidence_check(
     trigger_condition: str = typer.Argument(...),
     root_cause: str = typer.Argument(...),
     failure_command: str = typer.Argument(...),
+    failure_output: str = typer.Argument(...),
 ) -> None:
     result = validate_failure_evidence(
         {
@@ -78,6 +79,7 @@ def failure_evidence_check(
             "trigger_condition": trigger_condition,
             "root_cause": root_cause,
             "failure_command": failure_command,
+            "failure_output": failure_output,
         }
     )
     if result["status"] == "pass":
@@ -115,6 +117,8 @@ def pass_evidence_check(
     ci_run_url: str = typer.Argument(...),
     reproducible_command_1: str = typer.Argument(...),
     reproducible_command_2: str = typer.Argument(...),
+    local_output: str = typer.Argument(...),
+    ci_output: str = typer.Argument(...),
 ) -> None:
     result = validate_pass_evidence(
         {
@@ -123,6 +127,8 @@ def pass_evidence_check(
             "ci_result": ci_result,
             "ci_run_url": ci_run_url,
             "reproducible_commands": [reproducible_command_1, reproducible_command_2],
+            "local_output": local_output,
+            "ci_output": ci_output,
         }
     )
     if result["status"] == "pass":

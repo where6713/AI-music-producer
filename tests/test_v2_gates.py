@@ -51,3 +51,35 @@ jobs:
     ci_script = "pytest -q\nout/lyrics.txt"
     result = validate_g6_contract(workflow_yaml=workflow, ci_script=ci_script)
     assert result["status"] == "pass"
+
+
+def test_g2_failure_evidence_contract_requires_failure_output() -> None:
+    from src.producer_tools.self_check.gate_g2 import validate_failure_evidence
+
+    result = validate_failure_evidence(
+        {
+            "symptom": "symptom",
+            "trigger_condition": "trigger",
+            "root_cause": "root",
+            "failure_command": "cmd",
+            "failure_output": "stderr snapshot",
+        }
+    )
+    assert result["status"] == "pass"
+
+
+def test_g3_pass_evidence_contract_requires_outputs() -> None:
+    from src.producer_tools.self_check.gate_g3 import validate_pass_evidence
+
+    result = validate_pass_evidence(
+        {
+            "local_command": "pytest -q",
+            "local_result": "pass",
+            "ci_result": "success",
+            "ci_run_url": "https://github.com/where6713/AI-music-producer/actions/runs/1",
+            "reproducible_commands": ["pytest -q", "python -m apps.cli.main gate-check --all"],
+            "local_output": "25 passed",
+            "ci_output": "ci-quality-gates: success",
+        }
+    )
+    assert result["status"] == "pass"
