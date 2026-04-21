@@ -105,6 +105,17 @@ if [ -n "$python_cmd" ]; then
     $python_cmd -m pytest -q
     ran_any_test=1
   fi
+
+  # v2.0 output contract check
+  py_script='from pathlib import Path
+required = ["out/lyrics.txt", "out/style.txt", "out/exclude.txt"]
+missing = [x for x in required if not Path(x).exists()]
+if missing:
+    print("[pre-push][WARN] output files missing:", ", ".join(missing))
+else:
+    print("[pre-push] output contract files present")'
+  # shellcheck disable=SC2086
+  $python_cmd -c "$py_script"
 else
   echo "[pre-push][BLOCK] Python 3.13 runtime is required for tests, but not found."
   exit 1

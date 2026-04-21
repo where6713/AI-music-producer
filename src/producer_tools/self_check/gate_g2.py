@@ -12,21 +12,13 @@ REQUIRED_FAILURE_FIELDS = [
 
 
 def validate_failure_evidence(payload: dict[str, Any]) -> dict[str, Any]:
-    normalized: dict[str, str] = {}
-    for key, value in payload.items():
-        if isinstance(value, str):
-            normalized[key] = value.strip()
-        else:
-            normalized[key] = ""
-
-    missing_fields = [
-        field for field in REQUIRED_FAILURE_FIELDS if not normalized.get(field, "")
-    ]
-    status = "pass" if not missing_fields else "fail"
-
+    missing_fields: list[str] = []
+    for field in REQUIRED_FAILURE_FIELDS:
+        value = payload.get(field, "")
+        if not isinstance(value, str) or not value.strip():
+            missing_fields.append(field)
     return {
-        "status": status,
-        "required_fields": REQUIRED_FAILURE_FIELDS,
+        "status": "pass" if not missing_fields else "fail",
         "missing_fields": missing_fields,
-        "payload": payload,
+        "required_fields": REQUIRED_FAILURE_FIELDS,
     }

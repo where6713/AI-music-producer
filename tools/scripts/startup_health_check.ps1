@@ -3,13 +3,14 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 
 $requiredPaths = @(
-  'apps/cli/requirements.txt',
+  'pyproject.toml',
   'tools/scripts/install_hook_chain.ps1',
   'tools/scripts/next_gate.ps1',
   'docs/映月工厂_极简歌词工坊_PRD_v2.0.json',
   'docs/ai_doc_manifest.json',
   'one law.md',
-  '目录框架规范.md'
+  '目录框架规范.md',
+  '.claude/skills/lyric-craftsman/SKILL.md'
 )
 
 $missing = $false

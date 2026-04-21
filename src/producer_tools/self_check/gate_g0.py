@@ -20,22 +20,16 @@ def _read_hooks_path(workspace_root: Path) -> str | None:
     return output or None
 
 
-def check_gate_g0(
-    workspace_root: Path,
-    *,
-    strict_hooks_path: bool = True,
-) -> dict[str, object]:
+def check_gate_g0(workspace_root: Path, *, strict_hooks_path: bool = True) -> dict[str, object]:
     hooks_dir = workspace_root / "tools" / "githooks"
     missing_hooks = [name for name in REQUIRED_HOOKS if not (hooks_dir / name).is_file()]
 
-    warnings: list[str] = []
     hooks_path = _read_hooks_path(workspace_root)
     hooks_path_ok = hooks_path == "tools/githooks"
 
+    warnings: list[str] = []
     if strict_hooks_path and not hooks_path_ok:
-        warnings.append(
-            "core.hooksPath is not tools/githooks; run: git config core.hooksPath tools/githooks"
-        )
+        warnings.append("core.hooksPath is not tools/githooks")
 
     status = "pass"
     if missing_hooks:
@@ -45,8 +39,6 @@ def check_gate_g0(
 
     return {
         "status": status,
-        "workspace_root": str(workspace_root.resolve()),
-        "required_hooks": REQUIRED_HOOKS,
         "missing_hooks": missing_hooks,
         "hooks_path": hooks_path,
         "hooks_path_ok": hooks_path_ok,
