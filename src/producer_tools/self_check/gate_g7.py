@@ -12,7 +12,7 @@ from src.producer_tools.self_check.gate_g6 import check_gate_g6
 
 
 def _run_g1_check(workspace_root: Path) -> dict[str, Any]:
-    prd = workspace_root / "docs" / "映月工厂_极简歌词工坊_PRD_v2.0.json"
+    prd = workspace_root / "docs" / "映月工厂_极简歌词工坊_PRD.json"
     skill = workspace_root / ".claude" / "skills" / "lyric-craftsman" / "SKILL.md"
     if prd.exists() and skill.exists():
         return {"status": "pass"}
@@ -45,7 +45,7 @@ def _run_g3_check() -> dict[str, Any]:
 def _run_g4_check() -> dict[str, Any]:
     return validate_docs_alignment(
         {
-            "prd_path": "docs/映月工厂_极简歌词工坊_PRD_v2.0.json",
+            "prd_path": "docs/映月工厂_极简歌词工坊_PRD.json",
             "pm_role_path": "one law.md",
             "pm_rules_path": "目录框架规范.md",
             "delivery_files": ["out/lyrics.txt", "out/style.txt", "out/exclude.txt"],

@@ -23,7 +23,7 @@ def test_cli_docs_alignment_check_reports_pass() -> None:
             "-m",
             "apps.cli.main",
             "docs-alignment-check",
-            "docs/映月工厂_极简歌词工坊_PRD_v2.0.json",
+            "docs/映月工厂_极简歌词工坊_PRD.json",
             "one law.md",
             "目录框架规范.md",
             "out/lyrics.txt",

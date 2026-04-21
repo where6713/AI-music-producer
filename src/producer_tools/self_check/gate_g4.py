@@ -4,7 +4,7 @@ from typing import Any
 
 
 REQUIRED_DOC_PATHS = {
-    "prd_path": "docs/映月工厂_极简歌词工坊_PRD_v2.0.json",
+    "prd_path": "docs/映月工厂_极简歌词工坊_PRD.json",
     "pm_role_path": "one law.md",
     "pm_rules_path": "目录框架规范.md",
 }

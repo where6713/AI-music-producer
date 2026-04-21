@@ -48,7 +48,7 @@ def _valid_payload_dict() -> dict[str, object]:
 
 def test_payload_schema_valid() -> None:
     payload = LyricPayload.model_validate(_valid_payload_dict())
-    assert payload.schema_version == "v2.0"
+    assert payload.schema_version == "v2.1"
     assert payload.skill_used == "lyric-craftsman@v1.0"
 
 

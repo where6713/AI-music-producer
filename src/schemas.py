@@ -50,7 +50,7 @@ class StyleTags(BaseModel):
 
 
 class LyricPayload(BaseModel):
-    schema_version: str = "v2.0"
+    schema_version: str = "v2.1"
     generation_id: str = Field(default_factory=lambda: str(uuid4()))
     model_used: str = "claude-opus-4-7"
     skill_used: str = "lyric-craftsman@v1.0"

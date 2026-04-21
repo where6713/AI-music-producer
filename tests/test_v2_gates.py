@@ -10,7 +10,7 @@ from src.producer_tools.self_check.gate_g6 import validate_g6_contract
 def test_g4_docs_alignment_pass() -> None:
     result = validate_docs_alignment(
         {
-            "prd_path": "docs/映月工厂_极简歌词工坊_PRD_v2.0.json",
+            "prd_path": "docs/映月工厂_极简歌词工坊_PRD.json",
             "pm_role_path": "one law.md",
             "pm_rules_path": "目录框架规范.md",
             "delivery_files": ["out/lyrics.txt", "out/style.txt", "out/exclude.txt"],

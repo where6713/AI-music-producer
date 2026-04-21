@@ -1,5 +1,5 @@
 {
-  "version": "2.0.0",
+  "version": "2.1.0",
   "policy": {
     "mode": "ai-oriented",
     "single_source_required": true,
@@ -8,11 +8,12 @@
   },
   "canonical_topics": [
     {
-      "topic_id": "product_prd_v2",
-      "owner_file": "docs/映月工厂_极简歌词工坊_PRD_v2.0.json",
-      "owner_marker": "\"version\": \"v2.0\"",
+      "topic_id": "product_prd",
+      "owner_file": "docs/映月工厂_极简歌词工坊_PRD.json",
+      "owner_marker": "\"version\": \"v2.1\"",
       "forbidden_fulltext_outside_owner": [
-        "Skill-Driven Single-Pass Generation with Surgical Lint",
+        "Skill-Driven Single-Pass Generation with Dynamic Few-Shot and Surgical Lint",
+        "复杂度红线",
         "max_llm_calls_per_run"
       ]
     },
@@ -27,7 +28,7 @@
     {
       "topic_id": "rule_13_18",
       "owner_file": "目录框架规范.md",
-      "owner_marker": "## 7. RULE-13 ~ RULE-18（v2.0）",
+      "owner_marker": "## 7. RULE-13 ~ RULE-18",
       "forbidden_fulltext_outside_owner": [
         "RULE-13（命名规范）",
         "RULE-14（单一输出）",

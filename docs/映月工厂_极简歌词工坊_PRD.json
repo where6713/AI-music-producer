@@ -1,0 +1,284 @@
+{
+  "$schema": "music-producer/prd/v2.1_dynamic_few_shot_prompting",
+  "codename": "映月工厂 · 极简歌词工坊 (Lyric Craftsman)",
+  "version": "v2.1",
+  "issued_date": "2026-04-20",
+  "issued_by": "顶级 AI 音乐产品经理",
+  "status": "可直接进入开发与验收",
+  "one_liner": "一个 CLI 命令 + 一份 SKILL.md + 一次 Claude Opus 4.7 调用 + 动态少样本示例注入 + Python lint = 一组可直接粘贴到 Suno/MiniMax 的发行级歌词三件套。",
+  "核心裁定": {
+    "方案可行性": "通过，且建议立即升级。动态少样本提示（Dynamic Few-Shot Prompting）与分布级输出（Distribution-level Prompting）组合，是 2024-2026 年最被验证有效的 Prompt 工程技术。",
+    "核心洞察": "这不是增加一个系统，而是在单次 LLM 调用的 Prompt 里加入 2-3 条真实人类示例。工程本质是 Prompt 工程深化，不是架构扩张。",
+    "复杂度结论": {
+      "LLM调用次数": "仍然 1.1 次（上限 2 次）",
+      "新增代码": "retriever 约 30 行（纯字典过滤 + random）",
+      "新增依赖": "0 个（json / random 为标准库）",
+      "开发工期": "2 天 -> 2.5 天",
+      "单次成本": "$0.05 -> $0.09（相对旧多调用方案仍显著更低）"
+    }
+  },
+  "复杂度红线": {
+    "红线_1": "禁止引入任何向量数据库（chromadb/FAISS/Milvus）",
+    "红线_2": "禁止引入 Embedding 模型",
+    "红线_3": "禁止运行时清洗或打标签语料（语料必须预处理后只读）",
+    "红线_4": "Few-Shot 示例数必须 <= 3",
+    "红线_5": "禁止把单次调用内三变体伪装成三次独立调用"
+  },
+  "新架构_全景图": {
+    "name": "Skill-Driven Single-Pass Generation with Dynamic Few-Shot and Surgical Lint",
+    "pipeline_steps": 5,
+    "max_llm_calls_per_run": 2,
+    "expected_llm_calls_per_run": 1.1,
+    "pipeline": [
+      {
+        "step": 1,
+        "name": "Intent Intake + Context Retrieval（无 LLM）",
+        "actor": "main.py + retriever.py",
+        "phases": [
+          "A. 解析 CLI 参数 -> user_input",
+          "B. 在主调用前做轻量蒸馏（默认 regex + 关键词）",
+          "C. 基于情感标签与 valence 检索 corpus",
+          "D. 取 2-3 条示例注入 Skill 上下文"
+        ],
+        "duration_estimate": "<0.5s",
+        "cost": "$0.00"
+      },
+      {
+        "step": 2,
+        "name": "Skill-Driven Craft with Few-Shot（单次 LLM 调用）",
+        "actor": "Claude Opus 4.7 + lyric-craftsman SKILL + few_shot_examples",
+        "prompt_structure": [
+          "系统层：SKILL.md 自动加载",
+          "用户层：user_input + few_shot_examples（2-3 条）",
+          "模型在单次调用内执行 Phase A -> B -> B.5 -> C -> D -> E",
+          "输出 3 个 variants"
+        ],
+        "duration_estimate": "25-40s"
+      },
+      {
+        "step": 3,
+        "name": "Surgical Lint + Best-Variant Selection（无 LLM）",
+        "actor": "lint.py",
+        "logic": [
+          "对 3 个 variants 各跑一遍 13 条硬规则",
+          "按通过规则数排序，取 Top-1",
+          "若 Top-1 全通过 -> 直接进入编译",
+          "若 Top-1 有硬规则违规 -> 触发 Step 4"
+        ]
+      },
+      {
+        "step": 4,
+        "name": "Targeted Revise（条件触发，至多 1 次 LLM 调用）",
+        "trigger_condition": "Step 3 Top-1 仍有硬规则违规",
+        "behavior": "把 Top-1 + lint_report 回送模型，只改违规行"
+      },
+      {
+        "step": 5,
+        "name": "Compile to Suno Triplet（无 LLM）",
+        "actor": "compile.py",
+        "output": [
+          "lyrics.txt",
+          "style.txt",
+          "exclude.txt",
+          "lyric_payload.json",
+          "trace.json"
+        ]
+      }
+    ]
+  },
+  "corpus_pack": {
+    "directory": "corpus/",
+    "files": {
+      "poetry_classical.json": "古典诗词（预标注 emotion tags）",
+      "lyrics_modern_zh.json": "现代中文歌词（预标注）",
+      "lyrics_modern_en.json": "可选，英文扩展"
+    },
+    "item_schema": {
+      "id": "string",
+      "type": "classical_poem | modern_lyric",
+      "title": "string",
+      "author": "string",
+      "era": "string",
+      "text": "string",
+      "emotion_tags": [
+        "string"
+      ],
+      "aesthetic_tags": [
+        "string"
+      ],
+      "valence": "positive | negative | mixed",
+      "arousal": "low | medium | high",
+      "char_count": "integer"
+    },
+    "hard_limits": {
+      "poetry_max": 2000,
+      "modern_max": 3000,
+      "single_file_mb_max": 30
+    }
+  },
+  "retriever_module": {
+    "path": "src/retriever.py",
+    "核心逻辑": [
+      "标签交集 + valence 一致",
+      "命中不足时降级到仅 valence",
+      "1 条古典 + 1-2 条现代，最多 3 条",
+      "可选 seed 以支持可复现测试"
+    ],
+    "硬规则": [
+      "无 ML 代码",
+      "无副作用（不写缓存、不调外部 API）",
+      "只读语料"
+    ]
+  },
+  "skill_document": {
+    "filepath_project": ".claude/skills/lyric-craftsman/SKILL.md",
+    "新增章节": {
+      "Phase_B_5": "在填词前对 2-3 条示例进行叙事逻辑、意境质感、可学/不可学点分析，禁止复写超过 4 个字连续片段。",
+      "Section_8": "单次调用内强制输出 3 个完整变体，POV 必须不同，结构骨架一致，情感基调一致，具象名词重合率 <= 30%。"
+    }
+  },
+  "data_schemas": {
+    "user_input": {
+      "$id": "user_input/v1",
+      "fields": {
+        "raw_intent": "string",
+        "language": "enum[zh-CN,en-US]",
+        "genre_hint": "string",
+        "mood_hint": "string",
+        "vocal_gender_hint": "enum[male,female,any]"
+      }
+    },
+    "lyric_payload": {
+      "$id": "lyric_payload/v2.1",
+      "fields": {
+        "schema_version": "v2.1",
+        "generation_id": "uuid",
+        "model_used": "claude-opus-4-7",
+        "skill_used": "lyric-craftsman@v2.1",
+        "few_shot_examples_used": [
+          {
+            "source_id": "string",
+            "type": "enum[classical_poem,modern_lyric]",
+            "title": "string",
+            "emotion_tags_matched": [
+              "string"
+            ]
+          }
+        ],
+        "variants": [
+          {
+            "variant_id": "enum[a,b,c]",
+            "narrative_pov": "enum[first_person,second_person,third_person]",
+            "lyrics_by_section": "同 section 结构",
+            "lint_result": {
+              "passed_rules": "integer (0-13)",
+              "failed_rules": [
+                "rule_id"
+              ],
+              "rank": "integer"
+            }
+          }
+        ],
+        "chosen_variant_id": "enum[a,b,c]",
+        "style_tags": "object",
+        "exclude_tags": "array"
+      }
+    }
+  },
+  "lint_logic": {
+    "path": "src/lint.py",
+    "rules": [
+      "输入从单个 payload 改为 variants[3]",
+      "每个 variant 跑完整 13 条规则",
+      "排序：passed_count DESC -> len(failed_rules) ASC -> variant_id ASC",
+      "lint 只评分与选择，不自动修复",
+      "lint 禁止调用 LLM"
+    ]
+  },
+  "directory_structure": {
+    "tree": {
+      "music-producer/": {
+        "src/": {
+          "main.py": "CLI 入口",
+          "claude_client.py": "LLM 调用封装",
+          "retriever.py": "few-shot 示例检索",
+          "lint.py": "三变体硬规则评分与选择",
+          "compile.py": "triplet 编译",
+          "schemas.py": "pydantic 数据模型"
+        },
+        "corpus/": {
+          "poetry_classical.json": "古典语料",
+          "lyrics_modern_zh.json": "现代中文语料"
+        },
+        ".claude/skills/lyric-craftsman/SKILL.md": "规则与写作规范",
+        "out/": {
+          "lyrics.txt": "Suno Lyrics",
+          "style.txt": "Suno Style",
+          "exclude.txt": "负向提示",
+          "lyric_payload.json": "结构化结果",
+          "trace.json": "调用轨迹"
+        },
+        "pyproject.toml": "依赖声明",
+        "README.md": "快速说明"
+      }
+    },
+    "forbidden_dirs": [
+      "motif_atlas/",
+      "drafts/",
+      "scorer_output/",
+      "soft_brief/"
+    ]
+  },
+  "github_dependencies": {
+    "required": [
+      "anthropic",
+      "pypinyin",
+      "jieba",
+      "rapidfuzz",
+      "pydantic",
+      "typer",
+      "rich"
+    ],
+    "new_dependencies": 0
+  },
+  "cli_interface": {
+    "main_command": "music-producer \"<raw_intent>\"",
+    "options": {
+      "--genre": "GMIV Genre hint",
+      "--mood": "情绪 hint",
+      "--vocal": "male / female / any",
+      "--lang": "zh-CN / en-US",
+      "--out-dir": "输出目录",
+      "--verbose": "打印 distillation + variants lint 详情",
+      "--dry-run": "只跑到 lint"
+    }
+  },
+  "acceptance_criteria": {
+    "功能性": [
+      "AC-01 同一 intent 跑 3 次，平均 LLM 调用次数 <= 1.3",
+      "AC-02 单次产出中重复 >=4 次具象名词数 = 0",
+      "AC-03 forbidden_literal_phrases 命中数 = 0",
+      "AC-04 副歌 Hook 第 1 行尾字符合开口音 + 平声",
+      "AC-05 标签 100% 在白名单内",
+      "AC-06 style.txt 标签数在 4-8",
+      "AC-07 triplet 粘贴后可完整生成歌曲",
+      "AC-13 few_shot_examples_used >= 2",
+      "AC-14 三个 variants 的 POV 字段各不相同",
+      "AC-15 三个 variants 主题名词重合率 <= 30%",
+      "AC-16 retriever 在 10 个典型 intent 上 >=95% 命中 >=2 条示例",
+      "AC-17 单次 run API 成本 <= $0.10"
+    ]
+  },
+  "迁移路径": {
+    "Day_1_AM": "下载并离线处理古典诗词语料，生成 poetry_classical.json",
+    "Day_1_PM": "下载并离线处理现代中文歌词语料，生成 lyrics_modern_zh.json",
+    "Day_2_AM": "实现 retriever.py 与 prompt 注入",
+    "Day_2_PM": "更新 SKILL.md（Phase B.5 + Section 8）与 lint.py（3 variants）",
+    "Day_3": "执行 AC-01 至 AC-17 回归测试与盲评"
+  },
+  "签字": {
+    "结论": "坚持极简架构，不引入动态 RAG，不牺牲可审计性，保证输出分布质量与工程成本共同最优。",
+    "issued_by": "顶级 AI 音乐产品经理",
+    "date": "2026-04-20"
+  }
+}
