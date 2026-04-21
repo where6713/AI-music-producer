@@ -55,6 +55,12 @@ def self_check(
         typer.echo("G0 PASS")
         return
     typer.echo("G0 FAIL")
+    missing_hooks = result.get("missing_hooks", [])
+    missing_docs = result.get("missing_docs", [])
+    if missing_hooks:
+        typer.echo("missing_hooks: " + ", ".join(missing_hooks))
+    if missing_docs:
+        typer.echo("missing_docs: " + ", ".join(missing_docs))
     raise typer.Exit(code=1)
 
 
