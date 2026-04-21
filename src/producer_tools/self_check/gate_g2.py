@@ -8,6 +8,7 @@ REQUIRED_FAILURE_FIELDS = [
     "trigger_condition",
     "root_cause",
     "failure_command",
+    "failure_output",
 ]
 
 

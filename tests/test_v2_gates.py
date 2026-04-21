@@ -51,3 +51,18 @@ jobs:
     ci_script = "pytest -q\nout/lyrics.txt"
     result = validate_g6_contract(workflow_yaml=workflow, ci_script=ci_script)
     assert result["status"] == "pass"
+
+
+def test_g2_failure_evidence_contract_requires_failure_output() -> None:
+    from src.producer_tools.self_check.gate_g2 import validate_failure_evidence
+
+    result = validate_failure_evidence(
+        {
+            "symptom": "symptom",
+            "trigger_condition": "trigger",
+            "root_cause": "root",
+            "failure_command": "cmd",
+            "failure_output": "stderr snapshot",
+        }
+    )
+    assert result["status"] == "pass"
