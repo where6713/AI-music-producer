@@ -8,6 +8,7 @@ import typer
 
 from src.main import produce as produce_v2
 from src.producer_tools.self_check.gate_g0 import check_gate_g0
+from src.producer_tools.self_check.gate_g1 import check_gate_g1
 from src.producer_tools.self_check.gate_g2 import validate_failure_evidence
 from src.producer_tools.self_check.gate_g3 import validate_pass_evidence
 from src.producer_tools.self_check.gate_g4 import validate_docs_alignment
@@ -83,6 +84,26 @@ def failure_evidence_check(
         typer.echo("G2 FAILURE-EVIDENCE PASS")
         return
     typer.echo("G2 FAILURE-EVIDENCE FAIL")
+    raise typer.Exit(code=1)
+
+
+@app.command("scope-check")
+def scope_check(
+    gate: str = typer.Argument(...),
+) -> None:
+    if gate.strip().lower() != "g1":
+        typer.echo(f"Unsupported gate: {gate}")
+        raise typer.Exit(code=2)
+
+    result = check_gate_g1(Path.cwd())
+    if result["status"] == "pass":
+        typer.echo("G1 SCOPE-CHECK PASS")
+        return
+
+    typer.echo("G1 SCOPE-CHECK FAIL")
+    failed = result.get("failed_checks", [])
+    if failed:
+        typer.echo("failed_checks: " + ", ".join(failed))
     raise typer.Exit(code=1)
 
 
