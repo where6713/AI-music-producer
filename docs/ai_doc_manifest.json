@@ -37,7 +37,8 @@
       "forbidden_fulltext_outside_owner": [
         "最高优先级（P0，必须先完成）",
         "打通模型提供方适配层（Anthropic / OpenAI-compatible）",
-        "建立“禁止旁路生成”守卫"
+        "建立“禁止旁路生成”守卫",
+        "今日审计定位（2026-04-21，按文件整改）"
       ]
     },
     {
