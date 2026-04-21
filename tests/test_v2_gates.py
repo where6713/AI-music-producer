@@ -13,6 +13,7 @@ def test_g4_docs_alignment_pass() -> None:
             "prd_path": "docs/映月工厂_极简歌词工坊_PRD.json",
             "pm_role_path": "one law.md",
             "pm_rules_path": "目录框架规范.md",
+            "manifest_path": "docs/ai_doc_manifest.json",
             "delivery_files": ["out/lyrics.txt", "out/style.txt", "out/exclude.txt"],
             "field_name_conflicts": [],
         }

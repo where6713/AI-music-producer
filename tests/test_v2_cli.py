@@ -26,6 +26,7 @@ def test_cli_docs_alignment_check_reports_pass() -> None:
             "docs/映月工厂_极简歌词工坊_PRD.json",
             "one law.md",
             "目录框架规范.md",
+            "docs/ai_doc_manifest.json",
             "out/lyrics.txt",
             "out/style.txt",
             "out/exclude.txt",

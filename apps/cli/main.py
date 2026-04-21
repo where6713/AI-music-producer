@@ -143,6 +143,7 @@ def docs_alignment_check(
     prd_path: str = typer.Argument(...),
     pm_role_path: str = typer.Argument(...),
     pm_rules_path: str = typer.Argument(...),
+    manifest_path: str = typer.Argument(...),
     delivery_file_1: str = typer.Argument(...),
     delivery_file_2: str = typer.Argument(...),
     delivery_file_3: str = typer.Argument(...),
@@ -152,6 +153,7 @@ def docs_alignment_check(
             "prd_path": prd_path,
             "pm_role_path": pm_role_path,
             "pm_rules_path": pm_rules_path,
+            "manifest_path": manifest_path,
             "delivery_files": [delivery_file_1, delivery_file_2, delivery_file_3],
             "field_name_conflicts": [],
         }
