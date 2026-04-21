@@ -9,6 +9,11 @@
   "核心裁定": {
     "方案可行性": "通过，且建议立即升级。动态少样本提示（Dynamic Few-Shot Prompting）与分布级输出（Distribution-level Prompting）组合，是 2024-2026 年最被验证有效的 Prompt 工程技术。",
     "核心洞察": "这不是增加一个系统，而是在单次 LLM 调用的 Prompt 里加入 2-3 条真实人类示例。工程本质是 Prompt 工程深化，不是架构扩张。",
+    "机制阐释": {
+      "v2_0价值": "SKILL.md 负向约束负责告诉模型不要做什么，降低违规则率。",
+      "v2_1新增价值": "Few-Shot 正向锚点负责告诉模型好作品长什么样，拉回真实创作分布。",
+      "组合结论": "仅有负向清单会诱发黑名单外陈词滥调，仅有正向示范会诱发机械复读；两者必须并存。"
+    },
     "复杂度结论": {
       "LLM调用次数": "仍然 1.1 次（上限 2 次）",
       "新增代码": "retriever 约 30 行（纯字典过滤 + random）",
@@ -36,7 +41,8 @@
         "actor": "main.py + retriever.py",
         "phases": [
           "A. 解析 CLI 参数 -> user_input",
-          "B. 在主调用前做轻量蒸馏（默认 regex + 关键词）",
+          "B. 在主调用前做 40-token 级轻量蒸馏（默认 regex + 关键词）",
+          "B.1 蒸馏输出映射到粗粒度情感标签集合：哀愁/愉悦/愤懑/平静/怀旧/热烈",
           "C. 基于情感标签与 valence 检索 corpus",
           "D. 取 2-3 条示例注入 Skill 上下文"
         ],
@@ -63,7 +69,7 @@
           "对 3 个 variants 各跑一遍 13 条硬规则",
           "按通过规则数排序，取 Top-1",
           "若 Top-1 全通过 -> 直接进入编译",
-          "若 Top-1 有硬规则违规 -> 触发 Step 4"
+          "若 Top-1 有硬规则违规（等价于三变体均存在硬规则违规）-> 触发 Step 4"
         ]
       },
       {
@@ -133,8 +139,8 @@
   "skill_document": {
     "filepath_project": ".claude/skills/lyric-craftsman/SKILL.md",
     "新增章节": {
-      "Phase_B_5": "在填词前对 2-3 条示例进行叙事逻辑、意境质感、可学/不可学点分析，禁止复写超过 4 个字连续片段。",
-      "Section_8": "单次调用内强制输出 3 个完整变体，POV 必须不同，结构骨架一致，情感基调一致，具象名词重合率 <= 30%。"
+      "Phase_B_5": "在填词前对 2-3 条示例进行叙事逻辑、意境质感、可学/不可学点分析，禁止复写超过 4 个字连续片段；明确学推进节奏、具象替抽象、克制表达，不学具体短语与特定意象照抄。",
+      "Section_8": "单次调用内强制输出 3 个完整变体，POV 必须不同，结构骨架一致，情感基调一致，具象名词重合率 <= 30%；严禁同义词换皮、严禁三变体共用同一句 Hook、严禁输出少于 3 个变体。"
     }
   },
   "data_schemas": {
@@ -165,8 +171,16 @@
             ]
           }
         ],
-        "variants": [
-          {
+        "variants": {
+          "type": "array",
+          "min_items": 3,
+          "max_items": 3,
+          "required_variant_ids": [
+            "a",
+            "b",
+            "c"
+          ],
+          "items": {
             "variant_id": "enum[a,b,c]",
             "narrative_pov": "enum[first_person,second_person,third_person]",
             "lyrics_by_section": "同 section 结构",
@@ -178,7 +192,7 @@
               "rank": "integer"
             }
           }
-        ],
+        },
         "chosen_variant_id": "enum[a,b,c]",
         "style_tags": "object",
         "exclude_tags": "array"
@@ -254,21 +268,59 @@
     }
   },
   "acceptance_criteria": {
+    "口径说明": {
+      "AC_04_scope": "AC-04 仅对 zh-CN 生效；en-US 使用英文韵律规则（尾词可唱性 + 重音落点）替代。",
+      "AC_13": "few_shot_examples_used 非空且 >=2，保证示例可追溯。",
+      "AC_14": "3 个 variants 的 narrative_pov 必须各不相同，保证视角独立。",
+      "AC_15": "3 个 variants 主题具象名词重合率 <=30%，保证分布差异。",
+      "AC_16": "10 个典型 intent 回归中，retriever 命中 >=2 条示例比例 = 100%（10/10）。",
+      "AC_17": "单次 run API 成本 <=$0.10。"
+    },
     "功能性": [
       "AC-01 同一 intent 跑 3 次，平均 LLM 调用次数 <= 1.3",
       "AC-02 单次产出中重复 >=4 次具象名词数 = 0",
       "AC-03 forbidden_literal_phrases 命中数 = 0",
-      "AC-04 副歌 Hook 第 1 行尾字符合开口音 + 平声",
+      "AC-04 仅 zh-CN：副歌 Hook 第 1 行尾字符合开口音 + 平声；en-US：尾词可唱性 + 重音落点达标",
       "AC-05 标签 100% 在白名单内",
       "AC-06 style.txt 标签数在 4-8",
       "AC-07 triplet 粘贴后可完整生成歌曲",
       "AC-13 few_shot_examples_used >= 2",
       "AC-14 三个 variants 的 POV 字段各不相同",
       "AC-15 三个 variants 主题名词重合率 <= 30%",
-      "AC-16 retriever 在 10 个典型 intent 上 >=95% 命中 >=2 条示例",
+      "AC-16 retriever 在 10 个典型 intent 上 100% 命中 >=2 条示例（10/10）",
       "AC-17 单次 run API 成本 <= $0.10"
     ]
   },
+  "成本对比": {
+    "计价快照日期": "2026-04-20",
+    "计价口径": "按 claude-opus-4-7 官方 Input/Output token 单价估算；不计缓存命中优惠与重试异常开销。",
+    "成本公式": "estimated_cost_usd = input_tokens * input_price_per_1m / 1_000_000 + output_tokens * output_price_per_1m / 1_000_000",
+    "v2_0_单次调用输入token": "约 800",
+    "v2_0_单次调用输出token": "约 1200",
+    "v2_1_单次调用输入token": "约 2000（+1200 few-shot 示例）",
+    "v2_1_单次调用输出token": "约 3200（+2000 三变体）",
+    "v2_1_相对v2_0_成本增幅": "约 1.8-2.2 倍（单次 $0.05 -> $0.09）",
+    "v2_1_相对v1_1_成本降幅": "仍为 6-7 倍（v1.1 基线约 $0.60）",
+    "结论": "单次成本 <$0.10，对 MCN 运营规模可忽略。"
+  },
+  "github_语料源建议": {
+    "古典诗词": [
+      "chewzhiyuan/chinese-poetry",
+      "chinese-poetry/chinese-poetry"
+    ],
+    "现代中文歌词": [
+      "dengxiuqi/Chinese-Lyric-Corpus",
+      "gaussic/Chinese-Lyric-Corpus"
+    ],
+    "标签策略": "仅允许一次性离线脚本批处理补齐 emotion_tags；运行时语料永远只读。"
+  },
+  "执行顺序_自检清单": [
+    "Day 1 AM：生成 corpus/poetry_classical.json；自检文件 <=30MB 且 emotion_tags/valence 完整。",
+    "Day 1 PM：生成 corpus/lyrics_modern_zh.json；自检同上。",
+    "Day 2 AM：完成 retriever.py + prompt 注入；自检 0 外部模型依赖，10 个样例命中率达标。",
+    "Day 2 PM：更新 SKILL.md（Phase B.5 + Section 8）与 lint.py（三变体）；自检 SKILL 未无序膨胀。",
+    "Day 3：执行 AC-01 至 AC-17 回归 + 盲评；自检无任何红线触发。"
+  ],
   "迁移路径": {
     "Day_1_AM": "下载并离线处理古典诗词语料，生成 poetry_classical.json",
     "Day_1_PM": "下载并离线处理现代中文歌词语料，生成 lyrics_modern_zh.json",
