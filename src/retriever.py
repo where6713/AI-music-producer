@@ -14,6 +14,27 @@ CORPUS_FILES = [
 ]
 
 
+def _infer_profile_tag(row: dict[str, Any]) -> str:
+    explicit = str(row.get("profile_tag", "")).strip()
+    if explicit:
+        return explicit
+
+    row_type = str(row.get("type", "")).strip().lower()
+    tags = [str(x).strip().lower() for x in row.get("emotion_tags", []) if str(x).strip()]
+
+    if row_type == "modern_lyric":
+        if any(x in tags for x in {"breakup", "late-night", "regret", "distance", "self-control"}):
+            return "urban_introspective"
+        return "urban_introspective"
+
+    if row_type == "classical_poem":
+        if any(x in tags for x in {"restraint", "nostalgia", "longing", "night", "separation"}):
+            return "classical_restraint"
+        return "classical_restraint"
+
+    return ""
+
+
 def _tokenize(text: str) -> list[str]:
     val = text.strip().lower()
     if not val:
@@ -66,13 +87,14 @@ def retrieve_few_shot_examples(
 
     normalized: list[dict[str, Any]] = []
     for row in selected:
+        profile_tag = _infer_profile_tag(row)
         normalized.append(
             {
                 "source_id": str(row.get("source_id", "")),
                 "type": str(row.get("type", "modern_lyric")),
                 "title": str(row.get("title", "")),
                 "emotion_tags_matched": [str(x) for x in row.get("emotion_tags", [])[:4]],
-                "profile_tag": str(row.get("profile_tag", "")),
+                "profile_tag": profile_tag,
                 "content": str(row.get("content", "")),
             }
         )
