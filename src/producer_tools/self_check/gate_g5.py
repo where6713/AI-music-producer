@@ -29,6 +29,9 @@ def validate_hook_contract(
     if "pytest -q" not in pre_push_text or "pytest -q" not in ci_gate_text:
         failed_checks.append("hook_ci_test_parity")
 
+    if "apps.cli.main pm-audit" not in pre_push_text or "apps.cli.main pm-audit" not in ci_gate_text:
+        failed_checks.append("hook_ci_pm_audit_parity")
+
     has_ledger_policy = (
         "oost-hook-ledger" in pre_push_text
         and "git commit --amend --no-edit" in pre_push_text

@@ -5,9 +5,9 @@ from src.producer_tools.self_check.gate_g5 import validate_hook_contract
 
 def test_validate_hook_contract_pass_with_no_bypass_ledger_markers() -> None:
     pre_commit = "git diff --cached --name-only --diff-filter=ACMRD"
-    pre_push = "oost-hook-ledger\npytest -q\ngit commit --amend --no-edit"
+    pre_push = "oost-hook-ledger\npytest -q\npython -m apps.cli.main pm-audit\ngit commit --amend --no-edit"
     commit_msg = "type(scope): summary"
-    ci = "placeholder/mock markers detected\npytest -q\npyproject.toml"
+    ci = "placeholder/mock markers detected\npytest -q\npython -m apps.cli.main pm-audit\npyproject.toml"
 
     result = validate_hook_contract(
         pre_commit_text=pre_commit,
@@ -35,3 +35,20 @@ def test_validate_hook_contract_fail_when_ledger_policy_missing() -> None:
 
     assert result["status"] == "fail"
     assert "no_bypass_ledger_policy" in result["failed_checks"]
+
+
+def test_validate_hook_contract_fail_without_pm_audit_parity() -> None:
+    pre_commit = "git diff --cached --name-only --diff-filter=ACMRD"
+    pre_push = "oost-hook-ledger\npytest -q\ngit commit --amend --no-edit"
+    commit_msg = "type(scope): summary"
+    ci = "placeholder/mock markers detected\npytest -q\npyproject.toml"
+
+    result = validate_hook_contract(
+        pre_commit_text=pre_commit,
+        pre_push_text=pre_push,
+        commit_msg_text=commit_msg,
+        ci_gate_text=ci,
+    )
+
+    assert result["status"] == "fail"
+    assert "hook_ci_pm_audit_parity" in result["failed_checks"]

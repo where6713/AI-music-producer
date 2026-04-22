@@ -92,6 +92,11 @@ if [ -n "$python_cmd" ]; then
     echo "[ci-gates] $python_cmd -m pytest -q"
     # shellcheck disable=SC2086
     $python_cmd -m pytest -q
+
+    echo "[ci-gates] $python_cmd -m apps.cli.main pm-audit"
+    # shellcheck disable=SC2086
+    $python_cmd -m apps.cli.main pm-audit
+
     ran_any_test=1
   fi
 
