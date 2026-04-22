@@ -103,6 +103,7 @@ def _apply_retrieval_profile_decision(trace: dict[str, Any]) -> None:
     vote_confidence = _safe_float(trace.get("retrieval_vote_confidence", 0.0), default=0.0)
     source_ids_raw = trace.get("few_shot_source_ids", [])
     source_ids = [str(x) for x in source_ids_raw] if isinstance(source_ids_raw, list) else []
+    source_stage = str(trace.get("retrieval_profile_source", "initial")).strip() or "initial"
 
     has_vote = bool(profile_vote)
     confidence_ok = vote_confidence >= (2 / 3)
@@ -118,25 +119,33 @@ def _apply_retrieval_profile_decision(trace: dict[str, Any]) -> None:
         "vote_confidence": vote_confidence,
         "active_profile": active_profile,
         "decision_reason": decision_reason,
+        "source_stage": source_stage,
         "source_ids": source_ids,
     }
 
 
 def _merge_revise_trace_metadata(trace: dict[str, Any], revise_trace: dict[str, Any]) -> None:
+    updated = False
     revise_profile_vote = str(revise_trace.get("retrieval_profile_vote", "")).strip()
     if revise_profile_vote:
         trace["retrieval_profile_vote"] = revise_profile_vote
+        updated = True
 
     if "retrieval_vote_confidence" in revise_trace:
         trace["retrieval_vote_confidence"] = _safe_float(
             revise_trace.get("retrieval_vote_confidence", trace.get("retrieval_vote_confidence", 0.0)),
             default=_safe_float(trace.get("retrieval_vote_confidence", 0.0), default=0.0),
         )
+        updated = True
 
     revise_source_ids_raw = revise_trace.get("few_shot_source_ids", [])
     revise_source_ids = [str(x) for x in revise_source_ids_raw] if isinstance(revise_source_ids_raw, list) else []
     if revise_source_ids:
         trace["few_shot_source_ids"] = revise_source_ids
+        updated = True
+
+    if updated:
+        trace["retrieval_profile_source"] = "revise"
 
 
 @app.command("produce")
@@ -162,6 +171,7 @@ def produce(
     )
 
     payload, trace = generate_lyric_payload(user_input, repo_root=repo_root)
+    trace.setdefault("retrieval_profile_source", "initial")
     payload, variant_rank = _score_variants(payload)
     lint_report = lint_payload(payload)
 

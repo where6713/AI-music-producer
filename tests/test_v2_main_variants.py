@@ -123,6 +123,7 @@ def test_apply_retrieval_profile_decision_activates_when_vote_confident() -> Non
         "few_shot_source_ids": ["poem-jys-001", "lyric-modern-101", "lyric-modern-102"],
         "retrieval_profile_vote": "urban_introspective",
         "retrieval_vote_confidence": 2 / 3,
+        "retrieval_profile_source": "initial",
     }
 
     _apply_retrieval_profile_decision(trace)
@@ -133,6 +134,7 @@ def test_apply_retrieval_profile_decision_activates_when_vote_confident() -> Non
     assert decision["profile_vote"] == "urban_introspective"
     assert decision["vote_confidence"] >= (2 / 3)
     assert decision["source_ids"] == ["poem-jys-001", "lyric-modern-101", "lyric-modern-102"]
+    assert decision["source_stage"] == "initial"
 
 
 def test_apply_retrieval_profile_decision_marks_reason_when_not_active() -> None:
@@ -155,6 +157,7 @@ def test_merge_revise_trace_metadata_prefers_revise_retrieval_fields() -> None:
         "retrieval_profile_vote": "classical_restraint",
         "retrieval_vote_confidence": 0.5,
         "few_shot_source_ids": ["poem-jys-001", "poem-cy-002"],
+        "retrieval_profile_source": "initial",
     }
     revise_trace = {
         "retrieval_profile_vote": "urban_introspective",
@@ -167,6 +170,7 @@ def test_merge_revise_trace_metadata_prefers_revise_retrieval_fields() -> None:
     assert trace["retrieval_profile_vote"] == "urban_introspective"
     assert trace["retrieval_vote_confidence"] >= (2 / 3)
     assert trace["few_shot_source_ids"] == ["lyric-modern-101", "lyric-modern-102", "poem-jys-001"]
+    assert trace["retrieval_profile_source"] == "revise"
 
 
 def test_merge_revise_trace_metadata_keeps_initial_when_revise_missing() -> None:
@@ -174,6 +178,7 @@ def test_merge_revise_trace_metadata_keeps_initial_when_revise_missing() -> None
         "retrieval_profile_vote": "classical_restraint",
         "retrieval_vote_confidence": 2 / 3,
         "few_shot_source_ids": ["poem-jys-001", "poem-cy-002"],
+        "retrieval_profile_source": "initial",
     }
     revise_trace = {
         "stage": "revise",
@@ -184,6 +189,7 @@ def test_merge_revise_trace_metadata_keeps_initial_when_revise_missing() -> None
     assert trace["retrieval_profile_vote"] == "classical_restraint"
     assert trace["retrieval_vote_confidence"] >= (2 / 3)
     assert trace["few_shot_source_ids"] == ["poem-jys-001", "poem-cy-002"]
+    assert trace["retrieval_profile_source"] == "initial"
 
 
 def test_apply_retrieval_profile_decision_marks_no_vote_when_profile_missing() -> None:
