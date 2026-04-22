@@ -61,7 +61,7 @@ def test_validate_g1_scope_pass_for_docs_only_commit_without_gate_scope() -> Non
             "commit_subject": "docs(pm): add file-level remediation map from today audit",
             "changed_files": [
                 "docs/ai_doc_manifest.json",
-                "docs/开发整改事项清单.md",
+                "docs/整改task.json",
                 "docs/🎵 AI 音乐生成系统产品经理 (PM) Role & Rule.md",
             ],
         }
@@ -113,11 +113,11 @@ def test_check_gate_g1_fail_when_git_unavailable(monkeypatch, tmp_path) -> None:
 
 
 def test_read_git_output_decodes_non_utf8_bytes(monkeypatch, tmp_path) -> None:
-    sample = "docs/开发整改事项清单.md\n".encode("utf-8")
+    sample = "docs/整改task.json\n".encode("utf-8")
 
     def _fake_check_output(*_args, **_kwargs):
         return sample
 
     monkeypatch.setattr(gate_g1.subprocess, "check_output", _fake_check_output)
     output = gate_g1._read_git_output(tmp_path, ["show", "--name-only"])
-    assert "开发整改事项清单.md" in output
+    assert "整改task.json" in output
