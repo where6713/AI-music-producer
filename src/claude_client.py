@@ -433,7 +433,22 @@ def generate_lyric_payload(
     env_map = _read_env_map(repo_root)
     config = _resolve_provider_config(env_map, default_model=model)
     skill_text = _load_skill_text(repo_root)
-    few_shot_examples = retrieve_few_shot_examples(user_input, repo_root=repo_root, top_k=3)
+    retrieval = retrieve_few_shot_examples(
+        user_input,
+        repo_root=repo_root,
+        top_k=3,
+        return_metadata=True,
+    )
+    if isinstance(retrieval, dict):
+        few_shot_examples = [
+            ex for ex in retrieval.get("samples", []) if isinstance(ex, dict)
+        ]
+        profile_vote = str(retrieval.get("profile_vote", ""))
+        vote_confidence = float(retrieval.get("vote_confidence", 0.0) or 0.0)
+    else:
+        few_shot_examples = retrieval
+        profile_vote = ""
+        vote_confidence = 0.0
 
     prompt = {
         "task": "Generate lyric_payload JSON only with 3 variants and choose best one.",
@@ -518,6 +533,8 @@ def generate_lyric_payload(
         "usage": usage,
         "llm_calls": 1,
         "few_shot_source_ids": [x["source_id"] for x in few_shot_examples],
+        "retrieval_profile_vote": profile_vote,
+        "retrieval_vote_confidence": vote_confidence,
         "stage": "revise" if targeted_revise_prompt else "initial",
     }
     return payload, trace

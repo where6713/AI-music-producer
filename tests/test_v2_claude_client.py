@@ -110,6 +110,7 @@ def _seed_min_corpus(repo_root: Path) -> None:
                     "type": "classical_poem",
                     "title": "静夜思",
                     "emotion_tags": ["nostalgia", "restraint"],
+                    "profile_tag": "classical_restraint",
                     "content": "举头望明月，低头思故乡。",
                 }
             ],
@@ -125,6 +126,7 @@ def _seed_min_corpus(repo_root: Path) -> None:
                     "type": "modern_lyric",
                     "title": "凌晨未发送",
                     "emotion_tags": ["breakup", "late-night"],
+                    "profile_tag": "urban_introspective",
                     "content": "对话框停在最后一句。",
                 },
                 {
@@ -132,6 +134,7 @@ def _seed_min_corpus(repo_root: Path) -> None:
                     "type": "modern_lyric",
                     "title": "不再拨通",
                     "emotion_tags": ["distance", "regret"],
+                    "profile_tag": "urban_introspective",
                     "content": "手在拨出前停住。",
                 },
             ],
@@ -192,6 +195,8 @@ def test_generate_payload_uses_openai_compatible_path(tmp_path, monkeypatch) -> 
     assert trace["model_used"] == "gpt-5.3-codex"
     assert trace["llm_calls"] == 1
     assert trace["usage"]["total_tokens"] == 579
+    assert trace["retrieval_profile_vote"] == "urban_introspective"
+    assert trace["retrieval_vote_confidence"] >= (2 / 3)
     assert len(payload.few_shot_examples_used) >= 2
     assert len(payload.variants) == 3
     assert payload.chosen_variant_id in {"a", "b", "c"}
@@ -247,6 +252,8 @@ def test_generate_payload_normalizes_non_schema_response(tmp_path, monkeypatch) 
 
     assert trace["provider"] == "openai-compatible"
     assert trace["model_used"] == "gpt-5.3-codex"
+    assert trace["retrieval_profile_vote"] == "urban_introspective"
+    assert trace["retrieval_vote_confidence"] >= (2 / 3)
     assert len(payload.few_shot_examples_used) >= 2
     assert len(payload.variants) == 3
     assert payload.chosen_variant_id == "a"

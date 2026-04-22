@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from collections import Counter
 from pathlib import Path
 from typing import Any
 
@@ -39,7 +40,8 @@ def retrieve_few_shot_examples(
     *,
     repo_root: Path,
     top_k: int = 3,
-) -> list[dict[str, Any]]:
+    return_metadata: bool = False,
+) -> list[dict[str, Any]] | dict[str, Any]:
     corpus = _load_corpus(repo_root)
     if not corpus:
         raise RuntimeError("few-shot corpus missing under corpus/")
@@ -70,7 +72,26 @@ def retrieve_few_shot_examples(
                 "type": str(row.get("type", "modern_lyric")),
                 "title": str(row.get("title", "")),
                 "emotion_tags_matched": [str(x) for x in row.get("emotion_tags", [])[:4]],
+                "profile_tag": str(row.get("profile_tag", "")),
                 "content": str(row.get("content", "")),
             }
         )
-    return normalized
+
+    if not return_metadata:
+        return normalized
+
+    votes = Counter(
+        sample["profile_tag"] for sample in normalized if sample.get("profile_tag")
+    )
+    if votes:
+        profile_vote, vote_count = votes.most_common(1)[0]
+        vote_confidence = vote_count / max(len(normalized), 1)
+    else:
+        profile_vote = ""
+        vote_confidence = 0.0
+
+    return {
+        "samples": normalized,
+        "profile_vote": profile_vote,
+        "vote_confidence": vote_confidence,
+    }
