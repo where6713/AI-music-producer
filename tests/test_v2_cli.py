@@ -4,6 +4,37 @@ import subprocess
 import sys
 
 
+def _read_local_hooks_path() -> str | None:
+    result = subprocess.run(
+        ["git", "config", "--local", "--get", "core.hooksPath"],
+        capture_output=True,
+        text=False,
+        check=False,
+    )
+    if result.returncode != 0:
+        return None
+    value = result.stdout.decode("utf-8", errors="replace").strip()
+    return value or None
+
+
+def _restore_local_hooks_path(original: str | None) -> None:
+    if original is None:
+        subprocess.run(
+            ["git", "config", "--local", "--unset", "core.hooksPath"],
+            capture_output=True,
+            text=False,
+            check=False,
+        )
+        return
+
+    subprocess.run(
+        ["git", "config", "--local", "core.hooksPath", original],
+        capture_output=True,
+        text=False,
+        check=False,
+    )
+
+
 def test_cli_status() -> None:
     result = subprocess.run(
         [sys.executable, "-m", "apps.cli.main", "status"],
@@ -41,15 +72,27 @@ def test_cli_docs_alignment_check_reports_pass() -> None:
 
 
 def test_cli_self_check_g0_reports_pass() -> None:
-    result = subprocess.run(
-        [sys.executable, "-m", "apps.cli.main", "self-check", "g0"],
-        capture_output=True,
-        text=False,
-        check=False,
-    )
-    stdout = result.stdout.decode("utf-8", errors="replace")
-    assert result.returncode == 0
-    assert "G0 PASS" in stdout
+    original = _read_local_hooks_path()
+    try:
+        set_result = subprocess.run(
+            ["git", "config", "--local", "core.hooksPath", "tools/githooks"],
+            capture_output=True,
+            text=False,
+            check=False,
+        )
+        assert set_result.returncode == 0
+
+        result = subprocess.run(
+            [sys.executable, "-m", "apps.cli.main", "self-check", "g0"],
+            capture_output=True,
+            text=False,
+            check=False,
+        )
+        stdout = result.stdout.decode("utf-8", errors="replace")
+        assert result.returncode == 0
+        assert "G0 PASS" in stdout
+    finally:
+        _restore_local_hooks_path(original)
 
 
 def test_cli_scope_check_g1_reports_pass() -> None:
