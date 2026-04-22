@@ -80,3 +80,53 @@ def test_proof_check_pass_with_legacy_retrieval_source_ids(tmp_path) -> None:
     assert result["llm_calls_ok"] is True
     assert result["retrieval_audit_ok"] is True
     assert result["retrieval_audit_mode"] == "legacy"
+
+
+def test_proof_check_fail_when_llm_calls_out_of_contract(tmp_path) -> None:
+    out = tmp_path / "out"
+    out.mkdir(parents=True, exist_ok=True)
+    for name in ("lyrics.txt", "style.txt", "exclude.txt", "lyric_payload.json"):
+        (out / name).write_text("ok\n", encoding="utf-8")
+
+    (out / "trace.json").write_text(
+        json.dumps(
+            {
+                "llm_calls": 10,
+                "few_shot_source_ids": ["lyric-modern-102"],
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+    result = _proof_check(tmp_path)
+
+    assert result["status"] == "fail"
+    assert result["llm_calls_ok"] is False
+
+
+def test_proof_check_fail_when_legacy_retrieval_ids_empty(tmp_path) -> None:
+    out = tmp_path / "out"
+    out.mkdir(parents=True, exist_ok=True)
+    for name in ("lyrics.txt", "style.txt", "exclude.txt", "lyric_payload.json"):
+        (out / name).write_text("ok\n", encoding="utf-8")
+
+    (out / "trace.json").write_text(
+        json.dumps(
+            {
+                "llm_calls": 1,
+                "few_shot_source_ids": [],
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+    result = _proof_check(tmp_path)
+
+    assert result["status"] == "fail"
+    assert result["llm_calls_ok"] is True
+    assert result["retrieval_audit_ok"] is False
+    assert result["retrieval_audit_mode"] == "missing"

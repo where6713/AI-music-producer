@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Any
 
@@ -60,13 +61,25 @@ def _proof_check(workspace_root: Path) -> dict[str, Any]:
     required = ["lyrics.txt", "style.txt", "exclude.txt", "lyric_payload.json", "trace.json"]
     missing = [name for name in required if not (out / name).exists()]
     trace_text = (out / "trace.json").read_text(encoding="utf-8", errors="ignore") if (out / "trace.json").exists() else ""
-    llm_calls_ok = '"llm_calls": 1' in trace_text or '"llm_calls": 2' in trace_text
-    has_decision_block = (
-        '"retrieval_profile_decision"' in trace_text
-        and '"decision_reason"' in trace_text
-        and '"source_ids"' in trace_text
-    )
-    has_legacy_retrieval = '"few_shot_source_ids": [' in trace_text
+    try:
+        trace_payload = json.loads(trace_text) if trace_text else {}
+    except json.JSONDecodeError:
+        trace_payload = {}
+
+    llm_calls_raw = trace_payload.get("llm_calls")
+    try:
+        llm_calls = int(llm_calls_raw)
+    except (TypeError, ValueError):
+        llm_calls = -1
+    llm_calls_ok = llm_calls in {1, 2}
+
+    decision = trace_payload.get("retrieval_profile_decision")
+    decision_reason = decision.get("decision_reason") if isinstance(decision, dict) else ""
+    source_ids = decision.get("source_ids") if isinstance(decision, dict) else []
+    has_decision_block = bool(decision_reason) and isinstance(source_ids, list) and bool(source_ids)
+
+    legacy_source_ids = trace_payload.get("few_shot_source_ids")
+    has_legacy_retrieval = isinstance(legacy_source_ids, list) and bool(legacy_source_ids)
     retrieval_audit_ok = has_decision_block or has_legacy_retrieval
     retrieval_audit_mode = "missing"
     if has_decision_block:
