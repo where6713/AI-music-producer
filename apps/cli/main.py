@@ -162,6 +162,9 @@ def docs_alignment_check(
         typer.echo("G4 DOCS-ALIGNMENT PASS")
         return
     typer.echo("G4 DOCS-ALIGNMENT FAIL")
+    failed = result.get("failed_checks", [])
+    if failed:
+        typer.echo("failed_checks: " + ", ".join(failed))
     raise typer.Exit(code=1)
 
 

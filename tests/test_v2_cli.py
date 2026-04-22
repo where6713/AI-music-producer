@@ -71,6 +71,31 @@ def test_cli_docs_alignment_check_reports_pass() -> None:
     assert "G4 DOCS-ALIGNMENT PASS" in stdout
 
 
+def test_cli_docs_alignment_check_prints_failed_checks_on_fail() -> None:
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "apps.cli.main",
+            "docs-alignment-check",
+            "docs/映月工厂_极简歌词工坊_PRD.json",
+            "one law.md",
+            "目录框架规范.md",
+            "",
+            "out/lyrics.txt",
+            "out/style.txt",
+            "out/exclude.txt",
+        ],
+        capture_output=True,
+        text=False,
+        check=False,
+    )
+    stdout = result.stdout.decode("utf-8", errors="replace")
+    assert result.returncode == 1
+    assert "G4 DOCS-ALIGNMENT FAIL" in stdout
+    assert "failed_checks: manifest_path" in stdout
+
+
 def test_cli_self_check_g0_reports_pass() -> None:
     original = _read_local_hooks_path()
     try:
