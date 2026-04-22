@@ -14,6 +14,13 @@ from src.schemas import LyricPayload, UserInput
 app = typer.Typer(help="Lyric Craftsman CLI (PRD v2.0)")
 
 
+def _safe_float(value: Any, *, default: float = 0.0) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
 def _build_targeted_revise_prompt(payload: dict[str, Any], lint_report: dict[str, Any]) -> str:
     return (
         "Targeted revise only for failing lines. Keep unchanged lines untouched.\n"
@@ -93,7 +100,7 @@ def _sync_chosen_variant(payload: LyricPayload) -> None:
 
 def _apply_retrieval_profile_decision(trace: dict[str, Any]) -> None:
     profile_vote = str(trace.get("retrieval_profile_vote", "")).strip()
-    vote_confidence = float(trace.get("retrieval_vote_confidence", 0.0) or 0.0)
+    vote_confidence = _safe_float(trace.get("retrieval_vote_confidence", 0.0), default=0.0)
     source_ids_raw = trace.get("few_shot_source_ids", [])
     source_ids = [str(x) for x in source_ids_raw] if isinstance(source_ids_raw, list) else []
 
@@ -121,8 +128,9 @@ def _merge_revise_trace_metadata(trace: dict[str, Any], revise_trace: dict[str, 
         trace["retrieval_profile_vote"] = revise_profile_vote
 
     if "retrieval_vote_confidence" in revise_trace:
-        trace["retrieval_vote_confidence"] = float(
-            revise_trace.get("retrieval_vote_confidence", 0.0) or 0.0
+        trace["retrieval_vote_confidence"] = _safe_float(
+            revise_trace.get("retrieval_vote_confidence", trace.get("retrieval_vote_confidence", 0.0)),
+            default=_safe_float(trace.get("retrieval_vote_confidence", 0.0), default=0.0),
         )
 
     revise_source_ids_raw = revise_trace.get("few_shot_source_ids", [])
