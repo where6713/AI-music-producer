@@ -61,10 +61,12 @@ def _proof_check(workspace_root: Path) -> dict[str, Any]:
     required = ["lyrics.txt", "style.txt", "exclude.txt", "lyric_payload.json", "trace.json"]
     missing = [name for name in required if not (out / name).exists()]
     trace_text = (out / "trace.json").read_text(encoding="utf-8", errors="ignore") if (out / "trace.json").exists() else ""
+    trace_json_valid = True
     try:
         trace_payload = json.loads(trace_text) if trace_text else {}
     except json.JSONDecodeError:
         trace_payload = {}
+        trace_json_valid = False
 
     llm_calls_raw = trace_payload.get("llm_calls")
     try:
@@ -91,6 +93,7 @@ def _proof_check(workspace_root: Path) -> dict[str, Any]:
         "status": status,
         "output_dir": str(out),
         "missing_files": missing,
+        "trace_json_valid": trace_json_valid,
         "llm_calls_ok": llm_calls_ok,
         "retrieval_audit_ok": retrieval_audit_ok,
         "retrieval_audit_mode": retrieval_audit_mode,
