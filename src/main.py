@@ -21,6 +21,16 @@ def _safe_float(value: Any, *, default: float = 0.0) -> float:
         return default
 
 
+def _infer_profile_vote_from_source_ids(source_ids: list[str]) -> str:
+    modern_hits = sum(1 for x in source_ids if x.startswith("lyric-modern-"))
+    classical_hits = sum(1 for x in source_ids if x.startswith("poem-"))
+    if modern_hits >= classical_hits and modern_hits > 0:
+        return "urban_introspective"
+    if classical_hits > 0:
+        return "classical_restraint"
+    return ""
+
+
 def _build_targeted_revise_prompt(payload: dict[str, Any], lint_report: dict[str, Any]) -> str:
     return (
         "Targeted revise only for failing lines. Keep unchanged lines untouched.\n"
@@ -104,6 +114,8 @@ def _apply_retrieval_profile_decision(trace: dict[str, Any]) -> None:
     source_ids_raw = trace.get("few_shot_source_ids", [])
     source_ids = [str(x) for x in source_ids_raw] if isinstance(source_ids_raw, list) else []
     source_stage = str(trace.get("retrieval_profile_source", "initial")).strip() or "initial"
+    if not profile_vote:
+        profile_vote = _infer_profile_vote_from_source_ids(source_ids)
 
     has_vote = bool(profile_vote)
     confidence_ok = vote_confidence >= (2 / 3)
