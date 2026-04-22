@@ -84,6 +84,7 @@ def test_proof_check_pass_with_legacy_retrieval_source_ids(tmp_path) -> None:
     assert result["retrieval_audit_ok"] is True
     assert result["retrieval_audit_mode"] == "legacy"
     assert result["retrieval_audit_migration"] == "legacy_compat_pending"
+    assert "retrieval_profile_decision" in result["retrieval_decision_gap"]
 
 
 def test_proof_check_fail_when_llm_calls_out_of_contract(tmp_path) -> None:
@@ -186,6 +187,7 @@ def test_proof_check_prefers_decision_mode_when_both_formats_exist(tmp_path) -> 
     assert result["retrieval_audit_ok"] is True
     assert result["retrieval_audit_mode"] == "decision"
     assert result["retrieval_audit_migration"] == "decision_primary"
+    assert result["retrieval_decision_gap"] == []
 
 
 def test_pm_audit_proof_reports_decision_mode_when_trace_has_decision_block() -> None:

@@ -80,6 +80,15 @@ def _proof_check(workspace_root: Path) -> dict[str, Any]:
     source_ids = decision.get("source_ids") if isinstance(decision, dict) else []
     has_decision_block = bool(decision_reason) and isinstance(source_ids, list) and bool(source_ids)
 
+    retrieval_decision_gap: list[str] = []
+    if not isinstance(decision, dict):
+        retrieval_decision_gap.append("retrieval_profile_decision")
+    else:
+        if not decision_reason:
+            retrieval_decision_gap.append("decision_reason")
+        if not (isinstance(source_ids, list) and bool(source_ids)):
+            retrieval_decision_gap.append("source_ids")
+
     legacy_source_ids = trace_payload.get("few_shot_source_ids")
     has_legacy_retrieval = isinstance(legacy_source_ids, list) and bool(legacy_source_ids)
     retrieval_audit_ok = has_decision_block or has_legacy_retrieval
@@ -103,6 +112,7 @@ def _proof_check(workspace_root: Path) -> dict[str, Any]:
         "retrieval_audit_ok": retrieval_audit_ok,
         "retrieval_audit_mode": retrieval_audit_mode,
         "retrieval_audit_migration": retrieval_audit_migration,
+        "retrieval_decision_gap": retrieval_decision_gap,
     }
 
 
