@@ -129,3 +129,18 @@ def test_apply_retrieval_profile_decision_activates_when_vote_confident() -> Non
     assert decision["profile_vote"] == "urban_introspective"
     assert decision["vote_confidence"] >= (2 / 3)
     assert decision["source_ids"] == ["poem-jys-001", "lyric-modern-101", "lyric-modern-102"]
+
+
+def test_apply_retrieval_profile_decision_marks_reason_when_not_active() -> None:
+    trace = {
+        "few_shot_source_ids": ["poem-jys-001", "lyric-modern-101"],
+        "retrieval_profile_vote": "urban_introspective",
+        "retrieval_vote_confidence": 0.5,
+    }
+
+    _apply_retrieval_profile_decision(trace)
+
+    decision = trace.get("retrieval_profile_decision")
+    assert isinstance(decision, dict)
+    assert decision["active_profile"] == ""
+    assert decision["decision_reason"] == "insufficient_confidence"

@@ -97,11 +97,20 @@ def _apply_retrieval_profile_decision(trace: dict[str, Any]) -> None:
     source_ids_raw = trace.get("few_shot_source_ids", [])
     source_ids = [str(x) for x in source_ids_raw] if isinstance(source_ids_raw, list) else []
 
-    active_profile = profile_vote if (profile_vote and vote_confidence >= (2 / 3)) else ""
+    has_vote = bool(profile_vote)
+    confidence_ok = vote_confidence >= (2 / 3)
+    active_profile = profile_vote if (has_vote and confidence_ok) else ""
+    if active_profile:
+        decision_reason = "activated"
+    elif not has_vote:
+        decision_reason = "no_profile_vote"
+    else:
+        decision_reason = "insufficient_confidence"
     trace["retrieval_profile_decision"] = {
         "profile_vote": profile_vote,
         "vote_confidence": vote_confidence,
         "active_profile": active_profile,
+        "decision_reason": decision_reason,
         "source_ids": source_ids,
     }
 
