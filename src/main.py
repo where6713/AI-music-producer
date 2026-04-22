@@ -91,6 +91,21 @@ def _sync_chosen_variant(payload: LyricPayload) -> None:
             return
 
 
+def _apply_retrieval_profile_decision(trace: dict[str, Any]) -> None:
+    profile_vote = str(trace.get("retrieval_profile_vote", "")).strip()
+    vote_confidence = float(trace.get("retrieval_vote_confidence", 0.0) or 0.0)
+    source_ids_raw = trace.get("few_shot_source_ids", [])
+    source_ids = [str(x) for x in source_ids_raw] if isinstance(source_ids_raw, list) else []
+
+    active_profile = profile_vote if (profile_vote and vote_confidence >= (2 / 3)) else ""
+    trace["retrieval_profile_decision"] = {
+        "profile_vote": profile_vote,
+        "vote_confidence": vote_confidence,
+        "active_profile": active_profile,
+        "source_ids": source_ids,
+    }
+
+
 @app.command("produce")
 def produce(
     raw_intent: str = typer.Argument(...),
@@ -169,6 +184,7 @@ def produce(
     trace["lint_report"] = lint_report
     trace["llm_calls"] = llm_calls
     trace["max_llm_calls_per_run"] = 2
+    _apply_retrieval_profile_decision(trace)
 
     if dry_run:
         typer.echo("dry-run complete")

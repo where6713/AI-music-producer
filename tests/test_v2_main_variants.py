@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from src.main import _score_variants
+from src.main import _apply_retrieval_profile_decision, _score_variants
 from src.schemas import LyricPayload
 
 
@@ -112,3 +112,20 @@ def test_score_variants_assigns_rank_and_chosen() -> None:
     assert len(evidence["ranking"]) == 3
     ranks = [v.lint_result.rank for v in out.variants]
     assert sorted(ranks) == [1, 2, 3]
+
+
+def test_apply_retrieval_profile_decision_activates_when_vote_confident() -> None:
+    trace = {
+        "few_shot_source_ids": ["poem-jys-001", "lyric-modern-101", "lyric-modern-102"],
+        "retrieval_profile_vote": "urban_introspective",
+        "retrieval_vote_confidence": 2 / 3,
+    }
+
+    _apply_retrieval_profile_decision(trace)
+
+    decision = trace.get("retrieval_profile_decision")
+    assert isinstance(decision, dict)
+    assert decision["active_profile"] == "urban_introspective"
+    assert decision["profile_vote"] == "urban_introspective"
+    assert decision["vote_confidence"] >= (2 / 3)
+    assert decision["source_ids"] == ["poem-jys-001", "lyric-modern-101", "lyric-modern-102"]
