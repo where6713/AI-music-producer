@@ -184,3 +184,33 @@ def test_merge_revise_trace_metadata_keeps_initial_when_revise_missing() -> None
     assert trace["retrieval_profile_vote"] == "classical_restraint"
     assert trace["retrieval_vote_confidence"] >= (2 / 3)
     assert trace["few_shot_source_ids"] == ["poem-jys-001", "poem-cy-002"]
+
+
+def test_apply_retrieval_profile_decision_marks_no_vote_when_profile_missing() -> None:
+    trace = {
+        "few_shot_source_ids": ["poem-jys-001", "lyric-modern-101"],
+        "retrieval_profile_vote": "",
+        "retrieval_vote_confidence": 0.9,
+    }
+
+    _apply_retrieval_profile_decision(trace)
+
+    decision = trace.get("retrieval_profile_decision")
+    assert isinstance(decision, dict)
+    assert decision["active_profile"] == ""
+    assert decision["decision_reason"] == "no_profile_vote"
+
+
+def test_apply_retrieval_profile_decision_treats_missing_confidence_as_zero() -> None:
+    trace = {
+        "few_shot_source_ids": ["poem-jys-001", "lyric-modern-101"],
+        "retrieval_profile_vote": "urban_introspective",
+    }
+
+    _apply_retrieval_profile_decision(trace)
+
+    decision = trace.get("retrieval_profile_decision")
+    assert isinstance(decision, dict)
+    assert decision["vote_confidence"] == 0.0
+    assert decision["active_profile"] == ""
+    assert decision["decision_reason"] == "insufficient_confidence"
