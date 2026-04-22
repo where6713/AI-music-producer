@@ -192,6 +192,21 @@ def test_merge_revise_trace_metadata_keeps_initial_when_revise_missing() -> None
     assert trace["retrieval_profile_source"] == "initial"
 
 
+def test_merge_revise_trace_metadata_sets_default_source_stage() -> None:
+    trace = {
+        "retrieval_profile_vote": "classical_restraint",
+        "retrieval_vote_confidence": 2 / 3,
+        "few_shot_source_ids": ["poem-jys-001", "poem-cy-002"],
+    }
+    revise_trace = {
+        "stage": "revise",
+    }
+
+    _merge_revise_trace_metadata(trace, revise_trace)
+
+    assert trace["retrieval_profile_source"] == "initial"
+
+
 def test_apply_retrieval_profile_decision_marks_no_vote_when_profile_missing() -> None:
     trace = {
         "few_shot_source_ids": ["poem-jys-001", "lyric-modern-101"],

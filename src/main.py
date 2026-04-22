@@ -125,6 +125,7 @@ def _apply_retrieval_profile_decision(trace: dict[str, Any]) -> None:
 
 
 def _merge_revise_trace_metadata(trace: dict[str, Any], revise_trace: dict[str, Any]) -> None:
+    trace.setdefault("retrieval_profile_source", "initial")
     updated = False
     revise_profile_vote = str(revise_trace.get("retrieval_profile_vote", "")).strip()
     if revise_profile_vote:
