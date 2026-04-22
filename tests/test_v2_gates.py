@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from src.producer_tools.self_check.gate_g4 import validate_docs_alignment
@@ -100,3 +101,14 @@ def test_g3_pass_evidence_contract_requires_outputs() -> None:
         }
     )
     assert result["status"] == "pass"
+
+
+def test_ci_legacy_residue_scan_excludes_ci_script_self_match() -> None:
+    script = Path("tools/scripts/run_quality_gates_ci.sh").read_text(encoding="utf-8")
+    legacy_block = re.search(
+        r"# 4\.2\) PM hard-stop: legacy v1\.1 middleware residue forbidden\n(.*?)(?:\n\n# 5\)|\Z)",
+        script,
+        flags=re.DOTALL,
+    )
+    assert legacy_block is not None
+    assert "':!tools/scripts/run_quality_gates_ci.sh'" in legacy_block.group(1)

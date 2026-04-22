@@ -54,9 +54,9 @@ if git grep -nE '(mock_data|Lorem ipsum|TODO_FILL|dummy_json|fake_json)' -- . ':
 fi
 
 # 4.2) PM hard-stop: legacy v1.1 middleware residue forbidden
-if git grep -nE '(wide sampling|holistic scorer|llm-as-judge|motif atlas|dynamic motif router|svo engine)' -- . ':!*.md' ':!docs/映月工厂_极简歌词工坊_PRD.json' >/dev/null 2>&1; then
+if git grep -nE '(wide sampling|holistic scorer|llm-as-judge|motif atlas|dynamic motif router|svo engine)' -- . ':!*.md' ':!docs/映月工厂_极简歌词工坊_PRD.json' ':!tools/scripts/run_quality_gates_ci.sh' >/dev/null 2>&1; then
   echo "[ci-gates][BLOCK] legacy middleware residue detected (v2.0 red line)."
-  git grep -nE '(wide sampling|holistic scorer|llm-as-judge|motif atlas|dynamic motif router|svo engine)' -- . ':!*.md' ':!docs/映月工厂_极简歌词工坊_PRD.json' || true
+  git grep -nE '(wide sampling|holistic scorer|llm-as-judge|motif atlas|dynamic motif router|svo engine)' -- . ':!*.md' ':!docs/映月工厂_极简歌词工坊_PRD.json' ':!tools/scripts/run_quality_gates_ci.sh' || true
   exit 1
 fi
 
