@@ -115,6 +115,22 @@ def _apply_retrieval_profile_decision(trace: dict[str, Any]) -> None:
     }
 
 
+def _merge_revise_trace_metadata(trace: dict[str, Any], revise_trace: dict[str, Any]) -> None:
+    revise_profile_vote = str(revise_trace.get("retrieval_profile_vote", "")).strip()
+    if revise_profile_vote:
+        trace["retrieval_profile_vote"] = revise_profile_vote
+
+    if "retrieval_vote_confidence" in revise_trace:
+        trace["retrieval_vote_confidence"] = float(
+            revise_trace.get("retrieval_vote_confidence", 0.0) or 0.0
+        )
+
+    revise_source_ids_raw = revise_trace.get("few_shot_source_ids", [])
+    revise_source_ids = [str(x) for x in revise_source_ids_raw] if isinstance(revise_source_ids_raw, list) else []
+    if revise_source_ids:
+        trace["few_shot_source_ids"] = revise_source_ids
+
+
 @app.command("produce")
 def produce(
     raw_intent: str = typer.Argument(...),
@@ -165,6 +181,7 @@ def produce(
             "output_tokens": int(usage_prev.get("output_tokens", 0)) + int(usage_next.get("output_tokens", 0)),
             "total_tokens": int(usage_prev.get("total_tokens", 0)) + int(usage_next.get("total_tokens", 0)),
         }
+        _merge_revise_trace_metadata(trace, revise_trace)
         trace["revise_trace"] = revise_trace
         revise_evidence = {
             "targeted_revise_prompt": targeted_prompt,

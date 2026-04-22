@@ -1,6 +1,10 @@
 from __future__ import annotations
 
-from src.main import _apply_retrieval_profile_decision, _score_variants
+from src.main import (
+    _apply_retrieval_profile_decision,
+    _merge_revise_trace_metadata,
+    _score_variants,
+)
 from src.schemas import LyricPayload
 
 
@@ -144,3 +148,39 @@ def test_apply_retrieval_profile_decision_marks_reason_when_not_active() -> None
     assert isinstance(decision, dict)
     assert decision["active_profile"] == ""
     assert decision["decision_reason"] == "insufficient_confidence"
+
+
+def test_merge_revise_trace_metadata_prefers_revise_retrieval_fields() -> None:
+    trace = {
+        "retrieval_profile_vote": "classical_restraint",
+        "retrieval_vote_confidence": 0.5,
+        "few_shot_source_ids": ["poem-jys-001", "poem-cy-002"],
+    }
+    revise_trace = {
+        "retrieval_profile_vote": "urban_introspective",
+        "retrieval_vote_confidence": 2 / 3,
+        "few_shot_source_ids": ["lyric-modern-101", "lyric-modern-102", "poem-jys-001"],
+    }
+
+    _merge_revise_trace_metadata(trace, revise_trace)
+
+    assert trace["retrieval_profile_vote"] == "urban_introspective"
+    assert trace["retrieval_vote_confidence"] >= (2 / 3)
+    assert trace["few_shot_source_ids"] == ["lyric-modern-101", "lyric-modern-102", "poem-jys-001"]
+
+
+def test_merge_revise_trace_metadata_keeps_initial_when_revise_missing() -> None:
+    trace = {
+        "retrieval_profile_vote": "classical_restraint",
+        "retrieval_vote_confidence": 2 / 3,
+        "few_shot_source_ids": ["poem-jys-001", "poem-cy-002"],
+    }
+    revise_trace = {
+        "stage": "revise",
+    }
+
+    _merge_revise_trace_metadata(trace, revise_trace)
+
+    assert trace["retrieval_profile_vote"] == "classical_restraint"
+    assert trace["retrieval_vote_confidence"] >= (2 / 3)
+    assert trace["few_shot_source_ids"] == ["poem-jys-001", "poem-cy-002"]
