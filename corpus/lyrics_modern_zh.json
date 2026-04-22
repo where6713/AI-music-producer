@@ -1,0 +1,23 @@
+[
+  {
+    "source_id": "lyric-modern-101",
+    "type": "modern_lyric",
+    "title": "凌晨未发送",
+    "emotion_tags": ["breakup", "restraint", "late-night"],
+    "content": "对话框停在最后一句，光标闪烁像一场犹豫。"
+  },
+  {
+    "source_id": "lyric-modern-102",
+    "type": "modern_lyric",
+    "title": "不再拨通",
+    "emotion_tags": ["distance", "regret", "self-control"],
+    "content": "号码还在记忆里滚烫，手却学会在拨出前收场。"
+  },
+  {
+    "source_id": "lyric-modern-103",
+    "type": "modern_lyric",
+    "title": "风停在站台",
+    "emotion_tags": ["departure", "melancholic", "letting-go"],
+    "content": "列车门关上的那秒，想说的话都退回胸口。"
+  }
+]

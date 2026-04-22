@@ -1,0 +1,23 @@
+[
+  {
+    "source_id": "poem-jys-001",
+    "type": "classical_poem",
+    "title": "静夜思",
+    "emotion_tags": ["nostalgia", "distance", "restraint"],
+    "content": "床前明月光，疑是地上霜。举头望明月，低头思故乡。"
+  },
+  {
+    "source_id": "poem-cy-002",
+    "type": "classical_poem",
+    "title": "长相思",
+    "emotion_tags": ["longing", "regret", "night"],
+    "content": "山一程，水一程，身向榆关那畔行，夜深千帐灯。"
+  },
+  {
+    "source_id": "poem-dfq-003",
+    "type": "classical_poem",
+    "title": "钗头凤",
+    "emotion_tags": ["separation", "ache", "restraint"],
+    "content": "红酥手，黄藤酒，满城春色宫墙柳。"
+  }
+]
