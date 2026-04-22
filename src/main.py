@@ -31,6 +31,19 @@ def _infer_profile_vote_from_source_ids(source_ids: list[str]) -> str:
     return ""
 
 
+def _infer_profile_confidence_from_source_ids(source_ids: list[str], profile_vote: str) -> float:
+    if not source_ids or not profile_vote:
+        return 0.0
+    total = len(source_ids)
+    if profile_vote == "urban_introspective":
+        hits = sum(1 for x in source_ids if x.startswith("lyric-modern-"))
+        return hits / max(total, 1)
+    if profile_vote == "classical_restraint":
+        hits = sum(1 for x in source_ids if x.startswith("poem-"))
+        return hits / max(total, 1)
+    return 0.0
+
+
 def _build_targeted_revise_prompt(payload: dict[str, Any], lint_report: dict[str, Any]) -> str:
     return (
         "Targeted revise only for failing lines. Keep unchanged lines untouched.\n"
@@ -116,6 +129,7 @@ def _apply_retrieval_profile_decision(trace: dict[str, Any]) -> None:
     source_stage = str(trace.get("retrieval_profile_source", "initial")).strip() or "initial"
     if not profile_vote:
         profile_vote = _infer_profile_vote_from_source_ids(source_ids)
+        vote_confidence = _infer_profile_confidence_from_source_ids(source_ids, profile_vote)
 
     has_vote = bool(profile_vote)
     confidence_ok = vote_confidence >= (2 / 3)

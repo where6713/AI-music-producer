@@ -255,6 +255,23 @@ def test_apply_retrieval_profile_decision_infers_profile_from_source_ids_when_vo
     assert decision["source_stage"] == "revise"
 
 
+def test_apply_retrieval_profile_decision_infers_confidence_from_source_ids_when_missing() -> None:
+    trace = {
+        "few_shot_source_ids": ["lyric-modern-101", "lyric-modern-102", "poem-jys-001"],
+        "retrieval_profile_vote": "",
+        "retrieval_vote_confidence": 0.0,
+        "retrieval_profile_source": "revise",
+    }
+
+    _apply_retrieval_profile_decision(trace)
+
+    decision = trace.get("retrieval_profile_decision")
+    assert isinstance(decision, dict)
+    assert decision["profile_vote"] == "urban_introspective"
+    assert decision["vote_confidence"] >= (2 / 3)
+    assert decision["active_profile"] == "urban_introspective"
+
+
 def test_apply_retrieval_profile_decision_handles_invalid_confidence_value() -> None:
     trace = {
         "few_shot_source_ids": ["poem-jys-001", "lyric-modern-101"],
