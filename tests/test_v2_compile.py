@@ -62,3 +62,25 @@ def test_compile_writes_triplet_and_payload(tmp_path) -> None:
 
     trace_loaded = json.loads((tmp_path / "trace.json").read_text(encoding="utf-8"))
     assert trace_loaded["llm_calls"] == 1
+
+
+def test_compile_backfills_retrieval_decision_block(tmp_path) -> None:
+    payload = _payload()
+    trace = {
+        "llm_calls": 2,
+        "few_shot_source_ids": ["lyric-modern-101", "poem-jys-001"],
+        "retrieval_profile_vote": "urban_introspective",
+        "retrieval_vote_confidence": 0.8,
+        "retrieval_profile_source": "revise",
+    }
+
+    write_outputs(payload, tmp_path, trace)
+
+    trace_loaded = json.loads((tmp_path / "trace.json").read_text(encoding="utf-8"))
+    decision = trace_loaded.get("retrieval_profile_decision")
+    assert isinstance(decision, dict)
+    assert decision["profile_vote"] == "urban_introspective"
+    assert decision["active_profile"] == "urban_introspective"
+    assert decision["decision_reason"] == "activated"
+    assert decision["source_stage"] == "revise"
+    assert decision["source_ids"] == ["lyric-modern-101", "poem-jys-001"]
