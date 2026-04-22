@@ -38,6 +38,7 @@ def test_proof_check_pass_with_retrieval_decision(tmp_path) -> None:
     assert result["retrieval_audit_mode"] == "decision"
     assert result["retrieval_audit_migration"] == "decision_primary"
     assert result["retrieval_decision_quality"] == "active"
+    assert result["retrieval_decision_recommendation"] == "none"
 
 
 def test_proof_check_fail_without_retrieval_decision(tmp_path) -> None:
@@ -58,6 +59,7 @@ def test_proof_check_fail_without_retrieval_decision(tmp_path) -> None:
     assert result["retrieval_audit_ok"] is False
     assert result["retrieval_audit_mode"] == "missing"
     assert result["retrieval_audit_migration"] == "missing_evidence"
+    assert result["retrieval_decision_recommendation"] == "emit_retrieval_audit_fields"
 
 
 def test_proof_check_pass_with_legacy_retrieval_source_ids(tmp_path) -> None:
@@ -86,6 +88,7 @@ def test_proof_check_pass_with_legacy_retrieval_source_ids(tmp_path) -> None:
     assert result["retrieval_audit_mode"] == "legacy"
     assert result["retrieval_audit_migration"] == "legacy_compat_pending"
     assert "retrieval_profile_decision" in result["retrieval_decision_gap"]
+    assert result["retrieval_decision_recommendation"] == "emit_decision_block"
 
 
 def test_proof_check_fail_when_llm_calls_out_of_contract(tmp_path) -> None:
@@ -221,6 +224,7 @@ def test_proof_check_marks_decision_quality_inactive_when_no_active_profile(tmp_
     assert result["status"] == "pass"
     assert result["retrieval_audit_mode"] == "decision"
     assert result["retrieval_decision_quality"] == "inactive"
+    assert result["retrieval_decision_recommendation"] == "improve_profile_vote"
 
 
 def test_pm_audit_proof_reports_decision_mode_when_trace_has_decision_block() -> None:

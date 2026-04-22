@@ -106,6 +106,15 @@ def _proof_check(workspace_root: Path) -> dict[str, Any]:
     retrieval_decision_quality = "inactive"
     if retrieval_audit_mode == "decision" and active_profile:
         retrieval_decision_quality = "active"
+
+    retrieval_decision_recommendation = "emit_retrieval_audit_fields"
+    if retrieval_audit_mode == "legacy":
+        retrieval_decision_recommendation = "emit_decision_block"
+    elif retrieval_audit_mode == "decision":
+        if retrieval_decision_quality == "active":
+            retrieval_decision_recommendation = "none"
+        else:
+            retrieval_decision_recommendation = "improve_profile_vote"
     status = "pass" if (not missing and llm_calls_ok and retrieval_audit_ok) else "fail"
     return {
         "status": status,
@@ -118,6 +127,7 @@ def _proof_check(workspace_root: Path) -> dict[str, Any]:
         "retrieval_audit_migration": retrieval_audit_migration,
         "retrieval_decision_gap": retrieval_decision_gap,
         "retrieval_decision_quality": retrieval_decision_quality,
+        "retrieval_decision_recommendation": retrieval_decision_recommendation,
     }
 
 
