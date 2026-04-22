@@ -78,6 +78,7 @@ def _proof_check(workspace_root: Path) -> dict[str, Any]:
     decision = trace_payload.get("retrieval_profile_decision")
     decision_reason = decision.get("decision_reason") if isinstance(decision, dict) else ""
     source_ids = decision.get("source_ids") if isinstance(decision, dict) else []
+    active_profile = str(decision.get("active_profile", "")).strip() if isinstance(decision, dict) else ""
     has_decision_block = bool(decision_reason) and isinstance(source_ids, list) and bool(source_ids)
 
     retrieval_decision_gap: list[str] = []
@@ -102,6 +103,9 @@ def _proof_check(workspace_root: Path) -> dict[str, Any]:
         retrieval_audit_migration = "decision_primary"
     elif retrieval_audit_mode == "legacy":
         retrieval_audit_migration = "legacy_compat_pending"
+    retrieval_decision_quality = "inactive"
+    if retrieval_audit_mode == "decision" and active_profile:
+        retrieval_decision_quality = "active"
     status = "pass" if (not missing and llm_calls_ok and retrieval_audit_ok) else "fail"
     return {
         "status": status,
@@ -113,6 +117,7 @@ def _proof_check(workspace_root: Path) -> dict[str, Any]:
         "retrieval_audit_mode": retrieval_audit_mode,
         "retrieval_audit_migration": retrieval_audit_migration,
         "retrieval_decision_gap": retrieval_decision_gap,
+        "retrieval_decision_quality": retrieval_decision_quality,
     }
 
 

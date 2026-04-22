@@ -37,6 +37,7 @@ def test_proof_check_pass_with_retrieval_decision(tmp_path) -> None:
     assert result["retrieval_audit_ok"] is True
     assert result["retrieval_audit_mode"] == "decision"
     assert result["retrieval_audit_migration"] == "decision_primary"
+    assert result["retrieval_decision_quality"] == "active"
 
 
 def test_proof_check_fail_without_retrieval_decision(tmp_path) -> None:
@@ -188,6 +189,38 @@ def test_proof_check_prefers_decision_mode_when_both_formats_exist(tmp_path) -> 
     assert result["retrieval_audit_mode"] == "decision"
     assert result["retrieval_audit_migration"] == "decision_primary"
     assert result["retrieval_decision_gap"] == []
+    assert result["retrieval_decision_quality"] == "active"
+
+
+def test_proof_check_marks_decision_quality_inactive_when_no_active_profile(tmp_path) -> None:
+    out = tmp_path / "out"
+    out.mkdir(parents=True, exist_ok=True)
+    for name in ("lyrics.txt", "style.txt", "exclude.txt", "lyric_payload.json"):
+        (out / name).write_text("ok\n", encoding="utf-8")
+
+    (out / "trace.json").write_text(
+        json.dumps(
+            {
+                "llm_calls": 2,
+                "retrieval_profile_decision": {
+                    "profile_vote": "",
+                    "vote_confidence": 0.0,
+                    "active_profile": "",
+                    "decision_reason": "no_profile_vote",
+                    "source_ids": ["lyric-modern-101", "poem-jys-001"],
+                },
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+    result = _proof_check(tmp_path)
+
+    assert result["status"] == "pass"
+    assert result["retrieval_audit_mode"] == "decision"
+    assert result["retrieval_decision_quality"] == "inactive"
 
 
 def test_pm_audit_proof_reports_decision_mode_when_trace_has_decision_block() -> None:
