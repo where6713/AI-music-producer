@@ -61,12 +61,20 @@ def _proof_check(workspace_root: Path) -> dict[str, Any]:
     missing = [name for name in required if not (out / name).exists()]
     trace_text = (out / "trace.json").read_text(encoding="utf-8", errors="ignore") if (out / "trace.json").exists() else ""
     llm_calls_ok = '"llm_calls": 1' in trace_text or '"llm_calls": 2' in trace_text
-    status = "pass" if (not missing and llm_calls_ok) else "fail"
+    has_decision_block = (
+        '"retrieval_profile_decision"' in trace_text
+        and '"decision_reason"' in trace_text
+        and '"source_ids"' in trace_text
+    )
+    has_legacy_retrieval = '"few_shot_source_ids": [' in trace_text
+    retrieval_audit_ok = has_decision_block or has_legacy_retrieval
+    status = "pass" if (not missing and llm_calls_ok and retrieval_audit_ok) else "fail"
     return {
         "status": status,
         "output_dir": str(out),
         "missing_files": missing,
         "llm_calls_ok": llm_calls_ok,
+        "retrieval_audit_ok": retrieval_audit_ok,
     }
 
 
