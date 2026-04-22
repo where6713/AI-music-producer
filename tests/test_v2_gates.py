@@ -128,3 +128,8 @@ def test_ci_legacy_residue_scan_excludes_ci_script_self_match() -> None:
     )
     assert legacy_block is not None
     assert "':!tools/scripts/run_quality_gates_ci.sh'" in legacy_block.group(1)
+
+
+def test_pytest_asyncio_default_loop_scope_is_configured() -> None:
+    pyproject = Path("pyproject.toml").read_text(encoding="utf-8")
+    assert "asyncio_default_fixture_loop_scope" in pyproject
