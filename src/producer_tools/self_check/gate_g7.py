@@ -88,6 +88,11 @@ def _proof_check(workspace_root: Path) -> dict[str, Any]:
         retrieval_audit_mode = "decision"
     elif has_legacy_retrieval:
         retrieval_audit_mode = "legacy"
+    retrieval_audit_migration = "missing_evidence"
+    if retrieval_audit_mode == "decision":
+        retrieval_audit_migration = "decision_primary"
+    elif retrieval_audit_mode == "legacy":
+        retrieval_audit_migration = "legacy_compat_pending"
     status = "pass" if (not missing and llm_calls_ok and retrieval_audit_ok) else "fail"
     return {
         "status": status,
@@ -97,6 +102,7 @@ def _proof_check(workspace_root: Path) -> dict[str, Any]:
         "llm_calls_ok": llm_calls_ok,
         "retrieval_audit_ok": retrieval_audit_ok,
         "retrieval_audit_mode": retrieval_audit_mode,
+        "retrieval_audit_migration": retrieval_audit_migration,
     }
 
 
