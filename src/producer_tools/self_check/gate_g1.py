@@ -27,7 +27,9 @@ def validate_g1_scope(payload: dict[str, Any]) -> dict[str, Any]:
     if not commit_subject or not _COMMIT_SUBJECT_RE.match(commit_subject):
         failed_checks.append("commit_message_format")
 
-    if not _GATE_SCOPE_RE.search(commit_subject):
+    docs_only_commit = bool(changed_files) and all(path.startswith("docs/") for path in changed_files)
+
+    if not _GATE_SCOPE_RE.search(commit_subject) and not docs_only_commit:
         failed_checks.append("commit_scope_gate")
 
     if not changed_files:
@@ -46,12 +48,18 @@ def validate_g1_scope(payload: dict[str, Any]) -> dict[str, Any]:
 
 
 def _read_git_output(workspace_root: Path, args: list[str]) -> str:
-    return subprocess.check_output(
+    raw = subprocess.check_output(
         ["git", *args],
         cwd=str(workspace_root),
         stderr=subprocess.DEVNULL,
-        text=True,
+        text=False,
     )
+    for encoding in ("utf-8", "gbk"):
+        try:
+            return raw.decode(encoding)
+        except UnicodeDecodeError:
+            continue
+    return raw.decode("utf-8", errors="replace")
 
 
 def check_gate_g1(workspace_root: Path) -> dict[str, Any]:

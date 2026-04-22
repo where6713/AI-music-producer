@@ -54,6 +54,22 @@ jobs:
     assert result["status"] == "pass"
 
 
+def test_g5_hook_contract_fail_without_ledger_policy() -> None:
+    pre_commit = "git diff --cached --name-only --diff-filter=ACMRD"
+    pre_push = "pytest -q"
+    commit_msg = "type(scope): summary"
+    ci = "placeholder/mock markers detected\npytest -q\npyproject.toml"
+
+    result = validate_hook_contract(
+        pre_commit_text=pre_commit,
+        pre_push_text=pre_push,
+        commit_msg_text=commit_msg,
+        ci_gate_text=ci,
+    )
+    assert result["status"] == "fail"
+    assert "no_bypass_ledger_policy" in result["failed_checks"]
+
+
 def test_g2_failure_evidence_contract_requires_failure_output() -> None:
     from src.producer_tools.self_check.gate_g2 import validate_failure_evidence
 
