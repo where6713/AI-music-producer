@@ -68,6 +68,11 @@ def _proof_check(workspace_root: Path) -> dict[str, Any]:
     )
     has_legacy_retrieval = '"few_shot_source_ids": [' in trace_text
     retrieval_audit_ok = has_decision_block or has_legacy_retrieval
+    retrieval_audit_mode = "missing"
+    if has_decision_block:
+        retrieval_audit_mode = "decision"
+    elif has_legacy_retrieval:
+        retrieval_audit_mode = "legacy"
     status = "pass" if (not missing and llm_calls_ok and retrieval_audit_ok) else "fail"
     return {
         "status": status,
@@ -75,6 +80,7 @@ def _proof_check(workspace_root: Path) -> dict[str, Any]:
         "missing_files": missing,
         "llm_calls_ok": llm_calls_ok,
         "retrieval_audit_ok": retrieval_audit_ok,
+        "retrieval_audit_mode": retrieval_audit_mode,
     }
 
 

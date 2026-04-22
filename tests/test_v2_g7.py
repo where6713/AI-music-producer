@@ -34,6 +34,7 @@ def test_proof_check_pass_with_retrieval_decision(tmp_path) -> None:
     assert result["status"] == "pass"
     assert result["llm_calls_ok"] is True
     assert result["retrieval_audit_ok"] is True
+    assert result["retrieval_audit_mode"] == "decision"
 
 
 def test_proof_check_fail_without_retrieval_decision(tmp_path) -> None:
@@ -52,6 +53,7 @@ def test_proof_check_fail_without_retrieval_decision(tmp_path) -> None:
     assert result["status"] == "fail"
     assert result["llm_calls_ok"] is True
     assert result["retrieval_audit_ok"] is False
+    assert result["retrieval_audit_mode"] == "missing"
 
 
 def test_proof_check_pass_with_legacy_retrieval_source_ids(tmp_path) -> None:
@@ -77,3 +79,4 @@ def test_proof_check_pass_with_legacy_retrieval_source_ids(tmp_path) -> None:
     assert result["status"] == "pass"
     assert result["llm_calls_ok"] is True
     assert result["retrieval_audit_ok"] is True
+    assert result["retrieval_audit_mode"] == "legacy"
