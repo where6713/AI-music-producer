@@ -7,7 +7,7 @@ from typing import Any
 import typer
 
 from src.claude_client import generate_lyric_payload
-from src.compile import write_outputs
+from src.compile import write_outputs, write_trace_and_audit
 from src.lint import lint_payload
 from src.profile_router import resolve_active_profile
 from src.schemas import LyricPayload, UserInput
@@ -183,11 +183,17 @@ def _merge_revise_trace_metadata(trace: dict[str, Any], revise_trace: dict[str, 
 
 
 def _write_rejected_trace(out_dir: Path, trace: dict[str, Any]) -> None:
-    out_dir.mkdir(parents=True, exist_ok=True)
-    (out_dir / "trace.json").write_text(
-        json.dumps(trace, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
+    write_trace_and_audit(out_dir, trace)
+
+
+def _fail_quality_floor(target_dir: Path, trace: dict[str, Any], *, dry_run: bool) -> None:
+    trace["run_status"] = "QUALITY_FLOOR_FAILED"
+    if dry_run:
+        typer.echo("dry-run complete")
+        typer.echo("run_status=QUALITY_FLOOR_FAILED")
+        raise typer.Exit(code=2)
+    _write_rejected_trace(target_dir, trace)
+    raise typer.Exit(code=2)
 
 
 @app.command("produce")
@@ -233,7 +239,9 @@ def produce(
     llm_calls = 1
     warning_report = ""
     revise_evidence: dict[str, Any] = {}
-    should_revise = bool(variant_rank.get("all_dead", False)) or (not lint_report["pass"])
+    craft_score = float(lint_report.get("craft_score", 0.0) or 0.0)
+    needs_quality_revise = craft_score < 0.85
+    should_revise = bool(variant_rank.get("all_dead", False)) or (not lint_report["pass"]) or needs_quality_revise
     if should_revise:
         targeted_prompt = _build_targeted_revise_prompt(
             payload.model_dump(), lint_report
@@ -315,6 +323,10 @@ def produce(
             raise typer.Exit(code=2)
         _write_rejected_trace(target_dir, trace)
         raise typer.Exit(code=2)
+
+    craft_score = float(lint_report.get("craft_score", 0.0) or 0.0)
+    if craft_score < 0.85:
+        _fail_quality_floor(target_dir, trace, dry_run=dry_run)
 
     if dry_run:
         typer.echo("dry-run complete")
