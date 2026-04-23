@@ -109,6 +109,7 @@ def test_run_ingestion_enriches_rows_and_strict_mode_reports_rejections(tmp_path
     summary = run_ingestion(repo_root=tmp_path, strict=True)
 
     clean_rows = json.loads((tmp_path / "corpus" / "_clean" / "lyrics_modern_zh.json").read_text(encoding="utf-8"))
+    report_text = (tmp_path / "corpus" / "_ingestion_report.md").read_text(encoding="utf-8")
     assert summary["rejected"] == 0
     assert summary["accepted"] == 1
     assert clean_rows[0]["profile_tag"] == "uplift_pop"
@@ -116,3 +117,4 @@ def test_run_ingestion_enriches_rows_and_strict_mode_reports_rejections(tmp_path
     assert len(clean_rows[0]["learn_point"]) >= 5
     assert "001" not in clean_rows[0]["content"]
     assert "001" not in clean_rows[0]["source_id"]
+    assert "- none: 0" in report_text

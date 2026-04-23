@@ -13,3 +13,4 @@
 - urban_introspective: 200
 
 ## reject_reason_top10
+- none: 0

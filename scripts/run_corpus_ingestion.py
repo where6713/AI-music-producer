@@ -133,8 +133,11 @@ def _render_report(summary: dict[str, Any]) -> str:
 
     lines.append("")
     lines.append("## reject_reason_top10")
-    for reason, count in summary["reject_reason_top10"]:
-        lines.append(f"- {reason}: {count}")
+    if summary["reject_reason_top10"]:
+        for reason, count in summary["reject_reason_top10"]:
+            lines.append(f"- {reason}: {count}")
+    else:
+        lines.append("- none: 0")
     lines.append("")
     return "\n".join(lines)
 
