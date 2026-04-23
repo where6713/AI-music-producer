@@ -21,6 +21,29 @@
       ]
     },
     {
+      "topic_id": "pm_role_rules",
+      "owner_file": "docs/🎵 AI 音乐生成系统产品经理 (PM) Role & Rule.md",
+      "owner_marker": "### 🎵 AI 音乐生成系统产品经理 (PM) Role & Rule",
+      "forbidden_fulltext_outside_owner": [
+        "开发审计补充铁律",
+        "禁止旁路生成，必须走产品主链路",
+        "v2.1 关键字段缺失即一票否决"
+      ]
+    },
+    {
+      "topic_id": "dev_remediation_checklist",
+      "owner_file": "docs/整改task - 02.json",
+      "owner_marker": "\"task_id\": \"TASK-012\"",
+      "forbidden_fulltext_outside_owner": [
+        "映月工厂 · 质量信号链重建（hard gate 化）",
+        "把系统从『软排序+兜底』重写为『硬门禁+fail-loud』",
+        "PR-012-01",
+        "PR-012-07",
+        "hard-kill",
+        "QUALITY_FLOOR_FAILED"
+      ]
+    },
+    {
       "topic_id": "one_law",
       "owner_file": "one law.md",
       "owner_marker": "## 唯一法则",

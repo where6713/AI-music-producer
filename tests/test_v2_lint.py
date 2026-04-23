@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 from src.lint import lint_payload
 from src.schemas import LyricPayload
 
@@ -64,3 +66,76 @@ def test_lint_blocks_invalid_tag() -> None:
     report = lint_payload(payload)
     assert report["pass"] is False
     assert "R06" in report["failed_rules"]
+
+
+def test_lint_merges_global_and_profile_forbidden_sources(tmp_path) -> None:
+    registry = tmp_path / "registry.json"
+    global_rules = tmp_path / "global_rules.json"
+    registry.write_text(
+        json.dumps(
+            {
+                "profiles": {
+                    "urban_introspective": {
+                        "R15_concrete_density": {"enforced": False},
+                        "R16_profile_forbidden": ["学会放下"],
+                        "R17_first_person_ratio_max": 0.9,
+                    }
+                }
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    global_rules.write_text(
+        json.dumps({"global_always_forbidden": ["霓虹天空"]}, ensure_ascii=False),
+        encoding="utf-8",
+    )
+
+    payload = _payload("霓虹天空里我学会放下吧", forbidden=[])
+    report = lint_payload(
+        payload,
+        trace={"active_profile": "urban_introspective"},
+        profiles_registry_path=registry,
+        global_rules_path=global_rules,
+    )
+
+    assert "R16" in report["failed_rules"]
+    sources = {x["source"] for x in report["profile_specific_violations"]}
+    assert "global" in sources
+    assert "profile" in sources
+    assert "R15" in report["skipped_rules_by_profile"]
+
+
+def test_lint_applies_r17_threshold_by_profile(tmp_path) -> None:
+    registry = tmp_path / "registry.json"
+    global_rules = tmp_path / "global_rules.json"
+    registry.write_text(
+        json.dumps(
+            {
+                "profiles": {
+                    "ambient_meditation": {
+                        "R15_concrete_density": {"enforced": False},
+                        "R16_profile_forbidden": [],
+                        "R17_first_person_ratio_max": 0.05,
+                    }
+                }
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    global_rules.write_text(
+        json.dumps({"global_always_forbidden": []}, ensure_ascii=False),
+        encoding="utf-8",
+    )
+
+    payload = _payload("我我我我我我我我吧", forbidden=[])
+    report = lint_payload(
+        payload,
+        trace={"active_profile": "ambient_meditation"},
+        profiles_registry_path=registry,
+        global_rules_path=global_rules,
+    )
+
+    assert "R17" in report["failed_rules"]
+    assert report["active_profile"] == "ambient_meditation"

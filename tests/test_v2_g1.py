@@ -34,13 +34,41 @@ def test_validate_g1_scope_fail_for_invalid_commit_format() -> None:
 def test_validate_g1_scope_fail_for_non_g1_scope() -> None:
     result = gate_g1.validate_g1_scope(
         {
-            "commit_subject": "feat(g2): add failure evidence checker",
+            "commit_subject": "feat(core): add failure evidence checker",
             "changed_files": ["src/producer_tools/self_check/gate_g1.py"],
         }
     )
 
     assert result["status"] == "fail"
-    assert "commit_scope_g1" in result["failed_checks"]
+    assert "commit_scope_gate" in result["failed_checks"]
+
+
+def test_validate_g1_scope_pass_for_later_gate_scope() -> None:
+    result = gate_g1.validate_g1_scope(
+        {
+            "commit_subject": "feat(g3): tighten pass evidence contract",
+            "changed_files": ["src/producer_tools/self_check/gate_g3.py"],
+        }
+    )
+
+    assert result["status"] == "pass"
+    assert result["failed_checks"] == []
+
+
+def test_validate_g1_scope_pass_for_docs_only_commit_without_gate_scope() -> None:
+    result = gate_g1.validate_g1_scope(
+        {
+            "commit_subject": "docs(pm): add file-level remediation map from today audit",
+            "changed_files": [
+                "docs/ai_doc_manifest.json",
+                "docs/整改task.json",
+                "docs/🎵 AI 音乐生成系统产品经理 (PM) Role & Rule.md",
+            ],
+        }
+    )
+
+    assert result["status"] == "pass"
+    assert "commit_scope_gate" not in result["failed_checks"]
 
 
 def test_validate_g1_scope_fail_when_mixed_gitkeep_cleanup() -> None:
@@ -82,3 +110,14 @@ def test_check_gate_g1_fail_when_git_unavailable(monkeypatch, tmp_path) -> None:
 
     assert result["status"] == "fail"
     assert result["failed_checks"] == ["git_metadata_unavailable"]
+
+
+def test_read_git_output_decodes_non_utf8_bytes(monkeypatch, tmp_path) -> None:
+    sample = "docs/整改task.json\n".encode("utf-8")
+
+    def _fake_check_output(*_args, **_kwargs):
+        return sample
+
+    monkeypatch.setattr(gate_g1.subprocess, "check_output", _fake_check_output)
+    output = gate_g1._read_git_output(tmp_path, ["show", "--name-only"])
+    assert "整改task.json" in output

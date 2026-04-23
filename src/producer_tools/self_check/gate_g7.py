@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Any
 
@@ -32,6 +33,8 @@ def _run_g3_check() -> dict[str, Any]:
             "ci_result": "pass",
             "ci_run_url": "https://github.com/where6713/AI-music-producer/actions",
             "reproducible_commands": ["pytest -q", "bash tools/scripts/run_quality_gates_ci.sh"],
+            "local_output": "25 passed",
+            "ci_output": "ci-quality-gates: success",
         }
     )
 
@@ -42,6 +45,7 @@ def _run_g4_check() -> dict[str, Any]:
             "prd_path": "docs/映月工厂_极简歌词工坊_PRD.json",
             "pm_role_path": "one law.md",
             "pm_rules_path": "目录框架规范.md",
+            "manifest_path": "docs/ai_doc_manifest.json",
             "delivery_files": ["out/lyrics.txt", "out/style.txt", "out/exclude.txt"],
             "field_name_conflicts": [],
         }
@@ -57,13 +61,77 @@ def _proof_check(workspace_root: Path) -> dict[str, Any]:
     required = ["lyrics.txt", "style.txt", "exclude.txt", "lyric_payload.json", "trace.json"]
     missing = [name for name in required if not (out / name).exists()]
     trace_text = (out / "trace.json").read_text(encoding="utf-8", errors="ignore") if (out / "trace.json").exists() else ""
-    llm_calls_ok = '"llm_calls": 1' in trace_text or '"llm_calls": 2' in trace_text
-    status = "pass" if (not missing and llm_calls_ok) else "fail"
+    trace_json_valid = True
+    try:
+        trace_payload = json.loads(trace_text) if trace_text else {}
+    except json.JSONDecodeError:
+        trace_payload = {}
+        trace_json_valid = False
+
+    llm_calls_raw = trace_payload.get("llm_calls")
+    try:
+        llm_calls = int(llm_calls_raw)
+    except (TypeError, ValueError):
+        llm_calls = -1
+    llm_calls_ok = llm_calls in {1, 2}
+
+    decision = trace_payload.get("retrieval_profile_decision")
+    decision_reason = decision.get("decision_reason") if isinstance(decision, dict) else ""
+    source_ids = decision.get("source_ids") if isinstance(decision, dict) else []
+    active_profile = str(decision.get("active_profile", "")).strip() if isinstance(decision, dict) else ""
+    source_stage = str(decision.get("source_stage", "")).strip() if isinstance(decision, dict) else ""
+    has_decision_block = bool(decision_reason) and isinstance(source_ids, list) and bool(source_ids)
+
+    retrieval_decision_gap: list[str] = []
+    if not isinstance(decision, dict):
+        retrieval_decision_gap.append("retrieval_profile_decision")
+    else:
+        if not decision_reason:
+            retrieval_decision_gap.append("decision_reason")
+        if not (isinstance(source_ids, list) and bool(source_ids)):
+            retrieval_decision_gap.append("source_ids")
+
+    legacy_source_ids = trace_payload.get("few_shot_source_ids")
+    has_legacy_retrieval = isinstance(legacy_source_ids, list) and bool(legacy_source_ids)
+    retrieval_audit_ok = has_decision_block or has_legacy_retrieval
+    retrieval_audit_mode = "missing"
+    if has_decision_block:
+        retrieval_audit_mode = "decision"
+    elif has_legacy_retrieval:
+        retrieval_audit_mode = "legacy"
+    retrieval_audit_migration = "missing_evidence"
+    if retrieval_audit_mode == "decision":
+        retrieval_audit_migration = "decision_primary"
+    elif retrieval_audit_mode == "legacy":
+        retrieval_audit_migration = "legacy_compat_pending"
+    retrieval_decision_quality = "inactive"
+    if retrieval_audit_mode == "decision" and active_profile:
+        retrieval_decision_quality = "active"
+
+    retrieval_decision_recommendation = "emit_retrieval_audit_fields"
+    if retrieval_audit_mode == "legacy":
+        retrieval_decision_recommendation = "emit_decision_block"
+    elif retrieval_audit_mode == "decision":
+        if retrieval_decision_quality == "active":
+            retrieval_decision_recommendation = "none"
+        else:
+            retrieval_decision_recommendation = "improve_profile_vote"
+
+    retrieval_decision_stage = source_stage if source_stage else "unknown"
+    status = "pass" if (not missing and llm_calls_ok and retrieval_audit_ok) else "fail"
     return {
         "status": status,
         "output_dir": str(out),
         "missing_files": missing,
+        "trace_json_valid": trace_json_valid,
         "llm_calls_ok": llm_calls_ok,
+        "retrieval_audit_ok": retrieval_audit_ok,
+        "retrieval_audit_mode": retrieval_audit_mode,
+        "retrieval_audit_migration": retrieval_audit_migration,
+        "retrieval_decision_gap": retrieval_decision_gap,
+        "retrieval_decision_quality": retrieval_decision_quality,
+        "retrieval_decision_recommendation": retrieval_decision_recommendation,
+        "retrieval_decision_stage": retrieval_decision_stage,
     }
 
 

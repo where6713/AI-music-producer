@@ -7,6 +7,7 @@ import click
 import typer
 
 from src.main import produce as produce_v2
+from src.profile_router import AmbiguousProfileError
 from src.producer_tools.self_check.gate_g0 import check_gate_g0
 from src.producer_tools.self_check.gate_g1 import check_gate_g1
 from src.producer_tools.self_check.gate_g2 import validate_failure_evidence
@@ -117,6 +118,8 @@ def pass_evidence_check(
     ci_run_url: str = typer.Argument(...),
     reproducible_command_1: str = typer.Argument(...),
     reproducible_command_2: str = typer.Argument(...),
+    local_output: str = typer.Argument(...),
+    ci_output: str = typer.Argument(...),
 ) -> None:
     result = validate_pass_evidence(
         {
@@ -125,6 +128,8 @@ def pass_evidence_check(
             "ci_result": ci_result,
             "ci_run_url": ci_run_url,
             "reproducible_commands": [reproducible_command_1, reproducible_command_2],
+            "local_output": local_output,
+            "ci_output": ci_output,
         }
     )
     if result["status"] == "pass":
@@ -139,6 +144,7 @@ def docs_alignment_check(
     prd_path: str = typer.Argument(...),
     pm_role_path: str = typer.Argument(...),
     pm_rules_path: str = typer.Argument(...),
+    manifest_path: str = typer.Argument(...),
     delivery_file_1: str = typer.Argument(...),
     delivery_file_2: str = typer.Argument(...),
     delivery_file_3: str = typer.Argument(...),
@@ -148,6 +154,7 @@ def docs_alignment_check(
             "prd_path": prd_path,
             "pm_role_path": pm_role_path,
             "pm_rules_path": pm_rules_path,
+            "manifest_path": manifest_path,
             "delivery_files": [delivery_file_1, delivery_file_2, delivery_file_3],
             "field_name_conflicts": [],
         }
@@ -156,6 +163,9 @@ def docs_alignment_check(
         typer.echo("G4 DOCS-ALIGNMENT PASS")
         return
     typer.echo("G4 DOCS-ALIGNMENT FAIL")
+    failed = result.get("failed_checks", [])
+    if failed:
+        typer.echo("failed_checks: " + ", ".join(failed))
     raise typer.Exit(code=1)
 
 
@@ -225,21 +235,31 @@ def produce_command(
     genre: str = typer.Option("", "--genre"),
     mood: str = typer.Option("", "--mood"),
     vocal: str = typer.Option("any", "--vocal"),
+    profile: str = typer.Option("", "--profile"),
     lang: str = typer.Option("zh-CN", "--lang"),
     out_dir: str = typer.Option("out", "--out-dir"),
     verbose: bool = typer.Option(False, "--verbose"),
     dry_run: bool = typer.Option(False, "--dry-run"),
 ) -> None:
-    produce_v2(
-        raw_intent=raw_intent,
-        genre=genre,
-        mood=mood,
-        vocal=vocal,
-        lang=lang,
-        out_dir=out_dir,
-        verbose=verbose,
-        dry_run=dry_run,
-    )
+    try:
+        produce_v2(
+            raw_intent=raw_intent,
+            genre=genre,
+            mood=mood,
+            vocal=vocal,
+            profile=profile,
+            lang=lang,
+            out_dir=out_dir,
+            verbose=verbose,
+            dry_run=dry_run,
+        )
+    except AmbiguousProfileError as err:
+        typer.echo("ambiguous profile, please choose with --profile:")
+        for row in err.candidates:
+            typer.echo(
+                f"- {row.get('profile_id','')} | {row.get('display_name','')} | {row.get('craft_focus','')}"
+            )
+        raise typer.Exit(code=1)
 
 
 def main() -> None:

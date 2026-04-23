@@ -29,6 +29,22 @@ def validate_hook_contract(
     if "pytest -q" not in pre_push_text or "pytest -q" not in ci_gate_text:
         failed_checks.append("hook_ci_test_parity")
 
+    if "apps.cli.main pm-audit" not in pre_push_text or "apps.cli.main pm-audit" not in ci_gate_text:
+        failed_checks.append("hook_ci_pm_audit_parity")
+
+    output_contract_markers = ["out/lyrics.txt", "out/style.txt", "out/exclude.txt"]
+    if not all(marker in pre_push_text for marker in output_contract_markers):
+        failed_checks.append("hook_output_contract_check")
+    if not all(marker in ci_gate_text for marker in output_contract_markers):
+        failed_checks.append("ci_output_contract_check")
+
+    has_ledger_policy = (
+        "oost-hook-ledger" in pre_push_text
+        and "git commit --amend --no-edit" in pre_push_text
+    )
+    if not has_ledger_policy:
+        failed_checks.append("no_bypass_ledger_policy")
+
     has_pyproject_marker = (
         "pyproject.toml" in pre_commit_text
         or "pyproject.toml" in ci_gate_text

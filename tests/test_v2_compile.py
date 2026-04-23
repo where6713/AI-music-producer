@@ -59,6 +59,98 @@ def test_compile_writes_triplet_and_payload(tmp_path) -> None:
     assert (tmp_path / "exclude.txt").exists()
     assert (tmp_path / "lyric_payload.json").exists()
     assert (tmp_path / "trace.json").exists()
+    assert (tmp_path / "audit.md").exists()
 
     trace_loaded = json.loads((tmp_path / "trace.json").read_text(encoding="utf-8"))
     assert trace_loaded["llm_calls"] == 1
+
+
+def test_compile_backfills_retrieval_decision_block(tmp_path) -> None:
+    payload = _payload()
+    trace = {
+        "llm_calls": 2,
+        "few_shot_source_ids": ["lyric-modern-101", "poem-jys-001"],
+        "retrieval_profile_vote": "urban_introspective",
+        "retrieval_vote_confidence": 0.8,
+        "retrieval_profile_source": "revise",
+    }
+
+    write_outputs(payload, tmp_path, trace)
+
+    trace_loaded = json.loads((tmp_path / "trace.json").read_text(encoding="utf-8"))
+    decision = trace_loaded.get("retrieval_profile_decision")
+    assert isinstance(decision, dict)
+    assert decision["profile_vote"] == "urban_introspective"
+    assert decision["active_profile"] == "urban_introspective"
+    assert decision["decision_reason"] == "activated"
+    assert decision["source_stage"] == "revise"
+    assert decision["source_ids"] == ["lyric-modern-101", "poem-jys-001"]
+
+
+def test_compile_infers_active_decision_when_vote_missing(tmp_path) -> None:
+    payload = _payload()
+    trace = {
+        "llm_calls": 2,
+        "few_shot_source_ids": ["lyric-modern-101", "lyric-modern-102", "poem-jys-001"],
+        "retrieval_profile_vote": "",
+        "retrieval_vote_confidence": 0.0,
+        "retrieval_profile_source": "revise",
+    }
+
+    write_outputs(payload, tmp_path, trace)
+
+    trace_loaded = json.loads((tmp_path / "trace.json").read_text(encoding="utf-8"))
+    decision = trace_loaded.get("retrieval_profile_decision")
+    assert isinstance(decision, dict)
+    assert decision["profile_vote"] == "urban_introspective"
+    assert decision["vote_confidence"] >= (2 / 3)
+    assert decision["active_profile"] == "urban_introspective"
+    assert decision["decision_reason"] == "activated"
+
+
+def test_compile_enriches_existing_inactive_decision_block(tmp_path) -> None:
+    payload = _payload()
+    trace = {
+        "llm_calls": 2,
+        "few_shot_source_ids": ["lyric-modern-101", "lyric-modern-102", "poem-jys-001"],
+        "retrieval_profile_source": "revise",
+        "retrieval_profile_decision": {
+            "profile_vote": "",
+            "vote_confidence": 0.0,
+            "active_profile": "",
+            "decision_reason": "no_profile_vote",
+            "source_stage": "revise",
+            "source_ids": ["lyric-modern-101", "lyric-modern-102", "poem-jys-001"],
+        },
+    }
+
+    write_outputs(payload, tmp_path, trace)
+
+    trace_loaded = json.loads((tmp_path / "trace.json").read_text(encoding="utf-8"))
+    decision = trace_loaded.get("retrieval_profile_decision")
+    assert isinstance(decision, dict)
+    assert decision["profile_vote"] == "urban_introspective"
+    assert decision["vote_confidence"] >= (2 / 3)
+    assert decision["active_profile"] == "urban_introspective"
+    assert decision["decision_reason"] == "activated"
+
+
+def test_compile_writes_profile_decision_section_in_audit(tmp_path) -> None:
+    payload = _payload()
+    trace = {
+        "llm_calls": 1,
+        "active_profile": "urban_introspective",
+        "profile_source": "cli_override",
+        "profile_vote_confidence": None,
+        "lint_report": {
+            "skipped_rules_by_profile": ["R15"],
+        },
+    }
+
+    write_outputs(payload, tmp_path, trace)
+
+    audit = (tmp_path / "audit.md").read_text(encoding="utf-8")
+    assert "## 0. Profile 决策" in audit
+    assert "active_profile: urban_introspective" in audit
+    assert "profile_source: cli_override" in audit
+    assert "skipped_rules_by_profile: R15" in audit

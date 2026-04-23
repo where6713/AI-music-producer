@@ -12,6 +12,14 @@ class UserInput(BaseModel):
     genre_hint: str = ""
     mood_hint: str = ""
     vocal_gender_hint: Literal["male", "female", "any"] = "any"
+    profile_override: Literal[
+        "",
+        "urban_introspective",
+        "classical_restraint",
+        "uplift_pop",
+        "club_dance",
+        "ambient_meditation",
+    ] = ""
 
 
 class Distillation(BaseModel):
@@ -49,13 +57,36 @@ class StyleTags(BaseModel):
     production: list[str] = Field(default_factory=list)
 
 
+class FewShotExample(BaseModel):
+    source_id: str
+    type: Literal["classical_poem", "modern_lyric"]
+    title: str
+    emotion_tags_matched: list[str] = Field(default_factory=list)
+
+
+class VariantLintResult(BaseModel):
+    passed_rules: int = 0
+    failed_rules: list[str] = Field(default_factory=list)
+    rank: int = 0
+
+
+class LyricVariant(BaseModel):
+    variant_id: Literal["a", "b", "c"]
+    narrative_pov: Literal["first_person", "second_person", "third_person"]
+    lyrics_by_section: list[LyricSection]
+    lint_result: VariantLintResult = Field(default_factory=VariantLintResult)
+
+
 class LyricPayload(BaseModel):
     schema_version: str = "v2.1"
     generation_id: str = Field(default_factory=lambda: str(uuid4()))
     model_used: str = "claude-opus-4-7"
     skill_used: str = "lyric-craftsman@v1.0"
+    few_shot_examples_used: list[FewShotExample] = Field(default_factory=list)
     distillation: Distillation
     structure: Structure
     lyrics_by_section: list[LyricSection]
+    variants: list[LyricVariant] = Field(default_factory=list)
+    chosen_variant_id: Literal["a", "b", "c"] = "a"
     style_tags: StyleTags
     exclude_tags: list[str] = Field(default_factory=list)
