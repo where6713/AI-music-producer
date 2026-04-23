@@ -102,4 +102,4 @@ def test_force_hook_line_pass_rewrites_chorus_tail() -> None:
 
     assert _force_hook_line_pass(payload)
     chorus = payload.lyrics_by_section[1]
-    assert chorus.lines[0].primary == "今夜我把想你慢慢收回来"
+    assert chorus.lines[0].primary == "今夜把心事轻轻放下吧"

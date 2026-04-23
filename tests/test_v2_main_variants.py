@@ -618,3 +618,72 @@ def test_produce_rejects_when_all_variants_dead_after_targeted_revise(tmp_path, 
     assert calls["n"] == 2
     assert not (tmp_path / "out" / "lyrics.txt").exists()
     assert (tmp_path / "out" / "trace.json").exists()
+
+
+def test_produce_rejects_when_postprocess_result_is_dead(tmp_path, monkeypatch) -> None:
+    from src import main as main_mod
+
+    payload = _payload()
+    payload.variants[0].lyrics_by_section = payload.lyrics_by_section
+    payload.variants[1].lyrics_by_section = payload.lyrics_by_section
+    payload.variants[2].lyrics_by_section = payload.lyrics_by_section
+
+    def _fake_generate(*_args, **_kwargs):
+        return payload.model_copy(deep=True), {
+            "provider": "openai-compatible",
+            "model_used": "gpt-5.3-codex",
+            "usage": {"input_tokens": 1, "output_tokens": 1, "total_tokens": 2},
+            "llm_calls": 1,
+            "few_shot_source_ids": ["lyric-modern-101", "lyric-modern-102", "poem-jys-001"],
+            "retrieval_profile_vote": "urban_introspective",
+            "retrieval_vote_confidence": 0.67,
+            "stage": "initial",
+        }
+
+    def _fake_lint(_payload, **_kwargs):
+        return {
+            "pass": False,
+            "failed_rules": ["R14"],
+            "violations": [
+                {
+                    "rule": "R14",
+                    "detail": "forbidden verb-object phrase: 收回来",
+                    "section": "[Chorus]",
+                    "line": 1,
+                }
+            ],
+            "active_profile": "urban_introspective",
+            "skipped_rules_by_profile": [],
+            "profile_specific_violations": [],
+            "is_dead": True,
+            "death_reason": ["R14: forbidden verb-object phrase: 收回来"],
+            "hard_kill_rules": ["R14"],
+            "hard_penalty_count": 0,
+            "soft_penalty_count": 0,
+            "penalty_score": 0,
+            "all_dead_run_status": "",
+        }
+
+    def _fail_write_outputs(*_args, **_kwargs):
+        raise AssertionError("write_outputs should not be called when postprocess is dead")
+
+    monkeypatch.setattr(main_mod, "generate_lyric_payload", _fake_generate)
+    monkeypatch.setattr(main_mod, "lint_payload", _fake_lint)
+    monkeypatch.setattr(main_mod, "write_outputs", _fail_write_outputs)
+
+    with pytest.raises(Exception) as err:
+        main_mod.produce(
+            raw_intent="分手后夜里想发消息又忍住",
+            genre="",
+            mood="",
+            vocal="female",
+            profile="urban_introspective",
+            lang="zh-CN",
+            out_dir=str(tmp_path / "out"),
+            verbose=False,
+            dry_run=False,
+        )
+
+    assert getattr(err.value, "exit_code", None) == 2
+    assert not (tmp_path / "out" / "lyrics.txt").exists()
+    assert (tmp_path / "out" / "trace.json").exists()

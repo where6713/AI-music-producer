@@ -130,7 +130,7 @@ def _force_hook_line_pass(payload: LyricPayload) -> bool:
         if not (1 <= hook_idx <= len(section.lines)):
             return False
         line = section.lines[hook_idx - 1]
-        line.primary = "今夜我把想你慢慢收回来"
+        line.primary = "今夜把心事轻轻放下吧"
         line.char_count = len(line.primary)
         return True
     return False
@@ -326,9 +326,7 @@ def produce(
     lint_before_polish = lint_report
     _polish_readability(payload)
     lint_report = lint_payload(payload, trace=trace)
-    if (not lint_report["pass"]) and ("R01" in lint_report.get("failed_rules", [])):
-        if _force_hook_line_pass(payload):
-            lint_report = lint_payload(payload, trace=trace)
+    # PR-012-02 hard-gate phase: disable postprocess hook-line rewrite path.
     _sync_chosen_variant(payload)
 
     trace["variant_rank"] = variant_rank
@@ -342,6 +340,18 @@ def produce(
     trace["llm_calls"] = llm_calls
     trace["max_llm_calls_per_run"] = 2
     _apply_retrieval_profile_decision(trace)
+
+    hard_reject = bool(lint_report.get("is_dead", False)) or (
+        str(lint_report.get("all_dead_run_status", "")).strip().upper() == "REJECTED"
+    )
+    if hard_reject:
+        trace["run_status"] = "REJECTED"
+        if dry_run:
+            typer.echo("dry-run complete")
+            typer.echo("run_status=REJECTED hard gate hit")
+            raise typer.Exit(code=2)
+        _write_rejected_trace(target_dir, trace)
+        raise typer.Exit(code=2)
 
     if dry_run:
         typer.echo("dry-run complete")
