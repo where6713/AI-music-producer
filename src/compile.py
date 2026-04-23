@@ -13,6 +13,29 @@ def _safe_float(value: object, *, default: float = 0.0) -> float:
         return default
 
 
+def _infer_profile_vote_from_source_ids(source_ids: list[str]) -> str:
+    modern_hits = sum(1 for x in source_ids if x.startswith("lyric-modern-"))
+    classical_hits = sum(1 for x in source_ids if x.startswith("poem-"))
+    if modern_hits >= classical_hits and modern_hits > 0:
+        return "urban_introspective"
+    if classical_hits > 0:
+        return "classical_restraint"
+    return ""
+
+
+def _infer_profile_confidence_from_source_ids(source_ids: list[str], profile_vote: str) -> float:
+    if not source_ids or not profile_vote:
+        return 0.0
+    total = len(source_ids)
+    if profile_vote == "urban_introspective":
+        hits = sum(1 for x in source_ids if x.startswith("lyric-modern-"))
+        return hits / max(total, 1)
+    if profile_vote == "classical_restraint":
+        hits = sum(1 for x in source_ids if x.startswith("poem-"))
+        return hits / max(total, 1)
+    return 0.0
+
+
 def _ensure_retrieval_profile_decision(trace: dict[str, object]) -> dict[str, object]:
     if isinstance(trace.get("retrieval_profile_decision"), dict):
         return trace
@@ -22,6 +45,10 @@ def _ensure_retrieval_profile_decision(trace: dict[str, object]) -> dict[str, ob
     source_ids_raw = trace.get("few_shot_source_ids", [])
     source_ids = [str(x) for x in source_ids_raw] if isinstance(source_ids_raw, list) else []
     source_stage = str(trace.get("retrieval_profile_source", "initial")).strip() or "initial"
+
+    if not profile_vote:
+        profile_vote = _infer_profile_vote_from_source_ids(source_ids)
+        vote_confidence = _infer_profile_confidence_from_source_ids(source_ids, profile_vote)
 
     has_vote = bool(profile_vote)
     confidence_ok = vote_confidence >= (2 / 3)
