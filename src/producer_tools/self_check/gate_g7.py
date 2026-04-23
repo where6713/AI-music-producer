@@ -79,6 +79,7 @@ def _proof_check(workspace_root: Path) -> dict[str, Any]:
     decision_reason = decision.get("decision_reason") if isinstance(decision, dict) else ""
     source_ids = decision.get("source_ids") if isinstance(decision, dict) else []
     active_profile = str(decision.get("active_profile", "")).strip() if isinstance(decision, dict) else ""
+    source_stage = str(decision.get("source_stage", "")).strip() if isinstance(decision, dict) else ""
     has_decision_block = bool(decision_reason) and isinstance(source_ids, list) and bool(source_ids)
 
     retrieval_decision_gap: list[str] = []
@@ -115,6 +116,8 @@ def _proof_check(workspace_root: Path) -> dict[str, Any]:
             retrieval_decision_recommendation = "none"
         else:
             retrieval_decision_recommendation = "improve_profile_vote"
+
+    retrieval_decision_stage = source_stage if source_stage else "unknown"
     status = "pass" if (not missing and llm_calls_ok and retrieval_audit_ok) else "fail"
     return {
         "status": status,
@@ -128,6 +131,7 @@ def _proof_check(workspace_root: Path) -> dict[str, Any]:
         "retrieval_decision_gap": retrieval_decision_gap,
         "retrieval_decision_quality": retrieval_decision_quality,
         "retrieval_decision_recommendation": retrieval_decision_recommendation,
+        "retrieval_decision_stage": retrieval_decision_stage,
     }
 
 

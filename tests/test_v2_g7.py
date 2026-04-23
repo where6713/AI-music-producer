@@ -21,6 +21,7 @@ def test_proof_check_pass_with_retrieval_decision(tmp_path) -> None:
                     "vote_confidence": 2 / 3,
                     "active_profile": "urban_introspective",
                     "decision_reason": "activated",
+                    "source_stage": "revise",
                     "source_ids": ["lyric-modern-101", "lyric-modern-102"],
                 },
             },
@@ -39,6 +40,7 @@ def test_proof_check_pass_with_retrieval_decision(tmp_path) -> None:
     assert result["retrieval_audit_migration"] == "decision_primary"
     assert result["retrieval_decision_quality"] == "active"
     assert result["retrieval_decision_recommendation"] == "none"
+    assert result["retrieval_decision_stage"] == "revise"
 
 
 def test_proof_check_fail_without_retrieval_decision(tmp_path) -> None:
@@ -60,6 +62,7 @@ def test_proof_check_fail_without_retrieval_decision(tmp_path) -> None:
     assert result["retrieval_audit_mode"] == "missing"
     assert result["retrieval_audit_migration"] == "missing_evidence"
     assert result["retrieval_decision_recommendation"] == "emit_retrieval_audit_fields"
+    assert result["retrieval_decision_stage"] == "unknown"
 
 
 def test_proof_check_pass_with_legacy_retrieval_source_ids(tmp_path) -> None:
@@ -89,6 +92,7 @@ def test_proof_check_pass_with_legacy_retrieval_source_ids(tmp_path) -> None:
     assert result["retrieval_audit_migration"] == "legacy_compat_pending"
     assert "retrieval_profile_decision" in result["retrieval_decision_gap"]
     assert result["retrieval_decision_recommendation"] == "emit_decision_block"
+    assert result["retrieval_decision_stage"] == "unknown"
 
 
 def test_proof_check_fail_when_llm_calls_out_of_contract(tmp_path) -> None:
@@ -176,6 +180,7 @@ def test_proof_check_prefers_decision_mode_when_both_formats_exist(tmp_path) -> 
                     "vote_confidence": 0.8,
                     "active_profile": "urban_introspective",
                     "decision_reason": "activated",
+                    "source_stage": "initial",
                     "source_ids": ["lyric-modern-102"],
                 },
             },
@@ -193,6 +198,7 @@ def test_proof_check_prefers_decision_mode_when_both_formats_exist(tmp_path) -> 
     assert result["retrieval_audit_migration"] == "decision_primary"
     assert result["retrieval_decision_gap"] == []
     assert result["retrieval_decision_quality"] == "active"
+    assert result["retrieval_decision_stage"] == "initial"
 
 
 def test_proof_check_marks_decision_quality_inactive_when_no_active_profile(tmp_path) -> None:
@@ -210,6 +216,7 @@ def test_proof_check_marks_decision_quality_inactive_when_no_active_profile(tmp_
                     "vote_confidence": 0.0,
                     "active_profile": "",
                     "decision_reason": "no_profile_vote",
+                    "source_stage": "revise",
                     "source_ids": ["lyric-modern-101", "poem-jys-001"],
                 },
             },
@@ -225,6 +232,7 @@ def test_proof_check_marks_decision_quality_inactive_when_no_active_profile(tmp_
     assert result["retrieval_audit_mode"] == "decision"
     assert result["retrieval_decision_quality"] == "inactive"
     assert result["retrieval_decision_recommendation"] == "improve_profile_vote"
+    assert result["retrieval_decision_stage"] == "revise"
 
 
 def test_pm_audit_proof_reports_decision_mode_when_trace_has_decision_block() -> None:
