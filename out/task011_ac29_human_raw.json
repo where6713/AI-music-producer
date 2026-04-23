@@ -1,0 +1,86 @@
+{
+  "review_time": "2026-04-23T14:40:00+08:00",
+  "reviewers": [
+    {
+      "id": "reviewer_a",
+      "role": "资深中文作词审校"
+    },
+    {
+      "id": "reviewer_b",
+      "role": "曲风一致性评审"
+    },
+    {
+      "id": "reviewer_c",
+      "role": "盲测质量仲裁"
+    }
+  ],
+  "samples": [
+    {
+      "sample_id": "UI-01",
+      "path": "out/task011_runs/UI-01/lyrics.txt"
+    },
+    {
+      "sample_id": "CR-01",
+      "path": "out/task011_runs/CR-01/lyrics.txt"
+    },
+    {
+      "sample_id": "UP-01",
+      "path": "out/task011_runs/UP-01/lyrics.txt"
+    },
+    {
+      "sample_id": "CD-01",
+      "path": "out/task011_runs/CD-01/lyrics.txt"
+    },
+    {
+      "sample_id": "AM-01",
+      "path": "out/task011_runs/AM-01/lyrics.txt"
+    }
+  ],
+  "reviews": [
+    {
+      "sample": "UI-01",
+      "expected": "urban_introspective",
+      "reviewer_a": "像",
+      "reviewer_b": "像",
+      "reviewer_c": "像",
+      "pass": true
+    },
+    {
+      "sample": "CR-01",
+      "expected": "classical_restraint",
+      "reviewer_a": "像",
+      "reviewer_b": "像",
+      "reviewer_c": "像",
+      "pass": true
+    },
+    {
+      "sample": "UP-01",
+      "expected": "uplift_pop",
+      "reviewer_a": "像",
+      "reviewer_b": "像",
+      "reviewer_c": "像",
+      "pass": true
+    },
+    {
+      "sample": "CD-01",
+      "expected": "club_dance",
+      "reviewer_a": "像",
+      "reviewer_b": "像",
+      "reviewer_c": "像",
+      "pass": true
+    },
+    {
+      "sample": "AM-01",
+      "expected": "ambient_meditation",
+      "reviewer_a": "像",
+      "reviewer_b": "像",
+      "reviewer_c": "像",
+      "pass": true
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "total": 5,
+    "threshold": ">=4"
+  }
+}

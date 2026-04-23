@@ -108,7 +108,52 @@ def _build_ac27_ac28(rows: list[dict]) -> str:
     return "\n".join(lines).strip() + "\n"
 
 
-def _build_ac29(rows: list[dict]) -> str:
+def _build_ac29(rows: list[dict], manual_path: Path | None) -> str:
+    if manual_path and manual_path.exists():
+        payload = json.loads(manual_path.read_text(encoding="utf-8"))
+        reviews = payload.get("reviews", []) if isinstance(payload, dict) else []
+        summary = payload.get("summary", {}) if isinstance(payload, dict) else {}
+
+        lines = [
+            "# TASK-011 AC_29 Blind Review",
+            "",
+            "## 评审角色",
+        ]
+        reviewers = payload.get("reviewers", []) if isinstance(payload, dict) else []
+        for row in reviewers if isinstance(reviewers, list) else []:
+            if isinstance(row, dict):
+                lines.append(f"- {row.get('id','')}: {row.get('role','')}")
+        lines.extend([
+            "",
+            "## 评审时间",
+            f"- {payload.get('review_time','')}",
+            "",
+            "## 样本路径",
+        ])
+        samples = payload.get("samples", []) if isinstance(payload, dict) else []
+        for row in samples if isinstance(samples, list) else []:
+            if isinstance(row, dict):
+                lines.append(f"- {row.get('sample_id','')}: {row.get('path','')}")
+        lines.extend([
+            "",
+            "## 评分记录",
+            "",
+            "| sample | expected | reviewer_a | reviewer_b | reviewer_c | pass |",
+            "| --- | --- | --- | --- | --- | --- |",
+        ])
+        for row in reviews if isinstance(reviews, list) else []:
+            if not isinstance(row, dict):
+                continue
+            lines.append(
+                f"| {row.get('sample','')} | {row.get('expected','')} | {row.get('reviewer_a','')} | {row.get('reviewer_b','')} | {row.get('reviewer_c','')} | {row.get('pass', False)} |"
+            )
+        lines.extend([
+            "",
+            f"结论：{summary.get('passed',0)}/{summary.get('total',0)} 通过（目标 >= 4/5）。",
+            f"来源：{manual_path.as_posix()}",
+        ])
+        return "\n".join(lines).strip() + "\n"
+
     target = ["UI-01", "CR-01", "UP-01", "CD-01", "AM-01"]
     m = {r["intent_id"]: r for r in rows}
     lines = [
@@ -227,9 +272,15 @@ def main() -> None:
         action="store_true",
         help="reuse out/task011_ac25_matrix.json rows instead of re-running 15 cases",
     )
+    parser.add_argument(
+        "--manual-blind-review",
+        default="",
+        help="path to manually collected blind review JSON for AC_29",
+    )
     args = parser.parse_args()
 
     sections = {x.strip().lower() for x in args.sections.split(",") if x.strip()}
+    manual_blind_review = Path(args.manual_blind_review) if args.manual_blind_review else None
     need_rows = bool({"ac25", "ac27", "ac28", "ac29"} & sections)
 
     rows: list[dict] = []
@@ -259,7 +310,9 @@ def main() -> None:
     if "ac27" in sections or "ac28" in sections:
         (OUT / "task011_ac27_ac28_e2e.md").write_text(_build_ac27_ac28(rows), encoding="utf-8")
     if "ac29" in sections:
-        (OUT / "task011_ac29_blind_review.md").write_text(_build_ac29(rows), encoding="utf-8")
+        (OUT / "task011_ac29_blind_review.md").write_text(
+            _build_ac29(rows, manual_blind_review), encoding="utf-8"
+        )
     if "ac32" in sections:
         (OUT / "task011_ac32_hook_ci_parity.md").write_text(_build_ac32(), encoding="utf-8")
     if "ac35" in sections:

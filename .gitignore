@@ -13,6 +13,7 @@ out/*
 !out/task011_ac25_matrix.json
 !out/task011_ac27_ac28_e2e.md
 !out/task011_ac29_blind_review.md
+!out/task011_ac29_human_raw.json
 !out/task011_ac32_hook_ci_parity.md
 !out/task011_ac35_fallback_failure.md
 

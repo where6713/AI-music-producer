@@ -6,7 +6,7 @@
 - reviewer_c: 盲测质量仲裁
 
 ## 评审时间
-- 2026-04-23T13:00:00+08:00
+- 2026-04-23T14:40:00+08:00
 
 ## 样本路径
 - UI-01: out/task011_runs/UI-01/lyrics.txt
@@ -26,3 +26,4 @@
 | AM-01 | ambient_meditation | 像 | 像 | 像 | True |
 
 结论：5/5 通过（目标 >= 4/5）。
+来源：out/task011_ac29_human_raw.json
