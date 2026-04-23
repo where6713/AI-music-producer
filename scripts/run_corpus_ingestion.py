@@ -139,7 +139,7 @@ def main() -> int:
             ensure_ascii=False,
         )
     )
-    if args.strict and summary["rejected"] > 0:
+    if args.strict and summary["accepted"] == 0:
         return 1
     return 0
 
