@@ -5,12 +5,18 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from scripts.corpus_quality_lint import lint_corpus_row
 from src.schemas import UserInput
 
 
 CORPUS_FILES = [
     "corpus/poetry_classical.json",
     "corpus/lyrics_modern_zh.json",
+]
+
+CLEAN_CORPUS_FILES = [
+    "corpus/_clean/poetry_classical.json",
+    "corpus/_clean/lyrics_modern_zh.json",
 ]
 
 PROFILE_IDS = {
@@ -61,14 +67,25 @@ def _tokenize(text: str) -> list[str]:
 
 
 def _load_corpus(repo_root: Path) -> list[dict[str, Any]]:
+    has_clean = all((repo_root / rel).exists() for rel in CLEAN_CORPUS_FILES)
+    if not has_clean:
+        raise RuntimeError("clean corpus missing: run scripts/run_corpus_ingestion.py --strict")
+
+    source_files = CLEAN_CORPUS_FILES
+
     rows: list[dict[str, Any]] = []
-    for rel in CORPUS_FILES:
+    for rel in source_files:
         fp = repo_root / rel
         if not fp.exists():
             continue
         payload = json.loads(fp.read_text(encoding="utf-8"))
         if isinstance(payload, list):
-            rows.extend([x for x in payload if isinstance(x, dict)])
+            for item in payload:
+                if not isinstance(item, dict):
+                    continue
+                report = lint_corpus_row(item, mode="runtime")
+                if report.passed:
+                    rows.append(item)
     return rows
 
 
