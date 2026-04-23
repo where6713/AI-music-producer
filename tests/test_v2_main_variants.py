@@ -519,3 +519,21 @@ def test_produce_verbose_prints_profile_source(tmp_path, monkeypatch, capsys) ->
     out = capsys.readouterr().out
     assert "active_profile=urban_introspective" in out
     assert "profile_source=cli_override" in out
+
+
+def test_apply_retrieval_profile_decision_uses_router_active_profile_when_present() -> None:
+    trace = {
+        "active_profile": "uplift_pop",
+        "profile_source": "genre_match",
+        "few_shot_source_ids": ["lyric-up-001", "lyric-up-002", "lyric-up-003"],
+        "retrieval_profile_vote": "",
+        "retrieval_vote_confidence": 0.0,
+        "retrieval_profile_source": "initial",
+    }
+
+    _apply_retrieval_profile_decision(trace)
+
+    decision = trace.get("retrieval_profile_decision")
+    assert isinstance(decision, dict)
+    assert decision["active_profile"] == "uplift_pop"
+    assert decision["decision_reason"] == "activated"

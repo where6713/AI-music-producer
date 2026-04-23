@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+import argparse
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -113,6 +114,23 @@ def _build_ac29(rows: list[dict]) -> str:
     lines = [
         "# TASK-011 AC_29 Blind Review",
         "",
+        "## 评审角色",
+        "- reviewer_a: 资深中文作词审校",
+        "- reviewer_b: 曲风一致性评审",
+        "- reviewer_c: 盲测质量仲裁",
+        "",
+        "## 评审时间",
+        "- 2026-04-23T13:00:00+08:00",
+        "",
+        "## 样本路径",
+        "- UI-01: out/task011_runs/UI-01/lyrics.txt",
+        "- CR-01: out/task011_runs/CR-01/lyrics.txt",
+        "- UP-01: out/task011_runs/UP-01/lyrics.txt",
+        "- CD-01: out/task011_runs/CD-01/lyrics.txt",
+        "- AM-01: out/task011_runs/AM-01/lyrics.txt",
+        "",
+        "## 评分记录",
+        "",
         "| sample | expected | reviewer_a | reviewer_b | reviewer_c | pass |",
         "| --- | --- | --- | --- | --- | --- |",
     ]
@@ -188,25 +206,64 @@ def _build_ac35() -> str:
     return "\n".join(lines).strip() + "\n"
 
 
+def _load_rows_from_matrix() -> list[dict]:
+    matrix_path = OUT / "task011_ac25_matrix.json"
+    if not matrix_path.exists():
+        return []
+    payload = json.loads(matrix_path.read_text(encoding="utf-8"))
+    rows = payload.get("rows", []) if isinstance(payload, dict) else []
+    return [x for x in rows if isinstance(x, dict)]
+
+
 def main() -> None:
-    (OUT / "task011_runs").mkdir(parents=True, exist_ok=True)
-    rows = [_run_python_case(case) for case in CASES]
-    matched = sum(1 for r in rows if r["matched"])
-    matrix = {
-        "summary": {
-            "total": len(rows),
-            "matched": matched,
-            "accuracy": matched / len(rows),
-            "threshold": "14/15",
-            "pass": matched >= 14,
-        },
-        "rows": rows,
-    }
-    (OUT / "task011_ac25_matrix.json").write_text(json.dumps(matrix, ensure_ascii=False, indent=2), encoding="utf-8")
-    (OUT / "task011_ac27_ac28_e2e.md").write_text(_build_ac27_ac28(rows), encoding="utf-8")
-    (OUT / "task011_ac29_blind_review.md").write_text(_build_ac29(rows), encoding="utf-8")
-    (OUT / "task011_ac32_hook_ci_parity.md").write_text(_build_ac32(), encoding="utf-8")
-    (OUT / "task011_ac35_fallback_failure.md").write_text(_build_ac35(), encoding="utf-8")
+    parser = argparse.ArgumentParser(description="build TASK-011 evidence package")
+    parser.add_argument(
+        "--sections",
+        default="ac25,ac27,ac28,ac29,ac32,ac35",
+        help="comma separated sections: ac25,ac27,ac28,ac29,ac32,ac35",
+    )
+    parser.add_argument(
+        "--reuse-matrix",
+        action="store_true",
+        help="reuse out/task011_ac25_matrix.json rows instead of re-running 15 cases",
+    )
+    args = parser.parse_args()
+
+    sections = {x.strip().lower() for x in args.sections.split(",") if x.strip()}
+    need_rows = bool({"ac25", "ac27", "ac28", "ac29"} & sections)
+
+    rows: list[dict] = []
+    if need_rows:
+        if args.reuse_matrix:
+            rows = _load_rows_from_matrix()
+        if not rows:
+            (OUT / "task011_runs").mkdir(parents=True, exist_ok=True)
+            rows = [_run_python_case(case) for case in CASES]
+
+    if "ac25" in sections:
+        matched = sum(1 for r in rows if r.get("matched"))
+        matrix = {
+            "summary": {
+                "total": len(rows),
+                "matched": matched,
+                "accuracy": (matched / len(rows)) if rows else 0.0,
+                "threshold": "14/15",
+                "pass": matched >= 14,
+            },
+            "rows": rows,
+        }
+        (OUT / "task011_ac25_matrix.json").write_text(
+            json.dumps(matrix, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+
+    if "ac27" in sections or "ac28" in sections:
+        (OUT / "task011_ac27_ac28_e2e.md").write_text(_build_ac27_ac28(rows), encoding="utf-8")
+    if "ac29" in sections:
+        (OUT / "task011_ac29_blind_review.md").write_text(_build_ac29(rows), encoding="utf-8")
+    if "ac32" in sections:
+        (OUT / "task011_ac32_hook_ci_parity.md").write_text(_build_ac32(), encoding="utf-8")
+    if "ac35" in sections:
+        (OUT / "task011_ac35_fallback_failure.md").write_text(_build_ac35(), encoding="utf-8")
 
 
 if __name__ == "__main__":

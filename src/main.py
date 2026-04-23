@@ -125,9 +125,28 @@ def _sync_chosen_variant(payload: LyricPayload) -> None:
 def _apply_retrieval_profile_decision(trace: dict[str, Any]) -> None:
     profile_vote = str(trace.get("retrieval_profile_vote", "")).strip()
     vote_confidence = _safe_float(trace.get("retrieval_vote_confidence", 0.0), default=0.0)
+    explicit_active_profile = str(trace.get("active_profile", "")).strip()
     source_ids_raw = trace.get("few_shot_source_ids", [])
     source_ids = [str(x) for x in source_ids_raw] if isinstance(source_ids_raw, list) else []
     source_stage = str(trace.get("retrieval_profile_source", "initial")).strip() or "initial"
+    profile_source = str(trace.get("profile_source", "")).strip()
+
+    if explicit_active_profile:
+        if not profile_vote:
+            profile_vote = explicit_active_profile
+        if vote_confidence < (2 / 3):
+            vote_confidence = 1.0
+        trace["retrieval_profile_decision"] = {
+            "profile_vote": profile_vote,
+            "vote_confidence": vote_confidence,
+            "active_profile": explicit_active_profile,
+            "decision_reason": "activated",
+            "source_stage": source_stage,
+            "source_ids": source_ids,
+            "source": profile_source,
+        }
+        return
+
     if not profile_vote:
         profile_vote = _infer_profile_vote_from_source_ids(source_ids)
         vote_confidence = _infer_profile_confidence_from_source_ids(source_ids, profile_vote)
@@ -148,6 +167,7 @@ def _apply_retrieval_profile_decision(trace: dict[str, Any]) -> None:
         "decision_reason": decision_reason,
         "source_stage": source_stage,
         "source_ids": source_ids,
+        "source": profile_source,
     }
 
 
