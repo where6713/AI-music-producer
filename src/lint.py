@@ -67,6 +67,19 @@ RULE_DEFINITIONS: dict[str, RuleSeverity] = {
     "R17": RuleSeverity.SOFT_PENALTY,
 }
 
+RULE_WEIGHTS: dict[str, int] = {
+    "R01": 8,
+    "R02": 4,
+    "R03": 10,
+    "R05": 4,
+    "R06": 3,
+    "R14": 10,
+    "R15": 5,
+    "R16_global": 10,
+    "R16_profile": 5,
+    "R17": 3,
+}
+
 R14_FORBIDDEN_PHRASES = [
     "折成静默",
     "浇浅",
@@ -109,6 +122,20 @@ def evaluate_violation_severity(violations: list[Violation]) -> dict[str, Any]:
         "penalty_score": penalty_score,
         "death_reason": death_reason,
     }
+
+
+def calculate_craft_score(violations: list[Violation]) -> float:
+    failed_weights = 0
+    total_weights = sum(RULE_WEIGHTS.values())
+    failed_keys: set[str] = set()
+    for violation in violations:
+        key = _violation_rule_key(violation)
+        if key in failed_keys:
+            continue
+        failed_keys.add(key)
+        failed_weights += RULE_WEIGHTS.get(key, 1)
+    passed_weights = max(total_weights - failed_weights, 0)
+    return passed_weights / total_weights if total_weights else 0.0
 
 
 def _all_lines(payload: LyricPayload) -> list[tuple[str, int, str]]:
@@ -359,6 +386,7 @@ def lint_payload(
 
     failed_rules = sorted({v.rule for v in violations})
     severity = evaluate_violation_severity(violations)
+    craft_score = calculate_craft_score(violations)
     return {
         "pass": len(violations) == 0 and not severity["is_dead"],
         "failed_rules": failed_rules,
@@ -372,5 +400,6 @@ def lint_payload(
         "hard_penalty_count": severity["hard_penalty_count"],
         "soft_penalty_count": severity["soft_penalty_count"],
         "penalty_score": severity["penalty_score"],
+        "craft_score": craft_score,
         "all_dead_run_status": "",
     }

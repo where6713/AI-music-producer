@@ -190,6 +190,16 @@ def _write_rejected_trace(out_dir: Path, trace: dict[str, Any]) -> None:
     )
 
 
+def _fail_quality_floor(target_dir: Path, trace: dict[str, Any], *, dry_run: bool) -> None:
+    trace["run_status"] = "QUALITY_FLOOR_FAILED"
+    if dry_run:
+        typer.echo("dry-run complete")
+        typer.echo("run_status=QUALITY_FLOOR_FAILED")
+        raise typer.Exit(code=2)
+    _write_rejected_trace(target_dir, trace)
+    raise typer.Exit(code=2)
+
+
 @app.command("produce")
 def produce(
     raw_intent: str = typer.Argument(...),
@@ -315,6 +325,10 @@ def produce(
             raise typer.Exit(code=2)
         _write_rejected_trace(target_dir, trace)
         raise typer.Exit(code=2)
+
+    craft_score = float(lint_report.get("craft_score", 0.0) or 0.0)
+    if craft_score < 0.85:
+        _fail_quality_floor(target_dir, trace, dry_run=dry_run)
 
     if dry_run:
         typer.echo("dry-run complete")

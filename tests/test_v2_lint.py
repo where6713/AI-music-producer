@@ -139,3 +139,11 @@ def test_lint_applies_r17_threshold_by_profile(tmp_path) -> None:
 
     assert "R17" in report["failed_rules"]
     assert report["active_profile"] == "ambient_meditation"
+
+
+def test_lint_reports_craft_score_in_range() -> None:
+    payload = _payload("再把手放开", forbidden=["失恋三个月"])
+    report = lint_payload(payload)
+
+    assert "craft_score" in report
+    assert 0.0 <= float(report["craft_score"]) <= 1.0

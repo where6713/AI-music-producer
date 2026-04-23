@@ -373,6 +373,9 @@ def test_produce_sets_active_profile_and_source_in_trace(tmp_path, monkeypatch) 
             "exclude_tags": ["EDM"],
         }
     )
+    payload.variants[0].lyrics_by_section = payload.lyrics_by_section
+    payload.variants[1].lyrics_by_section = payload.lyrics_by_section
+    payload.variants[2].lyrics_by_section = payload.lyrics_by_section
 
     def _fake_generate(*_args, **_kwargs):
         return payload.model_copy(deep=True), {
@@ -391,7 +394,26 @@ def test_produce_sets_active_profile_and_source_in_trace(tmp_path, monkeypatch) 
     def _fake_write_outputs(_payload, _out_dir, trace):
         captured.update(trace)
 
+    def _fake_lint(_payload, **_kwargs):
+        return {
+            "pass": True,
+            "failed_rules": [],
+            "violations": [],
+            "active_profile": "urban_introspective",
+            "skipped_rules_by_profile": [],
+            "profile_specific_violations": [],
+            "is_dead": False,
+            "death_reason": [],
+            "hard_kill_rules": [],
+            "hard_penalty_count": 0,
+            "soft_penalty_count": 0,
+            "penalty_score": 0,
+            "craft_score": 0.9,
+            "all_dead_run_status": "",
+        }
+
     monkeypatch.setattr(main_mod, "generate_lyric_payload", _fake_generate)
+    monkeypatch.setattr(main_mod, "lint_payload", _fake_lint)
     monkeypatch.setattr(main_mod, "write_outputs", _fake_write_outputs)
 
     main_mod.produce(
@@ -504,21 +526,23 @@ def test_produce_verbose_prints_profile_source(tmp_path, monkeypatch, capsys) ->
 
     monkeypatch.setattr(main_mod, "generate_lyric_payload", _fake_generate)
 
-    main_mod.produce(
-        raw_intent="分手后夜里想发消息又忍住",
-        genre="",
-        mood="",
-        vocal="female",
-        profile="urban_introspective",
-        lang="zh-CN",
-        out_dir=str(tmp_path / "out"),
-        verbose=True,
-        dry_run=True,
-    )
+    with pytest.raises(Exception) as err:
+        main_mod.produce(
+            raw_intent="分手后夜里想发消息又忍住",
+            genre="",
+            mood="",
+            vocal="female",
+            profile="urban_introspective",
+            lang="zh-CN",
+            out_dir=str(tmp_path / "out"),
+            verbose=True,
+            dry_run=True,
+        )
+
+    assert getattr(err.value, "exit_code", None) == 2
 
     out = capsys.readouterr().out
-    assert "active_profile=urban_introspective" in out
-    assert "profile_source=cli_override" in out
+    assert "run_status=QUALITY_FLOOR_FAILED" in out
 
 
 def test_apply_retrieval_profile_decision_uses_router_active_profile_when_present() -> None:
@@ -666,6 +690,76 @@ def test_produce_rejects_when_postprocess_result_is_dead(tmp_path, monkeypatch) 
 
     def _fail_write_outputs(*_args, **_kwargs):
         raise AssertionError("write_outputs should not be called when postprocess is dead")
+
+    monkeypatch.setattr(main_mod, "generate_lyric_payload", _fake_generate)
+    monkeypatch.setattr(main_mod, "lint_payload", _fake_lint)
+    monkeypatch.setattr(main_mod, "write_outputs", _fail_write_outputs)
+
+    with pytest.raises(Exception) as err:
+        main_mod.produce(
+            raw_intent="分手后夜里想发消息又忍住",
+            genre="",
+            mood="",
+            vocal="female",
+            profile="urban_introspective",
+            lang="zh-CN",
+            out_dir=str(tmp_path / "out"),
+            verbose=False,
+            dry_run=False,
+        )
+
+    assert getattr(err.value, "exit_code", None) == 2
+    assert not (tmp_path / "out" / "lyrics.txt").exists()
+    assert (tmp_path / "out" / "trace.json").exists()
+
+
+def test_produce_fails_quality_floor_and_skips_lyrics_write(tmp_path, monkeypatch) -> None:
+    from src import main as main_mod
+
+    payload = _payload()
+    payload.variants[0].lyrics_by_section = payload.lyrics_by_section
+    payload.variants[1].lyrics_by_section = payload.lyrics_by_section
+    payload.variants[2].lyrics_by_section = payload.lyrics_by_section
+
+    def _fake_generate(*_args, **_kwargs):
+        return payload.model_copy(deep=True), {
+            "provider": "openai-compatible",
+            "model_used": "gpt-5.3-codex",
+            "usage": {"input_tokens": 1, "output_tokens": 1, "total_tokens": 2},
+            "llm_calls": 1,
+            "few_shot_source_ids": ["lyric-modern-101", "lyric-modern-102", "poem-jys-001"],
+            "retrieval_profile_vote": "urban_introspective",
+            "retrieval_vote_confidence": 0.67,
+            "stage": "initial",
+        }
+
+    def _fake_lint(_payload, **_kwargs):
+        return {
+            "pass": True,
+            "failed_rules": ["R05"],
+            "violations": [
+                {
+                    "rule": "R05",
+                    "detail": "line length out of tolerance",
+                    "section": "[Chorus]",
+                    "line": 1,
+                }
+            ],
+            "active_profile": "urban_introspective",
+            "skipped_rules_by_profile": [],
+            "profile_specific_violations": [],
+            "is_dead": False,
+            "death_reason": [],
+            "hard_kill_rules": [],
+            "hard_penalty_count": 0,
+            "soft_penalty_count": 1,
+            "penalty_score": 1,
+            "craft_score": 0.7,
+            "all_dead_run_status": "",
+        }
+
+    def _fail_write_outputs(*_args, **_kwargs):
+        raise AssertionError("write_outputs should not be called on quality floor failure")
 
     monkeypatch.setattr(main_mod, "generate_lyric_payload", _fake_generate)
     monkeypatch.setattr(main_mod, "lint_payload", _fake_lint)
