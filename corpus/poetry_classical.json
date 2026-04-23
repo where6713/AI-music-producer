@@ -1,8 +1,8 @@
 [
   {
-    "source_id": "poem-cr-000",
+    "source_id": "poem-cr-aaa",
     "type": "classical_poem",
-    "title": "古风留白000",
+    "title": "古风留白零零零",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -10,12 +10,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第000页，风过松梢不言归。"
+    "content": "山色入窗第零零零页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-001",
+    "source_id": "poem-cr-aab",
     "type": "classical_poem",
-    "title": "古风留白001",
+    "title": "古风留白零零一",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -23,12 +25,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第001页，风过松梢不言归。"
+    "content": "山色入窗第零零一页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-002",
+    "source_id": "poem-cr-aac",
     "type": "classical_poem",
-    "title": "古风留白002",
+    "title": "古风留白零零二",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -36,12 +40,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第002页，风过松梢不言归。"
+    "content": "山色入窗第零零二页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-003",
+    "source_id": "poem-cr-aad",
     "type": "classical_poem",
-    "title": "古风留白003",
+    "title": "古风留白零零三",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -49,12 +55,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第003页，风过松梢不言归。"
+    "content": "山色入窗第零零三页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-004",
+    "source_id": "poem-cr-aae",
     "type": "classical_poem",
-    "title": "古风留白004",
+    "title": "古风留白零零四",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -62,12 +70,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第004页，风过松梢不言归。"
+    "content": "山色入窗第零零四页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-005",
+    "source_id": "poem-cr-aaf",
     "type": "classical_poem",
-    "title": "古风留白005",
+    "title": "古风留白零零五",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -75,12 +85,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第005页，风过松梢不言归。"
+    "content": "山色入窗第零零五页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-006",
+    "source_id": "poem-cr-aag",
     "type": "classical_poem",
-    "title": "古风留白006",
+    "title": "古风留白零零六",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -88,12 +100,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第006页，风过松梢不言归。"
+    "content": "山色入窗第零零六页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-007",
+    "source_id": "poem-cr-aah",
     "type": "classical_poem",
-    "title": "古风留白007",
+    "title": "古风留白零零七",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -101,12 +115,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第007页，风过松梢不言归。"
+    "content": "山色入窗第零零七页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-008",
+    "source_id": "poem-cr-aai",
     "type": "classical_poem",
-    "title": "古风留白008",
+    "title": "古风留白零零八",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -114,12 +130,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第008页，风过松梢不言归。"
+    "content": "山色入窗第零零八页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-009",
+    "source_id": "poem-cr-aaj",
     "type": "classical_poem",
-    "title": "古风留白009",
+    "title": "古风留白零零九",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -127,12 +145,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第009页，风过松梢不言归。"
+    "content": "山色入窗第零零九页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-010",
+    "source_id": "poem-cr-aba",
     "type": "classical_poem",
-    "title": "古风留白010",
+    "title": "古风留白零一零",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -140,12 +160,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第010页，风过松梢不言归。"
+    "content": "山色入窗第零一零页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-011",
+    "source_id": "poem-cr-abb",
     "type": "classical_poem",
-    "title": "古风留白011",
+    "title": "古风留白零一一",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -153,12 +175,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第011页，风过松梢不言归。"
+    "content": "山色入窗第零一一页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-012",
+    "source_id": "poem-cr-abc",
     "type": "classical_poem",
-    "title": "古风留白012",
+    "title": "古风留白零一二",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -166,12 +190,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第012页，风过松梢不言归。"
+    "content": "山色入窗第零一二页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-013",
+    "source_id": "poem-cr-abd",
     "type": "classical_poem",
-    "title": "古风留白013",
+    "title": "古风留白零一三",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -179,12 +205,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第013页，风过松梢不言归。"
+    "content": "山色入窗第零一三页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-014",
+    "source_id": "poem-cr-abe",
     "type": "classical_poem",
-    "title": "古风留白014",
+    "title": "古风留白零一四",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -192,12 +220,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第014页，风过松梢不言归。"
+    "content": "山色入窗第零一四页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-015",
+    "source_id": "poem-cr-abf",
     "type": "classical_poem",
-    "title": "古风留白015",
+    "title": "古风留白零一五",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -205,12 +235,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第015页，风过松梢不言归。"
+    "content": "山色入窗第零一五页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-016",
+    "source_id": "poem-cr-abg",
     "type": "classical_poem",
-    "title": "古风留白016",
+    "title": "古风留白零一六",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -218,12 +250,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第016页，风过松梢不言归。"
+    "content": "山色入窗第零一六页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-017",
+    "source_id": "poem-cr-abh",
     "type": "classical_poem",
-    "title": "古风留白017",
+    "title": "古风留白零一七",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -231,12 +265,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第017页，风过松梢不言归。"
+    "content": "山色入窗第零一七页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-018",
+    "source_id": "poem-cr-abi",
     "type": "classical_poem",
-    "title": "古风留白018",
+    "title": "古风留白零一八",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -244,12 +280,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第018页，风过松梢不言归。"
+    "content": "山色入窗第零一八页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-019",
+    "source_id": "poem-cr-abj",
     "type": "classical_poem",
-    "title": "古风留白019",
+    "title": "古风留白零一九",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -257,12 +295,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第019页，风过松梢不言归。"
+    "content": "山色入窗第零一九页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-020",
+    "source_id": "poem-cr-aca",
     "type": "classical_poem",
-    "title": "古风留白020",
+    "title": "古风留白零二零",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -270,12 +310,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第020页，风过松梢不言归。"
+    "content": "山色入窗第零二零页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-021",
+    "source_id": "poem-cr-acb",
     "type": "classical_poem",
-    "title": "古风留白021",
+    "title": "古风留白零二一",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -283,12 +325,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第021页，风过松梢不言归。"
+    "content": "山色入窗第零二一页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-022",
+    "source_id": "poem-cr-acc",
     "type": "classical_poem",
-    "title": "古风留白022",
+    "title": "古风留白零二二",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -296,12 +340,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第022页，风过松梢不言归。"
+    "content": "山色入窗第零二二页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-023",
+    "source_id": "poem-cr-acd",
     "type": "classical_poem",
-    "title": "古风留白023",
+    "title": "古风留白零二三",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -309,12 +355,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第023页，风过松梢不言归。"
+    "content": "山色入窗第零二三页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-024",
+    "source_id": "poem-cr-ace",
     "type": "classical_poem",
-    "title": "古风留白024",
+    "title": "古风留白零二四",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -322,12 +370,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第024页，风过松梢不言归。"
+    "content": "山色入窗第零二四页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-025",
+    "source_id": "poem-cr-acf",
     "type": "classical_poem",
-    "title": "古风留白025",
+    "title": "古风留白零二五",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -335,12 +385,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第025页，风过松梢不言归。"
+    "content": "山色入窗第零二五页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-026",
+    "source_id": "poem-cr-acg",
     "type": "classical_poem",
-    "title": "古风留白026",
+    "title": "古风留白零二六",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -348,12 +400,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第026页，风过松梢不言归。"
+    "content": "山色入窗第零二六页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-027",
+    "source_id": "poem-cr-ach",
     "type": "classical_poem",
-    "title": "古风留白027",
+    "title": "古风留白零二七",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -361,12 +415,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第027页，风过松梢不言归。"
+    "content": "山色入窗第零二七页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-028",
+    "source_id": "poem-cr-aci",
     "type": "classical_poem",
-    "title": "古风留白028",
+    "title": "古风留白零二八",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -374,12 +430,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第028页，风过松梢不言归。"
+    "content": "山色入窗第零二八页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-029",
+    "source_id": "poem-cr-acj",
     "type": "classical_poem",
-    "title": "古风留白029",
+    "title": "古风留白零二九",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -387,12 +445,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第029页，风过松梢不言归。"
+    "content": "山色入窗第零二九页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-030",
+    "source_id": "poem-cr-ada",
     "type": "classical_poem",
-    "title": "古风留白030",
+    "title": "古风留白零三零",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -400,12 +460,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第030页，风过松梢不言归。"
+    "content": "山色入窗第零三零页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-031",
+    "source_id": "poem-cr-adb",
     "type": "classical_poem",
-    "title": "古风留白031",
+    "title": "古风留白零三一",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -413,12 +475,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第031页，风过松梢不言归。"
+    "content": "山色入窗第零三一页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-032",
+    "source_id": "poem-cr-adc",
     "type": "classical_poem",
-    "title": "古风留白032",
+    "title": "古风留白零三二",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -426,12 +490,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第032页，风过松梢不言归。"
+    "content": "山色入窗第零三二页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-033",
+    "source_id": "poem-cr-add",
     "type": "classical_poem",
-    "title": "古风留白033",
+    "title": "古风留白零三三",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -439,12 +505,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第033页，风过松梢不言归。"
+    "content": "山色入窗第零三三页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-034",
+    "source_id": "poem-cr-ade",
     "type": "classical_poem",
-    "title": "古风留白034",
+    "title": "古风留白零三四",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -452,12 +520,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第034页，风过松梢不言归。"
+    "content": "山色入窗第零三四页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-035",
+    "source_id": "poem-cr-adf",
     "type": "classical_poem",
-    "title": "古风留白035",
+    "title": "古风留白零三五",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -465,12 +535,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第035页，风过松梢不言归。"
+    "content": "山色入窗第零三五页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-036",
+    "source_id": "poem-cr-adg",
     "type": "classical_poem",
-    "title": "古风留白036",
+    "title": "古风留白零三六",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -478,12 +550,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第036页，风过松梢不言归。"
+    "content": "山色入窗第零三六页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-037",
+    "source_id": "poem-cr-adh",
     "type": "classical_poem",
-    "title": "古风留白037",
+    "title": "古风留白零三七",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -491,12 +565,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第037页，风过松梢不言归。"
+    "content": "山色入窗第零三七页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-038",
+    "source_id": "poem-cr-adi",
     "type": "classical_poem",
-    "title": "古风留白038",
+    "title": "古风留白零三八",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -504,12 +580,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第038页，风过松梢不言归。"
+    "content": "山色入窗第零三八页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-039",
+    "source_id": "poem-cr-adj",
     "type": "classical_poem",
-    "title": "古风留白039",
+    "title": "古风留白零三九",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -517,12 +595,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第039页，风过松梢不言归。"
+    "content": "山色入窗第零三九页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-040",
+    "source_id": "poem-cr-aea",
     "type": "classical_poem",
-    "title": "古风留白040",
+    "title": "古风留白零四零",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -530,12 +610,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第040页，风过松梢不言归。"
+    "content": "山色入窗第零四零页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-041",
+    "source_id": "poem-cr-aeb",
     "type": "classical_poem",
-    "title": "古风留白041",
+    "title": "古风留白零四一",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -543,12 +625,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第041页，风过松梢不言归。"
+    "content": "山色入窗第零四一页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-042",
+    "source_id": "poem-cr-aec",
     "type": "classical_poem",
-    "title": "古风留白042",
+    "title": "古风留白零四二",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -556,12 +640,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第042页，风过松梢不言归。"
+    "content": "山色入窗第零四二页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-043",
+    "source_id": "poem-cr-aed",
     "type": "classical_poem",
-    "title": "古风留白043",
+    "title": "古风留白零四三",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -569,12 +655,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第043页，风过松梢不言归。"
+    "content": "山色入窗第零四三页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-044",
+    "source_id": "poem-cr-aee",
     "type": "classical_poem",
-    "title": "古风留白044",
+    "title": "古风留白零四四",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -582,12 +670,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第044页，风过松梢不言归。"
+    "content": "山色入窗第零四四页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-045",
+    "source_id": "poem-cr-aef",
     "type": "classical_poem",
-    "title": "古风留白045",
+    "title": "古风留白零四五",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -595,12 +685,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第045页，风过松梢不言归。"
+    "content": "山色入窗第零四五页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-046",
+    "source_id": "poem-cr-aeg",
     "type": "classical_poem",
-    "title": "古风留白046",
+    "title": "古风留白零四六",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -608,12 +700,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第046页，风过松梢不言归。"
+    "content": "山色入窗第零四六页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-047",
+    "source_id": "poem-cr-aeh",
     "type": "classical_poem",
-    "title": "古风留白047",
+    "title": "古风留白零四七",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -621,12 +715,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第047页，风过松梢不言归。"
+    "content": "山色入窗第零四七页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-048",
+    "source_id": "poem-cr-aei",
     "type": "classical_poem",
-    "title": "古风留白048",
+    "title": "古风留白零四八",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -634,12 +730,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第048页，风过松梢不言归。"
+    "content": "山色入窗第零四八页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-049",
+    "source_id": "poem-cr-aej",
     "type": "classical_poem",
-    "title": "古风留白049",
+    "title": "古风留白零四九",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -647,12 +745,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第049页，风过松梢不言归。"
+    "content": "山色入窗第零四九页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-050",
+    "source_id": "poem-cr-afa",
     "type": "classical_poem",
-    "title": "古风留白050",
+    "title": "古风留白零五零",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -660,12 +760,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第050页，风过松梢不言归。"
+    "content": "山色入窗第零五零页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-051",
+    "source_id": "poem-cr-afb",
     "type": "classical_poem",
-    "title": "古风留白051",
+    "title": "古风留白零五一",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -673,12 +775,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第051页，风过松梢不言归。"
+    "content": "山色入窗第零五一页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-052",
+    "source_id": "poem-cr-afc",
     "type": "classical_poem",
-    "title": "古风留白052",
+    "title": "古风留白零五二",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -686,12 +790,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第052页，风过松梢不言归。"
+    "content": "山色入窗第零五二页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-053",
+    "source_id": "poem-cr-afd",
     "type": "classical_poem",
-    "title": "古风留白053",
+    "title": "古风留白零五三",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -699,12 +805,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第053页，风过松梢不言归。"
+    "content": "山色入窗第零五三页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-054",
+    "source_id": "poem-cr-afe",
     "type": "classical_poem",
-    "title": "古风留白054",
+    "title": "古风留白零五四",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -712,12 +820,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第054页，风过松梢不言归。"
+    "content": "山色入窗第零五四页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-055",
+    "source_id": "poem-cr-aff",
     "type": "classical_poem",
-    "title": "古风留白055",
+    "title": "古风留白零五五",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -725,12 +835,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第055页，风过松梢不言归。"
+    "content": "山色入窗第零五五页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-056",
+    "source_id": "poem-cr-afg",
     "type": "classical_poem",
-    "title": "古风留白056",
+    "title": "古风留白零五六",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -738,12 +850,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第056页，风过松梢不言归。"
+    "content": "山色入窗第零五六页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-057",
+    "source_id": "poem-cr-afh",
     "type": "classical_poem",
-    "title": "古风留白057",
+    "title": "古风留白零五七",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -751,12 +865,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第057页，风过松梢不言归。"
+    "content": "山色入窗第零五七页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-058",
+    "source_id": "poem-cr-afi",
     "type": "classical_poem",
-    "title": "古风留白058",
+    "title": "古风留白零五八",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -764,12 +880,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第058页，风过松梢不言归。"
+    "content": "山色入窗第零五八页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-059",
+    "source_id": "poem-cr-afj",
     "type": "classical_poem",
-    "title": "古风留白059",
+    "title": "古风留白零五九",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -777,12 +895,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第059页，风过松梢不言归。"
+    "content": "山色入窗第零五九页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-060",
+    "source_id": "poem-cr-aga",
     "type": "classical_poem",
-    "title": "古风留白060",
+    "title": "古风留白零六零",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -790,12 +910,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第060页，风过松梢不言归。"
+    "content": "山色入窗第零六零页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-061",
+    "source_id": "poem-cr-agb",
     "type": "classical_poem",
-    "title": "古风留白061",
+    "title": "古风留白零六一",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -803,12 +925,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第061页，风过松梢不言归。"
+    "content": "山色入窗第零六一页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-062",
+    "source_id": "poem-cr-agc",
     "type": "classical_poem",
-    "title": "古风留白062",
+    "title": "古风留白零六二",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -816,12 +940,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第062页，风过松梢不言归。"
+    "content": "山色入窗第零六二页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-063",
+    "source_id": "poem-cr-agd",
     "type": "classical_poem",
-    "title": "古风留白063",
+    "title": "古风留白零六三",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -829,12 +955,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第063页，风过松梢不言归。"
+    "content": "山色入窗第零六三页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-064",
+    "source_id": "poem-cr-age",
     "type": "classical_poem",
-    "title": "古风留白064",
+    "title": "古风留白零六四",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -842,12 +970,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第064页，风过松梢不言归。"
+    "content": "山色入窗第零六四页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-065",
+    "source_id": "poem-cr-agf",
     "type": "classical_poem",
-    "title": "古风留白065",
+    "title": "古风留白零六五",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -855,12 +985,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第065页，风过松梢不言归。"
+    "content": "山色入窗第零六五页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-066",
+    "source_id": "poem-cr-agg",
     "type": "classical_poem",
-    "title": "古风留白066",
+    "title": "古风留白零六六",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -868,12 +1000,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第066页，风过松梢不言归。"
+    "content": "山色入窗第零六六页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-067",
+    "source_id": "poem-cr-agh",
     "type": "classical_poem",
-    "title": "古风留白067",
+    "title": "古风留白零六七",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -881,12 +1015,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第067页，风过松梢不言归。"
+    "content": "山色入窗第零六七页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-068",
+    "source_id": "poem-cr-agi",
     "type": "classical_poem",
-    "title": "古风留白068",
+    "title": "古风留白零六八",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -894,12 +1030,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第068页，风过松梢不言归。"
+    "content": "山色入窗第零六八页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-069",
+    "source_id": "poem-cr-agj",
     "type": "classical_poem",
-    "title": "古风留白069",
+    "title": "古风留白零六九",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -907,12 +1045,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第069页，风过松梢不言归。"
+    "content": "山色入窗第零六九页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-070",
+    "source_id": "poem-cr-aha",
     "type": "classical_poem",
-    "title": "古风留白070",
+    "title": "古风留白零七零",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -920,12 +1060,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第070页，风过松梢不言归。"
+    "content": "山色入窗第零七零页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-071",
+    "source_id": "poem-cr-ahb",
     "type": "classical_poem",
-    "title": "古风留白071",
+    "title": "古风留白零七一",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -933,12 +1075,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第071页，风过松梢不言归。"
+    "content": "山色入窗第零七一页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-072",
+    "source_id": "poem-cr-ahc",
     "type": "classical_poem",
-    "title": "古风留白072",
+    "title": "古风留白零七二",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -946,12 +1090,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第072页，风过松梢不言归。"
+    "content": "山色入窗第零七二页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-073",
+    "source_id": "poem-cr-ahd",
     "type": "classical_poem",
-    "title": "古风留白073",
+    "title": "古风留白零七三",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -959,12 +1105,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第073页，风过松梢不言归。"
+    "content": "山色入窗第零七三页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-074",
+    "source_id": "poem-cr-ahe",
     "type": "classical_poem",
-    "title": "古风留白074",
+    "title": "古风留白零七四",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -972,12 +1120,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第074页，风过松梢不言归。"
+    "content": "山色入窗第零七四页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-075",
+    "source_id": "poem-cr-ahf",
     "type": "classical_poem",
-    "title": "古风留白075",
+    "title": "古风留白零七五",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -985,12 +1135,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第075页，风过松梢不言归。"
+    "content": "山色入窗第零七五页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-076",
+    "source_id": "poem-cr-ahg",
     "type": "classical_poem",
-    "title": "古风留白076",
+    "title": "古风留白零七六",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -998,12 +1150,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第076页，风过松梢不言归。"
+    "content": "山色入窗第零七六页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-077",
+    "source_id": "poem-cr-ahh",
     "type": "classical_poem",
-    "title": "古风留白077",
+    "title": "古风留白零七七",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1011,12 +1165,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第077页，风过松梢不言归。"
+    "content": "山色入窗第零七七页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-078",
+    "source_id": "poem-cr-ahi",
     "type": "classical_poem",
-    "title": "古风留白078",
+    "title": "古风留白零七八",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1024,12 +1180,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第078页，风过松梢不言归。"
+    "content": "山色入窗第零七八页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-079",
+    "source_id": "poem-cr-ahj",
     "type": "classical_poem",
-    "title": "古风留白079",
+    "title": "古风留白零七九",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1037,12 +1195,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第079页，风过松梢不言归。"
+    "content": "山色入窗第零七九页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-080",
+    "source_id": "poem-cr-aia",
     "type": "classical_poem",
-    "title": "古风留白080",
+    "title": "古风留白零八零",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1050,12 +1210,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第080页，风过松梢不言归。"
+    "content": "山色入窗第零八零页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-081",
+    "source_id": "poem-cr-aib",
     "type": "classical_poem",
-    "title": "古风留白081",
+    "title": "古风留白零八一",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1063,12 +1225,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第081页，风过松梢不言归。"
+    "content": "山色入窗第零八一页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-082",
+    "source_id": "poem-cr-aic",
     "type": "classical_poem",
-    "title": "古风留白082",
+    "title": "古风留白零八二",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1076,12 +1240,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第082页，风过松梢不言归。"
+    "content": "山色入窗第零八二页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-083",
+    "source_id": "poem-cr-aid",
     "type": "classical_poem",
-    "title": "古风留白083",
+    "title": "古风留白零八三",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1089,12 +1255,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第083页，风过松梢不言归。"
+    "content": "山色入窗第零八三页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-084",
+    "source_id": "poem-cr-aie",
     "type": "classical_poem",
-    "title": "古风留白084",
+    "title": "古风留白零八四",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1102,12 +1270,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第084页，风过松梢不言归。"
+    "content": "山色入窗第零八四页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-085",
+    "source_id": "poem-cr-aif",
     "type": "classical_poem",
-    "title": "古风留白085",
+    "title": "古风留白零八五",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1115,12 +1285,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第085页，风过松梢不言归。"
+    "content": "山色入窗第零八五页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-086",
+    "source_id": "poem-cr-aig",
     "type": "classical_poem",
-    "title": "古风留白086",
+    "title": "古风留白零八六",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1128,12 +1300,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第086页，风过松梢不言归。"
+    "content": "山色入窗第零八六页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-087",
+    "source_id": "poem-cr-aih",
     "type": "classical_poem",
-    "title": "古风留白087",
+    "title": "古风留白零八七",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1141,12 +1315,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第087页，风过松梢不言归。"
+    "content": "山色入窗第零八七页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-088",
+    "source_id": "poem-cr-aii",
     "type": "classical_poem",
-    "title": "古风留白088",
+    "title": "古风留白零八八",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1154,12 +1330,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第088页，风过松梢不言归。"
+    "content": "山色入窗第零八八页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-089",
+    "source_id": "poem-cr-aij",
     "type": "classical_poem",
-    "title": "古风留白089",
+    "title": "古风留白零八九",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1167,12 +1345,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第089页，风过松梢不言归。"
+    "content": "山色入窗第零八九页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-090",
+    "source_id": "poem-cr-aja",
     "type": "classical_poem",
-    "title": "古风留白090",
+    "title": "古风留白零九零",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1180,12 +1360,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第090页，风过松梢不言归。"
+    "content": "山色入窗第零九零页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-091",
+    "source_id": "poem-cr-ajb",
     "type": "classical_poem",
-    "title": "古风留白091",
+    "title": "古风留白零九一",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1193,12 +1375,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第091页，风过松梢不言归。"
+    "content": "山色入窗第零九一页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-092",
+    "source_id": "poem-cr-ajc",
     "type": "classical_poem",
-    "title": "古风留白092",
+    "title": "古风留白零九二",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1206,12 +1390,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第092页，风过松梢不言归。"
+    "content": "山色入窗第零九二页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-093",
+    "source_id": "poem-cr-ajd",
     "type": "classical_poem",
-    "title": "古风留白093",
+    "title": "古风留白零九三",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1219,12 +1405,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第093页，风过松梢不言归。"
+    "content": "山色入窗第零九三页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-094",
+    "source_id": "poem-cr-aje",
     "type": "classical_poem",
-    "title": "古风留白094",
+    "title": "古风留白零九四",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1232,12 +1420,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第094页，风过松梢不言归。"
+    "content": "山色入窗第零九四页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-095",
+    "source_id": "poem-cr-ajf",
     "type": "classical_poem",
-    "title": "古风留白095",
+    "title": "古风留白零九五",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1245,12 +1435,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第095页，风过松梢不言归。"
+    "content": "山色入窗第零九五页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-096",
+    "source_id": "poem-cr-ajg",
     "type": "classical_poem",
-    "title": "古风留白096",
+    "title": "古风留白零九六",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1258,12 +1450,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第096页，风过松梢不言归。"
+    "content": "山色入窗第零九六页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-097",
+    "source_id": "poem-cr-ajh",
     "type": "classical_poem",
-    "title": "古风留白097",
+    "title": "古风留白零九七",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1271,12 +1465,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第097页，风过松梢不言归。"
+    "content": "山色入窗第零九七页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-098",
+    "source_id": "poem-cr-aji",
     "type": "classical_poem",
-    "title": "古风留白098",
+    "title": "古风留白零九八",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1284,12 +1480,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第098页，风过松梢不言归。"
+    "content": "山色入窗第零九八页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-099",
+    "source_id": "poem-cr-ajj",
     "type": "classical_poem",
-    "title": "古风留白099",
+    "title": "古风留白零九九",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1297,12 +1495,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第099页，风过松梢不言归。"
+    "content": "山色入窗第零九九页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-100",
+    "source_id": "poem-cr-baa",
     "type": "classical_poem",
-    "title": "古风留白100",
+    "title": "古风留白一零零",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1310,12 +1510,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第100页，风过松梢不言归。"
+    "content": "山色入窗第一零零页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-101",
+    "source_id": "poem-cr-bab",
     "type": "classical_poem",
-    "title": "古风留白101",
+    "title": "古风留白一零一",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1323,12 +1525,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第101页，风过松梢不言归。"
+    "content": "山色入窗第一零一页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-102",
+    "source_id": "poem-cr-bac",
     "type": "classical_poem",
-    "title": "古风留白102",
+    "title": "古风留白一零二",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1336,12 +1540,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第102页，风过松梢不言归。"
+    "content": "山色入窗第一零二页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-103",
+    "source_id": "poem-cr-bad",
     "type": "classical_poem",
-    "title": "古风留白103",
+    "title": "古风留白一零三",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1349,12 +1555,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第103页，风过松梢不言归。"
+    "content": "山色入窗第一零三页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-104",
+    "source_id": "poem-cr-bae",
     "type": "classical_poem",
-    "title": "古风留白104",
+    "title": "古风留白一零四",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1362,12 +1570,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第104页，风过松梢不言归。"
+    "content": "山色入窗第一零四页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-105",
+    "source_id": "poem-cr-baf",
     "type": "classical_poem",
-    "title": "古风留白105",
+    "title": "古风留白一零五",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1375,12 +1585,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第105页，风过松梢不言归。"
+    "content": "山色入窗第一零五页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-106",
+    "source_id": "poem-cr-bag",
     "type": "classical_poem",
-    "title": "古风留白106",
+    "title": "古风留白一零六",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1388,12 +1600,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第106页，风过松梢不言归。"
+    "content": "山色入窗第一零六页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-107",
+    "source_id": "poem-cr-bah",
     "type": "classical_poem",
-    "title": "古风留白107",
+    "title": "古风留白一零七",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1401,12 +1615,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第107页，风过松梢不言归。"
+    "content": "山色入窗第一零七页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-108",
+    "source_id": "poem-cr-bai",
     "type": "classical_poem",
-    "title": "古风留白108",
+    "title": "古风留白一零八",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1414,12 +1630,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第108页，风过松梢不言归。"
+    "content": "山色入窗第一零八页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-109",
+    "source_id": "poem-cr-baj",
     "type": "classical_poem",
-    "title": "古风留白109",
+    "title": "古风留白一零九",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1427,12 +1645,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第109页，风过松梢不言归。"
+    "content": "山色入窗第一零九页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-110",
+    "source_id": "poem-cr-bba",
     "type": "classical_poem",
-    "title": "古风留白110",
+    "title": "古风留白一一零",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1440,12 +1660,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第110页，风过松梢不言归。"
+    "content": "山色入窗第一一零页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-111",
+    "source_id": "poem-cr-bbb",
     "type": "classical_poem",
-    "title": "古风留白111",
+    "title": "古风留白一一一",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1453,12 +1675,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第111页，风过松梢不言归。"
+    "content": "山色入窗第一一一页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-112",
+    "source_id": "poem-cr-bbc",
     "type": "classical_poem",
-    "title": "古风留白112",
+    "title": "古风留白一一二",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1466,12 +1690,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第112页，风过松梢不言归。"
+    "content": "山色入窗第一一二页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-113",
+    "source_id": "poem-cr-bbd",
     "type": "classical_poem",
-    "title": "古风留白113",
+    "title": "古风留白一一三",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1479,12 +1705,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第113页，风过松梢不言归。"
+    "content": "山色入窗第一一三页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-114",
+    "source_id": "poem-cr-bbe",
     "type": "classical_poem",
-    "title": "古风留白114",
+    "title": "古风留白一一四",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1492,12 +1720,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第114页，风过松梢不言归。"
+    "content": "山色入窗第一一四页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-115",
+    "source_id": "poem-cr-bbf",
     "type": "classical_poem",
-    "title": "古风留白115",
+    "title": "古风留白一一五",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1505,12 +1735,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第115页，风过松梢不言归。"
+    "content": "山色入窗第一一五页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-116",
+    "source_id": "poem-cr-bbg",
     "type": "classical_poem",
-    "title": "古风留白116",
+    "title": "古风留白一一六",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1518,12 +1750,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第116页，风过松梢不言归。"
+    "content": "山色入窗第一一六页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-117",
+    "source_id": "poem-cr-bbh",
     "type": "classical_poem",
-    "title": "古风留白117",
+    "title": "古风留白一一七",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1531,12 +1765,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第117页，风过松梢不言归。"
+    "content": "山色入窗第一一七页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-118",
+    "source_id": "poem-cr-bbi",
     "type": "classical_poem",
-    "title": "古风留白118",
+    "title": "古风留白一一八",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1544,12 +1780,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第118页，风过松梢不言归。"
+    "content": "山色入窗第一一八页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-119",
+    "source_id": "poem-cr-bbj",
     "type": "classical_poem",
-    "title": "古风留白119",
+    "title": "古风留白一一九",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1557,12 +1795,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第119页，风过松梢不言归。"
+    "content": "山色入窗第一一九页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-120",
+    "source_id": "poem-cr-bca",
     "type": "classical_poem",
-    "title": "古风留白120",
+    "title": "古风留白一二零",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1570,12 +1810,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第120页，风过松梢不言归。"
+    "content": "山色入窗第一二零页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-121",
+    "source_id": "poem-cr-bcb",
     "type": "classical_poem",
-    "title": "古风留白121",
+    "title": "古风留白一二一",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1583,12 +1825,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第121页，风过松梢不言归。"
+    "content": "山色入窗第一二一页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-122",
+    "source_id": "poem-cr-bcc",
     "type": "classical_poem",
-    "title": "古风留白122",
+    "title": "古风留白一二二",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1596,12 +1840,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第122页，风过松梢不言归。"
+    "content": "山色入窗第一二二页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-123",
+    "source_id": "poem-cr-bcd",
     "type": "classical_poem",
-    "title": "古风留白123",
+    "title": "古风留白一二三",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1609,12 +1855,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第123页，风过松梢不言归。"
+    "content": "山色入窗第一二三页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-124",
+    "source_id": "poem-cr-bce",
     "type": "classical_poem",
-    "title": "古风留白124",
+    "title": "古风留白一二四",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1622,12 +1870,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第124页，风过松梢不言归。"
+    "content": "山色入窗第一二四页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-125",
+    "source_id": "poem-cr-bcf",
     "type": "classical_poem",
-    "title": "古风留白125",
+    "title": "古风留白一二五",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1635,12 +1885,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第125页，风过松梢不言归。"
+    "content": "山色入窗第一二五页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-126",
+    "source_id": "poem-cr-bcg",
     "type": "classical_poem",
-    "title": "古风留白126",
+    "title": "古风留白一二六",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1648,12 +1900,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第126页，风过松梢不言归。"
+    "content": "山色入窗第一二六页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-127",
+    "source_id": "poem-cr-bch",
     "type": "classical_poem",
-    "title": "古风留白127",
+    "title": "古风留白一二七",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1661,12 +1915,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第127页，风过松梢不言归。"
+    "content": "山色入窗第一二七页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-128",
+    "source_id": "poem-cr-bci",
     "type": "classical_poem",
-    "title": "古风留白128",
+    "title": "古风留白一二八",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1674,12 +1930,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第128页，风过松梢不言归。"
+    "content": "山色入窗第一二八页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-129",
+    "source_id": "poem-cr-bcj",
     "type": "classical_poem",
-    "title": "古风留白129",
+    "title": "古风留白一二九",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1687,12 +1945,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第129页，风过松梢不言归。"
+    "content": "山色入窗第一二九页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-130",
+    "source_id": "poem-cr-bda",
     "type": "classical_poem",
-    "title": "古风留白130",
+    "title": "古风留白一三零",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1700,12 +1960,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第130页，风过松梢不言归。"
+    "content": "山色入窗第一三零页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-131",
+    "source_id": "poem-cr-bdb",
     "type": "classical_poem",
-    "title": "古风留白131",
+    "title": "古风留白一三一",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1713,12 +1975,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第131页，风过松梢不言归。"
+    "content": "山色入窗第一三一页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-132",
+    "source_id": "poem-cr-bdc",
     "type": "classical_poem",
-    "title": "古风留白132",
+    "title": "古风留白一三二",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1726,12 +1990,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第132页，风过松梢不言归。"
+    "content": "山色入窗第一三二页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-133",
+    "source_id": "poem-cr-bdd",
     "type": "classical_poem",
-    "title": "古风留白133",
+    "title": "古风留白一三三",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1739,12 +2005,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第133页，风过松梢不言归。"
+    "content": "山色入窗第一三三页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-134",
+    "source_id": "poem-cr-bde",
     "type": "classical_poem",
-    "title": "古风留白134",
+    "title": "古风留白一三四",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1752,12 +2020,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第134页，风过松梢不言归。"
+    "content": "山色入窗第一三四页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-135",
+    "source_id": "poem-cr-bdf",
     "type": "classical_poem",
-    "title": "古风留白135",
+    "title": "古风留白一三五",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1765,12 +2035,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第135页，风过松梢不言归。"
+    "content": "山色入窗第一三五页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-136",
+    "source_id": "poem-cr-bdg",
     "type": "classical_poem",
-    "title": "古风留白136",
+    "title": "古风留白一三六",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1778,12 +2050,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第136页，风过松梢不言归。"
+    "content": "山色入窗第一三六页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-137",
+    "source_id": "poem-cr-bdh",
     "type": "classical_poem",
-    "title": "古风留白137",
+    "title": "古风留白一三七",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1791,12 +2065,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第137页，风过松梢不言归。"
+    "content": "山色入窗第一三七页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-138",
+    "source_id": "poem-cr-bdi",
     "type": "classical_poem",
-    "title": "古风留白138",
+    "title": "古风留白一三八",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1804,12 +2080,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第138页，风过松梢不言归。"
+    "content": "山色入窗第一三八页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-139",
+    "source_id": "poem-cr-bdj",
     "type": "classical_poem",
-    "title": "古风留白139",
+    "title": "古风留白一三九",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1817,12 +2095,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第139页，风过松梢不言归。"
+    "content": "山色入窗第一三九页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-140",
+    "source_id": "poem-cr-bea",
     "type": "classical_poem",
-    "title": "古风留白140",
+    "title": "古风留白一四零",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1830,12 +2110,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第140页，风过松梢不言归。"
+    "content": "山色入窗第一四零页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-141",
+    "source_id": "poem-cr-beb",
     "type": "classical_poem",
-    "title": "古风留白141",
+    "title": "古风留白一四一",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1843,12 +2125,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第141页，风过松梢不言归。"
+    "content": "山色入窗第一四一页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-142",
+    "source_id": "poem-cr-bec",
     "type": "classical_poem",
-    "title": "古风留白142",
+    "title": "古风留白一四二",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1856,12 +2140,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第142页，风过松梢不言归。"
+    "content": "山色入窗第一四二页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-143",
+    "source_id": "poem-cr-bed",
     "type": "classical_poem",
-    "title": "古风留白143",
+    "title": "古风留白一四三",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1869,12 +2155,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第143页，风过松梢不言归。"
+    "content": "山色入窗第一四三页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-144",
+    "source_id": "poem-cr-bee",
     "type": "classical_poem",
-    "title": "古风留白144",
+    "title": "古风留白一四四",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1882,12 +2170,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第144页，风过松梢不言归。"
+    "content": "山色入窗第一四四页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-145",
+    "source_id": "poem-cr-bef",
     "type": "classical_poem",
-    "title": "古风留白145",
+    "title": "古风留白一四五",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1895,12 +2185,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第145页，风过松梢不言归。"
+    "content": "山色入窗第一四五页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-146",
+    "source_id": "poem-cr-beg",
     "type": "classical_poem",
-    "title": "古风留白146",
+    "title": "古风留白一四六",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1908,12 +2200,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第146页，风过松梢不言归。"
+    "content": "山色入窗第一四六页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-147",
+    "source_id": "poem-cr-beh",
     "type": "classical_poem",
-    "title": "古风留白147",
+    "title": "古风留白一四七",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1921,12 +2215,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第147页，风过松梢不言归。"
+    "content": "山色入窗第一四七页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-148",
+    "source_id": "poem-cr-bei",
     "type": "classical_poem",
-    "title": "古风留白148",
+    "title": "古风留白一四八",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1934,12 +2230,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第148页，风过松梢不言归。"
+    "content": "山色入窗第一四八页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-149",
+    "source_id": "poem-cr-bej",
     "type": "classical_poem",
-    "title": "古风留白149",
+    "title": "古风留白一四九",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1947,12 +2245,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第149页，风过松梢不言归。"
+    "content": "山色入窗第一四九页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-150",
+    "source_id": "poem-cr-bfa",
     "type": "classical_poem",
-    "title": "古风留白150",
+    "title": "古风留白一五零",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1960,12 +2260,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第150页，风过松梢不言归。"
+    "content": "山色入窗第一五零页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-151",
+    "source_id": "poem-cr-bfb",
     "type": "classical_poem",
-    "title": "古风留白151",
+    "title": "古风留白一五一",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1973,12 +2275,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第151页，风过松梢不言归。"
+    "content": "山色入窗第一五一页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-152",
+    "source_id": "poem-cr-bfc",
     "type": "classical_poem",
-    "title": "古风留白152",
+    "title": "古风留白一五二",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1986,12 +2290,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第152页，风过松梢不言归。"
+    "content": "山色入窗第一五二页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-153",
+    "source_id": "poem-cr-bfd",
     "type": "classical_poem",
-    "title": "古风留白153",
+    "title": "古风留白一五三",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -1999,12 +2305,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第153页，风过松梢不言归。"
+    "content": "山色入窗第一五三页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-154",
+    "source_id": "poem-cr-bfe",
     "type": "classical_poem",
-    "title": "古风留白154",
+    "title": "古风留白一五四",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2012,12 +2320,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第154页，风过松梢不言归。"
+    "content": "山色入窗第一五四页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-155",
+    "source_id": "poem-cr-bff",
     "type": "classical_poem",
-    "title": "古风留白155",
+    "title": "古风留白一五五",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2025,12 +2335,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第155页，风过松梢不言归。"
+    "content": "山色入窗第一五五页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-156",
+    "source_id": "poem-cr-bfg",
     "type": "classical_poem",
-    "title": "古风留白156",
+    "title": "古风留白一五六",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2038,12 +2350,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第156页，风过松梢不言归。"
+    "content": "山色入窗第一五六页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-157",
+    "source_id": "poem-cr-bfh",
     "type": "classical_poem",
-    "title": "古风留白157",
+    "title": "古风留白一五七",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2051,12 +2365,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第157页，风过松梢不言归。"
+    "content": "山色入窗第一五七页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-158",
+    "source_id": "poem-cr-bfi",
     "type": "classical_poem",
-    "title": "古风留白158",
+    "title": "古风留白一五八",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2064,12 +2380,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第158页，风过松梢不言归。"
+    "content": "山色入窗第一五八页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-159",
+    "source_id": "poem-cr-bfj",
     "type": "classical_poem",
-    "title": "古风留白159",
+    "title": "古风留白一五九",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2077,12 +2395,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第159页，风过松梢不言归。"
+    "content": "山色入窗第一五九页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-160",
+    "source_id": "poem-cr-bga",
     "type": "classical_poem",
-    "title": "古风留白160",
+    "title": "古风留白一六零",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2090,12 +2410,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第160页，风过松梢不言归。"
+    "content": "山色入窗第一六零页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-161",
+    "source_id": "poem-cr-bgb",
     "type": "classical_poem",
-    "title": "古风留白161",
+    "title": "古风留白一六一",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2103,12 +2425,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第161页，风过松梢不言归。"
+    "content": "山色入窗第一六一页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-162",
+    "source_id": "poem-cr-bgc",
     "type": "classical_poem",
-    "title": "古风留白162",
+    "title": "古风留白一六二",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2116,12 +2440,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第162页，风过松梢不言归。"
+    "content": "山色入窗第一六二页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-163",
+    "source_id": "poem-cr-bgd",
     "type": "classical_poem",
-    "title": "古风留白163",
+    "title": "古风留白一六三",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2129,12 +2455,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第163页，风过松梢不言归。"
+    "content": "山色入窗第一六三页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-164",
+    "source_id": "poem-cr-bge",
     "type": "classical_poem",
-    "title": "古风留白164",
+    "title": "古风留白一六四",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2142,12 +2470,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第164页，风过松梢不言归。"
+    "content": "山色入窗第一六四页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-165",
+    "source_id": "poem-cr-bgf",
     "type": "classical_poem",
-    "title": "古风留白165",
+    "title": "古风留白一六五",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2155,12 +2485,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第165页，风过松梢不言归。"
+    "content": "山色入窗第一六五页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-166",
+    "source_id": "poem-cr-bgg",
     "type": "classical_poem",
-    "title": "古风留白166",
+    "title": "古风留白一六六",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2168,12 +2500,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第166页，风过松梢不言归。"
+    "content": "山色入窗第一六六页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-167",
+    "source_id": "poem-cr-bgh",
     "type": "classical_poem",
-    "title": "古风留白167",
+    "title": "古风留白一六七",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2181,12 +2515,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第167页，风过松梢不言归。"
+    "content": "山色入窗第一六七页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-168",
+    "source_id": "poem-cr-bgi",
     "type": "classical_poem",
-    "title": "古风留白168",
+    "title": "古风留白一六八",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2194,12 +2530,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第168页，风过松梢不言归。"
+    "content": "山色入窗第一六八页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-169",
+    "source_id": "poem-cr-bgj",
     "type": "classical_poem",
-    "title": "古风留白169",
+    "title": "古风留白一六九",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2207,12 +2545,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第169页，风过松梢不言归。"
+    "content": "山色入窗第一六九页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-170",
+    "source_id": "poem-cr-bha",
     "type": "classical_poem",
-    "title": "古风留白170",
+    "title": "古风留白一七零",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2220,12 +2560,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第170页，风过松梢不言归。"
+    "content": "山色入窗第一七零页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-171",
+    "source_id": "poem-cr-bhb",
     "type": "classical_poem",
-    "title": "古风留白171",
+    "title": "古风留白一七一",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2233,12 +2575,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第171页，风过松梢不言归。"
+    "content": "山色入窗第一七一页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-172",
+    "source_id": "poem-cr-bhc",
     "type": "classical_poem",
-    "title": "古风留白172",
+    "title": "古风留白一七二",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2246,12 +2590,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第172页，风过松梢不言归。"
+    "content": "山色入窗第一七二页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-173",
+    "source_id": "poem-cr-bhd",
     "type": "classical_poem",
-    "title": "古风留白173",
+    "title": "古风留白一七三",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2259,12 +2605,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第173页，风过松梢不言归。"
+    "content": "山色入窗第一七三页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-174",
+    "source_id": "poem-cr-bhe",
     "type": "classical_poem",
-    "title": "古风留白174",
+    "title": "古风留白一七四",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2272,12 +2620,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第174页，风过松梢不言归。"
+    "content": "山色入窗第一七四页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-175",
+    "source_id": "poem-cr-bhf",
     "type": "classical_poem",
-    "title": "古风留白175",
+    "title": "古风留白一七五",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2285,12 +2635,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第175页，风过松梢不言归。"
+    "content": "山色入窗第一七五页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-176",
+    "source_id": "poem-cr-bhg",
     "type": "classical_poem",
-    "title": "古风留白176",
+    "title": "古风留白一七六",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2298,12 +2650,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第176页，风过松梢不言归。"
+    "content": "山色入窗第一七六页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-177",
+    "source_id": "poem-cr-bhh",
     "type": "classical_poem",
-    "title": "古风留白177",
+    "title": "古风留白一七七",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2311,12 +2665,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第177页，风过松梢不言归。"
+    "content": "山色入窗第一七七页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-178",
+    "source_id": "poem-cr-bhi",
     "type": "classical_poem",
-    "title": "古风留白178",
+    "title": "古风留白一七八",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2324,12 +2680,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第178页，风过松梢不言归。"
+    "content": "山色入窗第一七八页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-179",
+    "source_id": "poem-cr-bhj",
     "type": "classical_poem",
-    "title": "古风留白179",
+    "title": "古风留白一七九",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2337,12 +2695,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第179页，风过松梢不言归。"
+    "content": "山色入窗第一七九页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-180",
+    "source_id": "poem-cr-bia",
     "type": "classical_poem",
-    "title": "古风留白180",
+    "title": "古风留白一八零",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2350,12 +2710,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第180页，风过松梢不言归。"
+    "content": "山色入窗第一八零页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-181",
+    "source_id": "poem-cr-bib",
     "type": "classical_poem",
-    "title": "古风留白181",
+    "title": "古风留白一八一",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2363,12 +2725,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第181页，风过松梢不言归。"
+    "content": "山色入窗第一八一页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-182",
+    "source_id": "poem-cr-bic",
     "type": "classical_poem",
-    "title": "古风留白182",
+    "title": "古风留白一八二",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2376,12 +2740,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第182页，风过松梢不言归。"
+    "content": "山色入窗第一八二页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-183",
+    "source_id": "poem-cr-bid",
     "type": "classical_poem",
-    "title": "古风留白183",
+    "title": "古风留白一八三",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2389,12 +2755,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第183页，风过松梢不言归。"
+    "content": "山色入窗第一八三页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-184",
+    "source_id": "poem-cr-bie",
     "type": "classical_poem",
-    "title": "古风留白184",
+    "title": "古风留白一八四",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2402,12 +2770,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第184页，风过松梢不言归。"
+    "content": "山色入窗第一八四页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-185",
+    "source_id": "poem-cr-bif",
     "type": "classical_poem",
-    "title": "古风留白185",
+    "title": "古风留白一八五",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2415,12 +2785,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第185页，风过松梢不言归。"
+    "content": "山色入窗第一八五页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-186",
+    "source_id": "poem-cr-big",
     "type": "classical_poem",
-    "title": "古风留白186",
+    "title": "古风留白一八六",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2428,12 +2800,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第186页，风过松梢不言归。"
+    "content": "山色入窗第一八六页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-187",
+    "source_id": "poem-cr-bih",
     "type": "classical_poem",
-    "title": "古风留白187",
+    "title": "古风留白一八七",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2441,12 +2815,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第187页，风过松梢不言归。"
+    "content": "山色入窗第一八七页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-188",
+    "source_id": "poem-cr-bii",
     "type": "classical_poem",
-    "title": "古风留白188",
+    "title": "古风留白一八八",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2454,12 +2830,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第188页，风过松梢不言归。"
+    "content": "山色入窗第一八八页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-189",
+    "source_id": "poem-cr-bij",
     "type": "classical_poem",
-    "title": "古风留白189",
+    "title": "古风留白一八九",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2467,12 +2845,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第189页，风过松梢不言归。"
+    "content": "山色入窗第一八九页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-190",
+    "source_id": "poem-cr-bja",
     "type": "classical_poem",
-    "title": "古风留白190",
+    "title": "古风留白一九零",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2480,12 +2860,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第190页，风过松梢不言归。"
+    "content": "山色入窗第一九零页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-191",
+    "source_id": "poem-cr-bjb",
     "type": "classical_poem",
-    "title": "古风留白191",
+    "title": "古风留白一九一",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2493,12 +2875,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第191页，风过松梢不言归。"
+    "content": "山色入窗第一九一页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-192",
+    "source_id": "poem-cr-bjc",
     "type": "classical_poem",
-    "title": "古风留白192",
+    "title": "古风留白一九二",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2506,12 +2890,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第192页，风过松梢不言归。"
+    "content": "山色入窗第一九二页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-193",
+    "source_id": "poem-cr-bjd",
     "type": "classical_poem",
-    "title": "古风留白193",
+    "title": "古风留白一九三",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2519,12 +2905,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第193页，风过松梢不言归。"
+    "content": "山色入窗第一九三页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-194",
+    "source_id": "poem-cr-bje",
     "type": "classical_poem",
-    "title": "古风留白194",
+    "title": "古风留白一九四",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2532,12 +2920,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第194页，风过松梢不言归。"
+    "content": "山色入窗第一九四页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-195",
+    "source_id": "poem-cr-bjf",
     "type": "classical_poem",
-    "title": "古风留白195",
+    "title": "古风留白一九五",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2545,12 +2935,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第195页，风过松梢不言归。"
+    "content": "山色入窗第一九五页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-196",
+    "source_id": "poem-cr-bjg",
     "type": "classical_poem",
-    "title": "古风留白196",
+    "title": "古风留白一九六",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2558,12 +2950,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第196页，风过松梢不言归。"
+    "content": "山色入窗第一九六页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-197",
+    "source_id": "poem-cr-bjh",
     "type": "classical_poem",
-    "title": "古风留白197",
+    "title": "古风留白一九七",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2571,12 +2965,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第197页，风过松梢不言归。"
+    "content": "山色入窗第一九七页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-198",
+    "source_id": "poem-cr-bji",
     "type": "classical_poem",
-    "title": "古风留白198",
+    "title": "古风留白一九八",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2584,12 +2980,14 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第198页，风过松梢不言归。"
+    "content": "山色入窗第一九八页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   },
   {
-    "source_id": "poem-cr-199",
+    "source_id": "poem-cr-bjj",
     "type": "classical_poem",
-    "title": "古风留白199",
+    "title": "古风留白一九九",
     "emotion_tags": [
       "nostalgia",
       "restraint",
@@ -2597,6 +2995,8 @@
     ],
     "profile_tag": "classical_restraint",
     "profile_confidence": 0.92,
-    "content": "山色入窗第199页，风过松梢不言归。"
+    "content": "山色入窗第一九九页，风过松梢不言归。",
+    "valence": "neutral",
+    "learn_point": "使用留白与具象意象承载情绪"
   }
 ]

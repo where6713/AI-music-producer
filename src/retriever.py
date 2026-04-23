@@ -68,7 +68,10 @@ def _tokenize(text: str) -> list[str]:
 
 def _load_corpus(repo_root: Path) -> list[dict[str, Any]]:
     has_clean = all((repo_root / rel).exists() for rel in CLEAN_CORPUS_FILES)
-    source_files = CLEAN_CORPUS_FILES if has_clean else CORPUS_FILES
+    if not has_clean:
+        raise RuntimeError("clean corpus missing: run scripts/run_corpus_ingestion.py --strict")
+
+    source_files = CLEAN_CORPUS_FILES
 
     rows: list[dict[str, Any]] = []
     for rel in source_files:

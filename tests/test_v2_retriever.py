@@ -6,46 +6,65 @@ from src.retriever import corpus_balance_check, retrieve_few_shot_examples
 from src.schemas import UserInput
 
 
+def _write_clean_corpus(corpus_dir, poetry_rows, lyric_rows) -> None:
+    clean_dir = corpus_dir / "_clean"
+    clean_dir.mkdir(parents=True, exist_ok=True)
+
+    def _normalize(row: dict) -> dict:
+        out = dict(row)
+        row_type = str(out.get("type", "")).strip().lower()
+        out.setdefault(
+            "profile_tag",
+            "classical_restraint" if row_type == "classical_poem" else "urban_introspective",
+        )
+        out.setdefault(
+            "valence",
+            "neutral" if out.get("profile_tag") == "classical_restraint" else "negative",
+        )
+        out.setdefault("learn_point", "保持具象化并避免模板化复写")
+        return out
+
+    (clean_dir / "poetry_classical.json").write_text(
+        json.dumps([_normalize(r) for r in poetry_rows], ensure_ascii=False),
+        encoding="utf-8",
+    )
+    (clean_dir / "lyrics_modern_zh.json").write_text(
+        json.dumps([_normalize(r) for r in lyric_rows], ensure_ascii=False),
+        encoding="utf-8",
+    )
+
+
 def test_retriever_returns_real_corpus_examples(tmp_path) -> None:
     corpus = tmp_path / "corpus"
     corpus.mkdir(parents=True, exist_ok=True)
-    (corpus / "poetry_classical.json").write_text(
-        json.dumps(
-            [
-                {
-                    "source_id": "poem-jys-001",
-                    "type": "classical_poem",
-                    "title": "静夜思",
-                    "emotion_tags": ["nostalgia", "restraint"],
-                    "content": "举头望明月，低头思故乡，夜色慢慢凉。",
-                }
-            ],
-            ensure_ascii=False,
-        ),
-        encoding="utf-8",
-    )
-    (corpus / "lyrics_modern_zh.json").write_text(
-        json.dumps(
-            [
-                {
-                    "source_id": "lyric-modern-101",
-                    "type": "modern_lyric",
-                    "title": "凌晨未发送",
-                    "emotion_tags": ["breakup", "late-night"],
-                    "content": "对话框停在最后一句，指尖仍然悬着。",
-                },
-                {
-                    "source_id": "lyric-modern-102",
-                    "type": "modern_lyric",
-                    "title": "不再拨通",
-                    "emotion_tags": ["distance", "regret"],
-                    "content": "手在拨出前停住，呼吸也跟着发颤。",
-                },
-            ],
-            ensure_ascii=False,
-        ),
-        encoding="utf-8",
-    )
+    poetry_rows = [
+        {
+            "source_id": "poem-jys-001",
+            "type": "classical_poem",
+            "title": "静夜思",
+            "emotion_tags": ["nostalgia", "restraint"],
+            "content": "举头望明月，低头思故乡，夜色慢慢凉。",
+        }
+    ]
+    lyric_rows = [
+        {
+            "source_id": "lyric-modern-101",
+            "type": "modern_lyric",
+            "title": "凌晨未发送",
+            "emotion_tags": ["breakup", "late-night"],
+            "content": "对话框停在最后一句，指尖仍然悬着。",
+        },
+        {
+            "source_id": "lyric-modern-102",
+            "type": "modern_lyric",
+            "title": "不再拨通",
+            "emotion_tags": ["distance", "regret"],
+            "content": "手在拨出前停住，呼吸也跟着发颤。",
+        },
+    ]
+    (corpus / "poetry_classical.json").write_text(json.dumps(poetry_rows, ensure_ascii=False), encoding="utf-8")
+    (corpus / "lyrics_modern_zh.json").write_text(json.dumps(lyric_rows, ensure_ascii=False), encoding="utf-8")
+    _write_clean_corpus(corpus, poetry_rows, lyric_rows)
 
     items = retrieve_few_shot_examples(
         UserInput(raw_intent="分手后深夜想发消息又克制住"),
@@ -60,46 +79,37 @@ def test_retriever_returns_real_corpus_examples(tmp_path) -> None:
 def test_retriever_returns_profile_vote_metadata(tmp_path) -> None:
     corpus = tmp_path / "corpus"
     corpus.mkdir(parents=True, exist_ok=True)
-    (corpus / "poetry_classical.json").write_text(
-        json.dumps(
-            [
-                {
-                    "source_id": "poem-jys-001",
-                    "type": "classical_poem",
-                    "title": "静夜思",
-                    "emotion_tags": ["nostalgia", "restraint"],
-                    "profile_tag": "classical_restraint",
-                    "content": "举头望明月，低头思故乡，夜色慢慢凉。",
-                }
-            ],
-            ensure_ascii=False,
-        ),
-        encoding="utf-8",
-    )
-    (corpus / "lyrics_modern_zh.json").write_text(
-        json.dumps(
-            [
-                {
-                    "source_id": "lyric-modern-101",
-                    "type": "modern_lyric",
-                    "title": "凌晨未发送",
-                    "emotion_tags": ["breakup", "late-night"],
-                    "profile_tag": "urban_introspective",
-                    "content": "对话框停在最后一句，指尖仍然悬着。",
-                },
-                {
-                    "source_id": "lyric-modern-102",
-                    "type": "modern_lyric",
-                    "title": "不再拨通",
-                    "emotion_tags": ["distance", "regret"],
-                    "profile_tag": "urban_introspective",
-                    "content": "手在拨出前停住，呼吸也跟着发颤。",
-                },
-            ],
-            ensure_ascii=False,
-        ),
-        encoding="utf-8",
-    )
+    poetry_rows = [
+        {
+            "source_id": "poem-jys-001",
+            "type": "classical_poem",
+            "title": "静夜思",
+            "emotion_tags": ["nostalgia", "restraint"],
+            "profile_tag": "classical_restraint",
+            "content": "举头望明月，低头思故乡，夜色慢慢凉。",
+        }
+    ]
+    lyric_rows = [
+        {
+            "source_id": "lyric-modern-101",
+            "type": "modern_lyric",
+            "title": "凌晨未发送",
+            "emotion_tags": ["breakup", "late-night"],
+            "profile_tag": "urban_introspective",
+            "content": "对话框停在最后一句，指尖仍然悬着。",
+        },
+        {
+            "source_id": "lyric-modern-102",
+            "type": "modern_lyric",
+            "title": "不再拨通",
+            "emotion_tags": ["distance", "regret"],
+            "profile_tag": "urban_introspective",
+            "content": "手在拨出前停住，呼吸也跟着发颤。",
+        },
+    ]
+    (corpus / "poetry_classical.json").write_text(json.dumps(poetry_rows, ensure_ascii=False), encoding="utf-8")
+    (corpus / "lyrics_modern_zh.json").write_text(json.dumps(lyric_rows, ensure_ascii=False), encoding="utf-8")
+    _write_clean_corpus(corpus, poetry_rows, lyric_rows)
 
     result = retrieve_few_shot_examples(
         UserInput(raw_intent="分手后深夜想发消息又克制住"),
@@ -117,43 +127,34 @@ def test_retriever_returns_profile_vote_metadata(tmp_path) -> None:
 def test_retriever_derives_profile_vote_when_profile_tag_missing(tmp_path) -> None:
     corpus = tmp_path / "corpus"
     corpus.mkdir(parents=True, exist_ok=True)
-    (corpus / "poetry_classical.json").write_text(
-        json.dumps(
-            [
-                {
-                    "source_id": "poem-jys-001",
-                    "type": "classical_poem",
-                    "title": "静夜思",
-                    "emotion_tags": ["nostalgia", "restraint"],
-                    "content": "举头望明月，低头思故乡，夜色慢慢凉。",
-                }
-            ],
-            ensure_ascii=False,
-        ),
-        encoding="utf-8",
-    )
-    (corpus / "lyrics_modern_zh.json").write_text(
-        json.dumps(
-            [
-                {
-                    "source_id": "lyric-modern-101",
-                    "type": "modern_lyric",
-                    "title": "凌晨未发送",
-                    "emotion_tags": ["breakup", "late-night"],
-                    "content": "对话框停在最后一句，指尖仍然悬着。",
-                },
-                {
-                    "source_id": "lyric-modern-102",
-                    "type": "modern_lyric",
-                    "title": "不再拨通",
-                    "emotion_tags": ["distance", "regret"],
-                    "content": "手在拨出前停住，呼吸也跟着发颤。",
-                },
-            ],
-            ensure_ascii=False,
-        ),
-        encoding="utf-8",
-    )
+    poetry_rows = [
+        {
+            "source_id": "poem-jys-001",
+            "type": "classical_poem",
+            "title": "静夜思",
+            "emotion_tags": ["nostalgia", "restraint"],
+            "content": "举头望明月，低头思故乡，夜色慢慢凉。",
+        }
+    ]
+    lyric_rows = [
+        {
+            "source_id": "lyric-modern-101",
+            "type": "modern_lyric",
+            "title": "凌晨未发送",
+            "emotion_tags": ["breakup", "late-night"],
+            "content": "对话框停在最后一句，指尖仍然悬着。",
+        },
+        {
+            "source_id": "lyric-modern-102",
+            "type": "modern_lyric",
+            "title": "不再拨通",
+            "emotion_tags": ["distance", "regret"],
+            "content": "手在拨出前停住，呼吸也跟着发颤。",
+        },
+    ]
+    (corpus / "poetry_classical.json").write_text(json.dumps(poetry_rows, ensure_ascii=False), encoding="utf-8")
+    (corpus / "lyrics_modern_zh.json").write_text(json.dumps(lyric_rows, ensure_ascii=False), encoding="utf-8")
+    _write_clean_corpus(corpus, poetry_rows, lyric_rows)
 
     result = retrieve_few_shot_examples(
         UserInput(raw_intent="分手后深夜想发消息又克制住"),
@@ -170,32 +171,29 @@ def test_retriever_derives_profile_vote_when_profile_tag_missing(tmp_path) -> No
 def test_retriever_includes_profile_confidence_in_samples(tmp_path) -> None:
     corpus = tmp_path / "corpus"
     corpus.mkdir(parents=True, exist_ok=True)
-    (corpus / "poetry_classical.json").write_text(json.dumps([], ensure_ascii=False), encoding="utf-8")
-    (corpus / "lyrics_modern_zh.json").write_text(
-        json.dumps(
-            [
-                {
-                    "source_id": "lyric-modern-101",
-                    "type": "modern_lyric",
-                    "title": "凌晨未发送",
-                    "emotion_tags": ["breakup", "late-night"],
-                    "profile_tag": "urban_introspective",
-                    "profile_confidence": 0.88,
-                    "content": "对话框停在最后一句，指尖仍然悬着。",
-                },
-                {
-                    "source_id": "lyric-modern-102",
-                    "type": "modern_lyric",
-                    "title": "不再拨通",
-                    "emotion_tags": ["distance", "regret"],
-                    "profile_tag": "urban_introspective",
-                    "content": "手在拨出前停住，呼吸也跟着发颤。",
-                },
-            ],
-            ensure_ascii=False,
-        ),
-        encoding="utf-8",
-    )
+    poetry_rows = []
+    lyric_rows = [
+        {
+            "source_id": "lyric-modern-101",
+            "type": "modern_lyric",
+            "title": "凌晨未发送",
+            "emotion_tags": ["breakup", "late-night"],
+            "profile_tag": "urban_introspective",
+            "profile_confidence": 0.88,
+            "content": "对话框停在最后一句，指尖仍然悬着。",
+        },
+        {
+            "source_id": "lyric-modern-102",
+            "type": "modern_lyric",
+            "title": "不再拨通",
+            "emotion_tags": ["distance", "regret"],
+            "profile_tag": "urban_introspective",
+            "content": "手在拨出前停住，呼吸也跟着发颤。",
+        },
+    ]
+    (corpus / "poetry_classical.json").write_text(json.dumps(poetry_rows, ensure_ascii=False), encoding="utf-8")
+    (corpus / "lyrics_modern_zh.json").write_text(json.dumps(lyric_rows, ensure_ascii=False), encoding="utf-8")
+    _write_clean_corpus(corpus, poetry_rows, lyric_rows)
 
     result = retrieve_few_shot_examples(
         UserInput(raw_intent="分手后深夜想发消息又克制住"),
@@ -211,8 +209,11 @@ def test_retriever_includes_profile_confidence_in_samples(tmp_path) -> None:
 def test_corpus_balance_check_reports_warnings_when_under_minimum(tmp_path) -> None:
     corpus = tmp_path / "corpus"
     corpus.mkdir(parents=True, exist_ok=True)
-    (corpus / "poetry_classical.json").write_text(json.dumps([], ensure_ascii=False), encoding="utf-8")
-    (corpus / "lyrics_modern_zh.json").write_text(json.dumps([], ensure_ascii=False), encoding="utf-8")
+    poetry_rows = []
+    lyric_rows = []
+    (corpus / "poetry_classical.json").write_text(json.dumps(poetry_rows, ensure_ascii=False), encoding="utf-8")
+    (corpus / "lyrics_modern_zh.json").write_text(json.dumps(lyric_rows, ensure_ascii=False), encoding="utf-8")
+    _write_clean_corpus(corpus, poetry_rows, lyric_rows)
 
     report = corpus_balance_check(tmp_path)
     assert isinstance(report, dict)
@@ -223,46 +224,37 @@ def test_corpus_balance_check_reports_warnings_when_under_minimum(tmp_path) -> N
 def test_retriever_exposes_corpus_balance_and_monoculture_flags(tmp_path) -> None:
     corpus = tmp_path / "corpus"
     corpus.mkdir(parents=True, exist_ok=True)
-    (corpus / "poetry_classical.json").write_text(
-        json.dumps(
-            [
-                {
-                    "source_id": "poem-jys-001",
-                    "type": "classical_poem",
-                    "title": "静夜思",
-                    "emotion_tags": ["nostalgia", "restraint"],
-                    "profile_tag": "classical_restraint",
-                    "content": "举头望明月，低头思故乡，夜色慢慢凉。",
-                }
-            ],
-            ensure_ascii=False,
-        ),
-        encoding="utf-8",
-    )
-    (corpus / "lyrics_modern_zh.json").write_text(
-        json.dumps(
-            [
-                {
-                    "source_id": "lyric-modern-101",
-                    "type": "modern_lyric",
-                    "title": "凌晨未发送",
-                    "emotion_tags": ["breakup", "late-night"],
-                    "profile_tag": "urban_introspective",
-                    "content": "对话框停在最后一句，指尖仍然悬着。",
-                },
-                {
-                    "source_id": "lyric-modern-102",
-                    "type": "modern_lyric",
-                    "title": "不再拨通",
-                    "emotion_tags": ["distance", "regret"],
-                    "profile_tag": "urban_introspective",
-                    "content": "手在拨出前停住，呼吸也跟着发颤。",
-                },
-            ],
-            ensure_ascii=False,
-        ),
-        encoding="utf-8",
-    )
+    poetry_rows = [
+        {
+            "source_id": "poem-jys-001",
+            "type": "classical_poem",
+            "title": "静夜思",
+            "emotion_tags": ["nostalgia", "restraint"],
+            "profile_tag": "classical_restraint",
+            "content": "举头望明月，低头思故乡，夜色慢慢凉。",
+        }
+    ]
+    lyric_rows = [
+        {
+            "source_id": "lyric-modern-101",
+            "type": "modern_lyric",
+            "title": "凌晨未发送",
+            "emotion_tags": ["breakup", "late-night"],
+            "profile_tag": "urban_introspective",
+            "content": "对话框停在最后一句，指尖仍然悬着。",
+        },
+        {
+            "source_id": "lyric-modern-102",
+            "type": "modern_lyric",
+            "title": "不再拨通",
+            "emotion_tags": ["distance", "regret"],
+            "profile_tag": "urban_introspective",
+            "content": "手在拨出前停住，呼吸也跟着发颤。",
+        },
+    ]
+    (corpus / "poetry_classical.json").write_text(json.dumps(poetry_rows, ensure_ascii=False), encoding="utf-8")
+    (corpus / "lyrics_modern_zh.json").write_text(json.dumps(lyric_rows, ensure_ascii=False), encoding="utf-8")
+    _write_clean_corpus(corpus, poetry_rows, lyric_rows)
 
     result = retrieve_few_shot_examples(
         UserInput(raw_intent="分手后深夜想发消息又克制住"),
@@ -309,6 +301,8 @@ def test_retriever_prefers_clean_corpus_when_available(tmp_path) -> None:
                     "title": "clean one",
                     "emotion_tags": ["breakup", "late-night"],
                     "profile_tag": "urban_introspective",
+                    "valence": "negative",
+                    "learn_point": "保留克制语气并用动作推进情绪",
                     "profile_confidence": 0.9,
                     "content": "对话框停在最后一句，指尖仍然悬着。",
                 },
@@ -318,6 +312,8 @@ def test_retriever_prefers_clean_corpus_when_available(tmp_path) -> None:
                     "title": "clean two",
                     "emotion_tags": ["distance", "regret"],
                     "profile_tag": "urban_introspective",
+                    "valence": "negative",
+                    "learn_point": "保留克制语气并用动作推进情绪",
                     "profile_confidence": 0.9,
                     "content": "手在拨出前停住，呼吸也跟着发颤。",
                 },
@@ -334,3 +330,22 @@ def test_retriever_prefers_clean_corpus_when_available(tmp_path) -> None:
     )
 
     assert all("clean" in row["source_id"] for row in items)
+
+
+def test_retriever_fails_loud_when_clean_corpus_missing(tmp_path) -> None:
+    corpus = tmp_path / "corpus"
+    corpus.mkdir(parents=True, exist_ok=True)
+    (corpus / "poetry_classical.json").write_text("[]", encoding="utf-8")
+    (corpus / "lyrics_modern_zh.json").write_text("[]", encoding="utf-8")
+
+    try:
+        retrieve_few_shot_examples(
+            UserInput(raw_intent="分手后深夜想发消息又克制住"),
+            repo_root=tmp_path,
+            top_k=3,
+        )
+    except RuntimeError as err:
+        assert "clean corpus missing" in str(err)
+        return
+
+    raise AssertionError("expected RuntimeError when clean corpus is missing")

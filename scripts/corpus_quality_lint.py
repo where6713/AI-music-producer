@@ -90,19 +90,18 @@ def lint_corpus_row(row: dict[str, Any], *, mode: str = "ingestion") -> RowLintR
         failed.append("RULE_C1")
         reasons.append("content contains >=3 consecutive digits")
 
-    if mode == "ingestion":
-        length = len(content)
-        if length < 10 or length > 800:
-            failed.append("RULE_C3")
-            reasons.append(f"content length out of range: {length}")
+    length = len(content)
+    if length < 10 or length > 800:
+        failed.append("RULE_C3")
+        reasons.append(f"content length out of range: {length}")
 
-    missing_profile_tag = (not profile_tag) and mode == "ingestion"
-    missing_valence = (not valence) and mode == "ingestion"
+    missing_profile_tag = (not profile_tag)
+    missing_valence = (not valence)
     if not isinstance(emotion_tags, list) or not emotion_tags or missing_profile_tag or missing_valence:
         failed.append("RULE_C4")
         reasons.append("missing emotion_tags/profile_tag/valence")
 
-    if mode == "ingestion" and (not learn_point or len(learn_point) < 5):
+    if not learn_point or len(learn_point) < 5:
         failed.append("RULE_C5")
         reasons.append("learn_point missing or too short")
 
@@ -110,7 +109,7 @@ def lint_corpus_row(row: dict[str, Any], *, mode: str = "ingestion") -> RowLintR
         failed.append("RULE_C6")
         reasons.append("placeholder/test marker detected")
 
-    if mode == "ingestion" and _verb_ratio(content) < 0.10:
+    if _verb_ratio(content) < 0.10:
         failed.append("RULE_C7")
         reasons.append("verb ratio below 10%")
 

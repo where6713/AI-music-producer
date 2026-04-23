@@ -101,45 +101,58 @@ def _payload_json() -> str:
 
 def _seed_min_corpus(repo_root: Path) -> None:
     corpus_dir = repo_root / "corpus"
+    clean_dir = corpus_dir / "_clean"
     corpus_dir.mkdir(parents=True, exist_ok=True)
+    clean_dir.mkdir(parents=True, exist_ok=True)
+    poetry_rows = [
+        {
+            "source_id": "poem-jys-001",
+            "type": "classical_poem",
+            "title": "静夜思",
+            "emotion_tags": ["nostalgia", "restraint"],
+            "profile_tag": "classical_restraint",
+            "content": "举头望明月，低头思故乡，夜色慢慢凉。",
+            "valence": "neutral",
+            "learn_point": "使用留白与具象意象承载情绪",
+        }
+    ]
+    lyric_rows = [
+        {
+            "source_id": "lyric-modern-101",
+            "type": "modern_lyric",
+            "title": "凌晨未发送",
+            "emotion_tags": ["breakup", "late-night"],
+            "profile_tag": "urban_introspective",
+            "content": "对话框停在最后一句，指尖仍然悬着。",
+            "valence": "negative",
+            "learn_point": "保留克制语气并用动作推进情绪",
+        },
+        {
+            "source_id": "lyric-modern-102",
+            "type": "modern_lyric",
+            "title": "不再拨通",
+            "emotion_tags": ["distance", "regret"],
+            "profile_tag": "urban_introspective",
+            "content": "手在拨出前停住，呼吸也跟着发颤。",
+            "valence": "negative",
+            "learn_point": "保留克制语气并用动作推进情绪",
+        },
+    ]
+
     (corpus_dir / "poetry_classical.json").write_text(
-        json.dumps(
-            [
-                {
-                    "source_id": "poem-jys-001",
-                    "type": "classical_poem",
-                    "title": "静夜思",
-                    "emotion_tags": ["nostalgia", "restraint"],
-                    "profile_tag": "classical_restraint",
-                    "content": "举头望明月，低头思故乡。",
-                }
-            ],
-            ensure_ascii=False,
-        ),
+        json.dumps(poetry_rows, ensure_ascii=False),
         encoding="utf-8",
     )
     (corpus_dir / "lyrics_modern_zh.json").write_text(
-        json.dumps(
-            [
-                {
-                    "source_id": "lyric-modern-101",
-                    "type": "modern_lyric",
-                    "title": "凌晨未发送",
-                    "emotion_tags": ["breakup", "late-night"],
-                    "profile_tag": "urban_introspective",
-                    "content": "对话框停在最后一句。",
-                },
-                {
-                    "source_id": "lyric-modern-102",
-                    "type": "modern_lyric",
-                    "title": "不再拨通",
-                    "emotion_tags": ["distance", "regret"],
-                    "profile_tag": "urban_introspective",
-                    "content": "手在拨出前停住。",
-                },
-            ],
-            ensure_ascii=False,
-        ),
+        json.dumps(lyric_rows, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    (clean_dir / "poetry_classical.json").write_text(
+        json.dumps(poetry_rows, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    (clean_dir / "lyrics_modern_zh.json").write_text(
+        json.dumps(lyric_rows, ensure_ascii=False),
         encoding="utf-8",
     )
     profiles_dir = repo_root / "src" / "profiles"

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
 import sys
 from collections import Counter
 from pathlib import Path
@@ -19,89 +18,6 @@ SOURCE_FILES = [
     "lyrics_modern_zh.json",
     "poetry_classical.json",
 ]
-
-_DIGIT_TO_CN = str.maketrans({
-    "0": "零",
-    "1": "一",
-    "2": "二",
-    "3": "三",
-    "4": "四",
-    "5": "五",
-    "6": "六",
-    "7": "七",
-    "8": "八",
-    "9": "九",
-})
-_DIGIT_TO_ASCII = str.maketrans({
-    "0": "a",
-    "1": "b",
-    "2": "c",
-    "3": "d",
-    "4": "e",
-    "5": "f",
-    "6": "g",
-    "7": "h",
-    "8": "i",
-    "9": "j",
-})
-_PROFILE_TO_VALENCE = {
-    "urban_introspective": "negative",
-    "classical_restraint": "neutral",
-    "uplift_pop": "positive",
-    "club_dance": "positive",
-    "ambient_meditation": "neutral",
-}
-_PROFILE_TO_LEARN_POINT = {
-    "urban_introspective": "保留克制语气并用动作推进情绪",
-    "classical_restraint": "使用留白与具象意象承载情绪",
-    "uplift_pop": "保持明亮节奏并强化动词驱动",
-    "club_dance": "突出律动词并维持高能推进",
-    "ambient_meditation": "以呼吸感意象维持平静流动",
-}
-
-
-def _clean_text_digits(value: str) -> str:
-    return value.translate(_DIGIT_TO_CN)
-
-
-def _clean_source_id(value: str) -> str:
-    normalized = value.translate(_DIGIT_TO_ASCII)
-    normalized = re.sub(r"[^a-zA-Z_\-]", "", normalized)
-    return normalized.lower()
-
-
-def _infer_profile_tag(row: dict[str, Any]) -> str:
-    explicit = str(row.get("profile_tag", "")).strip()
-    if explicit:
-        return explicit
-    row_type = str(row.get("type", "")).strip().lower()
-    tags = [str(x).strip().lower() for x in row.get("emotion_tags", []) if str(x).strip()]
-    if row_type == "classical_poem":
-        return "classical_restraint"
-    if any(tag in {"joy", "sunshine", "brave"} for tag in tags):
-        return "uplift_pop"
-    if any(tag in {"dance", "nightlife", "club"} for tag in tags):
-        return "club_dance"
-    if any(tag in {"calm", "meditation", "ambient"} for tag in tags):
-        return "ambient_meditation"
-    return "urban_introspective"
-
-
-def _prepare_row(row: dict[str, Any]) -> dict[str, Any]:
-    out = dict(row)
-    profile_tag = _infer_profile_tag(out)
-    source_id = str(out.get("source_id", "")).strip()
-    title = str(out.get("title", "")).strip()
-    content = str(out.get("content", "")).strip()
-
-    out["profile_tag"] = profile_tag
-    out["valence"] = str(out.get("valence", "")).strip() or _PROFILE_TO_VALENCE.get(profile_tag, "neutral")
-    out["learn_point"] = str(out.get("learn_point", "")).strip() or _PROFILE_TO_LEARN_POINT.get(profile_tag, "保持具象化并避免模板化复写")
-    out["source_id"] = _clean_source_id(source_id) or f"sample_{profile_tag}"
-    out["title"] = _clean_text_digits(title)
-    out["content"] = _clean_text_digits(content)
-    return out
-
 
 def _load_rows(path: Path) -> list[dict[str, Any]]:
     if not path.exists():
@@ -161,7 +77,7 @@ def run_ingestion(*, repo_root: Path, strict: bool) -> dict[str, Any]:
         lint_rejected_rows: list[dict[str, Any]] = []
 
         for raw_row in rows:
-            row = _prepare_row(raw_row)
+            row = dict(raw_row)
             report = lint_corpus_row(row)
             if report.passed:
                 lint_pass_rows.append(row)
