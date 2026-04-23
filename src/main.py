@@ -8,6 +8,7 @@ import typer
 from src.claude_client import generate_lyric_payload
 from src.compile import write_outputs
 from src.lint import lint_payload
+from src.profile_router import resolve_active_profile
 from src.schemas import LyricPayload, UserInput
 
 
@@ -181,6 +182,7 @@ def produce(
     genre: str = typer.Option("", "--genre"),
     mood: str = typer.Option("", "--mood"),
     vocal: str = typer.Option("any", "--vocal"),
+    profile: str = typer.Option("", "--profile"),
     lang: str = typer.Option("zh-CN", "--lang"),
     out_dir: str = typer.Option("out", "--out-dir"),
     verbose: bool = typer.Option(False, "--verbose"),
@@ -195,10 +197,22 @@ def produce(
         genre_hint=genre,
         mood_hint=mood,
         vocal_gender_hint=vocal,
+        profile_override=profile,
     )
 
     payload, trace = generate_lyric_payload(user_input, repo_root=repo_root)
     trace.setdefault("retrieval_profile_source", "initial")
+    active_profile, profile_source, profile_vote_confidence = resolve_active_profile(
+        user_input,
+        repo_root=repo_root,
+        retrieval_vote=str(trace.get("retrieval_profile_vote", "")),
+        vote_confidence=_safe_float(trace.get("retrieval_vote_confidence", 0.0), default=0.0),
+    )
+
+    trace["active_profile"] = active_profile
+    trace["profile_source"] = profile_source
+    if profile_vote_confidence is not None:
+        trace["profile_vote_confidence"] = profile_vote_confidence
     payload, variant_rank = _score_variants(payload)
     lint_report = lint_payload(payload)
 
@@ -264,6 +278,7 @@ def produce(
 
     write_outputs(payload, target_dir, trace)
     if warning_report:
+        target_dir.mkdir(parents=True, exist_ok=True)
         (target_dir / "warning_report.md").write_text(warning_report + "\n", encoding="utf-8")
 
     if verbose:

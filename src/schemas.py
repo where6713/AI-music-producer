@@ -12,6 +12,14 @@ class UserInput(BaseModel):
     genre_hint: str = ""
     mood_hint: str = ""
     vocal_gender_hint: Literal["male", "female", "any"] = "any"
+    profile_override: Literal[
+        "",
+        "urban_introspective",
+        "classical_restraint",
+        "uplift_pop",
+        "club_dance",
+        "ambient_meditation",
+    ] = ""
 
 
 class Distillation(BaseModel):
