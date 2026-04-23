@@ -37,7 +37,36 @@ def _infer_profile_confidence_from_source_ids(source_ids: list[str], profile_vot
 
 
 def _ensure_retrieval_profile_decision(trace: dict[str, object]) -> dict[str, object]:
-    if isinstance(trace.get("retrieval_profile_decision"), dict):
+    existing_decision = trace.get("retrieval_profile_decision")
+    if isinstance(existing_decision, dict):
+        profile_vote = str(existing_decision.get("profile_vote", "")).strip()
+        vote_confidence = _safe_float(existing_decision.get("vote_confidence", 0.0), default=0.0)
+        active_profile = str(existing_decision.get("active_profile", "")).strip()
+        decision_reason = str(existing_decision.get("decision_reason", "")).strip()
+        source_ids_raw = existing_decision.get("source_ids", trace.get("few_shot_source_ids", []))
+        source_ids = [str(x) for x in source_ids_raw] if isinstance(source_ids_raw, list) else []
+        source_stage = str(existing_decision.get("source_stage", trace.get("retrieval_profile_source", "initial"))).strip() or "initial"
+
+        if (not profile_vote) or (not active_profile):
+            inferred_vote = _infer_profile_vote_from_source_ids(source_ids)
+            inferred_confidence = _infer_profile_confidence_from_source_ids(source_ids, inferred_vote)
+            if inferred_vote:
+                profile_vote = inferred_vote
+                vote_confidence = max(vote_confidence, inferred_confidence)
+                active_profile = inferred_vote if vote_confidence >= (2 / 3) else ""
+                if active_profile:
+                    decision_reason = "activated"
+                elif not decision_reason:
+                    decision_reason = "insufficient_confidence"
+
+            trace["retrieval_profile_decision"] = {
+                "profile_vote": profile_vote,
+                "vote_confidence": vote_confidence,
+                "active_profile": active_profile,
+                "decision_reason": decision_reason or "no_profile_vote",
+                "source_stage": source_stage,
+                "source_ids": source_ids,
+            }
         return trace
 
     profile_vote = str(trace.get("retrieval_profile_vote", "")).strip()
