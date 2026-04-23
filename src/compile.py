@@ -195,3 +195,12 @@ def write_outputs(payload: LyricPayload, out_dir: Path, trace: dict[str, object]
         json.dumps(trace, ensure_ascii=False, indent=2), encoding="utf-8"
     )
     (out_dir / "audit.md").write_text(_format_audit_md(out_dir, trace), encoding="utf-8")
+
+
+def write_trace_and_audit(out_dir: Path, trace: dict[str, object]) -> None:
+    out_dir.mkdir(parents=True, exist_ok=True)
+    normalized = _ensure_retrieval_profile_decision(dict(trace))
+    (out_dir / "trace.json").write_text(
+        json.dumps(normalized, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    (out_dir / "audit.md").write_text(_format_audit_md(out_dir, normalized), encoding="utf-8")

@@ -642,6 +642,7 @@ def test_produce_rejects_when_all_variants_dead_after_targeted_revise(tmp_path, 
     assert calls["n"] == 2
     assert not (tmp_path / "out" / "lyrics.txt").exists()
     assert (tmp_path / "out" / "trace.json").exists()
+    assert (tmp_path / "out" / "audit.md").exists()
 
 
 def test_produce_rejects_when_postprocess_result_is_dead(tmp_path, monkeypatch) -> None:
@@ -711,6 +712,7 @@ def test_produce_rejects_when_postprocess_result_is_dead(tmp_path, monkeypatch) 
     assert getattr(err.value, "exit_code", None) == 2
     assert not (tmp_path / "out" / "lyrics.txt").exists()
     assert (tmp_path / "out" / "trace.json").exists()
+    assert (tmp_path / "out" / "audit.md").exists()
 
 
 def test_produce_fails_quality_floor_and_skips_lyrics_write(tmp_path, monkeypatch) -> None:
@@ -721,7 +723,10 @@ def test_produce_fails_quality_floor_and_skips_lyrics_write(tmp_path, monkeypatc
     payload.variants[1].lyrics_by_section = payload.lyrics_by_section
     payload.variants[2].lyrics_by_section = payload.lyrics_by_section
 
+    calls = {"n": 0}
+
     def _fake_generate(*_args, **_kwargs):
+        calls["n"] += 1
         return payload.model_copy(deep=True), {
             "provider": "openai-compatible",
             "model_used": "gpt-5.3-codex",
@@ -779,5 +784,7 @@ def test_produce_fails_quality_floor_and_skips_lyrics_write(tmp_path, monkeypatc
         )
 
     assert getattr(err.value, "exit_code", None) == 2
+    assert calls["n"] == 2
     assert not (tmp_path / "out" / "lyrics.txt").exists()
     assert (tmp_path / "out" / "trace.json").exists()
+    assert (tmp_path / "out" / "audit.md").exists()
