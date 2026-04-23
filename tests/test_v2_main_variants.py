@@ -537,3 +537,153 @@ def test_apply_retrieval_profile_decision_uses_router_active_profile_when_presen
     assert isinstance(decision, dict)
     assert decision["active_profile"] == "uplift_pop"
     assert decision["decision_reason"] == "activated"
+
+
+def test_produce_rejects_when_all_variants_dead_after_targeted_revise(tmp_path, monkeypatch) -> None:
+    from src import main as main_mod
+
+    payload = _payload()
+    dead_sections = [
+        {
+            "tag": "[Verse 1]",
+            "voice_tags_inline": [],
+            "lines": [
+                {"primary": "夜色还在窗沿徘徊", "backing": "", "tail_pinyin": "", "char_count": 8},
+                {"primary": "指尖悬在未发的对白", "backing": "", "tail_pinyin": "", "char_count": 9},
+                {"primary": "理智把冲动轻轻按开", "backing": "", "tail_pinyin": "", "char_count": 9},
+                {"primary": "我把想念折成静默", "backing": "", "tail_pinyin": "", "char_count": 8},
+            ],
+        },
+        {
+            "tag": "[Chorus]",
+            "voice_tags_inline": [],
+            "lines": [
+                {"primary": "我把想念折成静默", "backing": "", "tail_pinyin": "", "char_count": 8},
+                {"primary": "未寄出的月光沉在口袋", "backing": "", "tail_pinyin": "", "char_count": 10},
+                {"primary": "你听不见我学着离开", "backing": "", "tail_pinyin": "", "char_count": 9},
+                {"primary": "我把晚安留给未来", "backing": "", "tail_pinyin": "", "char_count": 8},
+            ],
+        },
+        {
+            "tag": "[Verse 2]",
+            "voice_tags_inline": [],
+            "lines": [
+                {"primary": "旧站台风把名字吹散", "backing": "", "tail_pinyin": "", "char_count": 9},
+                {"primary": "消息框静得像一片海", "backing": "", "tail_pinyin": "", "char_count": 9},
+                {"primary": "我把想念折成空白", "backing": "", "tail_pinyin": "", "char_count": 8},
+                {"primary": "让黎明替我把门关", "backing": "", "tail_pinyin": "", "char_count": 8},
+            ],
+        },
+    ]
+
+    payload.lyrics_by_section = [type(payload.lyrics_by_section[0]).model_validate(x) for x in dead_sections]
+    for variant in payload.variants:
+        variant.lyrics_by_section = [type(payload.lyrics_by_section[0]).model_validate(x) for x in dead_sections]
+
+    calls = {"n": 0}
+
+    def _fake_generate(*_args, **_kwargs):
+        calls["n"] += 1
+        return payload.model_copy(deep=True), {
+            "provider": "openai-compatible",
+            "model_used": "gpt-5.3-codex",
+            "usage": {"input_tokens": 1, "output_tokens": 1, "total_tokens": 2},
+            "llm_calls": 1,
+            "few_shot_source_ids": ["lyric-modern-101", "lyric-modern-102", "poem-jys-001"],
+            "retrieval_profile_vote": "urban_introspective",
+            "retrieval_vote_confidence": 0.67,
+            "stage": "initial",
+        }
+
+    def _fail_write_outputs(*_args, **_kwargs):
+        raise AssertionError("write_outputs should not be called when all variants are dead")
+
+    monkeypatch.setattr(main_mod, "generate_lyric_payload", _fake_generate)
+    monkeypatch.setattr(main_mod, "write_outputs", _fail_write_outputs)
+
+    with pytest.raises(Exception) as err:
+        main_mod.produce(
+            raw_intent="分手后夜里想发消息又忍住",
+            genre="",
+            mood="",
+            vocal="female",
+            profile="urban_introspective",
+            lang="zh-CN",
+            out_dir=str(tmp_path / "out"),
+            verbose=False,
+            dry_run=False,
+        )
+
+    assert getattr(err.value, "exit_code", None) == 2
+    assert calls["n"] == 2
+    assert not (tmp_path / "out" / "lyrics.txt").exists()
+    assert (tmp_path / "out" / "trace.json").exists()
+
+
+def test_produce_rejects_when_postprocess_result_is_dead(tmp_path, monkeypatch) -> None:
+    from src import main as main_mod
+
+    payload = _payload()
+    payload.variants[0].lyrics_by_section = payload.lyrics_by_section
+    payload.variants[1].lyrics_by_section = payload.lyrics_by_section
+    payload.variants[2].lyrics_by_section = payload.lyrics_by_section
+
+    def _fake_generate(*_args, **_kwargs):
+        return payload.model_copy(deep=True), {
+            "provider": "openai-compatible",
+            "model_used": "gpt-5.3-codex",
+            "usage": {"input_tokens": 1, "output_tokens": 1, "total_tokens": 2},
+            "llm_calls": 1,
+            "few_shot_source_ids": ["lyric-modern-101", "lyric-modern-102", "poem-jys-001"],
+            "retrieval_profile_vote": "urban_introspective",
+            "retrieval_vote_confidence": 0.67,
+            "stage": "initial",
+        }
+
+    def _fake_lint(_payload, **_kwargs):
+        return {
+            "pass": False,
+            "failed_rules": ["R14"],
+            "violations": [
+                {
+                    "rule": "R14",
+                    "detail": "forbidden verb-object phrase: 收回来",
+                    "section": "[Chorus]",
+                    "line": 1,
+                }
+            ],
+            "active_profile": "urban_introspective",
+            "skipped_rules_by_profile": [],
+            "profile_specific_violations": [],
+            "is_dead": True,
+            "death_reason": ["R14: forbidden verb-object phrase: 收回来"],
+            "hard_kill_rules": ["R14"],
+            "hard_penalty_count": 0,
+            "soft_penalty_count": 0,
+            "penalty_score": 0,
+            "all_dead_run_status": "",
+        }
+
+    def _fail_write_outputs(*_args, **_kwargs):
+        raise AssertionError("write_outputs should not be called when postprocess is dead")
+
+    monkeypatch.setattr(main_mod, "generate_lyric_payload", _fake_generate)
+    monkeypatch.setattr(main_mod, "lint_payload", _fake_lint)
+    monkeypatch.setattr(main_mod, "write_outputs", _fail_write_outputs)
+
+    with pytest.raises(Exception) as err:
+        main_mod.produce(
+            raw_intent="分手后夜里想发消息又忍住",
+            genre="",
+            mood="",
+            vocal="female",
+            profile="urban_introspective",
+            lang="zh-CN",
+            out_dir=str(tmp_path / "out"),
+            verbose=False,
+            dry_run=False,
+        )
+
+    assert getattr(err.value, "exit_code", None) == 2
+    assert not (tmp_path / "out" / "lyrics.txt").exists()
+    assert (tmp_path / "out" / "trace.json").exists()

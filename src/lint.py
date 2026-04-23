@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from collections import Counter
 from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
 from typing import Any
 
@@ -45,6 +46,69 @@ class Violation:
     detail: str
     section: str = ""
     line: int = 0
+
+
+class RuleSeverity(str, Enum):
+    HARD_KILL = "HARD_KILL"
+    HARD_PENALTY = "HARD_PENALTY"
+    SOFT_PENALTY = "SOFT_PENALTY"
+
+
+RULE_DEFINITIONS: dict[str, RuleSeverity] = {
+    "R01": RuleSeverity.HARD_PENALTY,
+    "R02": RuleSeverity.SOFT_PENALTY,
+    "R03": RuleSeverity.HARD_KILL,
+    "R05": RuleSeverity.SOFT_PENALTY,
+    "R06": RuleSeverity.SOFT_PENALTY,
+    "R14": RuleSeverity.HARD_KILL,
+    "R15": RuleSeverity.HARD_PENALTY,
+    "R16_global": RuleSeverity.HARD_KILL,
+    "R16_profile": RuleSeverity.HARD_PENALTY,
+    "R17": RuleSeverity.SOFT_PENALTY,
+}
+
+R14_FORBIDDEN_PHRASES = [
+    "折成静默",
+    "浇浅",
+    "收回来",
+]
+
+
+def _violation_rule_key(v: Violation) -> str:
+    if v.rule != "R16":
+        return v.rule
+    if "(global)" in v.detail:
+        return "R16_global"
+    return "R16_profile"
+
+
+def evaluate_violation_severity(violations: list[Violation]) -> dict[str, Any]:
+    hard_kill: list[str] = []
+    hard_penalty = 0
+    soft_penalty = 0
+    death_reason: list[str] = []
+
+    for violation in violations:
+        key = _violation_rule_key(violation)
+        severity = RULE_DEFINITIONS.get(key, RuleSeverity.SOFT_PENALTY)
+        if severity == RuleSeverity.HARD_KILL:
+            hard_kill.append(key)
+            death_reason.append(f"{key}: {violation.detail}")
+        elif severity == RuleSeverity.HARD_PENALTY:
+            hard_penalty += 1
+        else:
+            soft_penalty += 1
+
+    is_dead = bool(hard_kill)
+    penalty_score = hard_penalty * 5 + soft_penalty
+    return {
+        "is_dead": is_dead,
+        "hard_kill_rules": sorted(set(hard_kill)),
+        "hard_penalty_count": hard_penalty,
+        "soft_penalty_count": soft_penalty,
+        "penalty_score": penalty_score,
+        "death_reason": death_reason,
+    }
 
 
 def _all_lines(payload: LyricPayload) -> list[tuple[str, int, str]]:
@@ -169,6 +233,19 @@ def lint_payload(
                     )
                 )
 
+    # R14 hard kill phrase check (动宾合法性)
+    for section, idx, line in rows:
+        for phrase in R14_FORBIDDEN_PHRASES:
+            if phrase in line:
+                violations.append(
+                    Violation(
+                        rule="R14",
+                        detail=f"forbidden verb-object phrase: {phrase}",
+                        section=section,
+                        line=idx,
+                    )
+                )
+
     # R01 chorus hook line tail (zh-CN)
     hook_section = payload.structure.hook_section
     hook_idx = payload.structure.hook_line_index
@@ -281,11 +358,19 @@ def lint_payload(
             violations.append(Violation(rule="R17", detail=f"first-person ratio {ratio:.3f} exceeds max {float(max_ratio):.3f}"))
 
     failed_rules = sorted({v.rule for v in violations})
+    severity = evaluate_violation_severity(violations)
     return {
-        "pass": len(violations) == 0,
+        "pass": len(violations) == 0 and not severity["is_dead"],
         "failed_rules": failed_rules,
         "violations": [v.__dict__ for v in violations],
         "active_profile": active_profile,
         "skipped_rules_by_profile": skipped_rules_by_profile,
         "profile_specific_violations": profile_specific_violations,
+        "is_dead": severity["is_dead"],
+        "death_reason": severity["death_reason"],
+        "hard_kill_rules": severity["hard_kill_rules"],
+        "hard_penalty_count": severity["hard_penalty_count"],
+        "soft_penalty_count": severity["soft_penalty_count"],
+        "penalty_score": severity["penalty_score"],
+        "all_dead_run_status": "",
     }
