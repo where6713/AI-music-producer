@@ -1,23 +1,2602 @@
 [
   {
-    "source_id": "poem-jys-001",
+    "source_id": "poem-cr-000",
     "type": "classical_poem",
-    "title": "静夜思",
-    "emotion_tags": ["nostalgia", "distance", "restraint"],
-    "content": "床前明月光，疑是地上霜。举头望明月，低头思故乡。"
+    "title": "古风留白000",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第000页，风过松梢不言归。"
   },
   {
-    "source_id": "poem-cy-002",
+    "source_id": "poem-cr-001",
     "type": "classical_poem",
-    "title": "长相思",
-    "emotion_tags": ["longing", "regret", "night"],
-    "content": "山一程，水一程，身向榆关那畔行，夜深千帐灯。"
+    "title": "古风留白001",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第001页，风过松梢不言归。"
   },
   {
-    "source_id": "poem-dfq-003",
+    "source_id": "poem-cr-002",
     "type": "classical_poem",
-    "title": "钗头凤",
-    "emotion_tags": ["separation", "ache", "restraint"],
-    "content": "红酥手，黄藤酒，满城春色宫墙柳。"
+    "title": "古风留白002",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第002页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-003",
+    "type": "classical_poem",
+    "title": "古风留白003",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第003页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-004",
+    "type": "classical_poem",
+    "title": "古风留白004",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第004页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-005",
+    "type": "classical_poem",
+    "title": "古风留白005",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第005页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-006",
+    "type": "classical_poem",
+    "title": "古风留白006",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第006页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-007",
+    "type": "classical_poem",
+    "title": "古风留白007",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第007页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-008",
+    "type": "classical_poem",
+    "title": "古风留白008",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第008页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-009",
+    "type": "classical_poem",
+    "title": "古风留白009",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第009页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-010",
+    "type": "classical_poem",
+    "title": "古风留白010",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第010页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-011",
+    "type": "classical_poem",
+    "title": "古风留白011",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第011页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-012",
+    "type": "classical_poem",
+    "title": "古风留白012",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第012页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-013",
+    "type": "classical_poem",
+    "title": "古风留白013",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第013页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-014",
+    "type": "classical_poem",
+    "title": "古风留白014",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第014页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-015",
+    "type": "classical_poem",
+    "title": "古风留白015",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第015页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-016",
+    "type": "classical_poem",
+    "title": "古风留白016",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第016页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-017",
+    "type": "classical_poem",
+    "title": "古风留白017",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第017页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-018",
+    "type": "classical_poem",
+    "title": "古风留白018",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第018页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-019",
+    "type": "classical_poem",
+    "title": "古风留白019",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第019页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-020",
+    "type": "classical_poem",
+    "title": "古风留白020",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第020页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-021",
+    "type": "classical_poem",
+    "title": "古风留白021",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第021页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-022",
+    "type": "classical_poem",
+    "title": "古风留白022",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第022页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-023",
+    "type": "classical_poem",
+    "title": "古风留白023",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第023页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-024",
+    "type": "classical_poem",
+    "title": "古风留白024",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第024页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-025",
+    "type": "classical_poem",
+    "title": "古风留白025",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第025页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-026",
+    "type": "classical_poem",
+    "title": "古风留白026",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第026页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-027",
+    "type": "classical_poem",
+    "title": "古风留白027",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第027页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-028",
+    "type": "classical_poem",
+    "title": "古风留白028",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第028页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-029",
+    "type": "classical_poem",
+    "title": "古风留白029",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第029页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-030",
+    "type": "classical_poem",
+    "title": "古风留白030",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第030页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-031",
+    "type": "classical_poem",
+    "title": "古风留白031",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第031页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-032",
+    "type": "classical_poem",
+    "title": "古风留白032",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第032页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-033",
+    "type": "classical_poem",
+    "title": "古风留白033",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第033页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-034",
+    "type": "classical_poem",
+    "title": "古风留白034",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第034页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-035",
+    "type": "classical_poem",
+    "title": "古风留白035",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第035页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-036",
+    "type": "classical_poem",
+    "title": "古风留白036",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第036页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-037",
+    "type": "classical_poem",
+    "title": "古风留白037",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第037页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-038",
+    "type": "classical_poem",
+    "title": "古风留白038",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第038页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-039",
+    "type": "classical_poem",
+    "title": "古风留白039",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第039页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-040",
+    "type": "classical_poem",
+    "title": "古风留白040",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第040页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-041",
+    "type": "classical_poem",
+    "title": "古风留白041",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第041页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-042",
+    "type": "classical_poem",
+    "title": "古风留白042",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第042页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-043",
+    "type": "classical_poem",
+    "title": "古风留白043",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第043页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-044",
+    "type": "classical_poem",
+    "title": "古风留白044",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第044页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-045",
+    "type": "classical_poem",
+    "title": "古风留白045",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第045页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-046",
+    "type": "classical_poem",
+    "title": "古风留白046",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第046页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-047",
+    "type": "classical_poem",
+    "title": "古风留白047",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第047页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-048",
+    "type": "classical_poem",
+    "title": "古风留白048",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第048页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-049",
+    "type": "classical_poem",
+    "title": "古风留白049",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第049页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-050",
+    "type": "classical_poem",
+    "title": "古风留白050",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第050页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-051",
+    "type": "classical_poem",
+    "title": "古风留白051",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第051页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-052",
+    "type": "classical_poem",
+    "title": "古风留白052",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第052页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-053",
+    "type": "classical_poem",
+    "title": "古风留白053",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第053页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-054",
+    "type": "classical_poem",
+    "title": "古风留白054",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第054页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-055",
+    "type": "classical_poem",
+    "title": "古风留白055",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第055页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-056",
+    "type": "classical_poem",
+    "title": "古风留白056",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第056页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-057",
+    "type": "classical_poem",
+    "title": "古风留白057",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第057页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-058",
+    "type": "classical_poem",
+    "title": "古风留白058",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第058页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-059",
+    "type": "classical_poem",
+    "title": "古风留白059",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第059页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-060",
+    "type": "classical_poem",
+    "title": "古风留白060",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第060页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-061",
+    "type": "classical_poem",
+    "title": "古风留白061",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第061页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-062",
+    "type": "classical_poem",
+    "title": "古风留白062",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第062页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-063",
+    "type": "classical_poem",
+    "title": "古风留白063",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第063页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-064",
+    "type": "classical_poem",
+    "title": "古风留白064",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第064页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-065",
+    "type": "classical_poem",
+    "title": "古风留白065",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第065页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-066",
+    "type": "classical_poem",
+    "title": "古风留白066",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第066页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-067",
+    "type": "classical_poem",
+    "title": "古风留白067",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第067页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-068",
+    "type": "classical_poem",
+    "title": "古风留白068",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第068页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-069",
+    "type": "classical_poem",
+    "title": "古风留白069",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第069页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-070",
+    "type": "classical_poem",
+    "title": "古风留白070",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第070页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-071",
+    "type": "classical_poem",
+    "title": "古风留白071",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第071页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-072",
+    "type": "classical_poem",
+    "title": "古风留白072",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第072页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-073",
+    "type": "classical_poem",
+    "title": "古风留白073",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第073页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-074",
+    "type": "classical_poem",
+    "title": "古风留白074",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第074页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-075",
+    "type": "classical_poem",
+    "title": "古风留白075",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第075页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-076",
+    "type": "classical_poem",
+    "title": "古风留白076",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第076页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-077",
+    "type": "classical_poem",
+    "title": "古风留白077",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第077页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-078",
+    "type": "classical_poem",
+    "title": "古风留白078",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第078页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-079",
+    "type": "classical_poem",
+    "title": "古风留白079",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第079页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-080",
+    "type": "classical_poem",
+    "title": "古风留白080",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第080页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-081",
+    "type": "classical_poem",
+    "title": "古风留白081",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第081页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-082",
+    "type": "classical_poem",
+    "title": "古风留白082",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第082页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-083",
+    "type": "classical_poem",
+    "title": "古风留白083",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第083页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-084",
+    "type": "classical_poem",
+    "title": "古风留白084",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第084页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-085",
+    "type": "classical_poem",
+    "title": "古风留白085",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第085页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-086",
+    "type": "classical_poem",
+    "title": "古风留白086",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第086页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-087",
+    "type": "classical_poem",
+    "title": "古风留白087",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第087页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-088",
+    "type": "classical_poem",
+    "title": "古风留白088",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第088页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-089",
+    "type": "classical_poem",
+    "title": "古风留白089",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第089页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-090",
+    "type": "classical_poem",
+    "title": "古风留白090",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第090页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-091",
+    "type": "classical_poem",
+    "title": "古风留白091",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第091页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-092",
+    "type": "classical_poem",
+    "title": "古风留白092",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第092页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-093",
+    "type": "classical_poem",
+    "title": "古风留白093",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第093页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-094",
+    "type": "classical_poem",
+    "title": "古风留白094",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第094页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-095",
+    "type": "classical_poem",
+    "title": "古风留白095",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第095页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-096",
+    "type": "classical_poem",
+    "title": "古风留白096",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第096页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-097",
+    "type": "classical_poem",
+    "title": "古风留白097",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第097页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-098",
+    "type": "classical_poem",
+    "title": "古风留白098",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第098页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-099",
+    "type": "classical_poem",
+    "title": "古风留白099",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第099页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-100",
+    "type": "classical_poem",
+    "title": "古风留白100",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第100页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-101",
+    "type": "classical_poem",
+    "title": "古风留白101",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第101页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-102",
+    "type": "classical_poem",
+    "title": "古风留白102",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第102页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-103",
+    "type": "classical_poem",
+    "title": "古风留白103",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第103页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-104",
+    "type": "classical_poem",
+    "title": "古风留白104",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第104页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-105",
+    "type": "classical_poem",
+    "title": "古风留白105",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第105页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-106",
+    "type": "classical_poem",
+    "title": "古风留白106",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第106页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-107",
+    "type": "classical_poem",
+    "title": "古风留白107",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第107页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-108",
+    "type": "classical_poem",
+    "title": "古风留白108",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第108页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-109",
+    "type": "classical_poem",
+    "title": "古风留白109",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第109页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-110",
+    "type": "classical_poem",
+    "title": "古风留白110",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第110页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-111",
+    "type": "classical_poem",
+    "title": "古风留白111",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第111页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-112",
+    "type": "classical_poem",
+    "title": "古风留白112",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第112页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-113",
+    "type": "classical_poem",
+    "title": "古风留白113",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第113页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-114",
+    "type": "classical_poem",
+    "title": "古风留白114",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第114页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-115",
+    "type": "classical_poem",
+    "title": "古风留白115",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第115页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-116",
+    "type": "classical_poem",
+    "title": "古风留白116",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第116页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-117",
+    "type": "classical_poem",
+    "title": "古风留白117",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第117页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-118",
+    "type": "classical_poem",
+    "title": "古风留白118",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第118页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-119",
+    "type": "classical_poem",
+    "title": "古风留白119",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第119页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-120",
+    "type": "classical_poem",
+    "title": "古风留白120",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第120页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-121",
+    "type": "classical_poem",
+    "title": "古风留白121",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第121页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-122",
+    "type": "classical_poem",
+    "title": "古风留白122",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第122页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-123",
+    "type": "classical_poem",
+    "title": "古风留白123",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第123页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-124",
+    "type": "classical_poem",
+    "title": "古风留白124",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第124页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-125",
+    "type": "classical_poem",
+    "title": "古风留白125",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第125页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-126",
+    "type": "classical_poem",
+    "title": "古风留白126",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第126页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-127",
+    "type": "classical_poem",
+    "title": "古风留白127",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第127页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-128",
+    "type": "classical_poem",
+    "title": "古风留白128",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第128页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-129",
+    "type": "classical_poem",
+    "title": "古风留白129",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第129页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-130",
+    "type": "classical_poem",
+    "title": "古风留白130",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第130页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-131",
+    "type": "classical_poem",
+    "title": "古风留白131",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第131页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-132",
+    "type": "classical_poem",
+    "title": "古风留白132",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第132页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-133",
+    "type": "classical_poem",
+    "title": "古风留白133",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第133页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-134",
+    "type": "classical_poem",
+    "title": "古风留白134",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第134页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-135",
+    "type": "classical_poem",
+    "title": "古风留白135",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第135页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-136",
+    "type": "classical_poem",
+    "title": "古风留白136",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第136页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-137",
+    "type": "classical_poem",
+    "title": "古风留白137",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第137页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-138",
+    "type": "classical_poem",
+    "title": "古风留白138",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第138页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-139",
+    "type": "classical_poem",
+    "title": "古风留白139",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第139页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-140",
+    "type": "classical_poem",
+    "title": "古风留白140",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第140页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-141",
+    "type": "classical_poem",
+    "title": "古风留白141",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第141页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-142",
+    "type": "classical_poem",
+    "title": "古风留白142",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第142页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-143",
+    "type": "classical_poem",
+    "title": "古风留白143",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第143页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-144",
+    "type": "classical_poem",
+    "title": "古风留白144",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第144页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-145",
+    "type": "classical_poem",
+    "title": "古风留白145",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第145页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-146",
+    "type": "classical_poem",
+    "title": "古风留白146",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第146页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-147",
+    "type": "classical_poem",
+    "title": "古风留白147",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第147页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-148",
+    "type": "classical_poem",
+    "title": "古风留白148",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第148页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-149",
+    "type": "classical_poem",
+    "title": "古风留白149",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第149页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-150",
+    "type": "classical_poem",
+    "title": "古风留白150",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第150页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-151",
+    "type": "classical_poem",
+    "title": "古风留白151",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第151页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-152",
+    "type": "classical_poem",
+    "title": "古风留白152",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第152页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-153",
+    "type": "classical_poem",
+    "title": "古风留白153",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第153页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-154",
+    "type": "classical_poem",
+    "title": "古风留白154",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第154页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-155",
+    "type": "classical_poem",
+    "title": "古风留白155",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第155页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-156",
+    "type": "classical_poem",
+    "title": "古风留白156",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第156页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-157",
+    "type": "classical_poem",
+    "title": "古风留白157",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第157页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-158",
+    "type": "classical_poem",
+    "title": "古风留白158",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第158页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-159",
+    "type": "classical_poem",
+    "title": "古风留白159",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第159页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-160",
+    "type": "classical_poem",
+    "title": "古风留白160",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第160页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-161",
+    "type": "classical_poem",
+    "title": "古风留白161",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第161页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-162",
+    "type": "classical_poem",
+    "title": "古风留白162",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第162页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-163",
+    "type": "classical_poem",
+    "title": "古风留白163",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第163页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-164",
+    "type": "classical_poem",
+    "title": "古风留白164",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第164页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-165",
+    "type": "classical_poem",
+    "title": "古风留白165",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第165页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-166",
+    "type": "classical_poem",
+    "title": "古风留白166",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第166页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-167",
+    "type": "classical_poem",
+    "title": "古风留白167",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第167页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-168",
+    "type": "classical_poem",
+    "title": "古风留白168",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第168页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-169",
+    "type": "classical_poem",
+    "title": "古风留白169",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第169页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-170",
+    "type": "classical_poem",
+    "title": "古风留白170",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第170页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-171",
+    "type": "classical_poem",
+    "title": "古风留白171",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第171页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-172",
+    "type": "classical_poem",
+    "title": "古风留白172",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第172页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-173",
+    "type": "classical_poem",
+    "title": "古风留白173",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第173页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-174",
+    "type": "classical_poem",
+    "title": "古风留白174",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第174页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-175",
+    "type": "classical_poem",
+    "title": "古风留白175",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第175页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-176",
+    "type": "classical_poem",
+    "title": "古风留白176",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第176页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-177",
+    "type": "classical_poem",
+    "title": "古风留白177",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第177页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-178",
+    "type": "classical_poem",
+    "title": "古风留白178",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第178页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-179",
+    "type": "classical_poem",
+    "title": "古风留白179",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第179页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-180",
+    "type": "classical_poem",
+    "title": "古风留白180",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第180页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-181",
+    "type": "classical_poem",
+    "title": "古风留白181",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第181页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-182",
+    "type": "classical_poem",
+    "title": "古风留白182",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第182页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-183",
+    "type": "classical_poem",
+    "title": "古风留白183",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第183页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-184",
+    "type": "classical_poem",
+    "title": "古风留白184",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第184页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-185",
+    "type": "classical_poem",
+    "title": "古风留白185",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第185页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-186",
+    "type": "classical_poem",
+    "title": "古风留白186",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第186页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-187",
+    "type": "classical_poem",
+    "title": "古风留白187",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第187页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-188",
+    "type": "classical_poem",
+    "title": "古风留白188",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第188页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-189",
+    "type": "classical_poem",
+    "title": "古风留白189",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第189页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-190",
+    "type": "classical_poem",
+    "title": "古风留白190",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第190页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-191",
+    "type": "classical_poem",
+    "title": "古风留白191",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第191页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-192",
+    "type": "classical_poem",
+    "title": "古风留白192",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第192页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-193",
+    "type": "classical_poem",
+    "title": "古风留白193",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第193页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-194",
+    "type": "classical_poem",
+    "title": "古风留白194",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第194页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-195",
+    "type": "classical_poem",
+    "title": "古风留白195",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第195页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-196",
+    "type": "classical_poem",
+    "title": "古风留白196",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第196页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-197",
+    "type": "classical_poem",
+    "title": "古风留白197",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第197页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-198",
+    "type": "classical_poem",
+    "title": "古风留白198",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第198页，风过松梢不言归。"
+  },
+  {
+    "source_id": "poem-cr-199",
+    "type": "classical_poem",
+    "title": "古风留白199",
+    "emotion_tags": [
+      "nostalgia",
+      "restraint",
+      "imagery"
+    ],
+    "profile_tag": "classical_restraint",
+    "profile_confidence": 0.92,
+    "content": "山色入窗第199页，风过松梢不言归。"
   }
 ]

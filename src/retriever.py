@@ -167,9 +167,16 @@ def retrieve_few_shot_examples(
         profile_vote = ""
         vote_confidence = 0.0
 
-    monoculture_risk = (
-        len(votes) == 1 and vote_confidence < 1.0 and len(normalized) >= 2
-    )
+    monoculture_risk = False
+    if len(votes) == 1 and normalized:
+        dominant = profile_vote
+        confidences = [
+            float(sample.get("profile_confidence", 0.0) or 0.0)
+            for sample in normalized
+            if sample.get("profile_tag") == dominant
+        ]
+        avg_confidence = (sum(confidences) / len(confidences)) if confidences else 0.0
+        monoculture_risk = avg_confidence < 0.67
 
     return {
         "samples": normalized,

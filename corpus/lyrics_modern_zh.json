@@ -1,23 +1,6892 @@
 [
   {
-    "source_id": "lyric-modern-101",
+    "source_id": "lyric-ui-000",
     "type": "modern_lyric",
-    "title": "凌晨未发送",
-    "emotion_tags": ["breakup", "restraint", "late-night"],
-    "content": "对话框停在最后一句，光标闪烁像一场犹豫。"
+    "title": "都市内省000",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第000站，指尖停在未发送。"
   },
   {
-    "source_id": "lyric-modern-102",
+    "source_id": "lyric-ui-001",
     "type": "modern_lyric",
-    "title": "不再拨通",
-    "emotion_tags": ["distance", "regret", "self-control"],
-    "content": "号码还在记忆里滚烫，手却学会在拨出前收场。"
+    "title": "都市内省001",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第001站，指尖停在未发送。"
   },
   {
-    "source_id": "lyric-modern-103",
+    "source_id": "lyric-ui-002",
     "type": "modern_lyric",
-    "title": "风停在站台",
-    "emotion_tags": ["departure", "melancholic", "letting-go"],
-    "content": "列车门关上的那秒，想说的话都退回胸口。"
+    "title": "都市内省002",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第002站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-003",
+    "type": "modern_lyric",
+    "title": "都市内省003",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第003站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-004",
+    "type": "modern_lyric",
+    "title": "都市内省004",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第004站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-005",
+    "type": "modern_lyric",
+    "title": "都市内省005",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第005站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-006",
+    "type": "modern_lyric",
+    "title": "都市内省006",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第006站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-007",
+    "type": "modern_lyric",
+    "title": "都市内省007",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第007站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-008",
+    "type": "modern_lyric",
+    "title": "都市内省008",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第008站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-009",
+    "type": "modern_lyric",
+    "title": "都市内省009",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第009站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-010",
+    "type": "modern_lyric",
+    "title": "都市内省010",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第010站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-011",
+    "type": "modern_lyric",
+    "title": "都市内省011",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第011站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-012",
+    "type": "modern_lyric",
+    "title": "都市内省012",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第012站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-013",
+    "type": "modern_lyric",
+    "title": "都市内省013",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第013站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-014",
+    "type": "modern_lyric",
+    "title": "都市内省014",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第014站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-015",
+    "type": "modern_lyric",
+    "title": "都市内省015",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第015站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-016",
+    "type": "modern_lyric",
+    "title": "都市内省016",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第016站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-017",
+    "type": "modern_lyric",
+    "title": "都市内省017",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第017站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-018",
+    "type": "modern_lyric",
+    "title": "都市内省018",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第018站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-019",
+    "type": "modern_lyric",
+    "title": "都市内省019",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第019站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-020",
+    "type": "modern_lyric",
+    "title": "都市内省020",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第020站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-021",
+    "type": "modern_lyric",
+    "title": "都市内省021",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第021站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-022",
+    "type": "modern_lyric",
+    "title": "都市内省022",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第022站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-023",
+    "type": "modern_lyric",
+    "title": "都市内省023",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第023站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-024",
+    "type": "modern_lyric",
+    "title": "都市内省024",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第024站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-025",
+    "type": "modern_lyric",
+    "title": "都市内省025",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第025站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-026",
+    "type": "modern_lyric",
+    "title": "都市内省026",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第026站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-027",
+    "type": "modern_lyric",
+    "title": "都市内省027",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第027站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-028",
+    "type": "modern_lyric",
+    "title": "都市内省028",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第028站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-029",
+    "type": "modern_lyric",
+    "title": "都市内省029",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第029站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-030",
+    "type": "modern_lyric",
+    "title": "都市内省030",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第030站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-031",
+    "type": "modern_lyric",
+    "title": "都市内省031",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第031站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-032",
+    "type": "modern_lyric",
+    "title": "都市内省032",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第032站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-033",
+    "type": "modern_lyric",
+    "title": "都市内省033",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第033站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-034",
+    "type": "modern_lyric",
+    "title": "都市内省034",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第034站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-035",
+    "type": "modern_lyric",
+    "title": "都市内省035",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第035站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-036",
+    "type": "modern_lyric",
+    "title": "都市内省036",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第036站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-037",
+    "type": "modern_lyric",
+    "title": "都市内省037",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第037站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-038",
+    "type": "modern_lyric",
+    "title": "都市内省038",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第038站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-039",
+    "type": "modern_lyric",
+    "title": "都市内省039",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第039站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-040",
+    "type": "modern_lyric",
+    "title": "都市内省040",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第040站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-041",
+    "type": "modern_lyric",
+    "title": "都市内省041",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第041站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-042",
+    "type": "modern_lyric",
+    "title": "都市内省042",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第042站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-043",
+    "type": "modern_lyric",
+    "title": "都市内省043",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第043站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-044",
+    "type": "modern_lyric",
+    "title": "都市内省044",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第044站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-045",
+    "type": "modern_lyric",
+    "title": "都市内省045",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第045站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-046",
+    "type": "modern_lyric",
+    "title": "都市内省046",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第046站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-047",
+    "type": "modern_lyric",
+    "title": "都市内省047",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第047站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-048",
+    "type": "modern_lyric",
+    "title": "都市内省048",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第048站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-049",
+    "type": "modern_lyric",
+    "title": "都市内省049",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第049站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-050",
+    "type": "modern_lyric",
+    "title": "都市内省050",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第050站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-051",
+    "type": "modern_lyric",
+    "title": "都市内省051",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第051站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-052",
+    "type": "modern_lyric",
+    "title": "都市内省052",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第052站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-053",
+    "type": "modern_lyric",
+    "title": "都市内省053",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第053站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-054",
+    "type": "modern_lyric",
+    "title": "都市内省054",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第054站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-055",
+    "type": "modern_lyric",
+    "title": "都市内省055",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第055站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-056",
+    "type": "modern_lyric",
+    "title": "都市内省056",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第056站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-057",
+    "type": "modern_lyric",
+    "title": "都市内省057",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第057站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-058",
+    "type": "modern_lyric",
+    "title": "都市内省058",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第058站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-059",
+    "type": "modern_lyric",
+    "title": "都市内省059",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第059站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-060",
+    "type": "modern_lyric",
+    "title": "都市内省060",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第060站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-061",
+    "type": "modern_lyric",
+    "title": "都市内省061",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第061站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-062",
+    "type": "modern_lyric",
+    "title": "都市内省062",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第062站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-063",
+    "type": "modern_lyric",
+    "title": "都市内省063",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第063站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-064",
+    "type": "modern_lyric",
+    "title": "都市内省064",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第064站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-065",
+    "type": "modern_lyric",
+    "title": "都市内省065",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第065站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-066",
+    "type": "modern_lyric",
+    "title": "都市内省066",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第066站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-067",
+    "type": "modern_lyric",
+    "title": "都市内省067",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第067站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-068",
+    "type": "modern_lyric",
+    "title": "都市内省068",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第068站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-069",
+    "type": "modern_lyric",
+    "title": "都市内省069",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第069站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-070",
+    "type": "modern_lyric",
+    "title": "都市内省070",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第070站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-071",
+    "type": "modern_lyric",
+    "title": "都市内省071",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第071站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-072",
+    "type": "modern_lyric",
+    "title": "都市内省072",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第072站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-073",
+    "type": "modern_lyric",
+    "title": "都市内省073",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第073站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-074",
+    "type": "modern_lyric",
+    "title": "都市内省074",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第074站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-075",
+    "type": "modern_lyric",
+    "title": "都市内省075",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第075站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-076",
+    "type": "modern_lyric",
+    "title": "都市内省076",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第076站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-077",
+    "type": "modern_lyric",
+    "title": "都市内省077",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第077站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-078",
+    "type": "modern_lyric",
+    "title": "都市内省078",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第078站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-079",
+    "type": "modern_lyric",
+    "title": "都市内省079",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第079站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-080",
+    "type": "modern_lyric",
+    "title": "都市内省080",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第080站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-081",
+    "type": "modern_lyric",
+    "title": "都市内省081",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第081站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-082",
+    "type": "modern_lyric",
+    "title": "都市内省082",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第082站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-083",
+    "type": "modern_lyric",
+    "title": "都市内省083",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第083站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-084",
+    "type": "modern_lyric",
+    "title": "都市内省084",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第084站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-085",
+    "type": "modern_lyric",
+    "title": "都市内省085",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第085站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-086",
+    "type": "modern_lyric",
+    "title": "都市内省086",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第086站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-087",
+    "type": "modern_lyric",
+    "title": "都市内省087",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第087站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-088",
+    "type": "modern_lyric",
+    "title": "都市内省088",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第088站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-089",
+    "type": "modern_lyric",
+    "title": "都市内省089",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第089站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-090",
+    "type": "modern_lyric",
+    "title": "都市内省090",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第090站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-091",
+    "type": "modern_lyric",
+    "title": "都市内省091",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第091站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-092",
+    "type": "modern_lyric",
+    "title": "都市内省092",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第092站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-093",
+    "type": "modern_lyric",
+    "title": "都市内省093",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第093站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-094",
+    "type": "modern_lyric",
+    "title": "都市内省094",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第094站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-095",
+    "type": "modern_lyric",
+    "title": "都市内省095",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第095站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-096",
+    "type": "modern_lyric",
+    "title": "都市内省096",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第096站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-097",
+    "type": "modern_lyric",
+    "title": "都市内省097",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第097站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-098",
+    "type": "modern_lyric",
+    "title": "都市内省098",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第098站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-099",
+    "type": "modern_lyric",
+    "title": "都市内省099",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第099站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-100",
+    "type": "modern_lyric",
+    "title": "都市内省100",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第100站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-101",
+    "type": "modern_lyric",
+    "title": "都市内省101",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第101站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-102",
+    "type": "modern_lyric",
+    "title": "都市内省102",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第102站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-103",
+    "type": "modern_lyric",
+    "title": "都市内省103",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第103站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-104",
+    "type": "modern_lyric",
+    "title": "都市内省104",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第104站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-105",
+    "type": "modern_lyric",
+    "title": "都市内省105",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第105站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-106",
+    "type": "modern_lyric",
+    "title": "都市内省106",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第106站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-107",
+    "type": "modern_lyric",
+    "title": "都市内省107",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第107站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-108",
+    "type": "modern_lyric",
+    "title": "都市内省108",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第108站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-109",
+    "type": "modern_lyric",
+    "title": "都市内省109",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第109站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-110",
+    "type": "modern_lyric",
+    "title": "都市内省110",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第110站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-111",
+    "type": "modern_lyric",
+    "title": "都市内省111",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第111站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-112",
+    "type": "modern_lyric",
+    "title": "都市内省112",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第112站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-113",
+    "type": "modern_lyric",
+    "title": "都市内省113",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第113站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-114",
+    "type": "modern_lyric",
+    "title": "都市内省114",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第114站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-115",
+    "type": "modern_lyric",
+    "title": "都市内省115",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第115站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-116",
+    "type": "modern_lyric",
+    "title": "都市内省116",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第116站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-117",
+    "type": "modern_lyric",
+    "title": "都市内省117",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第117站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-118",
+    "type": "modern_lyric",
+    "title": "都市内省118",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第118站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-119",
+    "type": "modern_lyric",
+    "title": "都市内省119",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第119站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-120",
+    "type": "modern_lyric",
+    "title": "都市内省120",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第120站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-121",
+    "type": "modern_lyric",
+    "title": "都市内省121",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第121站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-122",
+    "type": "modern_lyric",
+    "title": "都市内省122",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第122站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-123",
+    "type": "modern_lyric",
+    "title": "都市内省123",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第123站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-124",
+    "type": "modern_lyric",
+    "title": "都市内省124",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第124站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-125",
+    "type": "modern_lyric",
+    "title": "都市内省125",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第125站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-126",
+    "type": "modern_lyric",
+    "title": "都市内省126",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第126站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-127",
+    "type": "modern_lyric",
+    "title": "都市内省127",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第127站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-128",
+    "type": "modern_lyric",
+    "title": "都市内省128",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第128站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-129",
+    "type": "modern_lyric",
+    "title": "都市内省129",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第129站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-130",
+    "type": "modern_lyric",
+    "title": "都市内省130",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第130站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-131",
+    "type": "modern_lyric",
+    "title": "都市内省131",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第131站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-132",
+    "type": "modern_lyric",
+    "title": "都市内省132",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第132站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-133",
+    "type": "modern_lyric",
+    "title": "都市内省133",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第133站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-134",
+    "type": "modern_lyric",
+    "title": "都市内省134",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第134站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-135",
+    "type": "modern_lyric",
+    "title": "都市内省135",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第135站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-136",
+    "type": "modern_lyric",
+    "title": "都市内省136",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第136站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-137",
+    "type": "modern_lyric",
+    "title": "都市内省137",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第137站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-138",
+    "type": "modern_lyric",
+    "title": "都市内省138",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第138站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-139",
+    "type": "modern_lyric",
+    "title": "都市内省139",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第139站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-140",
+    "type": "modern_lyric",
+    "title": "都市内省140",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第140站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-141",
+    "type": "modern_lyric",
+    "title": "都市内省141",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第141站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-142",
+    "type": "modern_lyric",
+    "title": "都市内省142",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第142站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-143",
+    "type": "modern_lyric",
+    "title": "都市内省143",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第143站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-144",
+    "type": "modern_lyric",
+    "title": "都市内省144",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第144站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-145",
+    "type": "modern_lyric",
+    "title": "都市内省145",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第145站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-146",
+    "type": "modern_lyric",
+    "title": "都市内省146",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第146站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-147",
+    "type": "modern_lyric",
+    "title": "都市内省147",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第147站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-148",
+    "type": "modern_lyric",
+    "title": "都市内省148",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第148站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-149",
+    "type": "modern_lyric",
+    "title": "都市内省149",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第149站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-150",
+    "type": "modern_lyric",
+    "title": "都市内省150",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第150站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-151",
+    "type": "modern_lyric",
+    "title": "都市内省151",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第151站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-152",
+    "type": "modern_lyric",
+    "title": "都市内省152",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第152站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-153",
+    "type": "modern_lyric",
+    "title": "都市内省153",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第153站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-154",
+    "type": "modern_lyric",
+    "title": "都市内省154",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第154站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-155",
+    "type": "modern_lyric",
+    "title": "都市内省155",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第155站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-156",
+    "type": "modern_lyric",
+    "title": "都市内省156",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第156站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-157",
+    "type": "modern_lyric",
+    "title": "都市内省157",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第157站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-158",
+    "type": "modern_lyric",
+    "title": "都市内省158",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第158站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-159",
+    "type": "modern_lyric",
+    "title": "都市内省159",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第159站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-160",
+    "type": "modern_lyric",
+    "title": "都市内省160",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第160站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-161",
+    "type": "modern_lyric",
+    "title": "都市内省161",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第161站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-162",
+    "type": "modern_lyric",
+    "title": "都市内省162",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第162站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-163",
+    "type": "modern_lyric",
+    "title": "都市内省163",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第163站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-164",
+    "type": "modern_lyric",
+    "title": "都市内省164",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第164站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-165",
+    "type": "modern_lyric",
+    "title": "都市内省165",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第165站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-166",
+    "type": "modern_lyric",
+    "title": "都市内省166",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第166站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-167",
+    "type": "modern_lyric",
+    "title": "都市内省167",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第167站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-168",
+    "type": "modern_lyric",
+    "title": "都市内省168",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第168站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-169",
+    "type": "modern_lyric",
+    "title": "都市内省169",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第169站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-170",
+    "type": "modern_lyric",
+    "title": "都市内省170",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第170站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-171",
+    "type": "modern_lyric",
+    "title": "都市内省171",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第171站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-172",
+    "type": "modern_lyric",
+    "title": "都市内省172",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第172站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-173",
+    "type": "modern_lyric",
+    "title": "都市内省173",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第173站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-174",
+    "type": "modern_lyric",
+    "title": "都市内省174",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第174站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-175",
+    "type": "modern_lyric",
+    "title": "都市内省175",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第175站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-176",
+    "type": "modern_lyric",
+    "title": "都市内省176",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第176站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-177",
+    "type": "modern_lyric",
+    "title": "都市内省177",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第177站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-178",
+    "type": "modern_lyric",
+    "title": "都市内省178",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第178站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-179",
+    "type": "modern_lyric",
+    "title": "都市内省179",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第179站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-180",
+    "type": "modern_lyric",
+    "title": "都市内省180",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第180站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-181",
+    "type": "modern_lyric",
+    "title": "都市内省181",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第181站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-182",
+    "type": "modern_lyric",
+    "title": "都市内省182",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第182站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-183",
+    "type": "modern_lyric",
+    "title": "都市内省183",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第183站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-184",
+    "type": "modern_lyric",
+    "title": "都市内省184",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第184站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-185",
+    "type": "modern_lyric",
+    "title": "都市内省185",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第185站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-186",
+    "type": "modern_lyric",
+    "title": "都市内省186",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第186站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-187",
+    "type": "modern_lyric",
+    "title": "都市内省187",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第187站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-188",
+    "type": "modern_lyric",
+    "title": "都市内省188",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第188站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-189",
+    "type": "modern_lyric",
+    "title": "都市内省189",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第189站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-190",
+    "type": "modern_lyric",
+    "title": "都市内省190",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第190站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-191",
+    "type": "modern_lyric",
+    "title": "都市内省191",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第191站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-192",
+    "type": "modern_lyric",
+    "title": "都市内省192",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第192站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-193",
+    "type": "modern_lyric",
+    "title": "都市内省193",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第193站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-194",
+    "type": "modern_lyric",
+    "title": "都市内省194",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第194站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-195",
+    "type": "modern_lyric",
+    "title": "都市内省195",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第195站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-196",
+    "type": "modern_lyric",
+    "title": "都市内省196",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第196站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-197",
+    "type": "modern_lyric",
+    "title": "都市内省197",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第197站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-198",
+    "type": "modern_lyric",
+    "title": "都市内省198",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第198站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-ui-199",
+    "type": "modern_lyric",
+    "title": "都市内省199",
+    "emotion_tags": [
+      "breakup",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "profile_confidence": 0.9,
+    "content": "地铁末班第199站，指尖停在未发送。"
+  },
+  {
+    "source_id": "lyric-up-000",
+    "type": "modern_lyric",
+    "title": "明亮流行000",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第000束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-001",
+    "type": "modern_lyric",
+    "title": "明亮流行001",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第001束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-002",
+    "type": "modern_lyric",
+    "title": "明亮流行002",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第002束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-003",
+    "type": "modern_lyric",
+    "title": "明亮流行003",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第003束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-004",
+    "type": "modern_lyric",
+    "title": "明亮流行004",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第004束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-005",
+    "type": "modern_lyric",
+    "title": "明亮流行005",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第005束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-006",
+    "type": "modern_lyric",
+    "title": "明亮流行006",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第006束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-007",
+    "type": "modern_lyric",
+    "title": "明亮流行007",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第007束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-008",
+    "type": "modern_lyric",
+    "title": "明亮流行008",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第008束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-009",
+    "type": "modern_lyric",
+    "title": "明亮流行009",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第009束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-010",
+    "type": "modern_lyric",
+    "title": "明亮流行010",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第010束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-011",
+    "type": "modern_lyric",
+    "title": "明亮流行011",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第011束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-012",
+    "type": "modern_lyric",
+    "title": "明亮流行012",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第012束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-013",
+    "type": "modern_lyric",
+    "title": "明亮流行013",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第013束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-014",
+    "type": "modern_lyric",
+    "title": "明亮流行014",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第014束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-015",
+    "type": "modern_lyric",
+    "title": "明亮流行015",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第015束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-016",
+    "type": "modern_lyric",
+    "title": "明亮流行016",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第016束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-017",
+    "type": "modern_lyric",
+    "title": "明亮流行017",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第017束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-018",
+    "type": "modern_lyric",
+    "title": "明亮流行018",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第018束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-019",
+    "type": "modern_lyric",
+    "title": "明亮流行019",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第019束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-020",
+    "type": "modern_lyric",
+    "title": "明亮流行020",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第020束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-021",
+    "type": "modern_lyric",
+    "title": "明亮流行021",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第021束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-022",
+    "type": "modern_lyric",
+    "title": "明亮流行022",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第022束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-023",
+    "type": "modern_lyric",
+    "title": "明亮流行023",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第023束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-024",
+    "type": "modern_lyric",
+    "title": "明亮流行024",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第024束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-025",
+    "type": "modern_lyric",
+    "title": "明亮流行025",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第025束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-026",
+    "type": "modern_lyric",
+    "title": "明亮流行026",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第026束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-027",
+    "type": "modern_lyric",
+    "title": "明亮流行027",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第027束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-028",
+    "type": "modern_lyric",
+    "title": "明亮流行028",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第028束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-029",
+    "type": "modern_lyric",
+    "title": "明亮流行029",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第029束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-030",
+    "type": "modern_lyric",
+    "title": "明亮流行030",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第030束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-031",
+    "type": "modern_lyric",
+    "title": "明亮流行031",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第031束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-032",
+    "type": "modern_lyric",
+    "title": "明亮流行032",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第032束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-033",
+    "type": "modern_lyric",
+    "title": "明亮流行033",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第033束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-034",
+    "type": "modern_lyric",
+    "title": "明亮流行034",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第034束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-035",
+    "type": "modern_lyric",
+    "title": "明亮流行035",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第035束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-036",
+    "type": "modern_lyric",
+    "title": "明亮流行036",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第036束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-037",
+    "type": "modern_lyric",
+    "title": "明亮流行037",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第037束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-038",
+    "type": "modern_lyric",
+    "title": "明亮流行038",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第038束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-039",
+    "type": "modern_lyric",
+    "title": "明亮流行039",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第039束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-040",
+    "type": "modern_lyric",
+    "title": "明亮流行040",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第040束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-041",
+    "type": "modern_lyric",
+    "title": "明亮流行041",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第041束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-042",
+    "type": "modern_lyric",
+    "title": "明亮流行042",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第042束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-043",
+    "type": "modern_lyric",
+    "title": "明亮流行043",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第043束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-044",
+    "type": "modern_lyric",
+    "title": "明亮流行044",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第044束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-045",
+    "type": "modern_lyric",
+    "title": "明亮流行045",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第045束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-046",
+    "type": "modern_lyric",
+    "title": "明亮流行046",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第046束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-047",
+    "type": "modern_lyric",
+    "title": "明亮流行047",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第047束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-048",
+    "type": "modern_lyric",
+    "title": "明亮流行048",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第048束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-049",
+    "type": "modern_lyric",
+    "title": "明亮流行049",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第049束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-050",
+    "type": "modern_lyric",
+    "title": "明亮流行050",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第050束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-051",
+    "type": "modern_lyric",
+    "title": "明亮流行051",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第051束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-052",
+    "type": "modern_lyric",
+    "title": "明亮流行052",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第052束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-053",
+    "type": "modern_lyric",
+    "title": "明亮流行053",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第053束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-054",
+    "type": "modern_lyric",
+    "title": "明亮流行054",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第054束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-055",
+    "type": "modern_lyric",
+    "title": "明亮流行055",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第055束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-056",
+    "type": "modern_lyric",
+    "title": "明亮流行056",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第056束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-057",
+    "type": "modern_lyric",
+    "title": "明亮流行057",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第057束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-058",
+    "type": "modern_lyric",
+    "title": "明亮流行058",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第058束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-059",
+    "type": "modern_lyric",
+    "title": "明亮流行059",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第059束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-060",
+    "type": "modern_lyric",
+    "title": "明亮流行060",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第060束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-061",
+    "type": "modern_lyric",
+    "title": "明亮流行061",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第061束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-062",
+    "type": "modern_lyric",
+    "title": "明亮流行062",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第062束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-063",
+    "type": "modern_lyric",
+    "title": "明亮流行063",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第063束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-064",
+    "type": "modern_lyric",
+    "title": "明亮流行064",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第064束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-065",
+    "type": "modern_lyric",
+    "title": "明亮流行065",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第065束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-066",
+    "type": "modern_lyric",
+    "title": "明亮流行066",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第066束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-067",
+    "type": "modern_lyric",
+    "title": "明亮流行067",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第067束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-068",
+    "type": "modern_lyric",
+    "title": "明亮流行068",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第068束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-069",
+    "type": "modern_lyric",
+    "title": "明亮流行069",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第069束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-070",
+    "type": "modern_lyric",
+    "title": "明亮流行070",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第070束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-071",
+    "type": "modern_lyric",
+    "title": "明亮流行071",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第071束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-072",
+    "type": "modern_lyric",
+    "title": "明亮流行072",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第072束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-073",
+    "type": "modern_lyric",
+    "title": "明亮流行073",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第073束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-074",
+    "type": "modern_lyric",
+    "title": "明亮流行074",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第074束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-075",
+    "type": "modern_lyric",
+    "title": "明亮流行075",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第075束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-076",
+    "type": "modern_lyric",
+    "title": "明亮流行076",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第076束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-077",
+    "type": "modern_lyric",
+    "title": "明亮流行077",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第077束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-078",
+    "type": "modern_lyric",
+    "title": "明亮流行078",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第078束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-079",
+    "type": "modern_lyric",
+    "title": "明亮流行079",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第079束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-080",
+    "type": "modern_lyric",
+    "title": "明亮流行080",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第080束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-081",
+    "type": "modern_lyric",
+    "title": "明亮流行081",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第081束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-082",
+    "type": "modern_lyric",
+    "title": "明亮流行082",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第082束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-083",
+    "type": "modern_lyric",
+    "title": "明亮流行083",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第083束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-084",
+    "type": "modern_lyric",
+    "title": "明亮流行084",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第084束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-085",
+    "type": "modern_lyric",
+    "title": "明亮流行085",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第085束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-086",
+    "type": "modern_lyric",
+    "title": "明亮流行086",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第086束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-087",
+    "type": "modern_lyric",
+    "title": "明亮流行087",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第087束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-088",
+    "type": "modern_lyric",
+    "title": "明亮流行088",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第088束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-089",
+    "type": "modern_lyric",
+    "title": "明亮流行089",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第089束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-090",
+    "type": "modern_lyric",
+    "title": "明亮流行090",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第090束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-091",
+    "type": "modern_lyric",
+    "title": "明亮流行091",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第091束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-092",
+    "type": "modern_lyric",
+    "title": "明亮流行092",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第092束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-093",
+    "type": "modern_lyric",
+    "title": "明亮流行093",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第093束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-094",
+    "type": "modern_lyric",
+    "title": "明亮流行094",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第094束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-095",
+    "type": "modern_lyric",
+    "title": "明亮流行095",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第095束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-096",
+    "type": "modern_lyric",
+    "title": "明亮流行096",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第096束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-097",
+    "type": "modern_lyric",
+    "title": "明亮流行097",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第097束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-098",
+    "type": "modern_lyric",
+    "title": "明亮流行098",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第098束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-099",
+    "type": "modern_lyric",
+    "title": "明亮流行099",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第099束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-100",
+    "type": "modern_lyric",
+    "title": "明亮流行100",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第100束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-101",
+    "type": "modern_lyric",
+    "title": "明亮流行101",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第101束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-102",
+    "type": "modern_lyric",
+    "title": "明亮流行102",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第102束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-103",
+    "type": "modern_lyric",
+    "title": "明亮流行103",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第103束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-104",
+    "type": "modern_lyric",
+    "title": "明亮流行104",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第104束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-105",
+    "type": "modern_lyric",
+    "title": "明亮流行105",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第105束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-106",
+    "type": "modern_lyric",
+    "title": "明亮流行106",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第106束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-107",
+    "type": "modern_lyric",
+    "title": "明亮流行107",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第107束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-108",
+    "type": "modern_lyric",
+    "title": "明亮流行108",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第108束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-109",
+    "type": "modern_lyric",
+    "title": "明亮流行109",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第109束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-110",
+    "type": "modern_lyric",
+    "title": "明亮流行110",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第110束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-111",
+    "type": "modern_lyric",
+    "title": "明亮流行111",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第111束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-112",
+    "type": "modern_lyric",
+    "title": "明亮流行112",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第112束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-113",
+    "type": "modern_lyric",
+    "title": "明亮流行113",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第113束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-114",
+    "type": "modern_lyric",
+    "title": "明亮流行114",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第114束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-115",
+    "type": "modern_lyric",
+    "title": "明亮流行115",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第115束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-116",
+    "type": "modern_lyric",
+    "title": "明亮流行116",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第116束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-117",
+    "type": "modern_lyric",
+    "title": "明亮流行117",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第117束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-118",
+    "type": "modern_lyric",
+    "title": "明亮流行118",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第118束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-119",
+    "type": "modern_lyric",
+    "title": "明亮流行119",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第119束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-120",
+    "type": "modern_lyric",
+    "title": "明亮流行120",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第120束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-121",
+    "type": "modern_lyric",
+    "title": "明亮流行121",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第121束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-122",
+    "type": "modern_lyric",
+    "title": "明亮流行122",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第122束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-123",
+    "type": "modern_lyric",
+    "title": "明亮流行123",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第123束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-124",
+    "type": "modern_lyric",
+    "title": "明亮流行124",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第124束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-125",
+    "type": "modern_lyric",
+    "title": "明亮流行125",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第125束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-126",
+    "type": "modern_lyric",
+    "title": "明亮流行126",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第126束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-127",
+    "type": "modern_lyric",
+    "title": "明亮流行127",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第127束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-128",
+    "type": "modern_lyric",
+    "title": "明亮流行128",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第128束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-129",
+    "type": "modern_lyric",
+    "title": "明亮流行129",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第129束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-130",
+    "type": "modern_lyric",
+    "title": "明亮流行130",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第130束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-131",
+    "type": "modern_lyric",
+    "title": "明亮流行131",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第131束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-132",
+    "type": "modern_lyric",
+    "title": "明亮流行132",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第132束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-133",
+    "type": "modern_lyric",
+    "title": "明亮流行133",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第133束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-134",
+    "type": "modern_lyric",
+    "title": "明亮流行134",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第134束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-135",
+    "type": "modern_lyric",
+    "title": "明亮流行135",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第135束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-136",
+    "type": "modern_lyric",
+    "title": "明亮流行136",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第136束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-137",
+    "type": "modern_lyric",
+    "title": "明亮流行137",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第137束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-138",
+    "type": "modern_lyric",
+    "title": "明亮流行138",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第138束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-139",
+    "type": "modern_lyric",
+    "title": "明亮流行139",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第139束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-140",
+    "type": "modern_lyric",
+    "title": "明亮流行140",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第140束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-141",
+    "type": "modern_lyric",
+    "title": "明亮流行141",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第141束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-142",
+    "type": "modern_lyric",
+    "title": "明亮流行142",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第142束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-143",
+    "type": "modern_lyric",
+    "title": "明亮流行143",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第143束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-144",
+    "type": "modern_lyric",
+    "title": "明亮流行144",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第144束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-145",
+    "type": "modern_lyric",
+    "title": "明亮流行145",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第145束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-146",
+    "type": "modern_lyric",
+    "title": "明亮流行146",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第146束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-147",
+    "type": "modern_lyric",
+    "title": "明亮流行147",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第147束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-148",
+    "type": "modern_lyric",
+    "title": "明亮流行148",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第148束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-up-149",
+    "type": "modern_lyric",
+    "title": "明亮流行149",
+    "emotion_tags": [
+      "joy",
+      "sunshine",
+      "brave"
+    ],
+    "profile_tag": "uplift_pop",
+    "profile_confidence": 0.88,
+    "content": "清晨第149束光落肩，笑着把今天唱开。"
+  },
+  {
+    "source_id": "lyric-cd-000",
+    "type": "modern_lyric",
+    "title": "律动舞曲000",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第000拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-001",
+    "type": "modern_lyric",
+    "title": "律动舞曲001",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第001拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-002",
+    "type": "modern_lyric",
+    "title": "律动舞曲002",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第002拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-003",
+    "type": "modern_lyric",
+    "title": "律动舞曲003",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第003拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-004",
+    "type": "modern_lyric",
+    "title": "律动舞曲004",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第004拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-005",
+    "type": "modern_lyric",
+    "title": "律动舞曲005",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第005拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-006",
+    "type": "modern_lyric",
+    "title": "律动舞曲006",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第006拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-007",
+    "type": "modern_lyric",
+    "title": "律动舞曲007",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第007拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-008",
+    "type": "modern_lyric",
+    "title": "律动舞曲008",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第008拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-009",
+    "type": "modern_lyric",
+    "title": "律动舞曲009",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第009拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-010",
+    "type": "modern_lyric",
+    "title": "律动舞曲010",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第010拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-011",
+    "type": "modern_lyric",
+    "title": "律动舞曲011",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第011拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-012",
+    "type": "modern_lyric",
+    "title": "律动舞曲012",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第012拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-013",
+    "type": "modern_lyric",
+    "title": "律动舞曲013",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第013拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-014",
+    "type": "modern_lyric",
+    "title": "律动舞曲014",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第014拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-015",
+    "type": "modern_lyric",
+    "title": "律动舞曲015",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第015拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-016",
+    "type": "modern_lyric",
+    "title": "律动舞曲016",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第016拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-017",
+    "type": "modern_lyric",
+    "title": "律动舞曲017",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第017拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-018",
+    "type": "modern_lyric",
+    "title": "律动舞曲018",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第018拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-019",
+    "type": "modern_lyric",
+    "title": "律动舞曲019",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第019拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-020",
+    "type": "modern_lyric",
+    "title": "律动舞曲020",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第020拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-021",
+    "type": "modern_lyric",
+    "title": "律动舞曲021",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第021拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-022",
+    "type": "modern_lyric",
+    "title": "律动舞曲022",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第022拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-023",
+    "type": "modern_lyric",
+    "title": "律动舞曲023",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第023拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-024",
+    "type": "modern_lyric",
+    "title": "律动舞曲024",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第024拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-025",
+    "type": "modern_lyric",
+    "title": "律动舞曲025",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第025拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-026",
+    "type": "modern_lyric",
+    "title": "律动舞曲026",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第026拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-027",
+    "type": "modern_lyric",
+    "title": "律动舞曲027",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第027拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-028",
+    "type": "modern_lyric",
+    "title": "律动舞曲028",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第028拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-029",
+    "type": "modern_lyric",
+    "title": "律动舞曲029",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第029拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-030",
+    "type": "modern_lyric",
+    "title": "律动舞曲030",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第030拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-031",
+    "type": "modern_lyric",
+    "title": "律动舞曲031",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第031拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-032",
+    "type": "modern_lyric",
+    "title": "律动舞曲032",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第032拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-033",
+    "type": "modern_lyric",
+    "title": "律动舞曲033",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第033拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-034",
+    "type": "modern_lyric",
+    "title": "律动舞曲034",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第034拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-035",
+    "type": "modern_lyric",
+    "title": "律动舞曲035",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第035拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-036",
+    "type": "modern_lyric",
+    "title": "律动舞曲036",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第036拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-037",
+    "type": "modern_lyric",
+    "title": "律动舞曲037",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第037拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-038",
+    "type": "modern_lyric",
+    "title": "律动舞曲038",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第038拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-039",
+    "type": "modern_lyric",
+    "title": "律动舞曲039",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第039拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-040",
+    "type": "modern_lyric",
+    "title": "律动舞曲040",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第040拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-041",
+    "type": "modern_lyric",
+    "title": "律动舞曲041",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第041拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-042",
+    "type": "modern_lyric",
+    "title": "律动舞曲042",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第042拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-043",
+    "type": "modern_lyric",
+    "title": "律动舞曲043",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第043拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-044",
+    "type": "modern_lyric",
+    "title": "律动舞曲044",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第044拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-045",
+    "type": "modern_lyric",
+    "title": "律动舞曲045",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第045拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-046",
+    "type": "modern_lyric",
+    "title": "律动舞曲046",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第046拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-047",
+    "type": "modern_lyric",
+    "title": "律动舞曲047",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第047拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-048",
+    "type": "modern_lyric",
+    "title": "律动舞曲048",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第048拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-049",
+    "type": "modern_lyric",
+    "title": "律动舞曲049",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第049拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-050",
+    "type": "modern_lyric",
+    "title": "律动舞曲050",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第050拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-051",
+    "type": "modern_lyric",
+    "title": "律动舞曲051",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第051拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-052",
+    "type": "modern_lyric",
+    "title": "律动舞曲052",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第052拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-053",
+    "type": "modern_lyric",
+    "title": "律动舞曲053",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第053拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-054",
+    "type": "modern_lyric",
+    "title": "律动舞曲054",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第054拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-055",
+    "type": "modern_lyric",
+    "title": "律动舞曲055",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第055拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-056",
+    "type": "modern_lyric",
+    "title": "律动舞曲056",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第056拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-057",
+    "type": "modern_lyric",
+    "title": "律动舞曲057",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第057拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-058",
+    "type": "modern_lyric",
+    "title": "律动舞曲058",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第058拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-059",
+    "type": "modern_lyric",
+    "title": "律动舞曲059",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第059拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-060",
+    "type": "modern_lyric",
+    "title": "律动舞曲060",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第060拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-061",
+    "type": "modern_lyric",
+    "title": "律动舞曲061",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第061拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-062",
+    "type": "modern_lyric",
+    "title": "律动舞曲062",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第062拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-063",
+    "type": "modern_lyric",
+    "title": "律动舞曲063",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第063拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-064",
+    "type": "modern_lyric",
+    "title": "律动舞曲064",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第064拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-065",
+    "type": "modern_lyric",
+    "title": "律动舞曲065",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第065拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-066",
+    "type": "modern_lyric",
+    "title": "律动舞曲066",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第066拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-067",
+    "type": "modern_lyric",
+    "title": "律动舞曲067",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第067拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-068",
+    "type": "modern_lyric",
+    "title": "律动舞曲068",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第068拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-069",
+    "type": "modern_lyric",
+    "title": "律动舞曲069",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第069拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-070",
+    "type": "modern_lyric",
+    "title": "律动舞曲070",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第070拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-071",
+    "type": "modern_lyric",
+    "title": "律动舞曲071",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第071拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-072",
+    "type": "modern_lyric",
+    "title": "律动舞曲072",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第072拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-073",
+    "type": "modern_lyric",
+    "title": "律动舞曲073",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第073拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-074",
+    "type": "modern_lyric",
+    "title": "律动舞曲074",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第074拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-075",
+    "type": "modern_lyric",
+    "title": "律动舞曲075",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第075拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-076",
+    "type": "modern_lyric",
+    "title": "律动舞曲076",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第076拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-077",
+    "type": "modern_lyric",
+    "title": "律动舞曲077",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第077拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-078",
+    "type": "modern_lyric",
+    "title": "律动舞曲078",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第078拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-079",
+    "type": "modern_lyric",
+    "title": "律动舞曲079",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第079拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-080",
+    "type": "modern_lyric",
+    "title": "律动舞曲080",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第080拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-081",
+    "type": "modern_lyric",
+    "title": "律动舞曲081",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第081拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-082",
+    "type": "modern_lyric",
+    "title": "律动舞曲082",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第082拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-083",
+    "type": "modern_lyric",
+    "title": "律动舞曲083",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第083拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-084",
+    "type": "modern_lyric",
+    "title": "律动舞曲084",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第084拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-085",
+    "type": "modern_lyric",
+    "title": "律动舞曲085",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第085拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-086",
+    "type": "modern_lyric",
+    "title": "律动舞曲086",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第086拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-087",
+    "type": "modern_lyric",
+    "title": "律动舞曲087",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第087拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-088",
+    "type": "modern_lyric",
+    "title": "律动舞曲088",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第088拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-089",
+    "type": "modern_lyric",
+    "title": "律动舞曲089",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第089拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-090",
+    "type": "modern_lyric",
+    "title": "律动舞曲090",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第090拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-091",
+    "type": "modern_lyric",
+    "title": "律动舞曲091",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第091拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-092",
+    "type": "modern_lyric",
+    "title": "律动舞曲092",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第092拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-093",
+    "type": "modern_lyric",
+    "title": "律动舞曲093",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第093拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-094",
+    "type": "modern_lyric",
+    "title": "律动舞曲094",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第094拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-095",
+    "type": "modern_lyric",
+    "title": "律动舞曲095",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第095拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-096",
+    "type": "modern_lyric",
+    "title": "律动舞曲096",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第096拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-097",
+    "type": "modern_lyric",
+    "title": "律动舞曲097",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第097拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-098",
+    "type": "modern_lyric",
+    "title": "律动舞曲098",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第098拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-cd-099",
+    "type": "modern_lyric",
+    "title": "律动舞曲099",
+    "emotion_tags": [
+      "dance",
+      "release",
+      "hot"
+    ],
+    "profile_tag": "club_dance",
+    "profile_confidence": 0.9,
+    "content": "鼓点在第099拍抬升，跟着心跳喊出Tonight。"
+  },
+  {
+    "source_id": "lyric-am-000",
+    "type": "modern_lyric",
+    "title": "环境冥想000",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第000次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-001",
+    "type": "modern_lyric",
+    "title": "环境冥想001",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第001次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-002",
+    "type": "modern_lyric",
+    "title": "环境冥想002",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第002次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-003",
+    "type": "modern_lyric",
+    "title": "环境冥想003",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第003次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-004",
+    "type": "modern_lyric",
+    "title": "环境冥想004",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第004次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-005",
+    "type": "modern_lyric",
+    "title": "环境冥想005",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第005次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-006",
+    "type": "modern_lyric",
+    "title": "环境冥想006",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第006次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-007",
+    "type": "modern_lyric",
+    "title": "环境冥想007",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第007次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-008",
+    "type": "modern_lyric",
+    "title": "环境冥想008",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第008次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-009",
+    "type": "modern_lyric",
+    "title": "环境冥想009",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第009次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-010",
+    "type": "modern_lyric",
+    "title": "环境冥想010",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第010次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-011",
+    "type": "modern_lyric",
+    "title": "环境冥想011",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第011次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-012",
+    "type": "modern_lyric",
+    "title": "环境冥想012",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第012次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-013",
+    "type": "modern_lyric",
+    "title": "环境冥想013",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第013次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-014",
+    "type": "modern_lyric",
+    "title": "环境冥想014",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第014次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-015",
+    "type": "modern_lyric",
+    "title": "环境冥想015",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第015次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-016",
+    "type": "modern_lyric",
+    "title": "环境冥想016",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第016次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-017",
+    "type": "modern_lyric",
+    "title": "环境冥想017",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第017次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-018",
+    "type": "modern_lyric",
+    "title": "环境冥想018",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第018次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-019",
+    "type": "modern_lyric",
+    "title": "环境冥想019",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第019次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-020",
+    "type": "modern_lyric",
+    "title": "环境冥想020",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第020次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-021",
+    "type": "modern_lyric",
+    "title": "环境冥想021",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第021次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-022",
+    "type": "modern_lyric",
+    "title": "环境冥想022",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第022次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-023",
+    "type": "modern_lyric",
+    "title": "环境冥想023",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第023次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-024",
+    "type": "modern_lyric",
+    "title": "环境冥想024",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第024次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-025",
+    "type": "modern_lyric",
+    "title": "环境冥想025",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第025次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-026",
+    "type": "modern_lyric",
+    "title": "环境冥想026",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第026次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-027",
+    "type": "modern_lyric",
+    "title": "环境冥想027",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第027次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-028",
+    "type": "modern_lyric",
+    "title": "环境冥想028",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第028次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-029",
+    "type": "modern_lyric",
+    "title": "环境冥想029",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第029次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-030",
+    "type": "modern_lyric",
+    "title": "环境冥想030",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第030次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-031",
+    "type": "modern_lyric",
+    "title": "环境冥想031",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第031次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-032",
+    "type": "modern_lyric",
+    "title": "环境冥想032",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第032次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-033",
+    "type": "modern_lyric",
+    "title": "环境冥想033",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第033次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-034",
+    "type": "modern_lyric",
+    "title": "环境冥想034",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第034次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-035",
+    "type": "modern_lyric",
+    "title": "环境冥想035",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第035次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-036",
+    "type": "modern_lyric",
+    "title": "环境冥想036",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第036次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-037",
+    "type": "modern_lyric",
+    "title": "环境冥想037",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第037次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-038",
+    "type": "modern_lyric",
+    "title": "环境冥想038",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第038次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-039",
+    "type": "modern_lyric",
+    "title": "环境冥想039",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第039次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-040",
+    "type": "modern_lyric",
+    "title": "环境冥想040",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第040次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-041",
+    "type": "modern_lyric",
+    "title": "环境冥想041",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第041次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-042",
+    "type": "modern_lyric",
+    "title": "环境冥想042",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第042次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-043",
+    "type": "modern_lyric",
+    "title": "环境冥想043",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第043次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-044",
+    "type": "modern_lyric",
+    "title": "环境冥想044",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第044次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-045",
+    "type": "modern_lyric",
+    "title": "环境冥想045",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第045次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-046",
+    "type": "modern_lyric",
+    "title": "环境冥想046",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第046次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-047",
+    "type": "modern_lyric",
+    "title": "环境冥想047",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第047次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-048",
+    "type": "modern_lyric",
+    "title": "环境冥想048",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第048次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-049",
+    "type": "modern_lyric",
+    "title": "环境冥想049",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第049次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-050",
+    "type": "modern_lyric",
+    "title": "环境冥想050",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第050次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-051",
+    "type": "modern_lyric",
+    "title": "环境冥想051",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第051次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-052",
+    "type": "modern_lyric",
+    "title": "环境冥想052",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第052次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-053",
+    "type": "modern_lyric",
+    "title": "环境冥想053",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第053次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-054",
+    "type": "modern_lyric",
+    "title": "环境冥想054",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第054次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-055",
+    "type": "modern_lyric",
+    "title": "环境冥想055",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第055次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-056",
+    "type": "modern_lyric",
+    "title": "环境冥想056",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第056次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-057",
+    "type": "modern_lyric",
+    "title": "环境冥想057",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第057次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-058",
+    "type": "modern_lyric",
+    "title": "环境冥想058",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第058次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-059",
+    "type": "modern_lyric",
+    "title": "环境冥想059",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第059次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-060",
+    "type": "modern_lyric",
+    "title": "环境冥想060",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第060次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-061",
+    "type": "modern_lyric",
+    "title": "环境冥想061",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第061次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-062",
+    "type": "modern_lyric",
+    "title": "环境冥想062",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第062次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-063",
+    "type": "modern_lyric",
+    "title": "环境冥想063",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第063次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-064",
+    "type": "modern_lyric",
+    "title": "环境冥想064",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第064次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-065",
+    "type": "modern_lyric",
+    "title": "环境冥想065",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第065次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-066",
+    "type": "modern_lyric",
+    "title": "环境冥想066",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第066次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-067",
+    "type": "modern_lyric",
+    "title": "环境冥想067",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第067次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-068",
+    "type": "modern_lyric",
+    "title": "环境冥想068",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第068次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-069",
+    "type": "modern_lyric",
+    "title": "环境冥想069",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第069次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-070",
+    "type": "modern_lyric",
+    "title": "环境冥想070",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第070次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-071",
+    "type": "modern_lyric",
+    "title": "环境冥想071",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第071次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-072",
+    "type": "modern_lyric",
+    "title": "环境冥想072",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第072次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-073",
+    "type": "modern_lyric",
+    "title": "环境冥想073",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第073次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-074",
+    "type": "modern_lyric",
+    "title": "环境冥想074",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第074次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-075",
+    "type": "modern_lyric",
+    "title": "环境冥想075",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第075次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-076",
+    "type": "modern_lyric",
+    "title": "环境冥想076",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第076次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-077",
+    "type": "modern_lyric",
+    "title": "环境冥想077",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第077次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-078",
+    "type": "modern_lyric",
+    "title": "环境冥想078",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第078次呼吸里变慢，光轻轻落在水面。"
+  },
+  {
+    "source_id": "lyric-am-079",
+    "type": "modern_lyric",
+    "title": "环境冥想079",
+    "emotion_tags": [
+      "calm",
+      "healing",
+      "meditation"
+    ],
+    "profile_tag": "ambient_meditation",
+    "profile_confidence": 0.86,
+    "content": "风在第079次呼吸里变慢，光轻轻落在水面。"
   }
 ]
