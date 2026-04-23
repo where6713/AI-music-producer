@@ -142,6 +142,30 @@ def _seed_min_corpus(repo_root: Path) -> None:
         ),
         encoding="utf-8",
     )
+    profiles_dir = repo_root / "src" / "profiles"
+    profiles_dir.mkdir(parents=True, exist_ok=True)
+    (profiles_dir / "registry.json").write_text(
+        json.dumps(
+            {
+                "profiles": {
+                    "urban_introspective": {
+                        "display_name": "都市内省",
+                        "typical_genres": ["都市流行", "mandopop"],
+                        "typical_moods": ["克制释怀", "melancholic"],
+                        "craft_focus": "具象化身体记账 + 场景锚定",
+                    },
+                    "classical_restraint": {
+                        "display_name": "古风留白",
+                        "typical_genres": ["古风"],
+                        "typical_moods": ["空寂"],
+                        "craft_focus": "意象并置 + 留白 + 典故克制",
+                    },
+                }
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
 
 
 def test_resolve_provider_prefers_openai_compatible_without_anthropic() -> None:
@@ -176,7 +200,7 @@ def test_generate_payload_uses_openai_compatible_path(tmp_path, monkeypatch) -> 
         encoding="utf-8",
     )
 
-    monkeypatch.setattr(claude_client, "_load_skill_text", lambda _root: "skill")
+    monkeypatch.setattr(claude_client, "_load_skill_text", lambda _root, active_profile="": "skill")
 
     def _fake_openai_call(*, config, skill_text, prompt):
         assert config.provider == "openai-compatible"
@@ -216,7 +240,7 @@ def test_generate_payload_normalizes_non_schema_response(tmp_path, monkeypatch) 
         + "\n",
         encoding="utf-8",
     )
-    monkeypatch.setattr(claude_client, "_load_skill_text", lambda _root: "skill")
+    monkeypatch.setattr(claude_client, "_load_skill_text", lambda _root, active_profile="": "skill")
 
     raw_non_schema = json.dumps(
         {
@@ -258,3 +282,50 @@ def test_generate_payload_normalizes_non_schema_response(tmp_path, monkeypatch) 
     assert len(payload.variants) == 3
     assert payload.chosen_variant_id == "a"
     assert payload.style_tags.genre
+
+
+def test_load_skill_text_appends_profile_fragment(tmp_path) -> None:
+    skill_root = tmp_path / ".claude" / "skills" / "lyric-craftsman"
+    fragments = skill_root / "fragments"
+    fragments.mkdir(parents=True, exist_ok=True)
+    (skill_root / "SKILL.md").write_text("core-skill", encoding="utf-8")
+    (fragments / "urban_introspective.md").write_text("urban-fragment", encoding="utf-8")
+
+    merged = claude_client._load_skill_text(tmp_path, active_profile="urban_introspective")
+    assert "core-skill" in merged
+    assert "urban-fragment" in merged
+
+
+def test_generate_payload_includes_profile_trace_fields(tmp_path, monkeypatch) -> None:
+    repo_root = tmp_path
+    _seed_min_corpus(repo_root)
+    (repo_root / ".env").write_text(
+        "\n".join(
+            [
+                "OPENAI_API_KEY=key-openai",
+                "OPENAI_BASE_URL=https://code.ppchat.vip/v1",
+                "OPENAI_MODEL=gpt-5.3-codex",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(claude_client, "_load_skill_text", lambda _root, active_profile="": "skill")
+    monkeypatch.setattr(
+        claude_client,
+        "_call_openai_compatible",
+        lambda **_kwargs: (
+            _payload_json(),
+            {"input_tokens": 20, "output_tokens": 30, "total_tokens": 50},
+        ),
+    )
+
+    _payload, trace = claude_client.generate_lyric_payload(
+        UserInput(raw_intent="失恋三个月想联系但知道不能", profile_override="urban_introspective"),
+        repo_root=repo_root,
+    )
+
+    assert trace["active_profile"] == "urban_introspective"
+    assert trace["profile_source"] == "cli_override"
+    assert "corpus_balance" in trace
+    assert "corpus_monoculture_risk" in trace

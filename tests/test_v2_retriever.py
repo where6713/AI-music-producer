@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 
-from src.retriever import retrieve_few_shot_examples
+from src.retriever import corpus_balance_check, retrieve_few_shot_examples
 from src.schemas import UserInput
 
 
@@ -165,3 +165,112 @@ def test_retriever_derives_profile_vote_when_profile_tag_missing(tmp_path) -> No
     assert isinstance(result, dict)
     assert result["profile_vote"] == "urban_introspective"
     assert result["vote_confidence"] >= (2 / 3)
+
+
+def test_retriever_includes_profile_confidence_in_samples(tmp_path) -> None:
+    corpus = tmp_path / "corpus"
+    corpus.mkdir(parents=True, exist_ok=True)
+    (corpus / "poetry_classical.json").write_text(json.dumps([], ensure_ascii=False), encoding="utf-8")
+    (corpus / "lyrics_modern_zh.json").write_text(
+        json.dumps(
+            [
+                {
+                    "source_id": "lyric-modern-101",
+                    "type": "modern_lyric",
+                    "title": "凌晨未发送",
+                    "emotion_tags": ["breakup", "late-night"],
+                    "profile_tag": "urban_introspective",
+                    "profile_confidence": 0.88,
+                    "content": "对话框停在最后一句。",
+                },
+                {
+                    "source_id": "lyric-modern-102",
+                    "type": "modern_lyric",
+                    "title": "不再拨通",
+                    "emotion_tags": ["distance", "regret"],
+                    "profile_tag": "urban_introspective",
+                    "content": "手在拨出前停住。",
+                },
+            ],
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    result = retrieve_few_shot_examples(
+        UserInput(raw_intent="分手后深夜想发消息又克制住"),
+        repo_root=tmp_path,
+        top_k=3,
+        return_metadata=True,
+    )
+    assert isinstance(result, dict)
+    assert all("profile_confidence" in sample for sample in result["samples"])
+    assert any(sample["profile_confidence"] == 0.88 for sample in result["samples"])
+
+
+def test_corpus_balance_check_reports_warnings_when_under_minimum(tmp_path) -> None:
+    corpus = tmp_path / "corpus"
+    corpus.mkdir(parents=True, exist_ok=True)
+    (corpus / "poetry_classical.json").write_text(json.dumps([], ensure_ascii=False), encoding="utf-8")
+    (corpus / "lyrics_modern_zh.json").write_text(json.dumps([], ensure_ascii=False), encoding="utf-8")
+
+    report = corpus_balance_check(tmp_path)
+    assert isinstance(report, dict)
+    assert len(report["warnings"]) >= 1
+    assert "urban_introspective" in report["counts"]
+
+
+def test_retriever_exposes_corpus_balance_and_monoculture_flags(tmp_path) -> None:
+    corpus = tmp_path / "corpus"
+    corpus.mkdir(parents=True, exist_ok=True)
+    (corpus / "poetry_classical.json").write_text(
+        json.dumps(
+            [
+                {
+                    "source_id": "poem-jys-001",
+                    "type": "classical_poem",
+                    "title": "静夜思",
+                    "emotion_tags": ["nostalgia", "restraint"],
+                    "profile_tag": "classical_restraint",
+                    "content": "举头望明月，低头思故乡。",
+                }
+            ],
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    (corpus / "lyrics_modern_zh.json").write_text(
+        json.dumps(
+            [
+                {
+                    "source_id": "lyric-modern-101",
+                    "type": "modern_lyric",
+                    "title": "凌晨未发送",
+                    "emotion_tags": ["breakup", "late-night"],
+                    "profile_tag": "urban_introspective",
+                    "content": "对话框停在最后一句。",
+                },
+                {
+                    "source_id": "lyric-modern-102",
+                    "type": "modern_lyric",
+                    "title": "不再拨通",
+                    "emotion_tags": ["distance", "regret"],
+                    "profile_tag": "urban_introspective",
+                    "content": "手在拨出前停住。",
+                },
+            ],
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    result = retrieve_few_shot_examples(
+        UserInput(raw_intent="分手后深夜想发消息又克制住"),
+        repo_root=tmp_path,
+        top_k=3,
+        return_metadata=True,
+    )
+
+    assert isinstance(result, dict)
+    assert "corpus_balance" in result
+    assert "corpus_monoculture_risk" in result

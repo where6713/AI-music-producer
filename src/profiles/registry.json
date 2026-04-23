@@ -1,5 +1,6 @@
 {
   "version": "profile-registry/v1.0",
+  "extensible": "研发团队可追加新 profile，但必须先提交 profile_spec PR，不允许在代码里写死未注册 profile",
   "profiles": {
     "urban_introspective": {
       "display_name": "都市内省",
@@ -12,18 +13,34 @@
         "慢慢放下",
         "默默走远",
         "各自安好",
-        "回到原点"
+        "回到原点",
+        "回原点",
+        "归零",
+        "归位",
+        "应停的位置",
+        "该在的位置",
+        "慢慢习惯",
+        "终究会习惯"
       ],
-      "R17_first_person_ratio_max": 0.4
+      "R17_first_person_ratio_max": 0.4,
+      "narrative_style": "linear_progression",
+      "variant_differentiation": "POV + 场景框架（内景/外景/对照）",
+      "chorus_repetition_allowed": false,
+      "abstraction_tolerance": "low"
     },
     "classical_restraint": {
       "display_name": "古风留白",
       "typical_genres": ["古风", "新古典", "国风", "禅意"],
       "typical_moods": ["意境", "空寂", "怀古", "禅思"],
       "craft_focus": "意象并置 + 留白 + 典故克制",
-      "R15_concrete_density": {"verse_min": 0, "chorus_min": 0, "enforced": false},
-      "R16_profile_forbidden": ["繁华落尽", "红尘滚滚", "一纸离愁"],
-      "R17_first_person_ratio_max": 0.2
+      "R15_concrete_density": {"verse_min": 0, "chorus_min": 0, "enforced": false, "alternative_check": "意象独特性"},
+      "R16_profile_forbidden": ["繁华落尽", "红尘滚滚", "一纸离愁", "岁月如梭", "时光荏苒", "此情可待成追忆"],
+      "R17_first_person_ratio_max": 0.2,
+      "narrative_style": "imagery_juxtaposition",
+      "variant_differentiation": "意象系统（山水/宫阙/禅寺）",
+      "chorus_repetition_allowed": false,
+      "abstraction_tolerance": "high",
+      "additional_constraints": "禁止都市具象名词（手机/电梯/地铁/备忘录/充电线），除非刻意对照"
     },
     "uplift_pop": {
       "display_name": "明亮流行",
@@ -31,8 +48,13 @@
       "typical_moods": ["愉悦", "悸动", "阳光", "勇敢"],
       "craft_focus": "画面感 + 朗朗上口 + 情绪直给",
       "R15_concrete_density": {"verse_min": 1, "chorus_min": 0, "enforced": true},
-      "R16_profile_forbidden": ["霓虹天空", "电流心动"],
-      "R17_first_person_ratio_max": 0.6
+      "R16_profile_forbidden": ["霓虹天空", "电流心动", "带电的心", "燃烧星空"],
+      "R17_first_person_ratio_max": 0.6,
+      "narrative_style": "emotional_arc_ABAB",
+      "variant_differentiation": "叙事时间点（初见/热恋/回望）",
+      "chorus_repetition_allowed": true,
+      "abstraction_tolerance": "medium",
+      "note": "本 profile 允许适度『美丽陈词』，因为口语化温度比独创性优先"
     },
     "club_dance": {
       "display_name": "律动舞曲",
@@ -41,7 +63,13 @@
       "craft_focus": "口感 + 重复 + 动词驱动",
       "R15_concrete_density": {"enforced": false},
       "R16_profile_forbidden": [],
-      "R17_first_person_ratio_max": 1.0
+      "R17_first_person_ratio_max": 1.0,
+      "narrative_style": "hook_repetition_dominant",
+      "variant_differentiation": "Hook 口号差异 + BPM 感差异",
+      "chorus_repetition_allowed": true,
+      "chorus_repetition_encouraged": true,
+      "abstraction_tolerance": "high",
+      "additional_constraints": "严禁 Verse 叙事过满；Pre-Chorus 必须有起势动词；Hook <=6 个字的短句优先"
     },
     "ambient_meditation": {
       "display_name": "环境冥想",
@@ -49,8 +77,13 @@
       "typical_moods": ["平静", "空灵", "冥想", "疗愈"],
       "craft_focus": "抽象意象 + 呼吸节奏 + 静态循环",
       "R15_concrete_density": {"verse_max": 1, "enforced": true, "direction": "upper_bound"},
-      "R16_profile_forbidden": ["心安之处", "此心安处", "慢慢好起来"],
-      "R17_first_person_ratio_max": 0.15
+      "R16_profile_forbidden": ["心安之处", "此心安处", "慢慢好起来", "一切都会好"],
+      "R17_first_person_ratio_max": 0.15,
+      "narrative_style": "static_circulation",
+      "variant_differentiation": "自然元素主轴（水/光/风）",
+      "chorus_repetition_allowed": true,
+      "abstraction_tolerance": "very_high",
+      "additional_constraints": "鼓励留白；允许不完整句；禁止叙事推进感"
     }
   }
 }

@@ -73,6 +73,38 @@ def test_profile_router_uses_corpus_vote_when_confident(tmp_path) -> None:
     assert vote_confidence >= (2 / 3)
 
 
+def test_profile_router_uses_genre_before_corpus_vote(tmp_path) -> None:
+    _seed_registry(tmp_path)
+    user_input = UserInput(raw_intent="想写一首古风", genre_hint="古风")
+
+    active_profile, source, vote_confidence = resolve_active_profile(
+        user_input,
+        repo_root=tmp_path,
+        retrieval_vote="urban_introspective",
+        vote_confidence=1.0,
+    )
+
+    assert active_profile == "classical_restraint"
+    assert source == "genre_match"
+    assert vote_confidence is None
+
+
+def test_profile_router_uses_mood_when_vote_not_confident(tmp_path) -> None:
+    _seed_registry(tmp_path)
+    user_input = UserInput(raw_intent="写一首空寂的歌", mood_hint="空寂")
+
+    active_profile, source, vote_confidence = resolve_active_profile(
+        user_input,
+        repo_root=tmp_path,
+        retrieval_vote="urban_introspective",
+        vote_confidence=0.5,
+    )
+
+    assert active_profile == "classical_restraint"
+    assert source == "mood_inference"
+    assert vote_confidence is None
+
+
 def test_profile_router_raises_ambiguous_with_candidates(tmp_path) -> None:
     _seed_registry(tmp_path)
     user_input = UserInput(raw_intent="写点东西")

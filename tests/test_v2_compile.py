@@ -59,6 +59,7 @@ def test_compile_writes_triplet_and_payload(tmp_path) -> None:
     assert (tmp_path / "exclude.txt").exists()
     assert (tmp_path / "lyric_payload.json").exists()
     assert (tmp_path / "trace.json").exists()
+    assert (tmp_path / "audit.md").exists()
 
     trace_loaded = json.loads((tmp_path / "trace.json").read_text(encoding="utf-8"))
     assert trace_loaded["llm_calls"] == 1
@@ -132,3 +133,24 @@ def test_compile_enriches_existing_inactive_decision_block(tmp_path) -> None:
     assert decision["vote_confidence"] >= (2 / 3)
     assert decision["active_profile"] == "urban_introspective"
     assert decision["decision_reason"] == "activated"
+
+
+def test_compile_writes_profile_decision_section_in_audit(tmp_path) -> None:
+    payload = _payload()
+    trace = {
+        "llm_calls": 1,
+        "active_profile": "urban_introspective",
+        "profile_source": "cli_override",
+        "profile_vote_confidence": None,
+        "lint_report": {
+            "skipped_rules_by_profile": ["R15"],
+        },
+    }
+
+    write_outputs(payload, tmp_path, trace)
+
+    audit = (tmp_path / "audit.md").read_text(encoding="utf-8")
+    assert "## 0. Profile 决策" in audit
+    assert "active_profile: urban_introspective" in audit
+    assert "profile_source: cli_override" in audit
+    assert "skipped_rules_by_profile: R15" in audit

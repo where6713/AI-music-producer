@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 
 from src.schemas import LyricPayload
 
@@ -139,6 +140,48 @@ def _format_exclude(payload: LyricPayload) -> str:
     return "(" + ", ".join(unique) + ")\n" if unique else "\n"
 
 
+def _load_profile_display_name(out_dir: Path, profile_id: str) -> str:
+    if not profile_id:
+        return ""
+    registry_path = out_dir.parent / "src" / "profiles" / "registry.json"
+    if not registry_path.exists():
+        return ""
+    payload = json.loads(registry_path.read_text(encoding="utf-8"))
+    profiles = payload.get("profiles", {})
+    if not isinstance(profiles, dict):
+        return ""
+    profile = profiles.get(profile_id, {})
+    if not isinstance(profile, dict):
+        return ""
+    return str(profile.get("display_name", "")).strip()
+
+
+def _format_audit_md(out_dir: Path, trace: dict[str, Any]) -> str:
+    active_profile = str(trace.get("active_profile", "")).strip()
+    display_name = _load_profile_display_name(out_dir, active_profile)
+    profile_source = str(trace.get("profile_source", "")).strip()
+    vote_confidence = trace.get("profile_vote_confidence", None)
+
+    lint_report = trace.get("lint_report", {})
+    skipped = []
+    if isinstance(lint_report, dict):
+        raw = lint_report.get("skipped_rules_by_profile", [])
+        if isinstance(raw, list):
+            skipped = [str(x) for x in raw if str(x).strip()]
+
+    lines = [
+        "# audit.md",
+        "",
+        "## 0. Profile 决策",
+        f"- active_profile: {active_profile}",
+        f"- display_name: {display_name}",
+        f"- profile_source: {profile_source}",
+        f"- vote_confidence: {vote_confidence}",
+        f"- skipped_rules_by_profile: {', '.join(skipped) if skipped else '(none)'}",
+    ]
+    return "\n".join(lines).strip() + "\n"
+
+
 def write_outputs(payload: LyricPayload, out_dir: Path, trace: dict[str, object]) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     trace = _ensure_retrieval_profile_decision(dict(trace))
@@ -151,3 +194,4 @@ def write_outputs(payload: LyricPayload, out_dir: Path, trace: dict[str, object]
     (out_dir / "trace.json").write_text(
         json.dumps(trace, ensure_ascii=False, indent=2), encoding="utf-8"
     )
+    (out_dir / "audit.md").write_text(_format_audit_md(out_dir, trace), encoding="utf-8")

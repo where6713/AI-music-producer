@@ -214,7 +214,7 @@ def produce(
     if profile_vote_confidence is not None:
         trace["profile_vote_confidence"] = profile_vote_confidence
     payload, variant_rank = _score_variants(payload)
-    lint_report = lint_payload(payload)
+    lint_report = lint_payload(payload, trace=trace)
 
     llm_calls = 1
     warning_report = ""
@@ -229,7 +229,7 @@ def produce(
             targeted_revise_prompt=targeted_prompt,
         )
         revised_payload, revised_rank = _score_variants(revised_payload)
-        revised_lint = lint_payload(revised_payload)
+        revised_lint = lint_payload(revised_payload, trace=trace)
         payload = revised_payload
         lint_report = revised_lint
         llm_calls = 2
@@ -253,10 +253,10 @@ def produce(
 
     lint_before_polish = lint_report
     _polish_readability(payload)
-    lint_report = lint_payload(payload)
+    lint_report = lint_payload(payload, trace=trace)
     if (not lint_report["pass"]) and ("R01" in lint_report.get("failed_rules", [])):
         if _force_hook_line_pass(payload):
-            lint_report = lint_payload(payload)
+            lint_report = lint_payload(payload, trace=trace)
     _sync_chosen_variant(payload)
 
     trace["variant_rank"] = variant_rank
@@ -274,6 +274,10 @@ def produce(
     if dry_run:
         typer.echo("dry-run complete")
         typer.echo(f"lint_pass={lint_report['pass']} llm_calls={llm_calls}")
+        if verbose:
+            typer.echo(
+                f"active_profile={trace.get('active_profile','')} profile_source={trace.get('profile_source','')}"
+            )
         return
 
     write_outputs(payload, target_dir, trace)
@@ -283,6 +287,9 @@ def produce(
 
     if verbose:
         typer.echo(f"lint_report={lint_report}")
+        typer.echo(
+            f"active_profile={trace.get('active_profile','')} profile_source={trace.get('profile_source','')}"
+        )
 
     typer.echo(
         f"generated {target_dir / 'lyrics.txt'} | {target_dir / 'style.txt'} | {target_dir / 'exclude.txt'}"

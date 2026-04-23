@@ -13,6 +13,22 @@ CORPUS_FILES = [
     "corpus/lyrics_modern_zh.json",
 ]
 
+PROFILE_IDS = {
+    "urban_introspective",
+    "classical_restraint",
+    "uplift_pop",
+    "club_dance",
+    "ambient_meditation",
+}
+
+MIN_PROFILE_COVERAGE = {
+    "urban_introspective": 200,
+    "classical_restraint": 200,
+    "uplift_pop": 150,
+    "club_dance": 100,
+    "ambient_meditation": 80,
+}
+
 
 def _infer_profile_tag(row: dict[str, Any]) -> str:
     explicit = str(row.get("profile_tag", "")).strip()
@@ -56,6 +72,42 @@ def _load_corpus(repo_root: Path) -> list[dict[str, Any]]:
     return rows
 
 
+def _normalize_profile_confidence(row: dict[str, Any]) -> float:
+    val = row.get("profile_confidence", 1.0)
+    try:
+        parsed = float(val)
+    except (TypeError, ValueError):
+        parsed = 1.0
+    if parsed < 0.0:
+        return 0.0
+    if parsed > 1.0:
+        return 1.0
+    return parsed
+
+
+def corpus_balance_check(repo_root: Path) -> dict[str, Any]:
+    corpus = _load_corpus(repo_root)
+    counts = {k: 0 for k in MIN_PROFILE_COVERAGE}
+    for row in corpus:
+        tag = _infer_profile_tag(row)
+        if tag in counts:
+            counts[tag] += 1
+
+    warnings = []
+    for profile_id, minimum in MIN_PROFILE_COVERAGE.items():
+        current = counts.get(profile_id, 0)
+        if current < minimum:
+            warnings.append(
+                f"profile={profile_id} current={current} minimum={minimum}"
+            )
+
+    return {
+        "counts": counts,
+        "minimum": dict(MIN_PROFILE_COVERAGE),
+        "warnings": warnings,
+    }
+
+
 def retrieve_few_shot_examples(
     user_input: UserInput,
     *,
@@ -95,6 +147,7 @@ def retrieve_few_shot_examples(
                 "title": str(row.get("title", "")),
                 "emotion_tags_matched": [str(x) for x in row.get("emotion_tags", [])[:4]],
                 "profile_tag": profile_tag,
+                "profile_confidence": _normalize_profile_confidence(row),
                 "content": str(row.get("content", "")),
             }
         )
@@ -103,7 +156,9 @@ def retrieve_few_shot_examples(
         return normalized
 
     votes = Counter(
-        sample["profile_tag"] for sample in normalized if sample.get("profile_tag")
+        sample["profile_tag"]
+        for sample in normalized
+        if sample.get("profile_tag") in PROFILE_IDS
     )
     if votes:
         profile_vote, vote_count = votes.most_common(1)[0]
@@ -112,8 +167,14 @@ def retrieve_few_shot_examples(
         profile_vote = ""
         vote_confidence = 0.0
 
+    monoculture_risk = (
+        len(votes) == 1 and vote_confidence < 1.0 and len(normalized) >= 2
+    )
+
     return {
         "samples": normalized,
         "profile_vote": profile_vote,
         "vote_confidence": vote_confidence,
+        "corpus_balance": corpus_balance_check(repo_root),
+        "corpus_monoculture_risk": monoculture_risk,
     }

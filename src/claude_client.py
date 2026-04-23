@@ -6,13 +6,21 @@ from pathlib import Path
 from typing import Any
 from urllib import request
 
+from src.profile_router import resolve_active_profile
 from src.retriever import retrieve_few_shot_examples
 from src.schemas import LyricPayload, UserInput
 
 
-def _load_skill_text(repo_root: Path) -> str:
-    skill_path = repo_root / ".claude" / "skills" / "lyric-craftsman" / "SKILL.md"
-    return skill_path.read_text(encoding="utf-8")
+def _load_skill_text(repo_root: Path, *, active_profile: str = "") -> str:
+    skill_root = repo_root / ".claude" / "skills" / "lyric-craftsman"
+    core = (skill_root / "SKILL.md").read_text(encoding="utf-8")
+    if not active_profile:
+        return core
+    fragment_path = skill_root / "fragments" / f"{active_profile}.md"
+    if not fragment_path.exists():
+        return core
+    fragment = fragment_path.read_text(encoding="utf-8")
+    return f"{core}\n\n# Active Profile Fragment\n\n{fragment}"
 
 
 def _extract_json_block(text: str) -> dict[str, Any]:
@@ -432,7 +440,6 @@ def generate_lyric_payload(
 ) -> tuple[LyricPayload, dict[str, Any]]:
     env_map = _read_env_map(repo_root)
     config = _resolve_provider_config(env_map, default_model=model)
-    skill_text = _load_skill_text(repo_root)
     retrieval = retrieve_few_shot_examples(
         user_input,
         repo_root=repo_root,
@@ -445,10 +452,22 @@ def generate_lyric_payload(
         ]
         profile_vote = str(retrieval.get("profile_vote", ""))
         vote_confidence = float(retrieval.get("vote_confidence", 0.0) or 0.0)
+        corpus_balance = retrieval.get("corpus_balance", {}) if isinstance(retrieval.get("corpus_balance", {}), dict) else {}
+        corpus_monoculture_risk = bool(retrieval.get("corpus_monoculture_risk", False))
     else:
         few_shot_examples = retrieval
         profile_vote = ""
         vote_confidence = 0.0
+        corpus_balance = {}
+        corpus_monoculture_risk = False
+
+    active_profile, profile_source, profile_vote_confidence = resolve_active_profile(
+        user_input,
+        repo_root=repo_root,
+        retrieval_vote=profile_vote,
+        vote_confidence=vote_confidence,
+    )
+    skill_text = _load_skill_text(repo_root, active_profile=active_profile)
 
     prompt = {
         "task": "Generate lyric_payload JSON only with 3 variants and choose best one.",
@@ -470,6 +489,8 @@ def generate_lyric_payload(
             ],
         },
         "few_shot_examples": few_shot_examples,
+        "active_profile": active_profile,
+        "profile_source": profile_source,
     }
     if targeted_revise_prompt:
         prompt["targeted_revise_prompt"] = targeted_revise_prompt
@@ -535,6 +556,11 @@ def generate_lyric_payload(
         "few_shot_source_ids": [x["source_id"] for x in few_shot_examples],
         "retrieval_profile_vote": profile_vote,
         "retrieval_vote_confidence": vote_confidence,
+        "active_profile": active_profile,
+        "profile_source": profile_source,
+        "profile_vote_confidence": profile_vote_confidence,
+        "corpus_balance": corpus_balance,
+        "corpus_monoculture_risk": corpus_monoculture_risk,
         "stage": "revise" if targeted_revise_prompt else "initial",
     }
     return payload, trace

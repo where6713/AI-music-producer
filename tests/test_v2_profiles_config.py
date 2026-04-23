@@ -33,6 +33,16 @@ def test_profile_registry_fields_for_urban_introspective() -> None:
     assert "R15_concrete_density" in profile
     assert "R16_profile_forbidden" in profile
     assert "R17_first_person_ratio_max" in profile
+    assert "narrative_style" in profile
+    assert "variant_differentiation" in profile
+    assert "chorus_repetition_allowed" in profile
+    assert "abstraction_tolerance" in profile
+
+
+def test_profile_registry_has_registry_metadata() -> None:
+    payload = json.loads(Path("src/profiles/registry.json").read_text(encoding="utf-8"))
+    assert payload.get("version") == "profile-registry/v1.0"
+    assert isinstance(payload.get("extensible"), str)
 
 
 def test_global_rules_contains_global_always_forbidden() -> None:
@@ -42,4 +52,5 @@ def test_global_rules_contains_global_always_forbidden() -> None:
 
     forbidden = payload.get("global_always_forbidden")
     assert isinstance(forbidden, list)
-    assert len(forbidden) >= 5
+    assert len(forbidden) >= 10
+    assert isinstance(payload.get("规则"), str)

@@ -480,3 +480,42 @@ def test_produce_raises_ambiguous_profile_error(tmp_path, monkeypatch) -> None:
 
     assert "ambiguous profile" in str(err.value)
     assert len(err.value.candidates) >= 2
+
+
+def test_produce_verbose_prints_profile_source(tmp_path, monkeypatch, capsys) -> None:
+    from src import main as main_mod
+
+    payload = _payload()
+    payload.variants[0].lyrics_by_section = payload.lyrics_by_section
+    payload.variants[1].lyrics_by_section = payload.lyrics_by_section
+    payload.variants[2].lyrics_by_section = payload.lyrics_by_section
+
+    def _fake_generate(*_args, **_kwargs):
+        return payload.model_copy(deep=True), {
+            "provider": "openai-compatible",
+            "model_used": "gpt-5.3-codex",
+            "usage": {"input_tokens": 1, "output_tokens": 1, "total_tokens": 2},
+            "llm_calls": 1,
+            "few_shot_source_ids": ["lyric-modern-101", "lyric-modern-102", "poem-jys-001"],
+            "retrieval_profile_vote": "urban_introspective",
+            "retrieval_vote_confidence": 0.67,
+            "stage": "initial",
+        }
+
+    monkeypatch.setattr(main_mod, "generate_lyric_payload", _fake_generate)
+
+    main_mod.produce(
+        raw_intent="分手后夜里想发消息又忍住",
+        genre="",
+        mood="",
+        vocal="female",
+        profile="urban_introspective",
+        lang="zh-CN",
+        out_dir=str(tmp_path / "out"),
+        verbose=True,
+        dry_run=True,
+    )
+
+    out = capsys.readouterr().out
+    assert "active_profile=urban_introspective" in out
+    assert "profile_source=cli_override" in out
