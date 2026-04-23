@@ -76,7 +76,7 @@
       "typical_genres": ["ambient", "new age", "冥想配乐", "ASMR 人声"],
       "typical_moods": ["平静", "空灵", "冥想", "疗愈"],
       "craft_focus": "抽象意象 + 呼吸节奏 + 静态循环",
-      "R15_concrete_density": {"verse_max": 1, "enforced": true, "direction": "upper_bound"},
+      "R15_concrete_density": {"verse_max": 1, "enforced": false, "direction": "upper_bound"},
       "R16_profile_forbidden": ["心安之处", "此心安处", "慢慢好起来", "一切都会好"],
       "R17_first_person_ratio_max": 0.15,
       "narrative_style": "static_circulation",
