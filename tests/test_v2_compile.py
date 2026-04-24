@@ -178,7 +178,8 @@ def test_compile_audit_includes_profile_vote_counts_and_warning(tmp_path) -> Non
             "urban_introspective": 2,
         },
         "profile_routing_warnings": [
-            "profile_routing_low_confidence profile=uplift_pop source=corpus_vote vote_confidence=0.40"
+            "profile_routing_low_confidence profile=uplift_pop source=corpus_vote vote_confidence=0.40",
+            "ProfileMismatchWarning mood_hint=哀伤内省 active_profile=uplift_pop typical_moods=活力,明亮",
         ],
         "few_shot_examples": [
             {
@@ -199,10 +200,62 @@ def test_compile_audit_includes_profile_vote_counts_and_warning(tmp_path) -> Non
     assert "uplift_pop:1" in audit
     assert "urban_introspective:2" in audit
     assert "profile_routing_low_confidence" in audit
+    assert "ProfileMismatchWarning" in audit
     assert "## 1. Few-shot 来源透明化" in audit
     assert "source_id=lyric-modern-101" in audit
     assert "learn_point=保留克制语气并用动作推进情绪" in audit
     assert "do_not_copy=不要复写原句与段落顺序" in audit
+
+
+def test_compile_derives_profile_mismatch_warning_from_trace_and_registry(tmp_path) -> None:
+    profiles_dir = tmp_path / "src" / "profiles"
+    profiles_dir.mkdir(parents=True, exist_ok=True)
+    (profiles_dir / "registry.json").write_text(
+        json.dumps(
+            {
+                "profiles": {
+                    "uplift_pop": {
+                        "display_name": "明亮流行",
+                        "typical_genres": ["流行"],
+                        "typical_moods": ["活力", "明亮"],
+                        "craft_focus": "强节奏与正向推进",
+                    }
+                }
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+
+    payload = _payload()
+    trace = {
+        "llm_calls": 1,
+        "active_profile": "uplift_pop",
+        "profile_source": "corpus_vote",
+        "profile_vote_confidence": 0.4,
+        "retrieval_profile_vote": "uplift_pop",
+        "retrieval_profile_vote_counts": {
+            "uplift_pop": 1,
+            "urban_introspective": 2,
+        },
+        "input_mood_hint": "哀伤内省",
+        "few_shot_examples": [
+            {
+                "source_id": "lyric-modern-101",
+                "content_preview": "对话框停在最后一句，指尖仍然悬着。"[:30],
+                "learn_point": "保留克制语气并用动作推进情绪",
+                "do_not_copy": "不要复写原句与段落顺序",
+            }
+        ],
+        "lint_report": {"skipped_rules_by_profile": []},
+    }
+
+    write_outputs(payload, tmp_path / "out", trace)
+    audit = ((tmp_path / "out") / "audit.md").read_text(encoding="utf-8")
+
+    assert "ProfileMismatchWarning" in audit
+    assert "uplift_pop:1" in audit
+    assert "urban_introspective:2" in audit
 
 
 def test_compile_raises_structural_incomplete_without_chorus(tmp_path) -> None:

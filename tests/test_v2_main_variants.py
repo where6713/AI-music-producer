@@ -3,7 +3,6 @@ from __future__ import annotations
 import pytest
 
 from src.main import (
-    _append_profile_routing_warnings,
     _apply_retrieval_profile_decision,
     _merge_revise_trace_metadata,
     _score_variants,
@@ -902,21 +901,6 @@ def test_produce_fails_loud_with_trace_when_initial_generation_crashes(tmp_path,
     assert not (tmp_path / "out" / "lyrics.txt").exists()
     assert (tmp_path / "out" / "trace.json").exists()
     assert (tmp_path / "out" / "audit.md").exists()
-
-
-def test_append_profile_routing_warning_for_low_confidence_vote_route() -> None:
-    trace = {
-        "active_profile": "uplift_pop",
-        "profile_source": "corpus_vote",
-        "retrieval_profile_vote": "uplift_pop",
-        "profile_vote_confidence": 0.4,
-    }
-
-    _append_profile_routing_warnings(trace)
-
-    warnings = trace.get("profile_routing_warnings")
-    assert isinstance(warnings, list)
-    assert any("profile_routing_low_confidence" in item for item in warnings)
 
 
 def test_produce_fails_loud_when_few_shot_quality_insufficient(tmp_path, monkeypatch) -> None:

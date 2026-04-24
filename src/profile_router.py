@@ -38,6 +38,17 @@ def _candidate_list(registry: dict[str, dict[str, Any]]) -> list[dict[str, str]]
     return out
 
 
+def load_profile_typical_moods(repo_root: Path, profile_id: str) -> list[str]:
+    registry = _load_registry(repo_root)
+    profile = registry.get(profile_id, {})
+    if not isinstance(profile, dict):
+        return []
+    raw = profile.get("typical_moods", [])
+    if not isinstance(raw, list):
+        return []
+    return [str(x).strip() for x in raw if str(x).strip()]
+
+
 def resolve_active_profile(
     user_input: UserInput,
     *,
