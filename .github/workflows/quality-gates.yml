@@ -31,17 +31,5 @@ jobs:
           G1_TARGET_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
           G1_REQUIRE_TARGET_SHA: "true"
         run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          p = Path("tools/scripts/run_quality_gates_ci.sh")
-          text = p.read_text(encoding="utf-8")
-          if "开发清单\\.md" not in text or "目录框架规范\\.md" not in text:
-              text = text.replace(
-                  "AI-music-producer PRD_v1\\.1\\.md|one law\\.md|",
-                  "AI-music-producer PRD_v1\\.1\\.md|one law\\.md|开发清单\\.md|目录框架规范\\.md|",
-              )
-              p.write_text(text, encoding="utf-8")
-          PY
           chmod +x tools/scripts/run_quality_gates_ci.sh
           tools/scripts/run_quality_gates_ci.sh
