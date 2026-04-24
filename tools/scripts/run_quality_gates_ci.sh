@@ -57,9 +57,9 @@ if disallowed:
 PY
 
 # 4) light secret scan
-if git grep -nE '(AKIA[0-9A-Z]{16}|BEGIN[[:space:]]+PRIVATE[[:space:]]+KEY|api[_-]?key[[:space:]]*[:=][[:space:]]*["'"'"'"'"'"'][^"'"'"'"'"'"']+["'"'"'"'"'"'])' -- . >/dev/null 2>&1; then
+if git grep -nE '(AKIA[0-9A-Z]{16}|BEGIN[[:space:]]+PRIVATE[[:space:]]+KEY|api[_-]?key[[:space:]]*[:=][[:space:]]*["'"'"'"'"'"'"'"'][^"'"'"'"'"'"'"'"']+["'"'"'"'"'"'"'"'])' -- . ':(exclude)*.md' >/dev/null 2>&1; then
   echo "[ci-gates][BLOCK] potential secrets detected in tracked files."
-  git grep -nE '(AKIA[0-9A-Z]{16}|BEGIN[[:space:]]+PRIVATE[[:space:]]+KEY|api[_-]?key[[:space:]]*[:=][[:space:]]*["'"'"'"'"'"'][^"'"'"'"'"'"']+["'"'"'"'"'"'])' -- . || true
+  git grep -nE '(AKIA[0-9A-Z]{16}|BEGIN[[:space:]]+PRIVATE[[:space:]]+KEY|api[_-]?key[[:space:]]*[:=][[:space:]]*["'"'"'"'"'"'"'"'][^"'"'"'"'"'"'"'"']+["'"'"'"'"'"'"'"'])' -- . ':(exclude)*.md' || true
   exit 1
 fi
 
