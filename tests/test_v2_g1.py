@@ -146,3 +146,25 @@ def test_check_gate_g1_uses_latest_non_merge_commit_when_head_is_merge(
 
     assert result["status"] == "pass"
     assert result["failed_checks"] == []
+
+
+def test_check_gate_g1_prefers_pr_head_parent_on_merge_head(monkeypatch, tmp_path) -> None:
+    responses = {
+        ("log", "-1", "--pretty=%s"): "Merge 123abc into main\n",
+        ("show", "--name-only", "--pretty=", "-1"): "apps/cli/main.py\n",
+        ("show", "-s", "--format=%s", "HEAD^2"): "test(g7): tighten structural revise contract\n",
+        ("show", "--name-only", "--pretty=", "HEAD^2"): "src/main.py\ntests/test_v2_main_variants.py\n",
+    }
+
+    def _fake_read_git_output(_workspace_root, args):
+        key = tuple(args)
+        if key not in responses:
+            raise RuntimeError(f"unexpected args: {args}")
+        return responses[key]
+
+    monkeypatch.setattr(gate_g1, "_read_git_output", _fake_read_git_output)
+
+    result = gate_g1.check_gate_g1(tmp_path)
+
+    assert result["status"] == "pass"
+    assert result["failed_checks"] == []

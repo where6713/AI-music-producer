@@ -87,6 +87,24 @@ def check_gate_g1(workspace_root: Path) -> dict[str, Any]:
         return primary
 
     try:
+        pr_head_subject = _read_git_output(
+            workspace_root,
+            ["show", "-s", "--format=%s", "HEAD^2"],
+        ).strip()
+        pr_head_changed = _read_git_output(
+            workspace_root,
+            ["show", "--name-only", "--pretty=", "HEAD^2"],
+        )
+        pr_head_files = [line.strip() for line in pr_head_changed.splitlines() if line.strip()]
+        pr_head_result = validate_g1_scope(
+            {"commit_subject": pr_head_subject, "changed_files": pr_head_files}
+        )
+        if pr_head_result["status"] == "pass":
+            return pr_head_result
+    except Exception:
+        pass
+
+    try:
         non_merge_sha = _read_git_output(
             workspace_root,
             ["rev-list", "--no-merges", "-n", "1", "HEAD"],
