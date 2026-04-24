@@ -304,6 +304,9 @@ def check_gate_g7(
 
     gate_summary = {name: _normalize(data) for name, data in gates.items()}
     failed_gates = [name for name, status in gate_summary.items() if status != "pass"]
+    failed_gate_details = {
+        name: gates.get(name, {}) for name in failed_gates if isinstance(gates.get(name, {}), dict)
+    }
 
     proof = {"status": "skipped", "output_dir": "", "missing_files": [], "llm_calls_ok": False}
     if run_proof:
@@ -323,5 +326,6 @@ def check_gate_g7(
         "status": status,
         "gate_summary": gate_summary,
         "failed_gates": failed_gates,
+        "failed_gate_details": failed_gate_details,
         "proof": proof,
     }

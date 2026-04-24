@@ -235,6 +235,35 @@ def test_proof_check_marks_decision_quality_inactive_when_no_active_profile(tmp_
     assert result["retrieval_decision_stage"] == "revise"
 
 
+def test_check_gate_g7_includes_failed_gate_details(monkeypatch, tmp_path) -> None:
+    def _ok(*_args, **_kwargs):
+        return {"status": "pass"}
+
+    def _g1_fail(*_args, **_kwargs):
+        return {
+            "status": "fail",
+            "failed_checks": ["commit_scope_gate"],
+            "commit_subject": "Merge deadbeef into main",
+            "changed_files": ["apps/cli/main.py"],
+        }
+
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7.check_gate_g0", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7.check_gate_g1", _g1_fail)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7._run_g2_check", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7._run_g3_check", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7._run_g4_check", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7.check_gate_g5", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7.check_gate_g6", _ok)
+
+    result = check_gate_g7(tmp_path, run_proof=False)
+
+    assert result["status"] == "fail"
+    assert result["failed_gates"] == ["G1"]
+    details = result.get("failed_gate_details", {})
+    assert isinstance(details, dict)
+    assert details["G1"]["failed_checks"] == ["commit_scope_gate"]
+
+
 def test_pm_audit_proof_reports_decision_mode_when_trace_has_decision_block() -> None:
     trace_path = Path("out") / "trace.json"
     original = trace_path.read_text(encoding="utf-8") if trace_path.exists() else None
