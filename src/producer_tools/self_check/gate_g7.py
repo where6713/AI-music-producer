@@ -294,9 +294,19 @@ def check_gate_g7(
     proof_output_dir: Path | None = None,
 ) -> dict[str, Any]:
     g1_target_sha = os.getenv("G1_TARGET_SHA", "").strip()
+    g1_require_target = os.getenv("G1_REQUIRE_TARGET_SHA", "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
     gates = {
         "G0": check_gate_g0(workspace_root, strict_hooks_path=False),
-        "G1": check_gate_g1(workspace_root, target_commit=g1_target_sha),
+        "G1": check_gate_g1(
+            workspace_root,
+            target_commit=g1_target_sha,
+            require_target=g1_require_target,
+        ),
         "G2": _run_g2_check(),
         "G3": _run_g3_check(),
         "G4": _run_g4_check(),

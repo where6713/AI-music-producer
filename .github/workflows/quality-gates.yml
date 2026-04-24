@@ -30,6 +30,7 @@ jobs:
         shell: bash
         env:
           G1_TARGET_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          G1_REQUIRE_TARGET_SHA: "true"
         run: |
           chmod +x tools/scripts/run_quality_gates_ci.sh
           tools/scripts/run_quality_gates_ci.sh

@@ -62,8 +62,20 @@ def _read_git_output(workspace_root: Path, args: list[str]) -> str:
     return raw.decode("utf-8", errors="replace")
 
 
-def check_gate_g1(workspace_root: Path, target_commit: str = "") -> dict[str, Any]:
+def check_gate_g1(
+    workspace_root: Path,
+    target_commit: str = "",
+    require_target: bool = False,
+) -> dict[str, Any]:
     explicit_target = str(target_commit).strip()
+    if require_target and not explicit_target:
+        return {
+            "status": "fail",
+            "failed_checks": ["target_commit_required"],
+            "commit_subject": "",
+            "changed_files": [],
+        }
+
     if explicit_target:
         try:
             explicit_subject = _read_git_output(
@@ -78,9 +90,18 @@ def check_gate_g1(workspace_root: Path, target_commit: str = "") -> dict[str, An
             explicit_result = validate_g1_scope(
                 {"commit_subject": explicit_subject, "changed_files": explicit_files}
             )
+            if require_target:
+                return explicit_result
             if explicit_result["status"] == "pass":
                 return explicit_result
         except Exception:
+            if require_target:
+                return {
+                    "status": "fail",
+                    "failed_checks": ["target_commit_unavailable"],
+                    "commit_subject": "",
+                    "changed_files": [],
+                }
             pass
 
     try:

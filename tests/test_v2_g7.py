@@ -270,7 +270,7 @@ def test_check_gate_g7_passes_env_target_sha_to_g1(monkeypatch, tmp_path) -> Non
     def _ok(*_args, **_kwargs):
         return {"status": "pass"}
 
-    def _g1_capture(_workspace_root, target_commit=""):
+    def _g1_capture(_workspace_root, target_commit="", require_target=False):
         captured["target"] = target_commit
         return {"status": "pass", "failed_checks": []}
 
@@ -287,6 +287,34 @@ def test_check_gate_g7_passes_env_target_sha_to_g1(monkeypatch, tmp_path) -> Non
 
     assert result["status"] == "pass"
     assert captured["target"] == "abc123head"
+
+
+def test_check_gate_g7_passes_require_target_flag_to_g1(monkeypatch, tmp_path) -> None:
+    captured: dict[str, object] = {"target": "", "require": None}
+
+    def _ok(*_args, **_kwargs):
+        return {"status": "pass"}
+
+    def _g1_capture(_workspace_root, target_commit="", require_target=False):
+        captured["target"] = target_commit
+        captured["require"] = require_target
+        return {"status": "pass", "failed_checks": []}
+
+    monkeypatch.setenv("G1_TARGET_SHA", "abc123head")
+    monkeypatch.setenv("G1_REQUIRE_TARGET_SHA", "true")
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7.check_gate_g0", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7.check_gate_g1", _g1_capture)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7._run_g2_check", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7._run_g3_check", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7._run_g4_check", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7.check_gate_g5", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7.check_gate_g6", _ok)
+
+    result = check_gate_g7(tmp_path, run_proof=False)
+
+    assert result["status"] == "pass"
+    assert captured["target"] == "abc123head"
+    assert captured["require"] is True
 
 
 def test_pm_audit_proof_reports_decision_mode_when_trace_has_decision_block() -> None:

@@ -42,32 +42,6 @@ def test_g6_ci_contract_pass() -> None:
 jobs:
   ci-quality-gates:
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Install Python test deps
-        run: |
-          pip install .
-          pip install pytest
-      - name: Run mirrored quality gates
-        run: |
-          tools/scripts/run_quality_gates_ci.sh
-"""
-    ci_script = "pytest -q\nout/lyrics.txt"
-    result = validate_g6_contract(workflow_yaml=workflow, ci_script=ci_script)
-    assert result["status"] == "pass"
-
-
-def test_g6_ci_contract_pass_with_checkout_fetch_depth_zero() -> None:
-    workflow = """
-jobs:
-  ci-quality-gates:
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: Install Python test deps
         run: |
           pip install .

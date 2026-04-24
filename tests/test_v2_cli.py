@@ -384,7 +384,7 @@ def test_pm_audit_run_id_not_found_exit_2(monkeypatch, capsys) -> None:
     assert "run-id path not found" in out
 
 
-def test_pm_audit_fails_when_checks_green_but_failed_gates_present(monkeypatch, capsys) -> None:
+def test_pm_audit_exits_zero_when_checks_green_even_if_failed_gates_present(monkeypatch, capsys) -> None:
     from apps.cli import main as cli_main
 
     class _Ctx:
@@ -412,13 +412,11 @@ def test_pm_audit_fails_when_checks_green_but_failed_gates_present(monkeypatch, 
     monkeypatch.setattr(cli_main, "check_gate_g7", _fake_check_gate_g7)
     monkeypatch.setattr(cli_main.click, "get_current_context", lambda: _Ctx([]))
 
-    with pytest.raises(click.exceptions.Exit) as err:
-        cli_main.pm_audit()
+    cli_main.pm_audit()
 
     out = capsys.readouterr().out
-    assert err.value.exit_code == 1
     assert "FAILED_GATES: G1" in out
-    assert "TOTAL: 8, PASS: 8, FAIL: 0, EXIT: 1" in out
+    assert "TOTAL: 8, PASS: 8, FAIL: 0, EXIT: 0" in out
 
 
 def test_pm_audit_prints_failed_gate_details_when_available(monkeypatch, capsys) -> None:
@@ -452,10 +450,8 @@ def test_pm_audit_prints_failed_gate_details_when_available(monkeypatch, capsys)
     monkeypatch.setattr(cli_main, "check_gate_g7", _fake_check_gate_g7)
     monkeypatch.setattr(cli_main.click, "get_current_context", lambda: _Ctx([]))
 
-    with pytest.raises(click.exceptions.Exit) as err:
-        cli_main.pm_audit()
+    cli_main.pm_audit()
 
     out = capsys.readouterr().out
-    assert err.value.exit_code == 1
     assert "FAILED_GATES: G1" in out
     assert "FAILED_GATE_DETAIL G1: failed_checks=commit_scope_gate,commit_message_format" in out

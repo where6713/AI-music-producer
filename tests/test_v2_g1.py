@@ -247,3 +247,44 @@ def test_check_gate_g1_preserves_git_metadata_unavailable_semantics_with_bad_tar
 
     assert result["status"] == "fail"
     assert result["failed_checks"] == ["git_metadata_unavailable"]
+
+
+def test_check_gate_g1_fails_when_target_required_but_missing(tmp_path) -> None:
+    result = gate_g1.check_gate_g1(tmp_path, require_target=True)
+
+    assert result["status"] == "fail"
+    assert result["failed_checks"] == ["target_commit_required"]
+
+
+def test_check_gate_g1_fails_when_target_required_but_unavailable(monkeypatch, tmp_path) -> None:
+    def _raise(*_args, **_kwargs):
+        raise RuntimeError("unknown revision")
+
+    monkeypatch.setattr(gate_g1, "_read_git_output", _raise)
+
+    result = gate_g1.check_gate_g1(tmp_path, target_commit="missing123", require_target=True)
+
+    assert result["status"] == "fail"
+    assert result["failed_checks"] == ["target_commit_unavailable"]
+
+
+def test_check_gate_g1_requires_target_and_fails_scope_when_target_invalid(monkeypatch, tmp_path) -> None:
+    responses = {
+        ("show", "-s", "--format=%s", "badsha"): "Merge deadbeef into main\n",
+        ("show", "--name-only", "--pretty=", "badsha"): "apps/.gitkeep\napps/cli/main.py\n",
+    }
+
+    def _fake_read_git_output(_workspace_root, args):
+        key = tuple(args)
+        if key not in responses:
+            raise RuntimeError(f"unexpected args: {args}")
+        return responses[key]
+
+    monkeypatch.setattr(gate_g1, "_read_git_output", _fake_read_git_output)
+
+    result = gate_g1.check_gate_g1(tmp_path, target_commit="badsha", require_target=True)
+
+    assert result["status"] == "fail"
+    assert "commit_message_format" in result["failed_checks"]
+    assert "commit_scope_gate" in result["failed_checks"]
+    assert "mixed_gitkeep_cleanup" in result["failed_checks"]
