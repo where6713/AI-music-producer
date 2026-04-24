@@ -235,6 +235,88 @@ def test_proof_check_marks_decision_quality_inactive_when_no_active_profile(tmp_
     assert result["retrieval_decision_stage"] == "revise"
 
 
+def test_check_gate_g7_includes_failed_gate_details(monkeypatch, tmp_path) -> None:
+    def _ok(*_args, **_kwargs):
+        return {"status": "pass"}
+
+    def _g1_fail(*_args, **_kwargs):
+        return {
+            "status": "fail",
+            "failed_checks": ["commit_scope_gate"],
+            "commit_subject": "Merge deadbeef into main",
+            "changed_files": ["apps/cli/main.py"],
+        }
+
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7.check_gate_g0", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7.check_gate_g1", _g1_fail)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7._run_g2_check", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7._run_g3_check", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7._run_g4_check", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7.check_gate_g5", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7.check_gate_g6", _ok)
+
+    result = check_gate_g7(tmp_path, run_proof=False)
+
+    assert result["status"] == "fail"
+    assert result["failed_gates"] == ["G1"]
+    details = result.get("failed_gate_details", {})
+    assert isinstance(details, dict)
+    assert details["G1"]["failed_checks"] == ["commit_scope_gate"]
+
+
+def test_check_gate_g7_passes_env_target_sha_to_g1(monkeypatch, tmp_path) -> None:
+    captured: dict[str, object] = {"target": ""}
+
+    def _ok(*_args, **_kwargs):
+        return {"status": "pass"}
+
+    def _g1_capture(_workspace_root, target_commit="", require_target=False):
+        captured["target"] = target_commit
+        return {"status": "pass", "failed_checks": []}
+
+    monkeypatch.setenv("G1_TARGET_SHA", "abc123head")
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7.check_gate_g0", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7.check_gate_g1", _g1_capture)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7._run_g2_check", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7._run_g3_check", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7._run_g4_check", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7.check_gate_g5", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7.check_gate_g6", _ok)
+
+    result = check_gate_g7(tmp_path, run_proof=False)
+
+    assert result["status"] == "pass"
+    assert captured["target"] == "abc123head"
+
+
+def test_check_gate_g7_passes_require_target_flag_to_g1(monkeypatch, tmp_path) -> None:
+    captured: dict[str, object] = {"target": "", "require": None}
+
+    def _ok(*_args, **_kwargs):
+        return {"status": "pass"}
+
+    def _g1_capture(_workspace_root, target_commit="", require_target=False):
+        captured["target"] = target_commit
+        captured["require"] = require_target
+        return {"status": "pass", "failed_checks": []}
+
+    monkeypatch.setenv("G1_TARGET_SHA", "abc123head")
+    monkeypatch.setenv("G1_REQUIRE_TARGET_SHA", "true")
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7.check_gate_g0", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7.check_gate_g1", _g1_capture)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7._run_g2_check", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7._run_g3_check", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7._run_g4_check", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7.check_gate_g5", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7.check_gate_g6", _ok)
+
+    result = check_gate_g7(tmp_path, run_proof=False)
+
+    assert result["status"] == "pass"
+    assert captured["target"] == "abc123head"
+    assert captured["require"] is True
+
+
 def test_pm_audit_proof_reports_decision_mode_when_trace_has_decision_block() -> None:
     trace_path = Path("out") / "trace.json"
     original = trace_path.read_text(encoding="utf-8") if trace_path.exists() else None
@@ -366,3 +448,49 @@ def test_check_gate_g7_uses_injected_proof_output_dir(tmp_path) -> None:
 
     assert result["proof"]["output_dir"] == str(out)
     assert result["proof"]["status"] == "pass"
+
+
+def test_pm_audit_profile_source_detail_marks_low_confidence(tmp_path) -> None:
+    out = tmp_path / "out"
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "lyrics.txt").write_text("[Verse 1]\nline one\nline two\nline three\n", encoding="utf-8")
+    (out / "style.txt").write_text("ok\n", encoding="utf-8")
+    (out / "exclude.txt").write_text("ok\n", encoding="utf-8")
+    (out / "lyric_payload.json").write_text("{}\n", encoding="utf-8")
+    (out / "audit.md").write_text("## 0.\n## 1.\n## 2.\n## 3.\n## 4.\n", encoding="utf-8")
+    (out / "trace.json").write_text(
+        json.dumps(
+            {
+                "llm_calls": 2,
+                "profile_source": "corpus_vote",
+                "retrieval_profile_decision": {
+                    "profile_vote": "urban_introspective",
+                    "vote_confidence": 0.5,
+                    "active_profile": "",
+                    "decision_reason": "insufficient_confidence",
+                    "source_stage": "initial",
+                    "source_ids": ["lyric-modern-aa", "poem-cr-bb"],
+                },
+                "few_shot_source_ids": ["lyric-modern-aa", "poem-cr-bb"],
+                "lint_report": {
+                    "craft_score": 0.9,
+                    "is_dead": False,
+                    "violations": [],
+                    "hard_kill_rules": [],
+                },
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir(parents=True, exist_ok=True)
+    (src_dir / "dummy.py").write_text("def ok():\n    return 1\n", encoding="utf-8")
+
+    result = _proof_check(tmp_path, strict_pm_audit=True, output_dir=out)
+    detail = result["pm_audit_checks"]["profile_source_recorded"]["detail"]
+
+    assert "profile_source=corpus_vote" in detail
+    assert "LOW_CONFIDENCE" in detail

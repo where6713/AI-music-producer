@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import os
 from pathlib import Path
 from typing import Any
 
@@ -142,6 +143,20 @@ def _pm_audit_checks(
     craft_score = float(lint_report.get("craft_score", 0.0) or 0.0)
     is_dead = bool(lint_report.get("is_dead", False))
     profile_source = str(trace_payload.get("profile_source", "")).strip()
+    decision = trace_payload.get("retrieval_profile_decision", {})
+    vote_confidence_raw = trace_payload.get("retrieval_vote_confidence", None)
+    if vote_confidence_raw is None and isinstance(decision, dict):
+        vote_confidence_raw = decision.get("vote_confidence", None)
+    low_confidence = False
+    try:
+        if vote_confidence_raw is not None:
+            low_confidence = float(vote_confidence_raw) < 0.67
+    except (TypeError, ValueError):
+        low_confidence = False
+
+    profile_source_detail = f"profile_source={profile_source}"
+    if low_confidence:
+        profile_source_detail += " LOW_CONFIDENCE"
 
     checks: dict[str, dict[str, Any]] = {
         "chosen_variant_not_dead": {
@@ -174,7 +189,7 @@ def _pm_audit_checks(
         },
         "profile_source_recorded": {
             "ok": bool(profile_source),
-            "detail": f"profile_source={profile_source}",
+            "detail": profile_source_detail,
         },
     }
     return checks
@@ -278,9 +293,20 @@ def check_gate_g7(
     strict_pm_audit: bool = False,
     proof_output_dir: Path | None = None,
 ) -> dict[str, Any]:
+    g1_target_sha = os.getenv("G1_TARGET_SHA", "").strip()
+    g1_require_target = os.getenv("G1_REQUIRE_TARGET_SHA", "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
     gates = {
         "G0": check_gate_g0(workspace_root, strict_hooks_path=False),
-        "G1": check_gate_g1(workspace_root),
+        "G1": check_gate_g1(
+            workspace_root,
+            target_commit=g1_target_sha,
+            require_target=g1_require_target,
+        ),
         "G2": _run_g2_check(),
         "G3": _run_g3_check(),
         "G4": _run_g4_check(),
@@ -290,6 +316,9 @@ def check_gate_g7(
 
     gate_summary = {name: _normalize(data) for name, data in gates.items()}
     failed_gates = [name for name, status in gate_summary.items() if status != "pass"]
+    failed_gate_details = {
+        name: gates.get(name, {}) for name in failed_gates if isinstance(gates.get(name, {}), dict)
+    }
 
     proof = {"status": "skipped", "output_dir": "", "missing_files": [], "llm_calls_ok": False}
     if run_proof:
@@ -309,5 +338,6 @@ def check_gate_g7(
         "status": status,
         "gate_summary": gate_summary,
         "failed_gates": failed_gates,
+        "failed_gate_details": failed_gate_details,
         "proof": proof,
     }
