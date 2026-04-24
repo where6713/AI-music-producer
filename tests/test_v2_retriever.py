@@ -398,3 +398,60 @@ def test_retriever_raises_when_preinjection_validation_leaves_less_than_two(tmp_
             top_k=3,
             return_metadata=True,
         )
+
+
+def test_retriever_does_not_relint_rows_on_selection_path(monkeypatch, tmp_path) -> None:
+    corpus = tmp_path / "corpus"
+    corpus.mkdir(parents=True, exist_ok=True)
+    poetry_rows = []
+    lyric_rows = [
+        {
+            "source_id": "lyric-modern-101",
+            "type": "modern_lyric",
+            "title": "clean one",
+            "emotion_tags": ["breakup", "late-night"],
+            "profile_tag": "urban_introspective",
+            "valence": "negative",
+            "learn_point": "保留克制语气并用动作推进情绪",
+            "do_not_copy": "不要复写原句与段落顺序",
+            "profile_confidence": 0.9,
+            "content": "对话框停在最后一句，指尖仍然悬着。",
+        },
+        {
+            "source_id": "lyric-modern-102",
+            "type": "modern_lyric",
+            "title": "clean two",
+            "emotion_tags": ["distance", "regret"],
+            "profile_tag": "urban_introspective",
+            "valence": "negative",
+            "learn_point": "保留克制语气并用动作推进情绪",
+            "do_not_copy": "不要复写原句与段落顺序",
+            "profile_confidence": 0.9,
+            "content": "手在拨出前停住，呼吸也跟着发颤。",
+        },
+    ]
+    (corpus / "poetry_classical.json").write_text(json.dumps(poetry_rows, ensure_ascii=False), encoding="utf-8")
+    (corpus / "lyrics_modern_zh.json").write_text(json.dumps(lyric_rows, ensure_ascii=False), encoding="utf-8")
+    _write_clean_corpus(corpus, poetry_rows, lyric_rows)
+
+    from src import retriever as retriever_mod
+
+    call_count = {"n": 0}
+    real_lint = retriever_mod.lint_corpus_row
+
+    def _wrapped_lint(row, *, mode="ingestion"):
+        call_count["n"] += 1
+        return real_lint(row, mode=mode)
+
+    monkeypatch.setattr(retriever_mod, "lint_corpus_row", _wrapped_lint)
+
+    result = retrieve_few_shot_examples(
+        UserInput(raw_intent="分手后深夜想发消息又克制住"),
+        repo_root=tmp_path,
+        top_k=3,
+        return_metadata=True,
+    )
+
+    assert isinstance(result, dict)
+    assert len(result["samples"]) == 2
+    assert call_count["n"] == 2

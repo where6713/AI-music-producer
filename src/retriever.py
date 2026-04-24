@@ -108,6 +108,10 @@ def _normalize_profile_confidence(row: dict[str, Any]) -> float:
 
 def corpus_balance_check(repo_root: Path) -> dict[str, Any]:
     corpus = _load_corpus(repo_root)
+    return _corpus_balance_from_rows(corpus)
+
+
+def _corpus_balance_from_rows(corpus: list[dict[str, Any]]) -> dict[str, Any]:
     counts = {k: 0 for k in MIN_PROFILE_COVERAGE}
     for row in corpus:
         tag = _infer_profile_tag(row)
@@ -156,9 +160,6 @@ def retrieve_few_shot_examples(
     scored.sort(key=lambda x: x[0], reverse=True)
 
     def _quality_pass(row: dict[str, Any]) -> bool:
-        report = lint_corpus_row(row, mode="runtime")
-        if not report.passed:
-            return False
         learn_point = str(row.get("learn_point", "")).strip()
         if len(learn_point) < 5:
             return False
@@ -229,6 +230,6 @@ def retrieve_few_shot_examples(
         "profile_vote": profile_vote,
         "vote_confidence": vote_confidence,
         "profile_vote_counts": dict(votes),
-        "corpus_balance": corpus_balance_check(repo_root),
+        "corpus_balance": _corpus_balance_from_rows(corpus),
         "corpus_monoculture_risk": monoculture_risk,
     }

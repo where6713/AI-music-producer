@@ -366,3 +366,49 @@ def test_check_gate_g7_uses_injected_proof_output_dir(tmp_path) -> None:
 
     assert result["proof"]["output_dir"] == str(out)
     assert result["proof"]["status"] == "pass"
+
+
+def test_pm_audit_profile_source_detail_marks_low_confidence(tmp_path) -> None:
+    out = tmp_path / "out"
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "lyrics.txt").write_text("[Verse 1]\nline one\nline two\nline three\n", encoding="utf-8")
+    (out / "style.txt").write_text("ok\n", encoding="utf-8")
+    (out / "exclude.txt").write_text("ok\n", encoding="utf-8")
+    (out / "lyric_payload.json").write_text("{}\n", encoding="utf-8")
+    (out / "audit.md").write_text("## 0.\n## 1.\n## 2.\n## 3.\n## 4.\n", encoding="utf-8")
+    (out / "trace.json").write_text(
+        json.dumps(
+            {
+                "llm_calls": 2,
+                "profile_source": "corpus_vote",
+                "retrieval_profile_decision": {
+                    "profile_vote": "urban_introspective",
+                    "vote_confidence": 0.5,
+                    "active_profile": "",
+                    "decision_reason": "insufficient_confidence",
+                    "source_stage": "initial",
+                    "source_ids": ["lyric-modern-aa", "poem-cr-bb"],
+                },
+                "few_shot_source_ids": ["lyric-modern-aa", "poem-cr-bb"],
+                "lint_report": {
+                    "craft_score": 0.9,
+                    "is_dead": False,
+                    "violations": [],
+                    "hard_kill_rules": [],
+                },
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir(parents=True, exist_ok=True)
+    (src_dir / "dummy.py").write_text("def ok():\n    return 1\n", encoding="utf-8")
+
+    result = _proof_check(tmp_path, strict_pm_audit=True, output_dir=out)
+    detail = result["pm_audit_checks"]["profile_source_recorded"]["detail"]
+
+    assert "profile_source=corpus_vote" in detail
+    assert "LOW_CONFIDENCE" in detail

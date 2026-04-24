@@ -142,6 +142,20 @@ def _pm_audit_checks(
     craft_score = float(lint_report.get("craft_score", 0.0) or 0.0)
     is_dead = bool(lint_report.get("is_dead", False))
     profile_source = str(trace_payload.get("profile_source", "")).strip()
+    decision = trace_payload.get("retrieval_profile_decision", {})
+    vote_confidence_raw = trace_payload.get("retrieval_vote_confidence", None)
+    if vote_confidence_raw is None and isinstance(decision, dict):
+        vote_confidence_raw = decision.get("vote_confidence", None)
+    low_confidence = False
+    try:
+        if vote_confidence_raw is not None:
+            low_confidence = float(vote_confidence_raw) < 0.67
+    except (TypeError, ValueError):
+        low_confidence = False
+
+    profile_source_detail = f"profile_source={profile_source}"
+    if low_confidence:
+        profile_source_detail += " LOW_CONFIDENCE"
 
     checks: dict[str, dict[str, Any]] = {
         "chosen_variant_not_dead": {
@@ -174,7 +188,7 @@ def _pm_audit_checks(
         },
         "profile_source_recorded": {
             "ok": bool(profile_source),
-            "detail": f"profile_source={profile_source}",
+            "detail": profile_source_detail,
         },
     }
     return checks
