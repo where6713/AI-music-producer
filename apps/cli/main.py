@@ -292,8 +292,12 @@ def pm_audit() -> None:
         table.add_row(name, status, "true" if ok else "false", detail)
 
     fail_count = len(PM_AUDIT_CHECK_ORDER) - pass_count
-    exit_code = 0 if fail_count == 0 and result.get("status") == "pass" else 1
+    failed_gates = result.get("failed_gates", []) if isinstance(result, dict) else []
+    gate_fail_count = len([x for x in failed_gates if str(x).strip()])
+    exit_code = 0 if fail_count == 0 and gate_fail_count == 0 else 1
     console.print(table)
+    if gate_fail_count > 0:
+        typer.echo("FAILED_GATES: " + ", ".join([str(x) for x in failed_gates]))
     typer.echo(f"TOTAL: 8, PASS: {pass_count}, FAIL: {fail_count}, EXIT: {exit_code}")
     if exit_code != 0:
         raise typer.Exit(code=1)

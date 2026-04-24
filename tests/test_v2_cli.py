@@ -365,3 +365,40 @@ def test_pm_audit_run_id_not_found_exit_2(monkeypatch, capsys) -> None:
     out = capsys.readouterr().out
     assert err.value.exit_code == 2
     assert "run-id path not found" in out
+
+
+def test_pm_audit_fails_when_checks_green_but_failed_gates_present(monkeypatch, capsys) -> None:
+    from apps.cli import main as cli_main
+
+    class _Ctx:
+        def __init__(self, args: list[str]) -> None:
+            self.args = args
+
+    def _fake_check_gate_g7(*_args, **_kwargs):
+        return {
+            "status": "fail",
+            "failed_gates": ["G1"],
+            "proof": {
+                "pm_audit_checks": {
+                    "chosen_variant_not_dead": {"ok": True, "detail": "is_dead=False"},
+                    "craft_score_floor": {"ok": True, "detail": "craft_score=0.9"},
+                    "r14_r16_global_hits": {"ok": True, "detail": "hits=0"},
+                    "few_shot_no_numeric_ids": {"ok": True, "detail": "ids clean"},
+                    "audit_sections_complete": {"ok": True, "detail": "0/1/2/3/4"},
+                    "lyrics_no_residuals": {"ok": True, "detail": "pass"},
+                    "postprocess_symbols_absent": {"ok": True, "detail": "pass"},
+                    "profile_source_recorded": {"ok": True, "detail": "profile_source=corpus_vote"},
+                }
+            },
+        }
+
+    monkeypatch.setattr(cli_main, "check_gate_g7", _fake_check_gate_g7)
+    monkeypatch.setattr(cli_main.click, "get_current_context", lambda: _Ctx([]))
+
+    with pytest.raises(click.exceptions.Exit) as err:
+        cli_main.pm_audit()
+
+    out = capsys.readouterr().out
+    assert err.value.exit_code == 1
+    assert "FAILED_GATES: G1" in out
+    assert "TOTAL: 8, PASS: 8, FAIL: 0, EXIT: 1" in out
