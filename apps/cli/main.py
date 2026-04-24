@@ -2,9 +2,13 @@ from __future__ import annotations
 
 from pathlib import Path
 import sys
+import argparse
+import os
 
 import click
 import typer
+from rich.console import Console
+from rich.table import Table
 
 from src.main import produce as produce_v2
 from src.profile_router import AmbiguousProfileError
@@ -21,8 +25,18 @@ from src.producer_tools.self_check.gate_g7 import check_gate_g7
 app = typer.Typer(
     help="AI music producer CLI (PRD v2.0)",
     rich_markup_mode=None,
-    context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
 )
+
+PM_AUDIT_CHECK_ORDER = [
+    "chosen_variant_not_dead",
+    "craft_score_floor",
+    "r14_r16_global_hits",
+    "few_shot_no_numeric_ids",
+    "audit_sections_complete",
+    "lyrics_no_residuals",
+    "postprocess_symbols_absent",
+    "profile_source_recorded",
+]
 
 
 def _ensure_utf8_output() -> None:
@@ -218,28 +232,83 @@ def gate_check() -> None:
     raise typer.Exit(code=1)
 
 
-@app.command("pm-audit")
+@app.command(
+    "pm-audit",
+    context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
+)
 def pm_audit() -> None:
-    result = check_gate_g7(Path.cwd(), run_proof=True)
-    if result["status"] != "pass":
-        typer.echo("PM AUDIT FAIL")
-        typer.echo(str(result))
+    args = list(click.get_current_context().args)
+    last = "--last" in args
+
+    run_id_value = ""
+    if "--run-id" in args:
+        idx = args.index("--run-id")
+        if idx + 1 >= len(args):
+            typer.echo("missing value for --run-id")
+            raise typer.Exit(code=2)
+        run_id_value = str(args[idx + 1]).strip()
+        if not run_id_value or run_id_value.startswith("--"):
+            typer.echo("missing value for --run-id")
+            raise typer.Exit(code=2)
+
+    if last and run_id_value:
+        typer.echo("parameter conflict: use either --last or --run-id")
+        raise typer.Exit(code=2)
+
+    target_out = Path.cwd() / "out"
+    if run_id_value:
+        target_out = Path.cwd() / "out" / "task011_runs" / run_id_value
+        if not target_out.exists() or not target_out.is_dir():
+            typer.echo(f"run-id path not found: {target_out}")
+            raise typer.Exit(code=2)
+
+    result = check_gate_g7(
+        Path.cwd(),
+        run_proof=True,
+        strict_pm_audit=True,
+        proof_output_dir=target_out,
+    )
+    proof = result.get("proof", {}) if isinstance(result, dict) else {}
+    checks = proof.get("pm_audit_checks", {}) if isinstance(proof, dict) else {}
+
+    no_color = os.getenv("NO_COLOR", "").strip() != ""
+    console = Console(no_color=no_color)
+    table = Table(title="PM Audit", show_lines=False)
+    table.add_column("check_key", style="cyan", no_wrap=True)
+    table.add_column("status", no_wrap=True)
+    table.add_column("ok", no_wrap=True)
+    table.add_column("detail")
+
+    pass_count = 0
+    for name in PM_AUDIT_CHECK_ORDER:
+        item = checks.get(name, {}) if isinstance(checks, dict) else {}
+        ok = bool(item.get("ok", False))
+        if ok:
+            status = "[green]PASS[/green]"
+            pass_count += 1
+        else:
+            status = "[red]FAIL[/red]"
+        detail = str(item.get("detail", ""))
+        table.add_row(name, status, "true" if ok else "false", detail)
+
+    fail_count = len(PM_AUDIT_CHECK_ORDER) - pass_count
+    exit_code = 0 if fail_count == 0 and result.get("status") == "pass" else 1
+    console.print(table)
+    typer.echo(f"TOTAL: 8, PASS: {pass_count}, FAIL: {fail_count}, EXIT: {exit_code}")
+    if exit_code != 0:
         raise typer.Exit(code=1)
-    typer.echo("PM AUDIT PASS")
-    typer.echo(str(result))
 
 
-@app.command("produce")
 def produce_command(
-    raw_intent: str = typer.Argument(...),
-    genre: str = typer.Option("", "--genre"),
-    mood: str = typer.Option("", "--mood"),
-    vocal: str = typer.Option("any", "--vocal"),
-    profile: str = typer.Option("", "--profile"),
-    lang: str = typer.Option("zh-CN", "--lang"),
-    out_dir: str = typer.Option("out", "--out-dir"),
-    verbose: bool = typer.Option(False, "--verbose"),
-    dry_run: bool = typer.Option(False, "--dry-run"),
+    raw_intent: str,
+    genre: str = "",
+    mood: str = "",
+    vocal: str = "any",
+    profile: str = "",
+    lang: str = "zh-CN",
+    out_dir: str = "out",
+    verbose: bool = False,
+    dry_run: bool = False,
 ) -> None:
     try:
         produce_v2(
@@ -262,8 +331,40 @@ def produce_command(
         raise typer.Exit(code=1)
 
 
+def _dispatch_produce_from_argv(argv: list[str]) -> None:
+    parser = argparse.ArgumentParser(prog="python -m apps.cli.main produce")
+    parser.add_argument("raw_intent")
+    parser.add_argument("--genre", default="")
+    parser.add_argument("--mood", default="")
+    parser.add_argument("--vocal", default="any")
+    parser.add_argument("--profile", default="")
+    parser.add_argument("--lang", default="zh-CN")
+    parser.add_argument("--out-dir", default="out")
+    parser.add_argument("--verbose", action="store_true")
+    parser.add_argument("--dry-run", action="store_true")
+    ns = parser.parse_args(argv)
+    produce_command(
+        raw_intent=ns.raw_intent,
+        genre=ns.genre,
+        mood=ns.mood,
+        vocal=ns.vocal,
+        profile=ns.profile,
+        lang=ns.lang,
+        out_dir=ns.out_dir,
+        verbose=ns.verbose,
+        dry_run=ns.dry_run,
+    )
+
+
 def main() -> None:
     _ensure_utf8_output()
+    # TODO(v3.0): unify CLI framework; current produce path uses argparse while others use Typer.
+    if len(sys.argv) > 1 and sys.argv[1] == "produce":
+        try:
+            _dispatch_produce_from_argv(sys.argv[2:])
+        except click.exceptions.Exit as err:
+            raise SystemExit(err.exit_code)
+        return
     app()
 
 

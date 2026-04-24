@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from src.producer_tools.self_check.gate_g7 import _proof_check
+from src.producer_tools.self_check.gate_g7 import _proof_check, check_gate_g7
 
 
 def test_proof_check_pass_with_retrieval_decision(tmp_path) -> None:
@@ -268,3 +268,101 @@ def test_pm_audit_proof_reports_decision_mode_when_trace_has_decision_block() ->
             trace_path.unlink(missing_ok=True)
         else:
             trace_path.write_text(original, encoding="utf-8")
+
+
+def test_proof_check_pm_audit_checks_cover_required_items(tmp_path) -> None:
+    out = tmp_path / "out"
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "lyrics.txt").write_text("[Verse 1]\nline one\nline two\nline three\nline four\nline five\n\n[Chorus]\nline one\nline two\nline three\nline four\nline five\n", encoding="utf-8")
+    (out / "style.txt").write_text("ok\n", encoding="utf-8")
+    (out / "exclude.txt").write_text("ok\n", encoding="utf-8")
+    (out / "lyric_payload.json").write_text("{}\n", encoding="utf-8")
+    (out / "audit.md").write_text("## 0.\n## 1.\n## 2.\n## 3.\n## 4.\n", encoding="utf-8")
+    (out / "trace.json").write_text(
+        json.dumps(
+            {
+                "llm_calls": 2,
+                "profile_source": "corpus_vote",
+                "few_shot_source_ids": ["lyric-modern-aa", "poem-cr-bb"],
+                "retrieval_profile_decision": {
+                    "profile_vote": "urban_introspective",
+                    "vote_confidence": 0.9,
+                    "active_profile": "urban_introspective",
+                    "decision_reason": "activated",
+                    "source_stage": "initial",
+                    "source_ids": ["lyric-modern-aa", "poem-cr-bb"],
+                },
+                "lint_report": {
+                    "craft_score": 0.9,
+                    "is_dead": False,
+                    "violations": [],
+                    "hard_kill_rules": [],
+                },
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir(parents=True, exist_ok=True)
+    (src_dir / "dummy.py").write_text("def ok():\n    return 1\n", encoding="utf-8")
+
+    result = _proof_check(tmp_path, strict_pm_audit=True)
+
+    assert result["status"] == "pass"
+    assert result["pm_audit_checks_ok"] is True
+    checks = result["pm_audit_checks"]
+    assert len(checks) == 8
+    assert all(bool(item.get("ok", False)) for item in checks.values())
+
+
+def test_check_gate_g7_uses_injected_proof_output_dir(tmp_path) -> None:
+    out = tmp_path / "custom_out"
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "lyrics.txt").write_text("[Verse 1]\nline one\nline two\n", encoding="utf-8")
+    (out / "style.txt").write_text("ok\n", encoding="utf-8")
+    (out / "exclude.txt").write_text("ok\n", encoding="utf-8")
+    (out / "lyric_payload.json").write_text("{}\n", encoding="utf-8")
+    (out / "audit.md").write_text("## 0.\n## 1.\n## 2.\n## 3.\n## 4.\n", encoding="utf-8")
+    (out / "trace.json").write_text(
+        json.dumps(
+            {
+                "llm_calls": 2,
+                "profile_source": "corpus_vote",
+                "few_shot_source_ids": ["lyric-modern-aa", "poem-cr-bb"],
+                "retrieval_profile_decision": {
+                    "profile_vote": "urban_introspective",
+                    "vote_confidence": 0.9,
+                    "active_profile": "urban_introspective",
+                    "decision_reason": "activated",
+                    "source_stage": "initial",
+                    "source_ids": ["lyric-modern-aa", "poem-cr-bb"],
+                },
+                "lint_report": {
+                    "craft_score": 0.9,
+                    "is_dead": False,
+                    "violations": [],
+                    "hard_kill_rules": [],
+                },
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir(parents=True, exist_ok=True)
+    (src_dir / "dummy.py").write_text("def ok():\n    return 1\n", encoding="utf-8")
+
+    result = check_gate_g7(
+        tmp_path,
+        run_proof=True,
+        strict_pm_audit=True,
+        proof_output_dir=out,
+    )
+
+    assert result["proof"]["output_dir"] == str(out)
+    assert result["proof"]["status"] == "pass"
