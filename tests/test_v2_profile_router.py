@@ -4,7 +4,11 @@ import json
 
 import pytest
 
-from src.profile_router import AmbiguousProfileError, resolve_active_profile
+from src.profile_router import (
+    AmbiguousProfileError,
+    load_profile_typical_moods,
+    resolve_active_profile,
+)
 from src.schemas import UserInput
 
 
@@ -119,3 +123,9 @@ def test_profile_router_raises_ambiguous_with_candidates(tmp_path) -> None:
 
     assert len(err.value.candidates) >= 2
     assert all("profile_id" in row for row in err.value.candidates)
+
+
+def test_load_profile_typical_moods_returns_registry_values(tmp_path) -> None:
+    _seed_registry(tmp_path)
+    moods = load_profile_typical_moods(tmp_path, "urban_introspective")
+    assert "克制释怀" in moods
