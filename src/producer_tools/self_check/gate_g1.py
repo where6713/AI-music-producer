@@ -78,6 +78,33 @@ def check_gate_g1(workspace_root: Path) -> dict[str, Any]:
         }
 
     changed_files = [line.strip() for line in changed_output.splitlines() if line.strip()]
-    return validate_g1_scope(
+    primary = validate_g1_scope(
         {"commit_subject": commit_subject, "changed_files": changed_files}
+    )
+
+    is_merge_head = commit_subject.lower().startswith("merge ")
+    if primary["status"] == "pass" or not is_merge_head:
+        return primary
+
+    try:
+        non_merge_sha = _read_git_output(
+            workspace_root,
+            ["rev-list", "--no-merges", "-n", "1", "HEAD"],
+        ).strip()
+        if not non_merge_sha:
+            return primary
+        fallback_subject = _read_git_output(
+            workspace_root,
+            ["show", "-s", "--format=%s", non_merge_sha],
+        ).strip()
+        fallback_changed = _read_git_output(
+            workspace_root,
+            ["show", "--name-only", "--pretty=", non_merge_sha],
+        )
+    except Exception:
+        return primary
+
+    fallback_files = [line.strip() for line in fallback_changed.splitlines() if line.strip()]
+    return validate_g1_scope(
+        {"commit_subject": fallback_subject, "changed_files": fallback_files}
     )

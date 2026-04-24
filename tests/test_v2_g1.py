@@ -121,3 +121,28 @@ def test_read_git_output_decodes_non_utf8_bytes(monkeypatch, tmp_path) -> None:
     monkeypatch.setattr(gate_g1.subprocess, "check_output", _fake_check_output)
     output = gate_g1._read_git_output(tmp_path, ["show", "--name-only"])
     assert "整改task.json" in output
+
+
+def test_check_gate_g1_uses_latest_non_merge_commit_when_head_is_merge(
+    monkeypatch, tmp_path
+) -> None:
+    responses = {
+        ("log", "-1", "--pretty=%s"): "Merge branch 'main' into feature\n",
+        ("show", "--name-only", "--pretty=", "-1"): "apps/cli/main.py\n",
+        ("rev-list", "--no-merges", "-n", "1", "HEAD"): "abc123\n",
+        ("show", "-s", "--format=%s", "abc123"): "feat(g7): add pm-audit table with strict exit codes\n",
+        ("show", "--name-only", "--pretty=", "abc123"): "apps/cli/main.py\nsrc/producer_tools/self_check/gate_g7.py\n",
+    }
+
+    def _fake_read_git_output(_workspace_root, args):
+        key = tuple(args)
+        if key not in responses:
+            raise RuntimeError(f"unexpected args: {args}")
+        return responses[key]
+
+    monkeypatch.setattr(gate_g1, "_read_git_output", _fake_read_git_output)
+
+    result = gate_g1.check_gate_g1(tmp_path)
+
+    assert result["status"] == "pass"
+    assert result["failed_checks"] == []
