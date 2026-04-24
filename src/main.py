@@ -9,7 +9,7 @@ import typer
 from src.claude_client import generate_lyric_payload
 from src.compile import StructuralIncompleteError, write_outputs, write_trace_and_audit
 from src.lint import lint_payload
-from src.profile_router import resolve_active_profile
+from src.profile_router import build_profile_routing_assessment, resolve_active_profile
 from src.retriever import InsufficientQualityFewShotError
 from src.schemas import LyricPayload, UserInput
 
@@ -272,6 +272,20 @@ def produce(
     trace["input_mood_hint"] = user_input.mood_hint
     if profile_vote_confidence is not None:
         trace["profile_vote_confidence"] = profile_vote_confidence
+    routing_assessment = build_profile_routing_assessment(
+        user_input,
+        repo_root=repo_root,
+        active_profile=active_profile,
+        profile_source=profile_source,
+        retrieval_vote=str(trace.get("retrieval_profile_vote", "")),
+        vote_confidence=_safe_float(
+            trace.get("profile_vote_confidence", trace.get("retrieval_vote_confidence", 0.0)),
+            default=0.0,
+        ),
+    )
+    trace["profile_routing_assessment"] = routing_assessment
+    if routing_assessment.get("warnings"):
+        trace["profile_routing_warnings"] = list(routing_assessment.get("warnings", []))
     payload, variant_rank = _score_variants(payload, trace=trace)
     lint_report = lint_payload(payload, trace=trace)
 

@@ -49,6 +49,49 @@ def load_profile_typical_moods(repo_root: Path, profile_id: str) -> list[str]:
     return [str(x).strip() for x in raw if str(x).strip()]
 
 
+def build_profile_routing_assessment(
+    user_input: UserInput,
+    *,
+    repo_root: Path,
+    active_profile: str,
+    profile_source: str,
+    retrieval_vote: str,
+    vote_confidence: float,
+) -> dict[str, Any]:
+    warnings: list[str] = []
+    low_confidence = False
+    has_mismatch = False
+
+    active = active_profile.strip()
+    source = profile_source.strip()
+    vote = retrieval_vote.strip()
+
+    low_confidence_route = source == "corpus_vote" or (active and vote == active)
+    if low_confidence_route and active and vote_confidence < 0.67:
+        low_confidence = True
+        warnings.append(
+            f"profile_routing_low_confidence profile={active} source={source or 'unknown'} vote_confidence={vote_confidence:.2f}"
+        )
+
+    mood_hint = user_input.mood_hint.strip()
+    typical_moods = load_profile_typical_moods(repo_root, active)
+    typical_set = {_norm(x) for x in typical_moods}
+    if mood_hint and typical_set and _norm(mood_hint) not in typical_set:
+        has_mismatch = True
+        warnings.append(
+            "ProfileMismatchWarning "
+            f"mood_hint={mood_hint} active_profile={active} "
+            f"typical_moods={','.join(typical_moods)}"
+        )
+
+    return {
+        "warnings": warnings,
+        "low_confidence": low_confidence,
+        "has_mismatch": has_mismatch,
+        "typical_moods": typical_moods,
+    }
+
+
 def resolve_active_profile(
     user_input: UserInput,
     *,

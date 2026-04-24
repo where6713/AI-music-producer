@@ -6,6 +6,7 @@ import pytest
 
 from src.profile_router import (
     AmbiguousProfileError,
+    build_profile_routing_assessment,
     load_profile_typical_moods,
     resolve_active_profile,
 )
@@ -129,3 +130,23 @@ def test_load_profile_typical_moods_returns_registry_values(tmp_path) -> None:
     _seed_registry(tmp_path)
     moods = load_profile_typical_moods(tmp_path, "urban_introspective")
     assert "克制释怀" in moods
+
+
+def test_build_profile_routing_assessment_emits_mismatch_and_low_confidence(tmp_path) -> None:
+    _seed_registry(tmp_path)
+    user_input = UserInput(raw_intent="写一首哀伤内省", mood_hint="哀伤内省")
+
+    assessment = build_profile_routing_assessment(
+        user_input,
+        repo_root=tmp_path,
+        active_profile="urban_introspective",
+        profile_source="corpus_vote",
+        retrieval_vote="urban_introspective",
+        vote_confidence=0.4,
+    )
+
+    assert assessment["low_confidence"] is True
+    assert assessment["has_mismatch"] is True
+    warnings = assessment["warnings"]
+    assert any("profile_routing_low_confidence" in x for x in warnings)
+    assert any("ProfileMismatchWarning" in x for x in warnings)

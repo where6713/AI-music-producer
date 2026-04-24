@@ -207,38 +207,21 @@ def test_compile_audit_includes_profile_vote_counts_and_warning(tmp_path) -> Non
     assert "do_not_copy=不要复写原句与段落顺序" in audit
 
 
-def test_compile_derives_profile_mismatch_warning_from_trace_and_registry(tmp_path) -> None:
-    profiles_dir = tmp_path / "src" / "profiles"
-    profiles_dir.mkdir(parents=True, exist_ok=True)
-    (profiles_dir / "registry.json").write_text(
-        json.dumps(
-            {
-                "profiles": {
-                    "uplift_pop": {
-                        "display_name": "明亮流行",
-                        "typical_genres": ["流行"],
-                        "typical_moods": ["活力", "明亮"],
-                        "craft_focus": "强节奏与正向推进",
-                    }
-                }
-            },
-            ensure_ascii=False,
-        ),
-        encoding="utf-8",
-    )
-
+def test_compile_audit_includes_profile_mismatch_warning_and_vote_counts(tmp_path) -> None:
     payload = _payload()
     trace = {
         "llm_calls": 1,
         "active_profile": "uplift_pop",
         "profile_source": "corpus_vote",
         "profile_vote_confidence": 0.4,
-        "retrieval_profile_vote": "uplift_pop",
         "retrieval_profile_vote_counts": {
             "uplift_pop": 1,
             "urban_introspective": 2,
         },
-        "input_mood_hint": "哀伤内省",
+        "profile_routing_warnings": [
+            "ProfileMismatchWarning mood_hint=哀伤内省 active_profile=uplift_pop typical_moods=energizing,bright",
+            "profile_routing_low_confidence profile=uplift_pop source=corpus_vote vote_confidence=0.40",
+        ],
         "few_shot_examples": [
             {
                 "source_id": "lyric-modern-101",
@@ -250,12 +233,14 @@ def test_compile_derives_profile_mismatch_warning_from_trace_and_registry(tmp_pa
         "lint_report": {"skipped_rules_by_profile": []},
     }
 
-    write_outputs(payload, tmp_path / "out", trace)
-    audit = ((tmp_path / "out") / "audit.md").read_text(encoding="utf-8")
+    write_outputs(payload, tmp_path, trace)
 
-    assert "ProfileMismatchWarning" in audit
+    audit = (tmp_path / "audit.md").read_text(encoding="utf-8")
+    assert "## 0. Profile 决策" in audit
+    assert "profile_vote_counts:" in audit
     assert "uplift_pop:1" in audit
     assert "urban_introspective:2" in audit
+    assert "ProfileMismatchWarning" in audit
 
 
 def test_compile_raises_structural_incomplete_without_chorus(tmp_path) -> None:

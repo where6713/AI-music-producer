@@ -196,65 +196,6 @@ def _load_profile_display_name(out_dir: Path, profile_id: str) -> str:
     return str(profile.get("display_name", "")).strip()
 
 
-def _load_profile_typical_moods(out_dir: Path, profile_id: str) -> list[str]:
-    if not profile_id:
-        return []
-    registry_path = out_dir.parent / "src" / "profiles" / "registry.json"
-    if not registry_path.exists():
-        return []
-    payload = json.loads(registry_path.read_text(encoding="utf-8"))
-    profiles = payload.get("profiles", {})
-    if not isinstance(profiles, dict):
-        return []
-    profile = profiles.get(profile_id, {})
-    if not isinstance(profile, dict):
-        return []
-    raw = profile.get("typical_moods", [])
-    if not isinstance(raw, list):
-        return []
-    return [str(x).strip() for x in raw if str(x).strip()]
-
-
-def _norm_text(value: object) -> str:
-    return str(value or "").strip().lower()
-
-
-def _derive_profile_routing_warnings(out_dir: Path, trace: dict[str, Any]) -> list[str]:
-    warnings_raw = trace.get("profile_routing_warnings", [])
-    warnings = [str(x).strip() for x in warnings_raw if str(x).strip()] if isinstance(warnings_raw, list) else []
-
-    profile_source = str(trace.get("profile_source", "")).strip()
-    active_profile = str(trace.get("active_profile", "")).strip()
-    vote_confidence = _safe_float(
-        trace.get("profile_vote_confidence", trace.get("retrieval_vote_confidence", 0.0)),
-        default=0.0,
-    )
-    retrieval_vote = str(trace.get("retrieval_profile_vote", "")).strip()
-    low_confidence_route = profile_source == "corpus_vote" or (active_profile and retrieval_vote == active_profile)
-    if low_confidence_route and active_profile and vote_confidence < 0.67:
-        warning = (
-            f"profile_routing_low_confidence profile={active_profile} "
-            f"source={profile_source or 'unknown'} vote_confidence={vote_confidence:.2f}"
-        )
-        if warning not in warnings:
-            warnings.append(warning)
-
-    mood_hint = str(trace.get("input_mood_hint", "")).strip()
-    if mood_hint and active_profile:
-        typical_moods = _load_profile_typical_moods(out_dir, active_profile)
-        typical_set = {_norm_text(x) for x in typical_moods}
-        if typical_set and _norm_text(mood_hint) not in typical_set:
-            warning = (
-                "ProfileMismatchWarning "
-                f"mood_hint={mood_hint} active_profile={active_profile} "
-                f"typical_moods={','.join(typical_moods)}"
-            )
-            if warning not in warnings:
-                warnings.append(warning)
-
-    return warnings
-
-
 def _format_audit_md(out_dir: Path, trace: dict[str, Any]) -> str:
     active_profile = str(trace.get("active_profile", "")).strip()
     display_name = _load_profile_display_name(out_dir, active_profile)
@@ -270,7 +211,12 @@ def _format_audit_md(out_dir: Path, trace: dict[str, Any]) -> str:
         if vote_counts
         else "(none)"
     )
-    profile_warnings = _derive_profile_routing_warnings(out_dir, trace)
+    profile_warnings_raw = trace.get("profile_routing_warnings", [])
+    profile_warnings = (
+        [str(x) for x in profile_warnings_raw if str(x).strip()]
+        if isinstance(profile_warnings_raw, list)
+        else []
+    )
 
     lint_report = trace.get("lint_report", {})
     skipped = []
