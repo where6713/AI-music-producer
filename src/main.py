@@ -198,33 +198,6 @@ def _write_rejected_trace(out_dir: Path, trace: dict[str, Any]) -> None:
     write_trace_and_audit(out_dir, trace)
 
 
-def _append_profile_routing_warnings(trace: dict[str, Any]) -> None:
-    warnings = trace.get("profile_routing_warnings", [])
-    if not isinstance(warnings, list):
-        warnings = []
-
-    profile_source = str(trace.get("profile_source", "")).strip()
-    active_profile = str(trace.get("active_profile", "")).strip()
-    vote_confidence = _safe_float(
-        trace.get("profile_vote_confidence", trace.get("retrieval_vote_confidence", 0.0)),
-        default=0.0,
-    )
-    retrieval_vote = str(trace.get("retrieval_profile_vote", "")).strip()
-    low_confidence_route = profile_source == "corpus_vote" or (
-        active_profile and retrieval_vote == active_profile
-    )
-    if low_confidence_route and active_profile and vote_confidence < 0.67:
-        warning = (
-            f"profile_routing_low_confidence profile={active_profile} "
-            f"source={profile_source or 'unknown'} vote_confidence={vote_confidence:.2f}"
-        )
-        if warning not in warnings:
-            warnings.append(warning)
-
-    if warnings:
-        trace["profile_routing_warnings"] = warnings
-
-
 def _fail_quality_floor(target_dir: Path, trace: dict[str, Any], *, dry_run: bool) -> None:
     trace["run_status"] = "QUALITY_FLOOR_FAILED"
     if dry_run:
@@ -296,9 +269,9 @@ def produce(
 
     trace["active_profile"] = active_profile
     trace["profile_source"] = profile_source
+    trace["input_mood_hint"] = user_input.mood_hint
     if profile_vote_confidence is not None:
         trace["profile_vote_confidence"] = profile_vote_confidence
-    _append_profile_routing_warnings(trace)
     payload, variant_rank = _score_variants(payload, trace=trace)
     lint_report = lint_payload(payload, trace=trace)
 
