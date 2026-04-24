@@ -7,6 +7,46 @@ from typing import Any
 from src.schemas import LyricPayload
 
 
+class StructuralIncompleteError(RuntimeError):
+    pass
+
+
+def _validate_required_sections(payload: LyricPayload) -> None:
+    has_verse = False
+    has_chorus = False
+
+    for section in payload.lyrics_by_section:
+        tag = section.tag.strip().lower()
+        line_count = len(section.lines)
+        if tag.startswith("[verse"):
+            if line_count >= 5:
+                has_verse = True
+        if tag.startswith("[chorus"):
+            if line_count >= 5:
+                has_chorus = True
+
+    if not has_verse:
+        raise StructuralIncompleteError(
+            "missing required section: Verse with at least 5 lines"
+        )
+    if not has_chorus:
+        raise StructuralIncompleteError(
+            "missing required section: Chorus with at least 5 lines"
+        )
+
+
+def _count_required_sections(payload: LyricPayload) -> tuple[int, int]:
+    verse_count = 0
+    chorus_count = 0
+    for section in payload.lyrics_by_section:
+        tag = section.tag.strip().lower()
+        if tag.startswith("[verse") and len(section.lines) >= 5:
+            verse_count += 1
+        if tag.startswith("[chorus") and len(section.lines) >= 5:
+            chorus_count += 1
+    return verse_count, chorus_count
+
+
 def _safe_float(value: object, *, default: float = 0.0) -> float:
     try:
         return float(value)
@@ -160,7 +200,23 @@ def _format_audit_md(out_dir: Path, trace: dict[str, Any]) -> str:
     active_profile = str(trace.get("active_profile", "")).strip()
     display_name = _load_profile_display_name(out_dir, active_profile)
     profile_source = str(trace.get("profile_source", "")).strip()
-    vote_confidence = trace.get("profile_vote_confidence", None)
+    vote_confidence = trace.get("profile_vote_confidence", trace.get("retrieval_vote_confidence", None))
+    vote_counts_raw = trace.get("retrieval_profile_vote_counts", {})
+    if isinstance(vote_counts_raw, dict):
+        vote_counts = {str(k): int(v) for k, v in vote_counts_raw.items()}
+    else:
+        vote_counts = {}
+    vote_counts_line = (
+        ", ".join(f"{k}:{v}" for k, v in sorted(vote_counts.items(), key=lambda x: x[0]))
+        if vote_counts
+        else "(none)"
+    )
+    profile_warnings_raw = trace.get("profile_routing_warnings", [])
+    profile_warnings = (
+        [str(x) for x in profile_warnings_raw if str(x).strip()]
+        if isinstance(profile_warnings_raw, list)
+        else []
+    )
 
     lint_report = trace.get("lint_report", {})
     skipped = []
@@ -177,12 +233,39 @@ def _format_audit_md(out_dir: Path, trace: dict[str, Any]) -> str:
         f"- display_name: {display_name}",
         f"- profile_source: {profile_source}",
         f"- vote_confidence: {vote_confidence}",
+        f"- profile_vote_counts: {vote_counts_line}",
+        f"- warnings: {'; '.join(profile_warnings) if profile_warnings else '(none)'}",
         f"- skipped_rules_by_profile: {', '.join(skipped) if skipped else '(none)'}",
     ]
+
+    few_shot_rows = trace.get("few_shot_examples", [])
+    lines.extend(["", "## 1. Few-shot 来源透明化"])
+    if isinstance(few_shot_rows, list) and few_shot_rows:
+        for item in few_shot_rows:
+            if not isinstance(item, dict):
+                continue
+            source_id = str(item.get("source_id", "")).strip()
+            content_preview = str(item.get("content_preview", "")).strip()
+            learn_point = str(item.get("learn_point", "")).strip()
+            do_not_copy = str(item.get("do_not_copy", "")).strip()
+            lines.append(
+                f"- source_id={source_id} | content_preview={content_preview} | learn_point={learn_point} | do_not_copy={do_not_copy}"
+            )
+    else:
+        lines.append("- (none)")
+
+    lines.extend(["", "## 2. Lint 概览", "- (pending)", "", "## 3. 产物状态", "- (pending)", "", "## 4. 运行结论", "- (pending)"])
     return "\n".join(lines).strip() + "\n"
 
 
 def write_outputs(payload: LyricPayload, out_dir: Path, trace: dict[str, object]) -> None:
+    verse_count, chorus_count = _count_required_sections(payload)
+    trace.setdefault("compile_structure", {})
+    if isinstance(trace.get("compile_structure"), dict):
+        trace["compile_structure"]["verse_sections"] = verse_count
+        trace["compile_structure"]["chorus_sections"] = chorus_count
+        trace["compile_structure"]["structural_ready"] = verse_count >= 1 and chorus_count >= 1
+    _validate_required_sections(payload)
     out_dir.mkdir(parents=True, exist_ok=True)
     trace = _ensure_retrieval_profile_decision(dict(trace))
     (out_dir / "lyrics.txt").write_text(_format_lyrics(payload), encoding="utf-8")

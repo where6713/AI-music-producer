@@ -135,9 +135,25 @@ def _call_openai_compatible(
 
 
 def _build_section_rows(raw_lyrics: dict[str, Any], section_order: list[str]) -> list[dict[str, Any]]:
+    def _normalize_tag(tag: str) -> str:
+        clean = tag.strip()
+        if clean.startswith("[") and clean.endswith("]"):
+            return clean
+        lower = clean.lower()
+        if lower.startswith("verse"):
+            suffix = clean[len("verse") :].strip() or "1"
+            return f"[Verse {suffix}]"
+        if lower.startswith("chorus"):
+            return "[Chorus]"
+        if lower.startswith("bridge"):
+            return "[Bridge]"
+        return clean
+
     rows: list[dict[str, Any]] = []
     for tag in section_order:
         val = raw_lyrics.get(tag, [])
+        if isinstance(val, str):
+            val = [x for x in val.splitlines() if x.strip()]
         if not isinstance(val, list):
             continue
         lines = [
@@ -152,8 +168,25 @@ def _build_section_rows(raw_lyrics: dict[str, Any], section_order: list[str]) ->
         ]
         if not lines:
             continue
-        rows.append({"tag": tag, "voice_tags_inline": [], "lines": lines})
+        rows.append({"tag": _normalize_tag(tag), "voice_tags_inline": [], "lines": lines})
     return rows
+
+
+def _normalize_section_tag(raw_tag: object) -> str:
+    clean = str(raw_tag or "").strip()
+    if not clean:
+        return ""
+    if clean.startswith("[") and clean.endswith("]"):
+        return clean
+    lower = clean.lower()
+    if lower.startswith("verse"):
+        suffix = clean[len("verse") :].strip() or "1"
+        return f"[Verse {suffix}]"
+    if lower.startswith("chorus"):
+        return "[Chorus]"
+    if lower.startswith("bridge"):
+        return "[Bridge]"
+    return clean
 
 
 def _normalize_distillation(raw: Any, user_input: UserInput) -> dict[str, Any]:
@@ -185,12 +218,34 @@ def _normalize_structure(raw: Any, fallback_tags: list[str]) -> dict[str, Any]:
     if not isinstance(order, list):
         order = val.get("target_sections") if isinstance(val.get("target_sections"), list) else []
     section_order = [str(x) for x in order if isinstance(x, str) and x.strip()]
+    normalized_order: list[str] = []
+    for tag in section_order:
+        clean = tag.strip()
+        lower = clean.lower()
+        if clean.startswith("[") and clean.endswith("]"):
+            normalized_order.append(clean)
+        elif lower.startswith("verse"):
+            suffix = clean[len("verse") :].strip() or "1"
+            normalized_order.append(f"[Verse {suffix}]")
+        elif lower.startswith("chorus"):
+            normalized_order.append("[Chorus]")
+        elif lower.startswith("bridge"):
+            normalized_order.append("[Bridge]")
+        else:
+            normalized_order.append(clean)
+    section_order = [x for x in normalized_order if x]
     if not section_order:
         section_order = fallback_tags
+    if not section_order:
+        section_order = ["[Verse 1]", "[Chorus]"]
     hook_section = str(val.get("hook_section") or "[Chorus]")
     if hook_section not in section_order:
         hook_section = "[Chorus]" if "[Chorus]" in section_order else section_order[0]
-    hook_line_index = int(val.get("hook_line_index") or 1)
+    hook_idx_raw = val.get("hook_line_index", 1)
+    try:
+        hook_line_index = int(hook_idx_raw)
+    except (TypeError, ValueError):
+        hook_line_index = 1
     return {
         "section_order": section_order,
         "hook_section": hook_section,
@@ -227,6 +282,9 @@ def _normalize_few_shot_examples(raw: Any, retrieved: list[dict[str, Any]]) -> l
                 "type": x["type"],
                 "title": x["title"],
                 "emotion_tags_matched": x["emotion_tags_matched"],
+                "learn_point": str(x.get("learn_point", "")).strip(),
+                "do_not_copy": str(x.get("do_not_copy", "")).strip(),
+                "content_preview": str(x.get("content", "")).strip()[:30],
             }
             for x in retrieved
         ]
@@ -248,6 +306,9 @@ def _normalize_few_shot_examples(raw: Any, retrieved: list[dict[str, Any]]) -> l
                 "type": type_val,
                 "title": str(item.get("title", "")).strip() or str(ref.get("title", sid)),
                 "emotion_tags_matched": [str(x) for x in (item.get("emotion_tags_matched") or ref.get("emotion_tags", [])) if str(x).strip()][:4],
+                "learn_point": str(item.get("learn_point", "")).strip() or str(ref.get("learn_point", "")).strip(),
+                "do_not_copy": str(item.get("do_not_copy", "")).strip() or str(ref.get("do_not_copy", "")).strip(),
+                "content_preview": str(ref.get("content", "")).strip()[:30],
             }
         )
 
@@ -258,6 +319,9 @@ def _normalize_few_shot_examples(raw: Any, retrieved: list[dict[str, Any]]) -> l
                 "type": x["type"],
                 "title": x["title"],
                 "emotion_tags_matched": x["emotion_tags_matched"],
+                "learn_point": str(x.get("learn_point", "")).strip(),
+                "do_not_copy": str(x.get("do_not_copy", "")).strip(),
+                "content_preview": str(x.get("content", "")).strip()[:30],
             }
             for x in retrieved
         ]
@@ -283,12 +347,44 @@ def _extract_base_sections(payload_dict: dict[str, Any]) -> list[dict[str, Any]]
 
     if not rows and isinstance(raw_lyrics, dict):
         rows = _build_section_rows(raw_lyrics, section_order)
-    rows = _ensure_min_structure(rows)
-    return rows
+
+    normalized_rows: list[dict[str, Any]] = []
+    for section in rows:
+        tag = ""
+        if isinstance(section, dict):
+            tag = _normalize_section_tag(section.get("tag") or section.get("name") or section.get("section"))
+        if not tag:
+            continue
+        lines_raw = section.get("lines", []) if isinstance(section, dict) else []
+        if not isinstance(lines_raw, list):
+            lines_raw = []
+        lines: list[dict[str, Any]] = []
+        for row in lines_raw:
+            if isinstance(row, str):
+                text = row.strip()
+                row_obj: dict[str, Any] = {}
+            elif isinstance(row, dict):
+                text = str(row.get("primary") or row.get("text") or row.get("line") or "").strip()
+                row_obj = row
+            else:
+                continue
+            if not text:
+                continue
+            lines.append(
+                {
+                    "primary": text,
+                    "backing": str(row_obj.get("backing", "")).strip(),
+                    "tail_pinyin": str(row_obj.get("tail_pinyin", "")).strip(),
+                    "char_count": int(row_obj.get("char_count", 0) or len(text)),
+                }
+            )
+        if lines:
+            normalized_rows.append({"tag": tag, "voice_tags_inline": [], "lines": lines})
+    return normalized_rows
 
 
 def _normalize_variants(raw: Any, base_sections: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], str]:
-    desired = [("a", "first_person", "我"), ("b", "second_person", "你"), ("c", "third_person", "他")]
+    desired = [("a", "first_person"), ("b", "second_person"), ("c", "third_person")]
     lookup: dict[str, dict[str, Any]] = {}
     if isinstance(raw, list):
         for item in raw:
@@ -299,7 +395,7 @@ def _normalize_variants(raw: Any, base_sections: list[dict[str, Any]]) -> tuple[
                 lookup[variant_id] = item
 
     normalized: list[dict[str, Any]] = []
-    for idx, (variant_id, pov, prefix) in enumerate(desired, start=1):
+    for idx, (variant_id, pov) in enumerate(desired, start=1):
         source = lookup.get(variant_id, {})
         raw_sections = source.get("lyrics_by_section")
         if isinstance(raw_sections, dict):
@@ -308,14 +404,28 @@ def _normalize_variants(raw: Any, base_sections: list[dict[str, Any]]) -> tuple[
             section_rows = [x for x in raw_sections if isinstance(x, dict)]
         else:
             section_rows = base_sections
-        section_rows = _ensure_min_structure(section_rows)
 
         updated_sections: list[dict[str, Any]] = []
         for section in section_rows:
-            new_section = {"tag": section["tag"], "voice_tags_inline": [], "lines": []}
-            for row in section.get("lines", []):
-                text = str(row.get("primary", "")).strip()
-                text = text if text.startswith(prefix) else f"{prefix}{text}"
+            if not isinstance(section, dict):
+                continue
+            tag = _normalize_section_tag(section.get("tag") or section.get("name") or section.get("section"))
+            if not tag:
+                continue
+            lines_raw = section.get("lines", [])
+            if not isinstance(lines_raw, list):
+                lines_raw = []
+
+            new_section = {"tag": tag, "voice_tags_inline": [], "lines": []}
+            for row in lines_raw:
+                if isinstance(row, str):
+                    text = row.strip()
+                elif isinstance(row, dict):
+                    text = str(row.get("primary") or row.get("text") or row.get("line") or "").strip()
+                else:
+                    continue
+                if not text:
+                    continue
                 new_section["lines"].append(
                     {
                         "primary": text,
@@ -324,20 +434,8 @@ def _normalize_variants(raw: Any, base_sections: list[dict[str, Any]]) -> tuple[
                         "char_count": len(text),
                     }
                 )
-            updated_sections.append(new_section)
-
-        if updated_sections and updated_sections[0].get("lines"):
-            if variant_id == "b":
-                base_text = updated_sections[0]["lines"][0]["primary"]
-                extended = base_text + " 仍然在凌晨反复想起你却不敢按下发送"
-                updated_sections[0]["lines"][0]["primary"] = extended
-                updated_sections[0]["lines"][0]["char_count"] = len(extended)
-            if variant_id == "c":
-                updated_sections[0]["tag"] = "[Scene]"
-                base_text = updated_sections[0]["lines"][0]["primary"]
-                stretched = base_text + " 旧消息在掌纹里折返四次"
-                updated_sections[0]["lines"][0]["primary"] = stretched
-                updated_sections[0]["lines"][0]["char_count"] = len(stretched)
+            if new_section["lines"]:
+                updated_sections.append(new_section)
 
         lint_result = source.get("lint_result", {}) if isinstance(source.get("lint_result", {}), dict) else {}
         normalized.append(
@@ -361,40 +459,6 @@ def _normalize_variants(raw: Any, base_sections: list[dict[str, Any]]) -> tuple[
                 chosen = candidate
                 break
     return normalized, chosen
-
-
-def _ensure_min_structure(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    target_tags = ["[Verse 1]", "[Chorus]", "[Verse 2]"]
-    by_tag: dict[str, dict[str, Any]] = {str(item.get("tag", "")): item for item in rows}
-
-    ensured: list[dict[str, Any]] = []
-    for tag in target_tags:
-        section = by_tag.get(tag)
-        if not section:
-            section = {
-                "tag": tag,
-                "voice_tags_inline": [],
-                "lines": [
-                    {"primary": "夜色还在窗沿徘徊", "backing": "", "tail_pinyin": "", "char_count": 8},
-                    {"primary": "指尖悬在未发的对白", "backing": "", "tail_pinyin": "", "char_count": 9},
-                    {"primary": "理智把冲动轻轻按开", "backing": "", "tail_pinyin": "", "char_count": 9},
-                    {"primary": "把号码放下吧", "backing": "", "tail_pinyin": "", "char_count": 6},
-                ],
-            }
-        lines = section.get("lines", [])
-        if not isinstance(lines, list):
-            lines = []
-        while len(lines) < 4:
-            seed = [
-                "夜色还在窗沿徘徊",
-                "指尖悬在未发的对白",
-                "理智把冲动轻轻按开",
-                "把号码放下吧",
-            ][len(lines) % 4]
-            lines.append({"primary": seed, "backing": "", "tail_pinyin": "", "char_count": len(seed)})
-        section["lines"] = lines[:8]
-        ensured.append(section)
-    return ensured
 
 
 def _normalize_payload_dict(
@@ -452,12 +516,14 @@ def generate_lyric_payload(
         ]
         profile_vote = str(retrieval.get("profile_vote", ""))
         vote_confidence = float(retrieval.get("vote_confidence", 0.0) or 0.0)
+        profile_vote_counts = retrieval.get("profile_vote_counts", {}) if isinstance(retrieval.get("profile_vote_counts", {}), dict) else {}
         corpus_balance = retrieval.get("corpus_balance", {}) if isinstance(retrieval.get("corpus_balance", {}), dict) else {}
         corpus_monoculture_risk = bool(retrieval.get("corpus_monoculture_risk", False))
     else:
         few_shot_examples = retrieval
         profile_vote = ""
         vote_confidence = 0.0
+        profile_vote_counts = {}
         corpus_balance = {}
         corpus_monoculture_risk = False
 
@@ -488,6 +554,11 @@ def generate_lyric_payload(
                 "exclude_tags",
             ],
         },
+        "few_shot_system_instruction": (
+            "以下示例展示的是 craft 方法，不是模板。"
+            "你需要学习它们的具象化手法、视角切换、留白节奏，"
+            "严禁复写超过 4 字连续片段，严禁照抄结构。"
+        ),
         "few_shot_examples": few_shot_examples,
         "active_profile": active_profile,
         "profile_source": profile_source,
@@ -554,8 +625,18 @@ def generate_lyric_payload(
         "usage": usage,
         "llm_calls": 1,
         "few_shot_source_ids": [x["source_id"] for x in few_shot_examples],
+        "few_shot_examples": [
+            {
+                "source_id": str(x.get("source_id", "")),
+                "content_preview": str(x.get("content", "")).strip()[:30],
+                "learn_point": str(x.get("learn_point", "")).strip(),
+                "do_not_copy": str(x.get("do_not_copy", "")).strip(),
+            }
+            for x in few_shot_examples
+        ],
         "retrieval_profile_vote": profile_vote,
         "retrieval_vote_confidence": vote_confidence,
+        "retrieval_profile_vote_counts": profile_vote_counts,
         "active_profile": active_profile,
         "profile_source": profile_source,
         "profile_vote_confidence": profile_vote_confidence,

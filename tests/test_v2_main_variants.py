@@ -3,6 +3,7 @@ from __future__ import annotations
 import pytest
 
 from src.main import (
+    _append_profile_routing_warnings,
     _apply_retrieval_profile_decision,
     _merge_revise_trace_metadata,
     _score_variants,
@@ -785,6 +786,162 @@ def test_produce_fails_quality_floor_and_skips_lyrics_write(tmp_path, monkeypatc
 
     assert getattr(err.value, "exit_code", None) == 2
     assert calls["n"] == 2
+    assert not (tmp_path / "out" / "lyrics.txt").exists()
+    assert (tmp_path / "out" / "trace.json").exists()
+    assert (tmp_path / "out" / "audit.md").exists()
+
+
+def test_produce_revises_when_compile_raises_structural_incomplete(tmp_path, monkeypatch) -> None:
+    from src import main as main_mod
+    from src.compile import StructuralIncompleteError
+
+    initial_payload = _payload()
+    initial_payload.lyrics_by_section = [initial_payload.lyrics_by_section[0]]
+    for variant in initial_payload.variants:
+        variant.lyrics_by_section = [initial_payload.lyrics_by_section[0]]
+
+    revised_payload = _payload()
+    for variant in revised_payload.variants:
+        variant.lyrics_by_section = revised_payload.lyrics_by_section
+
+    observed: dict[str, object] = {"targeted_prompt": "", "generate_calls": 0, "write_calls": 0}
+
+    def _fake_generate(_user_input, **kwargs):
+        observed["generate_calls"] = int(observed["generate_calls"]) + 1
+        targeted_prompt = kwargs.get("targeted_revise_prompt")
+        if targeted_prompt:
+            observed["targeted_prompt"] = targeted_prompt
+            return revised_payload.model_copy(deep=True), {
+                "provider": "openai-compatible",
+                "model_used": "gpt-5.3-codex",
+                "usage": {"input_tokens": 1, "output_tokens": 1, "total_tokens": 2},
+                "llm_calls": 1,
+                "few_shot_source_ids": ["lyric-modern-101", "lyric-modern-102", "poem-jys-001"],
+                "retrieval_profile_vote": "urban_introspective",
+                "retrieval_vote_confidence": 0.67,
+                "stage": "revise",
+            }
+        return initial_payload.model_copy(deep=True), {
+            "provider": "openai-compatible",
+            "model_used": "gpt-5.3-codex",
+            "usage": {"input_tokens": 1, "output_tokens": 1, "total_tokens": 2},
+            "llm_calls": 1,
+            "few_shot_source_ids": ["lyric-modern-101", "lyric-modern-102", "poem-jys-001"],
+            "retrieval_profile_vote": "urban_introspective",
+            "retrieval_vote_confidence": 0.67,
+            "stage": "initial",
+        }
+
+    def _fake_lint(_payload, **_kwargs):
+        return {
+            "pass": True,
+            "failed_rules": [],
+            "violations": [],
+            "active_profile": "urban_introspective",
+            "skipped_rules_by_profile": [],
+            "profile_specific_violations": [],
+            "is_dead": False,
+            "death_reason": [],
+            "hard_kill_rules": [],
+            "hard_penalty_count": 0,
+            "soft_penalty_count": 0,
+            "penalty_score": 0,
+            "craft_score": 0.9,
+            "all_dead_run_status": "",
+        }
+
+    def _fake_write_outputs(payload, _out_dir, _trace):
+        observed["write_calls"] = int(observed["write_calls"]) + 1
+        if len(payload.lyrics_by_section) == 1:
+            raise StructuralIncompleteError("missing required section: Chorus with at least 5 lines")
+
+    monkeypatch.setattr(main_mod, "generate_lyric_payload", _fake_generate)
+    monkeypatch.setattr(main_mod, "lint_payload", _fake_lint)
+    monkeypatch.setattr(main_mod, "write_outputs", _fake_write_outputs)
+
+    main_mod.produce(
+        raw_intent="分手后夜里想发消息又忍住",
+        genre="",
+        mood="",
+        vocal="female",
+        profile="urban_introspective",
+        lang="zh-CN",
+        out_dir=str(tmp_path / "out"),
+        verbose=False,
+        dry_run=False,
+    )
+
+    assert observed["generate_calls"] == 2
+    assert observed["write_calls"] == 2
+    assert "下游要求 V/C/V/C/Bridge/C 中必须有 Verse 与 Chorus 各 >=1 段，每段 >=5 行" in str(observed["targeted_prompt"])
+    assert observed["targeted_prompt"] == main_mod.STRUCTURAL_REVISE_PROMPT
+
+
+def test_produce_fails_loud_with_trace_when_initial_generation_crashes(tmp_path, monkeypatch) -> None:
+    from src import main as main_mod
+
+    def _boom_generate(*_args, **_kwargs):
+        raise KeyError("broken payload")
+
+    monkeypatch.setattr(main_mod, "generate_lyric_payload", _boom_generate)
+
+    with pytest.raises(Exception) as err:
+        main_mod.produce(
+            raw_intent="just write a 2-line haiku only, no verse no chorus",
+            genre="",
+            mood="",
+            vocal="any",
+            profile="",
+            lang="en-US",
+            out_dir=str(tmp_path / "out"),
+            verbose=False,
+            dry_run=False,
+        )
+
+    assert getattr(err.value, "exit_code", None) == 2
+    assert not (tmp_path / "out" / "lyrics.txt").exists()
+    assert (tmp_path / "out" / "trace.json").exists()
+    assert (tmp_path / "out" / "audit.md").exists()
+
+
+def test_append_profile_routing_warning_for_low_confidence_vote_route() -> None:
+    trace = {
+        "active_profile": "uplift_pop",
+        "profile_source": "corpus_vote",
+        "retrieval_profile_vote": "uplift_pop",
+        "profile_vote_confidence": 0.4,
+    }
+
+    _append_profile_routing_warnings(trace)
+
+    warnings = trace.get("profile_routing_warnings")
+    assert isinstance(warnings, list)
+    assert any("profile_routing_low_confidence" in item for item in warnings)
+
+
+def test_produce_fails_loud_when_few_shot_quality_insufficient(tmp_path, monkeypatch) -> None:
+    from src import main as main_mod
+    from src.retriever import InsufficientQualityFewShotError
+
+    def _bad_generate(*_args, **_kwargs):
+        raise InsufficientQualityFewShotError("insufficient quality few-shot samples after pre-injection validation")
+
+    monkeypatch.setattr(main_mod, "generate_lyric_payload", _bad_generate)
+
+    with pytest.raises(Exception) as err:
+        main_mod.produce(
+            raw_intent="分手后夜里想发消息又忍住",
+            genre="",
+            mood="",
+            vocal="female",
+            profile="",
+            lang="zh-CN",
+            out_dir=str(tmp_path / "out"),
+            verbose=False,
+            dry_run=False,
+        )
+
+    assert getattr(err.value, "exit_code", None) == 2
     assert not (tmp_path / "out" / "lyrics.txt").exists()
     assert (tmp_path / "out" / "trace.json").exists()
     assert (tmp_path / "out" / "audit.md").exists()

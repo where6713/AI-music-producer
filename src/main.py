@@ -7,13 +7,16 @@ from typing import Any
 import typer
 
 from src.claude_client import generate_lyric_payload
-from src.compile import write_outputs, write_trace_and_audit
+from src.compile import StructuralIncompleteError, write_outputs, write_trace_and_audit
 from src.lint import lint_payload
 from src.profile_router import resolve_active_profile
+from src.retriever import InsufficientQualityFewShotError
 from src.schemas import LyricPayload, UserInput
 
 
 app = typer.Typer(help="Lyric Craftsman CLI (PRD v2.0)")
+
+STRUCTURAL_REVISE_PROMPT = "下游要求 V/C/V/C/Bridge/C 中必须有 Verse 与 Chorus 各 >=1 段，每段 >=5 行"
 
 
 def _safe_float(value: Any, *, default: float = 0.0) -> float:
@@ -116,6 +119,8 @@ def _apply_retrieval_profile_decision(trace: dict[str, Any]) -> None:
     source_ids = [str(x) for x in source_ids_raw] if isinstance(source_ids_raw, list) else []
     source_stage = str(trace.get("retrieval_profile_source", "initial")).strip() or "initial"
     profile_source = str(trace.get("profile_source", "")).strip()
+    raw_vote_counts = trace.get("retrieval_profile_vote_counts", {})
+    vote_counts = raw_vote_counts if isinstance(raw_vote_counts, dict) else {}
 
     if explicit_active_profile:
         if not profile_vote:
@@ -130,6 +135,7 @@ def _apply_retrieval_profile_decision(trace: dict[str, Any]) -> None:
             "source_stage": source_stage,
             "source_ids": source_ids,
             "source": profile_source,
+            "profile_vote_counts": vote_counts,
         }
         return
 
@@ -154,6 +160,7 @@ def _apply_retrieval_profile_decision(trace: dict[str, Any]) -> None:
         "source_stage": source_stage,
         "source_ids": source_ids,
         "source": profile_source,
+        "profile_vote_counts": vote_counts,
     }
 
 
@@ -178,12 +185,44 @@ def _merge_revise_trace_metadata(trace: dict[str, Any], revise_trace: dict[str, 
         trace["few_shot_source_ids"] = revise_source_ids
         updated = True
 
+    revise_vote_counts = revise_trace.get("retrieval_profile_vote_counts", {})
+    if isinstance(revise_vote_counts, dict) and revise_vote_counts:
+        trace["retrieval_profile_vote_counts"] = {str(k): int(v) for k, v in revise_vote_counts.items()}
+        updated = True
+
     if updated:
         trace["retrieval_profile_source"] = "revise"
 
 
 def _write_rejected_trace(out_dir: Path, trace: dict[str, Any]) -> None:
     write_trace_and_audit(out_dir, trace)
+
+
+def _append_profile_routing_warnings(trace: dict[str, Any]) -> None:
+    warnings = trace.get("profile_routing_warnings", [])
+    if not isinstance(warnings, list):
+        warnings = []
+
+    profile_source = str(trace.get("profile_source", "")).strip()
+    active_profile = str(trace.get("active_profile", "")).strip()
+    vote_confidence = _safe_float(
+        trace.get("profile_vote_confidence", trace.get("retrieval_vote_confidence", 0.0)),
+        default=0.0,
+    )
+    retrieval_vote = str(trace.get("retrieval_profile_vote", "")).strip()
+    low_confidence_route = profile_source == "corpus_vote" or (
+        active_profile and retrieval_vote == active_profile
+    )
+    if low_confidence_route and active_profile and vote_confidence < 0.67:
+        warning = (
+            f"profile_routing_low_confidence profile={active_profile} "
+            f"source={profile_source or 'unknown'} vote_confidence={vote_confidence:.2f}"
+        )
+        if warning not in warnings:
+            warnings.append(warning)
+
+    if warnings:
+        trace["profile_routing_warnings"] = warnings
 
 
 def _fail_quality_floor(target_dir: Path, trace: dict[str, Any], *, dry_run: bool) -> None:
@@ -193,6 +232,27 @@ def _fail_quality_floor(target_dir: Path, trace: dict[str, Any], *, dry_run: boo
         typer.echo("run_status=QUALITY_FLOOR_FAILED")
         raise typer.Exit(code=2)
     _write_rejected_trace(target_dir, trace)
+    raise typer.Exit(code=2)
+
+
+def _fail_generation_error(
+    target_dir: Path,
+    *,
+    stage: str,
+    exc: Exception,
+    dry_run: bool,
+) -> None:
+    trace: dict[str, Any] = {
+        "run_status": "REJECTED",
+        "error_stage": stage,
+        "error_type": type(exc).__name__,
+        "error_message": str(exc),
+    }
+    if dry_run:
+        typer.echo("dry-run complete")
+        typer.echo("run_status=REJECTED generation error")
+        raise typer.Exit(code=2)
+    write_trace_and_audit(target_dir, trace)
     raise typer.Exit(code=2)
 
 
@@ -220,7 +280,12 @@ def produce(
         profile_override=profile,
     )
 
-    payload, trace = generate_lyric_payload(user_input, repo_root=repo_root)
+    try:
+        payload, trace = generate_lyric_payload(user_input, repo_root=repo_root)
+    except InsufficientQualityFewShotError as exc:
+        _fail_generation_error(target_dir, stage="few_shot_quality_gate", exc=exc, dry_run=dry_run)
+    except Exception as exc:
+        _fail_generation_error(target_dir, stage="initial_generation", exc=exc, dry_run=dry_run)
     trace.setdefault("retrieval_profile_source", "initial")
     active_profile, profile_source, profile_vote_confidence = resolve_active_profile(
         user_input,
@@ -233,6 +298,7 @@ def produce(
     trace["profile_source"] = profile_source
     if profile_vote_confidence is not None:
         trace["profile_vote_confidence"] = profile_vote_confidence
+    _append_profile_routing_warnings(trace)
     payload, variant_rank = _score_variants(payload, trace=trace)
     lint_report = lint_payload(payload, trace=trace)
 
@@ -246,11 +312,16 @@ def produce(
         targeted_prompt = _build_targeted_revise_prompt(
             payload.model_dump(), lint_report
         )
-        revised_payload, revise_trace = generate_lyric_payload(
-            user_input,
-            repo_root=repo_root,
-            targeted_revise_prompt=targeted_prompt,
-        )
+        try:
+            revised_payload, revise_trace = generate_lyric_payload(
+                user_input,
+                repo_root=repo_root,
+                targeted_revise_prompt=targeted_prompt,
+            )
+        except InsufficientQualityFewShotError as exc:
+            _fail_generation_error(target_dir, stage="few_shot_quality_gate", exc=exc, dry_run=dry_run)
+        except Exception as exc:
+            _fail_generation_error(target_dir, stage="targeted_revise_generation", exc=exc, dry_run=dry_run)
         revised_payload, revised_rank = _score_variants(revised_payload, trace=trace)
         revised_lint = lint_payload(revised_payload, trace=trace)
         payload = revised_payload
@@ -337,7 +408,73 @@ def produce(
             )
         return
 
-    write_outputs(payload, target_dir, trace)
+    try:
+        write_outputs(payload, target_dir, trace)
+    except StructuralIncompleteError as exc:
+        if llm_calls >= 2:
+            trace["run_status"] = "REJECTED"
+            trace["structural_error"] = str(exc)
+            _write_rejected_trace(target_dir, trace)
+            raise typer.Exit(code=2)
+
+        try:
+            revised_payload, revise_trace = generate_lyric_payload(
+                user_input,
+                repo_root=repo_root,
+                targeted_revise_prompt=STRUCTURAL_REVISE_PROMPT,
+            )
+        except Exception as revise_exc:
+            trace["run_status"] = "REJECTED"
+            trace["error_stage"] = "structural_targeted_revise_generation"
+            trace["error_type"] = type(revise_exc).__name__
+            trace["error_message"] = str(revise_exc)
+            _write_rejected_trace(target_dir, trace)
+            raise typer.Exit(code=2)
+        payload, variant_rank = _score_variants(revised_payload, trace=trace)
+        lint_report = lint_payload(payload, trace=trace)
+        _sync_chosen_variant(payload)
+        llm_calls = 2
+        usage_prev = trace.get("usage", {})
+        usage_next = revise_trace.get("usage", {})
+        trace["usage"] = {
+            "input_tokens": int(usage_prev.get("input_tokens", 0)) + int(usage_next.get("input_tokens", 0)),
+            "output_tokens": int(usage_prev.get("output_tokens", 0)) + int(usage_next.get("output_tokens", 0)),
+            "total_tokens": int(usage_prev.get("total_tokens", 0)) + int(usage_next.get("total_tokens", 0)),
+        }
+        _merge_revise_trace_metadata(trace, revise_trace)
+        trace["revise_trace"] = revise_trace
+        trace["revise_evidence"] = {
+            "targeted_revise_prompt": STRUCTURAL_REVISE_PROMPT,
+            "trigger": "StructuralIncompleteError",
+            "structural_error": str(exc),
+            "revised_lint_report": lint_report,
+        }
+        trace["structural_revise_triggered"] = True
+        trace["variant_rank"] = variant_rank
+        trace["lint_report"] = lint_report
+        trace["llm_calls"] = llm_calls
+        trace["max_llm_calls_per_run"] = 2
+        _apply_retrieval_profile_decision(trace)
+
+        hard_reject = bool(lint_report.get("is_dead", False)) or (
+            str(lint_report.get("all_dead_run_status", "")).strip().upper() == "REJECTED"
+        )
+        if hard_reject:
+            trace["run_status"] = "REJECTED"
+            _write_rejected_trace(target_dir, trace)
+            raise typer.Exit(code=2)
+
+        craft_score = float(lint_report.get("craft_score", 0.0) or 0.0)
+        if craft_score < 0.85:
+            _fail_quality_floor(target_dir, trace, dry_run=False)
+
+        try:
+            write_outputs(payload, target_dir, trace)
+        except StructuralIncompleteError as second_exc:
+            trace["run_status"] = "REJECTED"
+            trace["structural_error"] = str(second_exc)
+            _write_rejected_trace(target_dir, trace)
+            raise typer.Exit(code=2)
     if warning_report:
         target_dir.mkdir(parents=True, exist_ok=True)
         (target_dir / "warning_report.md").write_text(warning_report + "\n", encoding="utf-8")

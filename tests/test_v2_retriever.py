@@ -1,8 +1,13 @@
 from __future__ import annotations
 
 import json
+import pytest
 
-from src.retriever import corpus_balance_check, retrieve_few_shot_examples
+from src.retriever import (
+    InsufficientQualityFewShotError,
+    corpus_balance_check,
+    retrieve_few_shot_examples,
+)
 from src.schemas import UserInput
 
 
@@ -22,6 +27,7 @@ def _write_clean_corpus(corpus_dir, poetry_rows, lyric_rows) -> None:
             "neutral" if out.get("profile_tag") == "classical_restraint" else "negative",
         )
         out.setdefault("learn_point", "保持具象化并避免模板化复写")
+        out.setdefault("do_not_copy", "不要复写原句与段落顺序")
         return out
 
     (clean_dir / "poetry_classical.json").write_text(
@@ -303,6 +309,7 @@ def test_retriever_prefers_clean_corpus_when_available(tmp_path) -> None:
                     "profile_tag": "urban_introspective",
                     "valence": "negative",
                     "learn_point": "保留克制语气并用动作推进情绪",
+                    "do_not_copy": "不要复写原句与段落顺序",
                     "profile_confidence": 0.9,
                     "content": "对话框停在最后一句，指尖仍然悬着。",
                 },
@@ -314,6 +321,7 @@ def test_retriever_prefers_clean_corpus_when_available(tmp_path) -> None:
                     "profile_tag": "urban_introspective",
                     "valence": "negative",
                     "learn_point": "保留克制语气并用动作推进情绪",
+                    "do_not_copy": "不要复写原句与段落顺序",
                     "profile_confidence": 0.9,
                     "content": "手在拨出前停住，呼吸也跟着发颤。",
                 },
@@ -349,3 +357,44 @@ def test_retriever_fails_loud_when_clean_corpus_missing(tmp_path) -> None:
         return
 
     raise AssertionError("expected RuntimeError when clean corpus is missing")
+
+
+def test_retriever_raises_when_preinjection_validation_leaves_less_than_two(tmp_path) -> None:
+    corpus = tmp_path / "corpus"
+    corpus.mkdir(parents=True, exist_ok=True)
+    poetry_rows = []
+    lyric_rows = [
+        {
+            "source_id": "lyric-modern-101",
+            "type": "modern_lyric",
+            "title": "bad one",
+            "emotion_tags": ["breakup"],
+            "profile_tag": "urban_introspective",
+            "valence": "negative",
+            "learn_point": "短",
+            "do_not_copy": "",
+            "content": "对话框停在最后一句，指尖仍然悬着。",
+        },
+        {
+            "source_id": "lyric-modern-102",
+            "type": "modern_lyric",
+            "title": "bad two",
+            "emotion_tags": ["regret"],
+            "profile_tag": "urban_introspective",
+            "valence": "negative",
+            "learn_point": "保留克制语气并用动作推进情绪",
+            "do_not_copy": "",
+            "content": "手在拨出前停住，呼吸也跟着发颤。",
+        },
+    ]
+    (corpus / "poetry_classical.json").write_text(json.dumps(poetry_rows, ensure_ascii=False), encoding="utf-8")
+    (corpus / "lyrics_modern_zh.json").write_text(json.dumps(lyric_rows, ensure_ascii=False), encoding="utf-8")
+    _write_clean_corpus(corpus, poetry_rows, lyric_rows)
+
+    with pytest.raises(InsufficientQualityFewShotError):
+        retrieve_few_shot_examples(
+            UserInput(raw_intent="分手后深夜想发消息又克制住"),
+            repo_root=tmp_path,
+            top_k=3,
+            return_metadata=True,
+        )

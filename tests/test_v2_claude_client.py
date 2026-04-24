@@ -114,6 +114,7 @@ def _seed_min_corpus(repo_root: Path) -> None:
             "content": "举头望明月，低头思故乡，夜色慢慢凉。",
             "valence": "neutral",
             "learn_point": "使用留白与具象意象承载情绪",
+            "do_not_copy": "不要复写原句与段落顺序",
         }
     ]
     lyric_rows = [
@@ -126,6 +127,7 @@ def _seed_min_corpus(repo_root: Path) -> None:
             "content": "对话框停在最后一句，指尖仍然悬着。",
             "valence": "negative",
             "learn_point": "保留克制语气并用动作推进情绪",
+            "do_not_copy": "不要复写原句与段落顺序",
         },
         {
             "source_id": "lyric-modern-102",
@@ -136,6 +138,7 @@ def _seed_min_corpus(repo_root: Path) -> None:
             "content": "手在拨出前停住，呼吸也跟着发颤。",
             "valence": "negative",
             "learn_point": "保留克制语气并用动作推进情绪",
+            "do_not_copy": "不要复写原句与段落顺序",
         },
     ]
 
@@ -219,6 +222,8 @@ def test_generate_payload_uses_openai_compatible_path(tmp_path, monkeypatch) -> 
         assert config.provider == "openai-compatible"
         assert skill_text == "skill"
         assert "Generate lyric_payload JSON only" in prompt["task"]
+        assert "以下示例展示的是 craft 方法" in prompt["few_shot_system_instruction"]
+        assert all(str(x.get("do_not_copy", "")).strip() for x in prompt["few_shot_examples"])
         return _payload_json(), {"input_tokens": 123, "output_tokens": 456, "total_tokens": 579}
 
     monkeypatch.setattr(claude_client, "_call_openai_compatible", _fake_openai_call)
@@ -342,3 +347,48 @@ def test_generate_payload_includes_profile_trace_fields(tmp_path, monkeypatch) -
     assert trace["profile_source"] == "cli_override"
     assert "corpus_balance" in trace
     assert "corpus_monoculture_risk" in trace
+
+
+def test_normalize_structure_falls_back_when_order_missing() -> None:
+    structure = claude_client._normalize_structure({}, [])
+    assert structure["section_order"] == ["[Verse 1]", "[Chorus]"]
+    assert structure["hook_section"] == "[Chorus]"
+
+
+def test_normalize_variants_skips_sections_without_tag_or_lines() -> None:
+    variants, chosen = claude_client._normalize_variants(
+        [
+            {
+                "variant_id": "a",
+                "lyrics_by_section": [
+                    {"lines": [{"primary": "x"}]},
+                    {"tag": "[Verse 1]", "lines": [{"primary": "line 1"}]},
+                ],
+            }
+        ],
+        base_sections=[],
+    )
+
+    assert chosen == "a"
+    assert variants[0]["lyrics_by_section"][0]["tag"] == "[Verse 1]"
+
+
+def test_extract_base_sections_accepts_name_and_text_fields() -> None:
+    rows = claude_client._extract_base_sections(
+        {
+            "lyrics_by_section": [
+                {
+                    "name": "Verse 1",
+                    "lines": [{"text": "line one"}, {"line": "line two"}],
+                },
+                {
+                    "section": "chorus",
+                    "lines": ["line c1", "line c2"],
+                },
+            ]
+        }
+    )
+
+    tags = [row["tag"] for row in rows]
+    assert "[Verse 1]" in tags
+    assert "[Chorus]" in tags

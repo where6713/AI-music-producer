@@ -36,6 +36,10 @@ MIN_PROFILE_COVERAGE = {
 }
 
 
+class InsufficientQualityFewShotError(RuntimeError):
+    pass
+
+
 def _infer_profile_tag(row: dict[str, Any]) -> str:
     explicit = str(row.get("profile_tag", "")).strip()
     if explicit:
@@ -150,9 +154,32 @@ def retrieve_few_shot_examples(
         scored.append((score, row))
 
     scored.sort(key=lambda x: x[0], reverse=True)
-    selected = [row for _, row in scored[: max(2, min(top_k, 3))]]
+
+    def _quality_pass(row: dict[str, Any]) -> bool:
+        report = lint_corpus_row(row, mode="runtime")
+        if not report.passed:
+            return False
+        learn_point = str(row.get("learn_point", "")).strip()
+        if len(learn_point) < 5:
+            return False
+        do_not_copy = str(row.get("do_not_copy", "")).strip()
+        if not do_not_copy:
+            return False
+        return True
+
+    selected: list[dict[str, Any]] = []
+    target_max = max(2, min(top_k, 3))
+    for _, row in scored:
+        if not _quality_pass(row):
+            continue
+        selected.append(row)
+        if len(selected) >= target_max:
+            break
+
     if len(selected) < 2:
-        selected = [row for _, row in scored[:2]]
+        raise InsufficientQualityFewShotError(
+            "insufficient quality few-shot samples after pre-injection validation"
+        )
 
     normalized: list[dict[str, Any]] = []
     for row in selected:
@@ -166,6 +193,8 @@ def retrieve_few_shot_examples(
                 "profile_tag": profile_tag,
                 "profile_confidence": _normalize_profile_confidence(row),
                 "content": str(row.get("content", "")),
+                "learn_point": str(row.get("learn_point", "")).strip(),
+                "do_not_copy": str(row.get("do_not_copy", "")).strip(),
             }
         )
 
@@ -199,6 +228,7 @@ def retrieve_few_shot_examples(
         "samples": normalized,
         "profile_vote": profile_vote,
         "vote_confidence": vote_confidence,
+        "profile_vote_counts": dict(votes),
         "corpus_balance": corpus_balance_check(repo_root),
         "corpus_monoculture_risk": monoculture_risk,
     }
