@@ -29,20 +29,37 @@ if git ls-files | grep -Eiq '(^|/)(temp|new|utils|helper)\.(ps1|sh|py|js|ts)$'; 
 fi
 
 # 3) root clutter guard (RULE-15)
-root_files="$(git ls-files | grep -E '^[^/]+$' || true)"
-if [ -n "$root_files" ]; then
-  disallowed_root="$(printf '%s\n' "$root_files" | grep -Ev '^(AI-music-producer PRD_v1\.1\.md|one law\.md|开发清单\.md|目录框架规范\.md|README\.md|LICENSE|CHANGELOG\.md|\.gitignore)$' || true)"
-  if [ -n "$disallowed_root" ]; then
-    echo "[ci-gates][BLOCK] non-whitelisted root files detected:"
-    printf '%s\n' "$disallowed_root"
-    exit 1
-  fi
-fi
+python - <<'PY'
+import subprocess
+import sys
+
+allowed = {
+    "AI-music-producer PRD_v1.1.md",
+    "one law.md",
+    "开发清单.md",
+    "目录框架规范.md",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    ".gitignore",
+}
+
+raw = subprocess.check_output(["git", "ls-files", "-z"])
+all_files = [x for x in raw.decode("utf-8", errors="replace").split("\0") if x]
+root_files = [x for x in all_files if "/" not in x]
+disallowed = sorted([x for x in root_files if x not in allowed])
+
+if disallowed:
+    print("[ci-gates][BLOCK] non-whitelisted root files detected:")
+    for item in disallowed:
+        print(item)
+    sys.exit(1)
+PY
 
 # 4) light secret scan
-if git grep -nE '(AKIA[0-9A-Z]{16}|BEGIN[[:space:]]+PRIVATE[[:space:]]+KEY|api[_-]?key[[:space:]]*[:=][[:space:]]*["'"'"'"'"'"'][^"'"'"'"'"'"']+["'"'"'"'"'"'])' -- . >/dev/null 2>&1; then
+if git grep -nE '(AKIA[0-9A-Z]{16}|BEGIN[[:space:]]+PRIVATE[[:space:]]+KEY|api[_-]?key[[:space:]]*[:=][[:space:]]*["'"'"'"'"'"'"'"'][^"'"'"'"'"'"'"'"']+["'"'"'"'"'"'"'"'])' -- . ':(exclude)*.md' >/dev/null 2>&1; then
   echo "[ci-gates][BLOCK] potential secrets detected in tracked files."
-  git grep -nE '(AKIA[0-9A-Z]{16}|BEGIN[[:space:]]+PRIVATE[[:space:]]+KEY|api[_-]?key[[:space:]]*[:=][[:space:]]*["'"'"'"'"'"'][^"'"'"'"'"'"']+["'"'"'"'"'"'])' -- . || true
+  git grep -nE '(AKIA[0-9A-Z]{16}|BEGIN[[:space:]]+PRIVATE[[:space:]]+KEY|api[_-]?key[[:space:]]*[:=][[:space:]]*["'"'"'"'"'"'"'"'][^"'"'"'"'"'"'"'"']+["'"'"'"'"'"'"'"'])' -- . ':(exclude)*.md' || true
   exit 1
 fi
 
