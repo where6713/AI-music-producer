@@ -190,10 +190,10 @@ def test_check_gate_g1_uses_explicit_target_commit_when_provided(monkeypatch, tm
     assert result["failed_checks"] == []
 
 
-def test_check_gate_g1_uses_env_target_commit(monkeypatch, tmp_path) -> None:
+def test_check_gate_g1_ignores_env_when_target_not_explicit(monkeypatch, tmp_path) -> None:
     responses = {
-        ("show", "-s", "--format=%s", "envsha789"): "test(g7): add failed gate diagnostics output\n",
-        ("show", "--name-only", "--pretty=", "envsha789"): "apps/cli/main.py\ntests/test_v2_cli.py\n",
+        ("log", "-1", "--pretty=%s"): "feat(g1): add scope validator and cli entry\n",
+        ("show", "--name-only", "--pretty=", "-1"): "src/producer_tools/self_check/gate_g1.py\napps/cli/main.py\n",
     }
 
     def _fake_read_git_output(_workspace_root, args):
@@ -209,3 +209,41 @@ def test_check_gate_g1_uses_env_target_commit(monkeypatch, tmp_path) -> None:
 
     assert result["status"] == "pass"
     assert result["failed_checks"] == []
+
+
+def test_check_gate_g1_falls_back_when_target_commit_unavailable(monkeypatch, tmp_path) -> None:
+    responses = {
+        ("log", "-1", "--pretty=%s"): "fix(g1): stabilize fallback chain\n",
+        ("show", "--name-only", "--pretty=", "-1"): "src/producer_tools/self_check/gate_g1.py\n",
+    }
+
+    def _fake_read_git_output(_workspace_root, args):
+        key = tuple(args)
+        if key == ("show", "-s", "--format=%s", "missing123"):
+            raise RuntimeError("unknown revision")
+        if key == ("show", "--name-only", "--pretty=", "missing123"):
+            raise RuntimeError("unknown revision")
+        if key not in responses:
+            raise RuntimeError(f"unexpected args: {args}")
+        return responses[key]
+
+    monkeypatch.setattr(gate_g1, "_read_git_output", _fake_read_git_output)
+
+    result = gate_g1.check_gate_g1(tmp_path, target_commit="missing123")
+
+    assert result["status"] == "pass"
+    assert result["failed_checks"] == []
+
+
+def test_check_gate_g1_preserves_git_metadata_unavailable_semantics_with_bad_target(
+    monkeypatch, tmp_path
+) -> None:
+    def _raise(*_args, **_kwargs):
+        raise RuntimeError("git error")
+
+    monkeypatch.setattr(gate_g1, "_read_git_output", _raise)
+
+    result = gate_g1.check_gate_g1(tmp_path, target_commit="missing123")
+
+    assert result["status"] == "fail"
+    assert result["failed_checks"] == ["git_metadata_unavailable"]

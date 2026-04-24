@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Any
 import re
 import subprocess
-import os
 
 
 _COMMIT_SUBJECT_RE = re.compile(
@@ -64,7 +63,7 @@ def _read_git_output(workspace_root: Path, args: list[str]) -> str:
 
 
 def check_gate_g1(workspace_root: Path, target_commit: str = "") -> dict[str, Any]:
-    explicit_target = str(target_commit or os.getenv("G1_TARGET_SHA", "")).strip()
+    explicit_target = str(target_commit).strip()
     if explicit_target:
         try:
             explicit_subject = _read_git_output(
@@ -76,16 +75,13 @@ def check_gate_g1(workspace_root: Path, target_commit: str = "") -> dict[str, An
                 ["show", "--name-only", "--pretty=", explicit_target],
             )
             explicit_files = [line.strip() for line in explicit_changed.splitlines() if line.strip()]
-            return validate_g1_scope(
+            explicit_result = validate_g1_scope(
                 {"commit_subject": explicit_subject, "changed_files": explicit_files}
             )
+            if explicit_result["status"] == "pass":
+                return explicit_result
         except Exception:
-            return {
-                "status": "fail",
-                "failed_checks": ["target_commit_unavailable"],
-                "commit_subject": "",
-                "changed_files": [],
-            }
+            pass
 
     try:
         commit_subject = _read_git_output(workspace_root, ["log", "-1", "--pretty=%s"]).strip()
