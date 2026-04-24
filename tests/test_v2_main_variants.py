@@ -876,6 +876,105 @@ def test_produce_revises_when_compile_raises_structural_incomplete(tmp_path, mon
     assert observed["targeted_prompt"] == main_mod.STRUCTURAL_REVISE_PROMPT
 
 
+def test_produce_uses_structural_revise_prompt_when_lint_r00(tmp_path, monkeypatch) -> None:
+    from src import main as main_mod
+
+    initial_payload = _payload()
+    initial_payload.lyrics_by_section = []
+    for variant in initial_payload.variants:
+        variant.lyrics_by_section = []
+
+    revised_payload = _payload()
+    for variant in revised_payload.variants:
+        variant.lyrics_by_section = revised_payload.lyrics_by_section
+
+    observed: dict[str, object] = {"targeted_prompt": "", "generate_calls": 0, "write_calls": 0}
+
+    def _fake_generate(_user_input, **kwargs):
+        observed["generate_calls"] = int(observed["generate_calls"]) + 1
+        targeted_prompt = kwargs.get("targeted_revise_prompt")
+        if targeted_prompt:
+            observed["targeted_prompt"] = targeted_prompt
+            return revised_payload.model_copy(deep=True), {
+                "provider": "openai-compatible",
+                "model_used": "gpt-5.3-codex",
+                "usage": {"input_tokens": 1, "output_tokens": 1, "total_tokens": 2},
+                "llm_calls": 1,
+                "few_shot_source_ids": ["lyric-modern-101", "lyric-modern-102", "poem-jys-001"],
+                "retrieval_profile_vote": "urban_introspective",
+                "retrieval_vote_confidence": 0.67,
+                "stage": "revise",
+            }
+        return initial_payload.model_copy(deep=True), {
+            "provider": "openai-compatible",
+            "model_used": "gpt-5.3-codex",
+            "usage": {"input_tokens": 1, "output_tokens": 1, "total_tokens": 2},
+            "llm_calls": 1,
+            "few_shot_source_ids": ["lyric-modern-101", "lyric-modern-102", "poem-jys-001"],
+            "retrieval_profile_vote": "urban_introspective",
+            "retrieval_vote_confidence": 0.67,
+            "stage": "initial",
+        }
+
+    def _fake_lint(payload, **_kwargs):
+        if not payload.lyrics_by_section:
+            return {
+                "pass": False,
+                "failed_rules": ["R00"],
+                "violations": [{"rule": "R00", "detail": "lyrics_by_section is empty", "section": "", "line": 0}],
+                "active_profile": "urban_introspective",
+                "skipped_rules_by_profile": [],
+                "profile_specific_violations": [],
+                "is_dead": False,
+                "death_reason": [],
+                "hard_kill_rules": [],
+                "hard_penalty_count": 0,
+                "soft_penalty_count": 0,
+                "penalty_score": 0,
+                "craft_score": 0.0,
+                "all_dead_run_status": "",
+            }
+        return {
+            "pass": True,
+            "failed_rules": [],
+            "violations": [],
+            "active_profile": "urban_introspective",
+            "skipped_rules_by_profile": [],
+            "profile_specific_violations": [],
+            "is_dead": False,
+            "death_reason": [],
+            "hard_kill_rules": [],
+            "hard_penalty_count": 0,
+            "soft_penalty_count": 0,
+            "penalty_score": 0,
+            "craft_score": 0.9,
+            "all_dead_run_status": "",
+        }
+
+    def _fake_write_outputs(_payload, _out_dir, _trace):
+        observed["write_calls"] = int(observed["write_calls"]) + 1
+
+    monkeypatch.setattr(main_mod, "generate_lyric_payload", _fake_generate)
+    monkeypatch.setattr(main_mod, "lint_payload", _fake_lint)
+    monkeypatch.setattr(main_mod, "write_outputs", _fake_write_outputs)
+
+    main_mod.produce(
+        raw_intent="分手后夜里想发消息又忍住",
+        genre="",
+        mood="",
+        vocal="female",
+        profile="urban_introspective",
+        lang="zh-CN",
+        out_dir=str(tmp_path / "out"),
+        verbose=False,
+        dry_run=False,
+    )
+
+    assert observed["generate_calls"] == 2
+    assert observed["write_calls"] == 1
+    assert observed["targeted_prompt"] == main_mod.STRUCTURAL_REVISE_PROMPT
+
+
 def test_produce_fails_loud_with_trace_when_initial_generation_crashes(tmp_path, monkeypatch) -> None:
     from src import main as main_mod
 

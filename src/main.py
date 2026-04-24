@@ -58,6 +58,14 @@ def _build_targeted_revise_prompt(payload: dict[str, Any], lint_report: dict[str
     )
 
 
+def _choose_targeted_revise_prompt(payload: LyricPayload, lint_report: dict[str, Any]) -> str:
+    failed_rules_raw = lint_report.get("failed_rules", []) if isinstance(lint_report, dict) else []
+    failed_rules = [str(x).strip() for x in failed_rules_raw] if isinstance(failed_rules_raw, list) else []
+    if "R00" in failed_rules or (not payload.lyrics_by_section):
+        return STRUCTURAL_REVISE_PROMPT
+    return _build_targeted_revise_prompt(payload.model_dump(), lint_report)
+
+
 def _score_variants(payload: LyricPayload, *, trace: dict[str, Any] | None = None) -> tuple[LyricPayload, dict[str, Any]]:
     scored: list[tuple[str, bool, int, int, int]] = []
     dead_variants: list[str] = []
@@ -282,9 +290,7 @@ def produce(
     needs_quality_revise = craft_score < 0.85
     should_revise = bool(variant_rank.get("all_dead", False)) or (not lint_report["pass"]) or needs_quality_revise
     if should_revise:
-        targeted_prompt = _build_targeted_revise_prompt(
-            payload.model_dump(), lint_report
-        )
+        targeted_prompt = _choose_targeted_revise_prompt(payload, lint_report)
         try:
             revised_payload, revise_trace = generate_lyric_payload(
                 user_input,

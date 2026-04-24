@@ -27,6 +27,9 @@ description: Generate Suno-ready lyric triplet from raw intent with single-pass 
 4. Section tags must stay in approved whitelist.
 5. Keep line lengths stable within section-level tolerance.
 6. Avoid AI cliche phrases listed below.
+7. `lyrics_by_section` must not be empty.
+8. Output must include at least one Verse section and one Chorus section, with at least 5 lines in each required section.
+9. If revise is requested for structure, fix structure in model output; do not rely on parser or code fallback to add lyric content.
 
 ## Cliche Blacklist
 

@@ -554,6 +554,12 @@ def generate_lyric_payload(
                 "exclude_tags",
             ],
         },
+        "structure_hard_constraints": {
+            "required_sections": ["[Verse 1]", "[Chorus]"],
+            "min_lines_per_required_section": 5,
+            "forbid_empty_lyrics_by_section": True,
+            "forbid_code_generated_lyrics_fallback": True,
+        },
         "few_shot_system_instruction": (
             "以下示例展示的是 craft 方法，不是模板。"
             "你需要学习它们的具象化手法、视角切换、留白节奏，"
