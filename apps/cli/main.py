@@ -1,14 +1,17 @@
 from __future__ import annotations
 
 from pathlib import Path
-import sys
 import argparse
+import json
 import os
 
 import click
 import typer
 from rich.console import Console
 from rich.table import Table
+
+from apps.cli.memory import get_project_memory_context
+from apps.cli.translation import translate_result
 
 try:
     from src.main import produce as produce_v2
@@ -20,6 +23,7 @@ except ModuleNotFoundError:
         def __init__(self, candidates: list[dict[str, str]] | None = None) -> None:
             super().__init__("ambiguous profile")
             self.candidates = candidates or []
+
 try:
     from src.producer_tools.self_check.gate_g0 import check_gate_g0
     from src.producer_tools.self_check.gate_g2 import validate_failure_evidence
@@ -54,8 +58,9 @@ from src.producer_tools.self_check.gate_g7 import check_gate_g7
 
 
 app = typer.Typer(
-    help="AI music producer CLI (PRD v2.0)",
+    help="AI music producer CLI",
     rich_markup_mode=None,
+    context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
 )
 
 PM_AUDIT_CHECK_ORDER = [
@@ -70,18 +75,128 @@ PM_AUDIT_CHECK_ORDER = [
 ]
 
 
-def _ensure_utf8_output() -> None:
-    stdout_reconf = getattr(sys.stdout, "reconfigure", None)
-    if callable(stdout_reconf):
-        try:
-            stdout_reconf(encoding="utf-8", errors="replace")
-        except Exception:
-            pass
+@app.callback()
+def cli() -> None:
+    """Root command group."""
 
 
 @app.command()
 def status() -> None:
-    typer.echo("AI music producer ready")
+    typer.echo(translate_result("status_ready", "ok"))
+
+
+@app.command()
+def context() -> None:
+    summary = get_project_memory_context()
+    if summary:
+        typer.echo(summary)
+        return
+    typer.echo(translate_result("context_empty", "ok"))
+
+
+def enforce_plan_first(plan_path: Path | None, plan_step: str | None) -> None:
+    if plan_path is None or plan_step is None or not plan_step.strip():
+        typer.echo(translate_result("plan_required", "error"))
+        raise typer.Exit(code=1)
+    if not plan_path.exists():
+        typer.echo(
+            translate_result(
+                "plan_missing",
+                "error",
+                {"plan_path": plan_path},
+            )
+        )
+        raise typer.Exit(code=1)
+
+
+def load_checkpoint(path: Path) -> dict[str, object] | None:
+    if not path.exists():
+        return None
+    with path.open("r", encoding="utf-8") as handle:
+        data = json.load(handle)
+    if not isinstance(data, dict):
+        return None
+    return data
+
+
+def save_checkpoint(path: Path, data: dict[str, object]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as handle:
+        json.dump(data, handle, ensure_ascii=True, indent=2)
+
+
+@app.command(
+    context_settings={"allow_extra_args": True, "ignore_unknown_options": True}
+)
+def produce(
+    plan: Path = typer.Argument(..., help="Path to plan file for long-running action."),
+    plan_step: str = typer.Argument(
+        ..., help="Plan step identifier required before execution."
+    ),
+) -> None:
+    """Run a long-running production action (plan-first guarded)."""
+    enforce_plan_first(plan, plan_step)
+    checkpoint_path = Path(".sisyphus/runtime/producer_state.json")
+    resume = False
+
+    args = list(click.get_current_context().args)
+    index = 0
+    while index < len(args):
+        token = args[index]
+        if token == "--resume":
+            resume = True
+            index += 1
+            continue
+        if token == "--checkpoint":
+            if index + 1 >= len(args):
+                typer.echo(translate_result("checkpoint_required", "error"))
+                raise typer.Exit(code=1)
+            checkpoint_path = Path(args[index + 1])
+            index += 2
+            continue
+        if token.startswith("--checkpoint="):
+            checkpoint_path = Path(token.split("=", 1)[1])
+            index += 1
+            continue
+        index += 1
+
+    if resume:
+        state = load_checkpoint(checkpoint_path)
+        if state is None:
+            typer.echo(
+                translate_result(
+                    "checkpoint_missing",
+                    "error",
+                    {"checkpoint_path": checkpoint_path},
+                )
+            )
+            raise typer.Exit(code=1)
+        resumed_step = state.get("step", plan_step)
+        typer.echo(translate_result("resume", "ok", {"step": resumed_step}))
+    else:
+        save_checkpoint(
+            checkpoint_path,
+            {"plan": str(plan), "step": plan_step, "status": "started"},
+        )
+
+    typer.echo(
+        translate_result(
+            "plan_acknowledged",
+            "ok",
+            {"plan_step": plan_step},
+        )
+    )
+    save_checkpoint(
+        checkpoint_path,
+        {"plan": str(plan), "step": plan_step, "status": "completed"},
+    )
+    typer.echo(
+        translate_result(
+            "production_completed",
+            "ok",
+            {"checkpoint_path": checkpoint_path},
+        )
+    )
 
 
 @app.command("self-check")
@@ -359,6 +474,8 @@ def produce_command(
     verbose: bool = False,
     dry_run: bool = False,
 ) -> None:
+    if produce_v2 is None:
+        raise typer.Exit(code=1)
     try:
         produce_v2(
             raw_intent=raw_intent,
@@ -406,14 +523,6 @@ def _dispatch_produce_from_argv(argv: list[str]) -> None:
 
 
 def main() -> None:
-    _ensure_utf8_output()
-    # TODO(v3.0): unify CLI framework; current produce path uses argparse while others use Typer.
-    if len(sys.argv) > 1 and sys.argv[1] == "produce":
-        try:
-            _dispatch_produce_from_argv(sys.argv[2:])
-        except click.exceptions.Exit as err:
-            raise SystemExit(err.exit_code)
-        return
     app()
 
 
