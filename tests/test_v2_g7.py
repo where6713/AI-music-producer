@@ -264,6 +264,31 @@ def test_check_gate_g7_includes_failed_gate_details(monkeypatch, tmp_path) -> No
     assert details["G1"]["failed_checks"] == ["commit_scope_gate"]
 
 
+def test_check_gate_g7_passes_env_target_sha_to_g1(monkeypatch, tmp_path) -> None:
+    captured: dict[str, object] = {"target": ""}
+
+    def _ok(*_args, **_kwargs):
+        return {"status": "pass"}
+
+    def _g1_capture(_workspace_root, target_commit=""):
+        captured["target"] = target_commit
+        return {"status": "pass", "failed_checks": []}
+
+    monkeypatch.setenv("G1_TARGET_SHA", "abc123head")
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7.check_gate_g0", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7.check_gate_g1", _g1_capture)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7._run_g2_check", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7._run_g3_check", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7._run_g4_check", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7.check_gate_g5", _ok)
+    monkeypatch.setattr("src.producer_tools.self_check.gate_g7.check_gate_g6", _ok)
+
+    result = check_gate_g7(tmp_path, run_proof=False)
+
+    assert result["status"] == "pass"
+    assert captured["target"] == "abc123head"
+
+
 def test_pm_audit_proof_reports_decision_mode_when_trace_has_decision_block() -> None:
     trace_path = Path("out") / "trace.json"
     original = trace_path.read_text(encoding="utf-8") if trace_path.exists() else None

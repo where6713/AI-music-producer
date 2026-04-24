@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import os
 from pathlib import Path
 from typing import Any
 
@@ -292,9 +293,10 @@ def check_gate_g7(
     strict_pm_audit: bool = False,
     proof_output_dir: Path | None = None,
 ) -> dict[str, Any]:
+    g1_target_sha = os.getenv("G1_TARGET_SHA", "").strip()
     gates = {
         "G0": check_gate_g0(workspace_root, strict_hooks_path=False),
-        "G1": check_gate_g1(workspace_root),
+        "G1": check_gate_g1(workspace_root, target_commit=g1_target_sha),
         "G2": _run_g2_check(),
         "G3": _run_g3_check(),
         "G4": _run_g4_check(),

@@ -134,6 +134,23 @@ def test_cli_scope_check_g1_reports_pass() -> None:
     assert "G1 SCOPE-CHECK" in stdout
 
 
+def test_scope_check_uses_env_target_sha(monkeypatch) -> None:
+    from apps.cli import main as cli_main
+
+    captured: dict[str, object] = {"target": ""}
+
+    def _fake_check_gate_g1(_workspace_root, target_commit=""):
+        captured["target"] = target_commit
+        return {"status": "pass", "failed_checks": []}
+
+    monkeypatch.setenv("G1_TARGET_SHA", "prheadsha456")
+    monkeypatch.setattr(cli_main, "check_gate_g1", _fake_check_gate_g1)
+
+    cli_main.scope_check("g1")
+
+    assert captured["target"] == "prheadsha456"
+
+
 def test_cli_failure_evidence_check_requires_failure_output() -> None:
     result = subprocess.run(
         [

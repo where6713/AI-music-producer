@@ -168,3 +168,44 @@ def test_check_gate_g1_prefers_pr_head_parent_on_merge_head(monkeypatch, tmp_pat
 
     assert result["status"] == "pass"
     assert result["failed_checks"] == []
+
+
+def test_check_gate_g1_uses_explicit_target_commit_when_provided(monkeypatch, tmp_path) -> None:
+    responses = {
+        ("show", "-s", "--format=%s", "prsha123"): "fix(g1): pin scope check to pr head sha\n",
+        ("show", "--name-only", "--pretty=", "prsha123"): "src/producer_tools/self_check/gate_g1.py\ntests/test_v2_g1.py\n",
+    }
+
+    def _fake_read_git_output(_workspace_root, args):
+        key = tuple(args)
+        if key not in responses:
+            raise RuntimeError(f"unexpected args: {args}")
+        return responses[key]
+
+    monkeypatch.setattr(gate_g1, "_read_git_output", _fake_read_git_output)
+
+    result = gate_g1.check_gate_g1(tmp_path, target_commit="prsha123")
+
+    assert result["status"] == "pass"
+    assert result["failed_checks"] == []
+
+
+def test_check_gate_g1_uses_env_target_commit(monkeypatch, tmp_path) -> None:
+    responses = {
+        ("show", "-s", "--format=%s", "envsha789"): "test(g7): add failed gate diagnostics output\n",
+        ("show", "--name-only", "--pretty=", "envsha789"): "apps/cli/main.py\ntests/test_v2_cli.py\n",
+    }
+
+    def _fake_read_git_output(_workspace_root, args):
+        key = tuple(args)
+        if key not in responses:
+            raise RuntimeError(f"unexpected args: {args}")
+        return responses[key]
+
+    monkeypatch.setenv("G1_TARGET_SHA", "envsha789")
+    monkeypatch.setattr(gate_g1, "_read_git_output", _fake_read_git_output)
+
+    result = gate_g1.check_gate_g1(tmp_path)
+
+    assert result["status"] == "pass"
+    assert result["failed_checks"] == []

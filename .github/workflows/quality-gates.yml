@@ -26,6 +26,8 @@ jobs:
 
       - name: Run mirrored quality gates
         shell: bash
+        env:
+          G1_TARGET_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           chmod +x tools/scripts/run_quality_gates_ci.sh
           tools/scripts/run_quality_gates_ci.sh

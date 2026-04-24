@@ -112,7 +112,7 @@ def scope_check(
         typer.echo(f"Unsupported gate: {gate}")
         raise typer.Exit(code=2)
 
-    result = check_gate_g1(Path.cwd())
+    result = check_gate_g1(Path.cwd(), target_commit=os.getenv("G1_TARGET_SHA", ""))
     if result["status"] == "pass":
         typer.echo("G1 SCOPE-CHECK PASS")
         return
