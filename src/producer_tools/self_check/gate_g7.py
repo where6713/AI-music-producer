@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -56,8 +57,136 @@ def _normalize(result: dict[str, Any]) -> str:
     return "pass" if result.get("status") == "pass" else "fail"
 
 
-def _proof_check(workspace_root: Path) -> dict[str, Any]:
-    out = workspace_root / "out"
+def _read_text_safe(path: Path) -> str:
+    if not path.exists():
+        return ""
+    return path.read_text(encoding="utf-8", errors="ignore")
+
+
+def _count_rule_hits(report: dict[str, Any], rules: set[str]) -> int:
+    hits = 0
+    violations = report.get("violations", []) if isinstance(report, dict) else []
+    if isinstance(violations, list):
+        for item in violations:
+            if not isinstance(item, dict):
+                continue
+            if str(item.get("rule", "")).strip() in rules:
+                hits += 1
+
+    hard_kill = report.get("hard_kill_rules", []) if isinstance(report, dict) else []
+    if isinstance(hard_kill, list):
+        for rule in hard_kill:
+            if str(rule).strip() in rules:
+                hits += 1
+    return hits
+
+
+def _check_lyrics_no_residuals(lyrics_path: Path) -> bool:
+    text = _read_text_safe(lyrics_path)
+    if not text.strip():
+        return False
+    content_lines = [
+        line.strip()
+        for line in text.splitlines()
+        if line.strip() and not line.strip().startswith("[")
+    ]
+    if not content_lines:
+        return False
+    last = content_lines[-1]
+    if len(last) < 2:
+        return False
+    banned_tail = {"的", "在", "把", "被", "对", "向", "给", "和", "与", "于"}
+    return last[-1] not in banned_tail
+
+
+def _check_postprocess_symbols_absent(workspace_root: Path) -> bool:
+    symbols = {
+        "_polish_" + "readability",
+        "_force_hook_" + "line_pass",
+        "DEFAULT_FILLER_" + "POOL",
+        "_ensure_min_" + "structure",
+    }
+    src_root = workspace_root / "src"
+    if not src_root.exists():
+        return True
+    for path in src_root.rglob("*.py"):
+        text = _read_text_safe(path)
+        for symbol in symbols:
+            if symbol in text:
+                return False
+    return True
+
+
+def _audit_sections_complete(audit_path: Path) -> bool:
+    text = _read_text_safe(audit_path)
+    required = ["## 0.", "## 1.", "## 2.", "## 3.", "## 4."]
+    return all(token in text for token in required)
+
+
+def _few_shot_ids_clean(trace_payload: dict[str, Any]) -> bool:
+    ids = trace_payload.get("few_shot_source_ids", [])
+    if not isinstance(ids, list):
+        return False
+    pattern = re.compile(r"\d{3}")
+    return all(not pattern.search(str(x)) for x in ids)
+
+
+def _pm_audit_checks(
+    workspace_root: Path,
+    trace_payload: dict[str, Any],
+    output_dir: Path,
+) -> dict[str, dict[str, Any]]:
+    out = output_dir
+    lint_report = trace_payload.get("lint_report", {}) if isinstance(trace_payload.get("lint_report", {}), dict) else {}
+    r14_r16_hits = _count_rule_hits(lint_report, {"R14", "R16_global"})
+    craft_score = float(lint_report.get("craft_score", 0.0) or 0.0)
+    is_dead = bool(lint_report.get("is_dead", False))
+    profile_source = str(trace_payload.get("profile_source", "")).strip()
+
+    checks: dict[str, dict[str, Any]] = {
+        "chosen_variant_not_dead": {
+            "ok": not is_dead,
+            "detail": f"is_dead={is_dead}",
+        },
+        "craft_score_floor": {
+            "ok": craft_score >= 0.85,
+            "detail": f"craft_score={craft_score}",
+        },
+        "r14_r16_global_hits": {
+            "ok": r14_r16_hits == 0,
+            "detail": f"hits={r14_r16_hits}",
+        },
+        "few_shot_no_numeric_ids": {
+            "ok": _few_shot_ids_clean(trace_payload),
+            "detail": f"few_shot_source_ids={trace_payload.get('few_shot_source_ids', [])}",
+        },
+        "audit_sections_complete": {
+            "ok": _audit_sections_complete(out / "audit.md"),
+            "detail": "requires sections 0/1/2/3/4",
+        },
+        "lyrics_no_residuals": {
+            "ok": _check_lyrics_no_residuals(out / "lyrics.txt"),
+            "detail": "last lyric line should not be residual fragment",
+        },
+        "postprocess_symbols_absent": {
+            "ok": _check_postprocess_symbols_absent(workspace_root),
+            "detail": "grep forbidden postprocess symbols",
+        },
+        "profile_source_recorded": {
+            "ok": bool(profile_source),
+            "detail": f"profile_source={profile_source}",
+        },
+    }
+    return checks
+
+
+def _proof_check(
+    workspace_root: Path,
+    *,
+    strict_pm_audit: bool = False,
+    output_dir: Path | None = None,
+) -> dict[str, Any]:
+    out = output_dir if output_dir is not None else (workspace_root / "out")
     required = ["lyrics.txt", "style.txt", "exclude.txt", "lyric_payload.json", "trace.json"]
     missing = [name for name in required if not (out / name).exists()]
     trace_text = (out / "trace.json").read_text(encoding="utf-8", errors="ignore") if (out / "trace.json").exists() else ""
@@ -118,7 +247,12 @@ def _proof_check(workspace_root: Path) -> dict[str, Any]:
             retrieval_decision_recommendation = "improve_profile_vote"
 
     retrieval_decision_stage = source_stage if source_stage else "unknown"
+    pm_checks = _pm_audit_checks(workspace_root, trace_payload, out)
+    pm_checks_ok = all(bool(x.get("ok", False)) for x in pm_checks.values())
+
     status = "pass" if (not missing and llm_calls_ok and retrieval_audit_ok) else "fail"
+    if strict_pm_audit and not pm_checks_ok:
+        status = "fail"
     return {
         "status": status,
         "output_dir": str(out),
@@ -132,10 +266,18 @@ def _proof_check(workspace_root: Path) -> dict[str, Any]:
         "retrieval_decision_quality": retrieval_decision_quality,
         "retrieval_decision_recommendation": retrieval_decision_recommendation,
         "retrieval_decision_stage": retrieval_decision_stage,
+        "pm_audit_checks": pm_checks,
+        "pm_audit_checks_ok": pm_checks_ok,
     }
 
 
-def check_gate_g7(workspace_root: Path, *, run_proof: bool = False) -> dict[str, Any]:
+def check_gate_g7(
+    workspace_root: Path,
+    *,
+    run_proof: bool = False,
+    strict_pm_audit: bool = False,
+    proof_output_dir: Path | None = None,
+) -> dict[str, Any]:
     gates = {
         "G0": check_gate_g0(workspace_root, strict_hooks_path=False),
         "G1": check_gate_g1(workspace_root),
@@ -151,7 +293,11 @@ def check_gate_g7(workspace_root: Path, *, run_proof: bool = False) -> dict[str,
 
     proof = {"status": "skipped", "output_dir": "", "missing_files": [], "llm_calls_ok": False}
     if run_proof:
-        proof = _proof_check(workspace_root)
+        proof = _proof_check(
+            workspace_root,
+            strict_pm_audit=strict_pm_audit,
+            output_dir=proof_output_dir,
+        )
 
     status = "pass"
     if failed_gates:
