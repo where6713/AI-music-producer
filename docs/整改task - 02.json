@@ -1,0 +1,263 @@
+{
+  "task_id": "TASK-012",
+  "codename": "映月工厂 · 质量信号链重建（hard gate 化）",
+  "version": "v1.0",
+  "issued_date": "2026-04-23",
+  "issued_by": "顶级 Suno/MiniMax 填词专家 + AI 音乐管线架构师",
+  "supersedes": "对 TASK-011 P-011-06（lint 参数化）的执行方式做硬化",
+  "preserves": "TASK-010 + TASK-011 的所有架构决策（profile 路由、SKILL fragment、corpus 多元化、audit.md）",
+  "本任务唯一目标": "把系统从『软排序+兜底』重写为『硬门禁+fail-loud』",
+
+  "诊断_深层根因": [
+    "D1: Lint 是排序层而非门禁层 → 三选一必然交付一个，烂也会出厂",
+    "D2: 无最低质量底线 → 12/17 分也能通过，等于没有合格率概念",
+    "D3: 下游对 LLM 不达标无容错路径 → 逼出后处理 fallback",
+    "D4: Few-shot 反向污染被严重低估 → 占位符样本主动诱导 LLM 写垃圾",
+    "D5: corpus 入库无质量门 → 占位符桩永远会再次进来，清一次治标不治本"
+  ],
+
+  "PR_整改清单": [
+
+    {
+      "pr_id": "PR-012-01",
+      "title": "建立 corpus 入库门禁（quality lint at ingestion）",
+      "对应根因": "D4 + D5",
+      "files_to_create": [
+        "scripts/corpus_quality_lint.py（新建）",
+        "scripts/run_corpus_ingestion.py（新建）",
+        "tests/test_corpus_quality.py（新建）"
+      ],
+      "files_to_modify": [
+        "src/retriever.py：load 时跑 corpus_quality_lint，未通过的样本不进入检索池"
+      ],
+      "corpus_quality_lint_硬规则": [
+        "RULE_C1: 文本中含连续 3 位以上数字（如 000/001/002/123）→ 拒收",
+        "RULE_C2: 同 author/title/era 的样本中文本相似度 >= 80% → 标记为同源，仅保留 1 条",
+        "RULE_C3: 文本长度 < 10 字符 或 > 800 字符 → 拒收",
+        "RULE_C4: 缺失 emotion_tags / valence / profile_tag 任一字段 → 拒收",
+        "RULE_C5: learn_point 字段为 null / 空字符串 / 长度 < 5 字 → 拒收（继承 TASK-010 P-010-07）",
+        "RULE_C6: 文本与 learn_point 中出现 'placeholder' / 'TODO' / 'test' / '示例' / 'sample' → 拒收",
+        "RULE_C7: 整篇文本只由名词堆叠（用 jieba 分词后动词占比 < 10%）→ 拒收"
+      ],
+      "执行命令": "python scripts/run_corpus_ingestion.py --strict",
+      "落盘要求": [
+        "生成 corpus/_clean/ 目录存放通过 lint 的样本",
+        "生成 corpus/_rejected/ 目录存放被拒样本（含拒因）",
+        "生成 corpus/_ingestion_report.md（统计：总数 / 通过率 / 各 profile 通过数 / 拒因 Top10）"
+      ],
+      "retriever_改动": "load 时只读 corpus/_clean/，不再直接读 corpus 根目录原始文件",
+      "验证命令": [
+        "grep -rE '[0-9]{3}' corpus/_clean/ → 必须为空",
+        "python scripts/run_corpus_ingestion.py --strict → 退出码 0",
+        "pytest tests/test_corpus_quality.py → 全绿"
+      ],
+      "AC": "corpus/_clean/lyrics_modern_zh.json 中 0 条带数字编号样本；ingestion 报告中 uplift_pop profile 通过样本 >= 20 条"
+    },
+
+    {
+      "pr_id": "PR-012-02",
+      "title": "Lint 重构：从『排序』升级为『硬门禁 + 排序』双层",
+      "对应根因": "D1",
+      "files_to_modify": ["src/lint.py"],
+      "新增数据结构": {
+        "RuleSeverity": "枚举：HARD_KILL（一票否决）/ HARD_PENALTY（重扣）/ SOFT_PENALTY（轻扣）",
+        "rule_definitions 表": "每条 R01-R17 标注 severity"
+      },
+      "severity_映射_硬规定": {
+        "R14_动宾合法性": "HARD_KILL",
+        "R16_陈词检测_global": "HARD_KILL",
+        "R16_陈词检测_profile": "HARD_PENALTY",
+        "R03_forbidden_literal": "HARD_KILL",
+        "R15_具象密度": "HARD_PENALTY（profile enforced 时）",
+        "R17_代词堆叠": "SOFT_PENALTY",
+        "其余": "按现状映射"
+      },
+      "lint_新逻辑": [
+        "step_1: 对每个 variant，先跑所有 HARD_KILL 规则，触发任一 → variant.is_dead = true",
+        "step_2: 对未死的 variant 跑 HARD_PENALTY（每条扣 5 分）+ SOFT_PENALTY（每条扣 1 分）",
+        "step_3: 排序仅在 is_dead = false 的 variant 之间进行",
+        "step_4: 若所有 variant 都 dead → 触发 Step 4 Targeted Revise（不允许 fallback 选最不烂的）",
+        "step_5: Targeted Revise 后仍全 dead → run.status = REJECTED，写 trace 后 fail-loud 退出，不落盘 lyrics.txt"
+      ],
+      "禁止行为": [
+        "禁止把 HARD_KILL 实现成『扣很多分但仍参与排序』",
+        "禁止给 dead variant 留任何复活路径",
+        "禁止 lint 调 LLM"
+      ],
+      "lint_report_新字段": {
+        "is_dead": "bool",
+        "death_reason": "触发 HARD_KILL 的规则 ID 列表 + 原句",
+        "all_dead_run_status": "若所有 variant dead 时该 run 的最终状态"
+      },
+      "验证命令": [
+        "构造单元测试：手工塞一个含『折成静默』的 variant → 断言 lint 返回 is_dead=true",
+        "构造单元测试：三个 variant 都 dead → 断言 run 走 Targeted Revise 而非 chosen_variant 选 a",
+        "pytest tests/test_lint_hard_gate.py"
+      ],
+      "AC": "回归测试中『折成/浇浅/收回来』含触发样本 100% 被判 is_dead；带这些词的 variant 0% 被选为 chosen_variant"
+    },
+
+    {
+      "pr_id": "PR-012-03",
+      "title": "建立全局质量底线（quality floor）",
+      "对应根因": "D2",
+      "files_to_modify": [
+        "src/lint.py（新增 quality_floor 检查）",
+        "src/main.py（处理 floor_failed 状态）"
+      ],
+      "quality_floor_定义": {
+        "公式": "craft_score = sum(passed_rule_weights) / sum(all_rule_weights)",
+        "硬阈值": "chosen_variant.craft_score 必须 >= 0.85（即 R01-R17 加权通过率 85%）",
+        "理由": "工业级产物的合格率不能低于 85%，否则等于没有合格率"
+      },
+      "新流程": [
+        "Targeted Revise 完成后，再次 lint",
+        "若 chosen.craft_score < 0.85 → run.status = QUALITY_FLOOR_FAILED",
+        "QUALITY_FLOOR_FAILED 时：写 trace + audit.md，但不写 lyrics.txt",
+        "CLI 退出码 = 2（人类可见的 fail-loud）"
+      ],
+      "禁止行为": [
+        "禁止『虽然没达标但还是写出去』",
+        "禁止把 0.85 改成 0.70 来『提高通过率』（这等于自废）",
+        "禁止用 LLM 自评 craft_score"
+      ],
+      "验证命令": [
+        "故意构造一个所有变体都 craft_score=0.7 的回归用例 → 断言 lyrics.txt 不被写出，CLI 退出码=2"
+      ],
+      "AC": "10 次 E2E 回归中，凡 chosen.craft_score < 0.85 的 run 0% 落盘 lyrics.txt"
+    },
+
+    {
+      "pr_id": "PR-012-04",
+      "title": "拆除后处理的最后火种 + 让下游变脆",
+      "对应根因": "D3",
+      "files_to_modify": [
+        "src/main.py",
+        "src/claude_client.py",
+        "src/compile.py"
+      ],
+      "全局_grep_必须为空": [
+        "grep -rn '_polish_readability' src/ → 必须 0 行",
+        "grep -rn '_force_hook_line_pass' src/ → 必须 0 行",
+        "grep -rn 'DEFAULT_FILLER_POOL' src/ → 必须 0 行",
+        "grep -rn '_ensure_min_structure' src/ → 必须 0 行（整个函数删，不留壳）",
+        "grep -rnE '\\.replace\\(.+,.+\\)' src/main.py src/compile.py → 仅允许格式化用途（如 \\r\\n→\\n），禁止任何中文字符串替换"
+      ],
+      "下游脆化改造": {
+        "compile.py": "若 chosen_variant 缺失 [Verse]/[Chorus] 任一段 → raise StructuralIncompleteError，不本地补救",
+        "main.py": "捕获 StructuralIncompleteError → 触发 Targeted Revise 而非 fallback 模板",
+        "Targeted_Revise 的 prompt": "明确告知 LLM『下游要求 V/C/V/C/Bridge/C 中必须有 Verse 与 Chorus 各 >=1 段，每段 >=5 行』，由 LLM 自己补，不由代码补"
+      },
+      "禁止行为": [
+        "禁止任何代码层面的中文字符串生成（除 SKILL.md 静态加载外）",
+        "禁止任何『LLM 输出不完整就由代码补一段』的 fallback",
+        "禁止把删掉的函数注释保留（必须物理删除）",
+        "禁止以『safety net』『emergency fallback』『temporary patch』命名的新函数承担同样职责"
+      ],
+      "验证命令": [
+        "git log --all --oneline -- src/ | xargs git grep -l '_polish_readability' → 必须 0 文件",
+        "构造一个 LLM 故意只返回 [Verse 1] 的回归 → 断言 main.py 走 Targeted Revise 路径，且 lyrics.txt 不出现任何代码生成的中文字符"
+      ],
+      "AC": "回归产物中 0 次出现『的小动作让我又乱拍』『出发在』式语法废墟（人工抽检 20 首确认）"
+    },
+
+    {
+      "pr_id": "PR-012-05",
+      "title": "Few-shot 反向污染防御",
+      "对应根因": "D4",
+      "files_to_modify": [
+        "src/retriever.py",
+        "src/claude_client.py（prompt 注入处）"
+      ],
+      "防御_1_注入前再校验": [
+        "retriever 召回 2-3 条样本后，注入 prompt 之前再跑一次 corpus_quality_lint",
+        "任一条不通过 → 该条丢弃，重新召回",
+        "若召回池耗尽仍不足 2 条 → 抛 InsufficientQualityFewShotError → 该 run fail-loud",
+        "理由：双层防御，corpus 入库门禁是第一道，注入前校验是第二道"
+      ],
+      "防御_2_few_shot_来源透明化": [
+        "audit.md 必须列出每条 few-shot 的：source_id + 原文前 30 字 + learn_point + do_not_copy",
+        "Candice 终审时 5 秒可判断『学的是不是垃圾』"
+      ],
+      "防御_3_prompt_中明示样本职责": [
+        "在 prompt 注入 few-shot 前加一行系统级指令：『以下示例展示的是 craft 方法，不是模板。你需要学习它们的具象化手法、视角切换、留白节奏，严禁复写超过 4 字连续片段，严禁照抄结构。』",
+        "继承 TASK-010 P-010-01 的 do_not_copy 字段，逐条注入"
+      ],
+      "禁止行为": [
+        "禁止把『召回不足』静默降级为『有几条算几条』",
+        "禁止用 LLM 评估 few-shot 质量（必须规则）"
+      ],
+      "AC": "回归测试中，注入的 few-shot 样本中 0 条含数字编号或占位符；audit.md 第 1 节 learn_point 全部非空且 >= 5 字"
+    },
+
+    {
+      "pr_id": "PR-012-06",
+      "title": "Profile 路由可追溯 + 误判防御",
+      "对应根因": "D5 次生缺陷",
+      "files_to_modify": ["src/profile_router.py", "src/compile.py"],
+      "新增可观测性": [
+        "audit.md 第 0 节必须打印：active_profile + profile_source + 各候选 profile 的得票数",
+        "若 vote_confidence < 0.67 但仍走了 corpus_vote → 显式 WARNING：profile_routing_low_confidence"
+      ],
+      "误判防御": [
+        "若 mood_hint 与最终 active_profile 的 typical_moods 完全不交集 → 抛 ProfileMismatchWarning（不阻塞，但写入 trace）",
+        "本次案例：intent 含『想你/收回来』暗示哀愁内省，但路由到 uplift_pop → 这种情况必须能在 audit.md 一眼看出"
+      ],
+      "AC": "audit.md 第 0 节包含 profile_source / vote_confidence / 各候选得票，缺一即拒收"
+    },
+
+    {
+      "pr_id": "PR-012-07",
+      "title": "新增 pm-audit 命令（一键终端验收）",
+      "对应根因": "运维可观测性缺失",
+      "files_to_create": ["src/cli/pm_audit.py"],
+      "命令": "python -m src.cli.main pm-audit [--last | --run-id RUN_ID]",
+      "输出格式": "终端彩色表格，全绿表示通过：",
+      "检查项": [
+        "✓/✗ chosen_variant.is_dead == False",
+        "✓/✗ chosen_variant.craft_score >= 0.85",
+        "✓/✗ R14/R16_global 命中数 == 0",
+        "✓/✗ few_shot_examples 中无数字编号样本",
+        "✓/✗ audit.md 第 0/1/2/3/4 节齐全",
+        "✓/✗ lyrics.txt 无残句（最后一行非介词/无主语首句）",
+        "✓/✗ 后处理函数全局 grep == 0",
+        "✓/✗ profile_source 已记录"
+      ],
+      "退出码": "全绿 → 0；任一红 → 1",
+      "AC": "Candice 一句命令获得审计结论，无需读 JSON"
+    }
+
+  ],
+
+  "执行顺序": [
+    "Day 1：PR-012-01（corpus 门禁）→ 必须先做，否则后续测试都被毒源污染",
+    "Day 2 AM：PR-012-02（lint 硬门）",
+    "Day 2 PM：PR-012-03（quality floor）+ PR-012-05（few-shot 防御）",
+    "Day 3 AM：PR-012-04（拆后处理 + 下游脆化）",
+    "Day 3 PM：PR-012-06（profile 可观测）+ PR-012-07（pm-audit）",
+    "Day 4：10 个跨 profile intent 全回归 + Candice 终审"
+  ],
+
+  "下次提交_PR_必须随附": [
+    "1. `git grep -E '_polish_readability|_force_hook_line_pass|DEFAULT_FILLER_POOL|_ensure_min_structure'` 输出截图（必须 0 行）",
+    "2. `python scripts/run_corpus_ingestion.py --strict` 完整输出 + corpus/_ingestion_report.md",
+    "3. `pytest tests/test_lint_hard_gate.py tests/test_quality_floor.py` 全绿截图",
+    "4. 10 个 intent 的 audit.md 第 0/1 节集合截图",
+    "5. `python -m src.cli.main pm-audit --last` 全绿终端截图",
+    "6. 故意构造的『毒样本回归』：手动塞一个含『折成静默』的 variant，证明 is_dead=true 且未被选中"
+  ],
+
+  "拒收硬指标": [
+    "lyrics.txt 中出现任何形如『的XXX』『XX在』式残句 → 立即拒收",
+    "few_shot_source_ids 中出现任何含 3 位连续数字的 ID → 立即拒收",
+    "chosen_variant.craft_score < 0.85 但仍落盘 → 立即拒收",
+    "R14 命中行被选为 chosen_variant → 立即拒收",
+    "代码库中后处理函数 grep 非 0 → 立即拒收"
+  ],
+
+  "签字": {
+    "结论": "前一位 PM 的拒收单识别症状准确，但若仅按其清单整改，下次产出仍会烂——因为系统的『质量信号链』在五个层级断裂，仅修一处其余四处会继续制造同样事故。本次整改把整条链从 corpus 入库 → few-shot 注入 → lint 评估 → quality floor → 下游脆化 全部从『软排序』升级为『硬门禁』。任何一环不达标都立即 fail-loud，宁可一次跑空，也绝不交付烂产物。这是工业级 AI 内容管线的最低尊严。",
+    "issued_by": "顶级 Suno/MiniMax 填词专家 + AI 音乐管线架构师",
+    "date": "2026-04-23"
+  }
+}
