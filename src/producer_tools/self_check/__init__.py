@@ -1,8 +1,5 @@
-"""Agent self-check tool skeletons."""
+"""Gate checks for PRD v2.0 workflow."""
 
 from __future__ import annotations
 
-__all__ = [
-    "shell_probe",
-    "py_eval",
-]
+__all__: list[str] = []

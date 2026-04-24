@@ -1,0 +1,294 @@
+{
+  "summary": {
+    "total": 15,
+    "matched": 15,
+    "accuracy": 1.0,
+    "threshold": "14/15",
+    "pass": true
+  },
+  "rows": [
+    {
+      "intent_id": "UI-01",
+      "intent_text": "城市夜里想发消息又忍住",
+      "expected_profile": "urban_introspective",
+      "actual_profile": "urban_introspective",
+      "matched": true,
+      "command": "python -c \"from src.main import produce\\nproduce(raw_intent='城市夜里想发消息又忍住',genre='都市流行',mood='克制释怀',vocal='any',profile='',lang='zh-CN',out_dir='G:\\\\\\\\AI-music-producer\\\\\\\\out\\\\\\\\task011_runs\\\\\\\\UI-01',verbose=True,dry_run=False)\\n\"",
+      "returncode": 0,
+      "stdout_tail": "lint_report={'pass': True, 'failed_rules': [], 'violations': [], 'active_profile': 'urban_introspective', 'skipped_rules_by_profile': [], 'profile_specific_violations': []}\nactive_profile=urban_introspective profile_source=genre_match\ngenerated G:\\AI-music-producer\\out\\task011_runs\\UI-01\\lyrics.txt | G:\\AI-music-producer\\out\\task011_runs\\UI-01\\style.txt | G:\\AI-music-producer\\out\\task011_runs\\UI-01\\exclude.txt",
+      "stderr_tail": "C:\\Users\\admin\\AppData\\Roaming\\Python\\Python313\\site-packages\\jieba\\_compat.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.\n  import pkg_resources\nBuilding prefix dict from the default dictionary ...\nLoading model from cache C:\\Users\\admin\\AppData\\Local\\Temp\\jieba.cache\nLoading model cost 0.320 seconds.\nPrefix dict has been built successfully.",
+      "out_dir": "out/task011_runs/UI-01",
+      "trace_path": "out/task011_runs/UI-01/trace.json",
+      "profile_source": "genre_match",
+      "lint_failed_rules": [],
+      "lint_skipped_rules_by_profile": [],
+      "lint_profile_specific_violations": []
+    },
+    {
+      "intent_id": "UI-02",
+      "intent_text": "分开后在站台看灯灭",
+      "expected_profile": "urban_introspective",
+      "actual_profile": "urban_introspective",
+      "matched": true,
+      "command": "python -c \"from src.main import produce\\nproduce(raw_intent='分开后在站台看灯灭',genre='都市流行',mood='怀旧',vocal='any',profile='',lang='zh-CN',out_dir='G:\\\\\\\\AI-music-producer\\\\\\\\out\\\\\\\\task011_runs\\\\\\\\UI-02',verbose=True,dry_run=False)\\n\"",
+      "returncode": 0,
+      "stdout_tail": "lint_report={'pass': False, 'failed_rules': ['R05'], 'violations': [{'rule': 'R05', 'detail': 'line length out of tolerance: 7 vs mean 9.2', 'section': '[Chorus]', 'line': 1}], 'active_profile': 'urban_introspective', 'skipped_rules_by_profile': [], 'profile_specific_violations': []}\nactive_profile=urban_introspective profile_source=genre_match\ngenerated G:\\AI-music-producer\\out\\task011_runs\\UI-02\\lyrics.txt | G:\\AI-music-producer\\out\\task011_runs\\UI-02\\style.txt | G:\\AI-music-producer\\out\\task011_runs\\UI-02\\exclude.txt",
+      "stderr_tail": "C:\\Users\\admin\\AppData\\Roaming\\Python\\Python313\\site-packages\\jieba\\_compat.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.\n  import pkg_resources\nBuilding prefix dict from the default dictionary ...\nLoading model from cache C:\\Users\\admin\\AppData\\Local\\Temp\\jieba.cache\nLoading model cost 0.337 seconds.\nPrefix dict has been built successfully.",
+      "out_dir": "out/task011_runs/UI-02",
+      "trace_path": "out/task011_runs/UI-02/trace.json",
+      "profile_source": "genre_match",
+      "lint_failed_rules": [
+        "R05"
+      ],
+      "lint_skipped_rules_by_profile": [],
+      "lint_profile_specific_violations": []
+    },
+    {
+      "intent_id": "UI-03",
+      "intent_text": "凌晨对话框停在最后一句",
+      "expected_profile": "urban_introspective",
+      "actual_profile": "urban_introspective",
+      "matched": true,
+      "command": "python -c \"from src.main import produce\\nproduce(raw_intent='凌晨对话框停在最后一句',genre='indie pop',mood='哀愁',vocal='any',profile='',lang='zh-CN',out_dir='G:\\\\\\\\AI-music-producer\\\\\\\\out\\\\\\\\task011_runs\\\\\\\\UI-03',verbose=True,dry_run=False)\\n\"",
+      "returncode": 0,
+      "stdout_tail": "lint_report={'pass': True, 'failed_rules': [], 'violations': [], 'active_profile': 'urban_introspective', 'skipped_rules_by_profile': [], 'profile_specific_violations': []}\nactive_profile=urban_introspective profile_source=genre_match\ngenerated G:\\AI-music-producer\\out\\task011_runs\\UI-03\\lyrics.txt | G:\\AI-music-producer\\out\\task011_runs\\UI-03\\style.txt | G:\\AI-music-producer\\out\\task011_runs\\UI-03\\exclude.txt",
+      "stderr_tail": "C:\\Users\\admin\\AppData\\Roaming\\Python\\Python313\\site-packages\\jieba\\_compat.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.\n  import pkg_resources\nBuilding prefix dict from the default dictionary ...\nLoading model from cache C:\\Users\\admin\\AppData\\Local\\Temp\\jieba.cache\nLoading model cost 0.334 seconds.\nPrefix dict has been built successfully.",
+      "out_dir": "out/task011_runs/UI-03",
+      "trace_path": "out/task011_runs/UI-03/trace.json",
+      "profile_source": "genre_match",
+      "lint_failed_rules": [],
+      "lint_skipped_rules_by_profile": [],
+      "lint_profile_specific_violations": []
+    },
+    {
+      "intent_id": "CR-01",
+      "intent_text": "写一首古风留白山水意境",
+      "expected_profile": "classical_restraint",
+      "actual_profile": "classical_restraint",
+      "matched": true,
+      "command": "python -c \"from src.main import produce\\nproduce(raw_intent='写一首古风留白山水意境',genre='古风',mood='意境',vocal='any',profile='',lang='zh-CN',out_dir='G:\\\\\\\\AI-music-producer\\\\\\\\out\\\\\\\\task011_runs\\\\\\\\CR-01',verbose=True,dry_run=False)\\n\"",
+      "returncode": 0,
+      "stdout_tail": "lint_report={'pass': True, 'failed_rules': [], 'violations': [], 'active_profile': 'classical_restraint', 'skipped_rules_by_profile': ['R15'], 'profile_specific_violations': []}\nactive_profile=classical_restraint profile_source=genre_match\ngenerated G:\\AI-music-producer\\out\\task011_runs\\CR-01\\lyrics.txt | G:\\AI-music-producer\\out\\task011_runs\\CR-01\\style.txt | G:\\AI-music-producer\\out\\task011_runs\\CR-01\\exclude.txt",
+      "stderr_tail": "C:\\Users\\admin\\AppData\\Roaming\\Python\\Python313\\site-packages\\jieba\\_compat.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.\n  import pkg_resources\nBuilding prefix dict from the default dictionary ...\nLoading model from cache C:\\Users\\admin\\AppData\\Local\\Temp\\jieba.cache\nLoading model cost 0.333 seconds.\nPrefix dict has been built successfully.",
+      "out_dir": "out/task011_runs/CR-01",
+      "trace_path": "out/task011_runs/CR-01/trace.json",
+      "profile_source": "genre_match",
+      "lint_failed_rules": [],
+      "lint_skipped_rules_by_profile": [
+        "R15"
+      ],
+      "lint_profile_specific_violations": []
+    },
+    {
+      "intent_id": "CR-02",
+      "intent_text": "宫阙旧梦与空寂回望",
+      "expected_profile": "classical_restraint",
+      "actual_profile": "classical_restraint",
+      "matched": true,
+      "command": "python -c \"from src.main import produce\\nproduce(raw_intent='宫阙旧梦与空寂回望',genre='国风',mood='空寂',vocal='any',profile='',lang='zh-CN',out_dir='G:\\\\\\\\AI-music-producer\\\\\\\\out\\\\\\\\task011_runs\\\\\\\\CR-02',verbose=True,dry_run=False)\\n\"",
+      "returncode": 0,
+      "stdout_tail": "lint_report={'pass': True, 'failed_rules': [], 'violations': [], 'active_profile': 'classical_restraint', 'skipped_rules_by_profile': ['R15'], 'profile_specific_violations': []}\nactive_profile=classical_restraint profile_source=genre_match\ngenerated G:\\AI-music-producer\\out\\task011_runs\\CR-02\\lyrics.txt | G:\\AI-music-producer\\out\\task011_runs\\CR-02\\style.txt | G:\\AI-music-producer\\out\\task011_runs\\CR-02\\exclude.txt",
+      "stderr_tail": "C:\\Users\\admin\\AppData\\Roaming\\Python\\Python313\\site-packages\\jieba\\_compat.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.\n  import pkg_resources\nBuilding prefix dict from the default dictionary ...\nLoading model from cache C:\\Users\\admin\\AppData\\Local\\Temp\\jieba.cache\nLoading model cost 0.342 seconds.\nPrefix dict has been built successfully.",
+      "out_dir": "out/task011_runs/CR-02",
+      "trace_path": "out/task011_runs/CR-02/trace.json",
+      "profile_source": "genre_match",
+      "lint_failed_rules": [],
+      "lint_skipped_rules_by_profile": [
+        "R15"
+      ],
+      "lint_profile_specific_violations": []
+    },
+    {
+      "intent_id": "CR-03",
+      "intent_text": "禅寺钟声与克制离愁",
+      "expected_profile": "classical_restraint",
+      "actual_profile": "classical_restraint",
+      "matched": true,
+      "command": "python -c \"from src.main import produce\\nproduce(raw_intent='禅寺钟声与克制离愁',genre='禅意',mood='禅思',vocal='any',profile='',lang='zh-CN',out_dir='G:\\\\\\\\AI-music-producer\\\\\\\\out\\\\\\\\task011_runs\\\\\\\\CR-03',verbose=True,dry_run=False)\\n\"",
+      "returncode": 0,
+      "stdout_tail": "lint_report={'pass': True, 'failed_rules': [], 'violations': [], 'active_profile': 'classical_restraint', 'skipped_rules_by_profile': ['R15'], 'profile_specific_violations': []}\nactive_profile=classical_restraint profile_source=genre_match\ngenerated G:\\AI-music-producer\\out\\task011_runs\\CR-03\\lyrics.txt | G:\\AI-music-producer\\out\\task011_runs\\CR-03\\style.txt | G:\\AI-music-producer\\out\\task011_runs\\CR-03\\exclude.txt",
+      "stderr_tail": "C:\\Users\\admin\\AppData\\Roaming\\Python\\Python313\\site-packages\\jieba\\_compat.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.\n  import pkg_resources\nBuilding prefix dict from the default dictionary ...\nLoading model from cache C:\\Users\\admin\\AppData\\Local\\Temp\\jieba.cache\nLoading model cost 0.341 seconds.\nPrefix dict has been built successfully.",
+      "out_dir": "out/task011_runs/CR-03",
+      "trace_path": "out/task011_runs/CR-03/trace.json",
+      "profile_source": "genre_match",
+      "lint_failed_rules": [],
+      "lint_skipped_rules_by_profile": [
+        "R15"
+      ],
+      "lint_profile_specific_violations": []
+    },
+    {
+      "intent_id": "UP-01",
+      "intent_text": "青春热恋要明亮上口",
+      "expected_profile": "uplift_pop",
+      "actual_profile": "uplift_pop",
+      "matched": true,
+      "command": "python -c \"from src.main import produce\\nproduce(raw_intent='青春热恋要明亮上口',genre='华语流行',mood='愉悦',vocal='any',profile='',lang='zh-CN',out_dir='G:\\\\\\\\AI-music-producer\\\\\\\\out\\\\\\\\task011_runs\\\\\\\\UP-01',verbose=True,dry_run=False)\\n\"",
+      "returncode": 0,
+      "stdout_tail": "lint_report={'pass': True, 'failed_rules': [], 'violations': [], 'active_profile': 'uplift_pop', 'skipped_rules_by_profile': [], 'profile_specific_violations': []}\nactive_profile=uplift_pop profile_source=genre_match\ngenerated G:\\AI-music-producer\\out\\task011_runs\\UP-01\\lyrics.txt | G:\\AI-music-producer\\out\\task011_runs\\UP-01\\style.txt | G:\\AI-music-producer\\out\\task011_runs\\UP-01\\exclude.txt",
+      "stderr_tail": "C:\\Users\\admin\\AppData\\Roaming\\Python\\Python313\\site-packages\\jieba\\_compat.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.\n  import pkg_resources\nBuilding prefix dict from the default dictionary ...\nLoading model from cache C:\\Users\\admin\\AppData\\Local\\Temp\\jieba.cache\nLoading model cost 0.345 seconds.\nPrefix dict has been built successfully.",
+      "out_dir": "out/task011_runs/UP-01",
+      "trace_path": "out/task011_runs/UP-01/trace.json",
+      "profile_source": "genre_match",
+      "lint_failed_rules": [],
+      "lint_skipped_rules_by_profile": [],
+      "lint_profile_specific_violations": []
+    },
+    {
+      "intent_id": "UP-02",
+      "intent_text": "初见悸动像晴天展开",
+      "expected_profile": "uplift_pop",
+      "actual_profile": "uplift_pop",
+      "matched": true,
+      "command": "python -c \"from src.main import produce\\nproduce(raw_intent='初见悸动像晴天展开',genre='K-pop 风',mood='阳光',vocal='any',profile='',lang='zh-CN',out_dir='G:\\\\\\\\AI-music-producer\\\\\\\\out\\\\\\\\task011_runs\\\\\\\\UP-02',verbose=True,dry_run=False)\\n\"",
+      "returncode": 0,
+      "stdout_tail": "lint_report={'pass': True, 'failed_rules': [], 'violations': [], 'active_profile': 'uplift_pop', 'skipped_rules_by_profile': [], 'profile_specific_violations': []}\nactive_profile=uplift_pop profile_source=genre_match\ngenerated G:\\AI-music-producer\\out\\task011_runs\\UP-02\\lyrics.txt | G:\\AI-music-producer\\out\\task011_runs\\UP-02\\style.txt | G:\\AI-music-producer\\out\\task011_runs\\UP-02\\exclude.txt",
+      "stderr_tail": "C:\\Users\\admin\\AppData\\Roaming\\Python\\Python313\\site-packages\\jieba\\_compat.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.\n  import pkg_resources\nBuilding prefix dict from the default dictionary ...\nLoading model from cache C:\\Users\\admin\\AppData\\Local\\Temp\\jieba.cache\nLoading model cost 0.347 seconds.\nPrefix dict has been built successfully.",
+      "out_dir": "out/task011_runs/UP-02",
+      "trace_path": "out/task011_runs/UP-02/trace.json",
+      "profile_source": "genre_match",
+      "lint_failed_rules": [],
+      "lint_skipped_rules_by_profile": [],
+      "lint_profile_specific_violations": []
+    },
+    {
+      "intent_id": "UP-03",
+      "intent_text": "回望仍想勇敢往前唱",
+      "expected_profile": "uplift_pop",
+      "actual_profile": "uplift_pop",
+      "matched": true,
+      "command": "python -c \"from src.main import produce\\nproduce(raw_intent='回望仍想勇敢往前唱',genre='青春 pop',mood='勇敢',vocal='any',profile='',lang='zh-CN',out_dir='G:\\\\\\\\AI-music-producer\\\\\\\\out\\\\\\\\task011_runs\\\\\\\\UP-03',verbose=True,dry_run=False)\\n\"",
+      "returncode": 0,
+      "stdout_tail": "lint_report={'pass': True, 'failed_rules': [], 'violations': [], 'active_profile': 'uplift_pop', 'skipped_rules_by_profile': [], 'profile_specific_violations': []}\nactive_profile=uplift_pop profile_source=genre_match\ngenerated G:\\AI-music-producer\\out\\task011_runs\\UP-03\\lyrics.txt | G:\\AI-music-producer\\out\\task011_runs\\UP-03\\style.txt | G:\\AI-music-producer\\out\\task011_runs\\UP-03\\exclude.txt",
+      "stderr_tail": "C:\\Users\\admin\\AppData\\Roaming\\Python\\Python313\\site-packages\\jieba\\_compat.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.\n  import pkg_resources\nBuilding prefix dict from the default dictionary ...\nLoading model from cache C:\\Users\\admin\\AppData\\Local\\Temp\\jieba.cache\nLoading model cost 0.344 seconds.\nPrefix dict has been built successfully.",
+      "out_dir": "out/task011_runs/UP-03",
+      "trace_path": "out/task011_runs/UP-03/trace.json",
+      "profile_source": "genre_match",
+      "lint_failed_rules": [],
+      "lint_skipped_rules_by_profile": [],
+      "lint_profile_specific_violations": []
+    },
+    {
+      "intent_id": "CD-01",
+      "intent_text": "夜店舞池一起跳起来",
+      "expected_profile": "club_dance",
+      "actual_profile": "club_dance",
+      "matched": true,
+      "command": "python -c \"from src.main import produce\\nproduce(raw_intent='夜店舞池一起跳起来',genre='EDM',mood='热烈',vocal='any',profile='',lang='zh-CN',out_dir='G:\\\\\\\\AI-music-producer\\\\\\\\out\\\\\\\\task011_runs\\\\\\\\CD-01',verbose=True,dry_run=False)\\n\"",
+      "returncode": 0,
+      "stdout_tail": "lint_report={'pass': False, 'failed_rules': ['R05'], 'violations': [{'rule': 'R05', 'detail': 'line length out of tolerance: 11 vs mean 8.0', 'section': '[Chorus]', 'line': 1}], 'active_profile': 'club_dance', 'skipped_rules_by_profile': ['R15'], 'profile_specific_violations': []}\nactive_profile=club_dance profile_source=genre_match\ngenerated G:\\AI-music-producer\\out\\task011_runs\\CD-01\\lyrics.txt | G:\\AI-music-producer\\out\\task011_runs\\CD-01\\style.txt | G:\\AI-music-producer\\out\\task011_runs\\CD-01\\exclude.txt",
+      "stderr_tail": "C:\\Users\\admin\\AppData\\Roaming\\Python\\Python313\\site-packages\\jieba\\_compat.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.\n  import pkg_resources\nBuilding prefix dict from the default dictionary ...\nLoading model from cache C:\\Users\\admin\\AppData\\Local\\Temp\\jieba.cache\nLoading model cost 0.344 seconds.\nPrefix dict has been built successfully.",
+      "out_dir": "out/task011_runs/CD-01",
+      "trace_path": "out/task011_runs/CD-01/trace.json",
+      "profile_source": "genre_match",
+      "lint_failed_rules": [
+        "R05"
+      ],
+      "lint_skipped_rules_by_profile": [
+        "R15"
+      ],
+      "lint_profile_specific_violations": []
+    },
+    {
+      "intent_id": "CD-02",
+      "intent_text": "重低音和口号式副歌",
+      "expected_profile": "club_dance",
+      "actual_profile": "club_dance",
+      "matched": true,
+      "command": "python -c \"from src.main import produce\\nproduce(raw_intent='重低音和口号式副歌',genre='dance pop',mood='释放',vocal='any',profile='',lang='zh-CN',out_dir='G:\\\\\\\\AI-music-producer\\\\\\\\out\\\\\\\\task011_runs\\\\\\\\CD-02',verbose=True,dry_run=False)\\n\"",
+      "returncode": 0,
+      "stdout_tail": "lint_report={'pass': False, 'failed_rules': ['R05'], 'violations': [{'rule': 'R05', 'detail': 'line length out of tolerance: 11 vs mean 8.2', 'section': '[Chorus]', 'line': 1}], 'active_profile': 'club_dance', 'skipped_rules_by_profile': ['R15'], 'profile_specific_violations': []}\nactive_profile=club_dance profile_source=genre_match\ngenerated G:\\AI-music-producer\\out\\task011_runs\\CD-02\\lyrics.txt | G:\\AI-music-producer\\out\\task011_runs\\CD-02\\style.txt | G:\\AI-music-producer\\out\\task011_runs\\CD-02\\exclude.txt",
+      "stderr_tail": "C:\\Users\\admin\\AppData\\Roaming\\Python\\Python313\\site-packages\\jieba\\_compat.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.\n  import pkg_resources\nBuilding prefix dict from the default dictionary ...\nLoading model from cache C:\\Users\\admin\\AppData\\Local\\Temp\\jieba.cache\nLoading model cost 0.358 seconds.\nPrefix dict has been built successfully.",
+      "out_dir": "out/task011_runs/CD-02",
+      "trace_path": "out/task011_runs/CD-02/trace.json",
+      "profile_source": "genre_match",
+      "lint_failed_rules": [
+        "R05"
+      ],
+      "lint_skipped_rules_by_profile": [
+        "R15"
+      ],
+      "lint_profile_specific_violations": []
+    },
+    {
+      "intent_id": "CD-03",
+      "intent_text": "节奏冲起来不要停",
+      "expected_profile": "club_dance",
+      "actual_profile": "club_dance",
+      "matched": true,
+      "command": "python -c \"from src.main import produce\\nproduce(raw_intent='节奏冲起来不要停',genre='house',mood='躁动',vocal='any',profile='',lang='zh-CN',out_dir='G:\\\\\\\\AI-music-producer\\\\\\\\out\\\\\\\\task011_runs\\\\\\\\CD-03',verbose=True,dry_run=False)\\n\"",
+      "returncode": 0,
+      "stdout_tail": "lint_report={'pass': True, 'failed_rules': [], 'violations': [], 'active_profile': 'club_dance', 'skipped_rules_by_profile': ['R15'], 'profile_specific_violations': []}\nactive_profile=club_dance profile_source=genre_match\ngenerated G:\\AI-music-producer\\out\\task011_runs\\CD-03\\lyrics.txt | G:\\AI-music-producer\\out\\task011_runs\\CD-03\\style.txt | G:\\AI-music-producer\\out\\task011_runs\\CD-03\\exclude.txt",
+      "stderr_tail": "C:\\Users\\admin\\AppData\\Roaming\\Python\\Python313\\site-packages\\jieba\\_compat.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.\n  import pkg_resources\nBuilding prefix dict from the default dictionary ...\nLoading model from cache C:\\Users\\admin\\AppData\\Local\\Temp\\jieba.cache\nLoading model cost 0.348 seconds.\nPrefix dict has been built successfully.",
+      "out_dir": "out/task011_runs/CD-03",
+      "trace_path": "out/task011_runs/CD-03/trace.json",
+      "profile_source": "genre_match",
+      "lint_failed_rules": [],
+      "lint_skipped_rules_by_profile": [
+        "R15"
+      ],
+      "lint_profile_specific_violations": []
+    },
+    {
+      "intent_id": "AM-01",
+      "intent_text": "古筝冥想风和水慢慢流",
+      "expected_profile": "ambient_meditation",
+      "actual_profile": "ambient_meditation",
+      "matched": true,
+      "command": "python -c \"from src.main import produce\\nproduce(raw_intent='古筝冥想风和水慢慢流',genre='ambient',mood='平静',vocal='any',profile='',lang='zh-CN',out_dir='G:\\\\\\\\AI-music-producer\\\\\\\\out\\\\\\\\task011_runs\\\\\\\\AM-01',verbose=True,dry_run=False)\\n\"",
+      "returncode": 0,
+      "stdout_tail": "lint_report={'pass': True, 'failed_rules': [], 'violations': [], 'active_profile': 'ambient_meditation', 'skipped_rules_by_profile': ['R15'], 'profile_specific_violations': []}\nactive_profile=ambient_meditation profile_source=genre_match\ngenerated G:\\AI-music-producer\\out\\task011_runs\\AM-01\\lyrics.txt | G:\\AI-music-producer\\out\\task011_runs\\AM-01\\style.txt | G:\\AI-music-producer\\out\\task011_runs\\AM-01\\exclude.txt",
+      "stderr_tail": "C:\\Users\\admin\\AppData\\Roaming\\Python\\Python313\\site-packages\\jieba\\_compat.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.\n  import pkg_resources\nBuilding prefix dict from the default dictionary ...\nLoading model from cache C:\\Users\\admin\\AppData\\Local\\Temp\\jieba.cache\nLoading model cost 0.382 seconds.\nPrefix dict has been built successfully.",
+      "out_dir": "out/task011_runs/AM-01",
+      "trace_path": "out/task011_runs/AM-01/trace.json",
+      "profile_source": "genre_match",
+      "lint_failed_rules": [],
+      "lint_skipped_rules_by_profile": [
+        "R15"
+      ],
+      "lint_profile_specific_violations": []
+    },
+    {
+      "intent_id": "AM-02",
+      "intent_text": "疗愈呼吸和微光循环",
+      "expected_profile": "ambient_meditation",
+      "actual_profile": "ambient_meditation",
+      "matched": true,
+      "command": "python -c \"from src.main import produce\\nproduce(raw_intent='疗愈呼吸和微光循环',genre='new age',mood='疗愈',vocal='any',profile='',lang='zh-CN',out_dir='G:\\\\\\\\AI-music-producer\\\\\\\\out\\\\\\\\task011_runs\\\\\\\\AM-02',verbose=True,dry_run=False)\\n\"",
+      "returncode": 0,
+      "stdout_tail": "lint_report={'pass': False, 'failed_rules': ['R05'], 'violations': [{'rule': 'R05', 'detail': 'line length out of tolerance: 11 vs mean 8.8', 'section': '[Chorus]', 'line': 1}, {'rule': 'R05', 'detail': 'line length out of tolerance: 6 vs mean 8.8', 'section': '[Chorus]', 'line': 4}], 'active_profile': 'ambient_meditation', 'skipped_rules_by_profile': ['R15'], 'profile_specific_violations': []}\nactive_profile=ambient_meditation profile_source=genre_match\ngenerated G:\\AI-music-producer\\out\\task011_runs\\AM-02\\lyrics.txt | G:\\AI-music-producer\\out\\task011_runs\\AM-02\\style.txt | G:\\AI-music-producer\\out\\task011_runs\\AM-02\\exclude.txt",
+      "stderr_tail": "C:\\Users\\admin\\AppData\\Roaming\\Python\\Python313\\site-packages\\jieba\\_compat.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.\n  import pkg_resources\nBuilding prefix dict from the default dictionary ...\nLoading model from cache C:\\Users\\admin\\AppData\\Local\\Temp\\jieba.cache\nLoading model cost 0.349 seconds.\nPrefix dict has been built successfully.",
+      "out_dir": "out/task011_runs/AM-02",
+      "trace_path": "out/task011_runs/AM-02/trace.json",
+      "profile_source": "genre_match",
+      "lint_failed_rules": [
+        "R05"
+      ],
+      "lint_skipped_rules_by_profile": [
+        "R15"
+      ],
+      "lint_profile_specific_violations": []
+    },
+    {
+      "intent_id": "AM-03",
+      "intent_text": "空灵人声像风穿过雾",
+      "expected_profile": "ambient_meditation",
+      "actual_profile": "ambient_meditation",
+      "matched": true,
+      "command": "python -c \"from src.main import produce\\nproduce(raw_intent='空灵人声像风穿过雾',genre='冥想配乐',mood='空灵',vocal='any',profile='',lang='zh-CN',out_dir='G:\\\\\\\\AI-music-producer\\\\\\\\out\\\\\\\\task011_runs\\\\\\\\AM-03',verbose=True,dry_run=False)\\n\"",
+      "returncode": 0,
+      "stdout_tail": "lint_report={'pass': False, 'failed_rules': ['R05'], 'violations': [{'rule': 'R05', 'detail': 'line length out of tolerance: 11 vs mean 8.8', 'section': '[Chorus]', 'line': 1}], 'active_profile': 'ambient_meditation', 'skipped_rules_by_profile': ['R15'], 'profile_specific_violations': []}\nactive_profile=ambient_meditation profile_source=genre_match\ngenerated G:\\AI-music-producer\\out\\task011_runs\\AM-03\\lyrics.txt | G:\\AI-music-producer\\out\\task011_runs\\AM-03\\style.txt | G:\\AI-music-producer\\out\\task011_runs\\AM-03\\exclude.txt",
+      "stderr_tail": "C:\\Users\\admin\\AppData\\Roaming\\Python\\Python313\\site-packages\\jieba\\_compat.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.\n  import pkg_resources\nBuilding prefix dict from the default dictionary ...\nLoading model from cache C:\\Users\\admin\\AppData\\Local\\Temp\\jieba.cache\nLoading model cost 0.333 seconds.\nPrefix dict has been built successfully.",
+      "out_dir": "out/task011_runs/AM-03",
+      "trace_path": "out/task011_runs/AM-03/trace.json",
+      "profile_source": "genre_match",
+      "lint_failed_rules": [
+        "R05"
+      ],
+      "lint_skipped_rules_by_profile": [
+        "R15"
+      ],
+      "lint_profile_specific_violations": []
+    }
+  ]
+}
