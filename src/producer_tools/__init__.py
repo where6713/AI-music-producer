@@ -1,11 +1,5 @@
-"""Tooling package for AI music producer."""
+"""Compatibility namespace for legacy imports."""
 
 from __future__ import annotations
 
-from . import business, contracts, self_check
-
-__all__ = [
-    "business",
-    "contracts",
-    "self_check",
-]
+__all__: list[str] = []
