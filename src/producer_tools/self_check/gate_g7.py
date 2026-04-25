@@ -128,8 +128,17 @@ def _few_shot_ids_clean(trace_payload: dict[str, Any]) -> bool:
     ids = trace_payload.get("few_shot_source_ids", [])
     if not isinstance(ids, list):
         return False
-    pattern = re.compile(r"\d{3}")
-    return all(not pattern.search(str(x)) for x in ids)
+    numeric_pattern = re.compile(r"\d{3}")
+    prefixed_pattern = re.compile(r"^(lyric|poem)[-_].*\d{3}", re.IGNORECASE)
+    for raw in ids:
+        sid = str(raw)
+        if sid.startswith("github:"):
+            continue
+        if prefixed_pattern.search(sid):
+            return False
+        if numeric_pattern.search(sid):
+            return False
+    return True
 
 
 def _pm_audit_checks(

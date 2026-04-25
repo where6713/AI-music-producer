@@ -8,6 +8,7 @@ from rapidfuzz import fuzz
 
 
 _DIGIT_3_RE = re.compile(r"\d{3,}")
+_CN_DIGIT_3_RE = re.compile(r"[零〇一二三四五六七八九十百千万两壹贰叁肆伍陆柒捌玖拾佰仟]{3,}")
 _BAD_WORD_RE = re.compile(r"placeholder|todo|test|示例|sample", re.IGNORECASE)
 _CN_RE = re.compile(r"[\u4e00-\u9fff]")
 
@@ -61,9 +62,7 @@ def _string(value: Any) -> str:
 
 
 def _contains_chinese_digits(text: str) -> bool:
-    if not _CN_RE.search(text):
-        return False
-    return bool(_DIGIT_3_RE.search(text))
+    return bool(_DIGIT_3_RE.search(text) or _CN_DIGIT_3_RE.search(text))
 
 
 def _verb_ratio(text: str) -> float:
@@ -80,6 +79,7 @@ def lint_corpus_row(row: dict[str, Any], *, mode: str = "ingestion") -> RowLintR
 
     content = _string(row.get("content"))
     learn_point = _string(row.get("learn_point"))
+    do_not_copy = _string(row.get("do_not_copy"))
     emotion_tags = row.get("emotion_tags")
     profile_tag = _string(row.get("profile_tag"))
     valence = _string(row.get("valence"))
@@ -104,6 +104,10 @@ def lint_corpus_row(row: dict[str, Any], *, mode: str = "ingestion") -> RowLintR
     if not learn_point or len(learn_point) < 5:
         failed.append("RULE_C5")
         reasons.append("learn_point missing or too short")
+
+    if not do_not_copy:
+        failed.append("RULE_C8")
+        reasons.append("do_not_copy missing")
 
     if _BAD_WORD_RE.search(joined_text):
         failed.append("RULE_C6")

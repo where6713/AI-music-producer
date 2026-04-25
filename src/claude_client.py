@@ -59,6 +59,10 @@ class ProviderConfig:
 def _resolve_provider_config(env_map: dict[str, str], default_model: str) -> ProviderConfig:
     anthropic_key = env_map.get("ANTHROPIC_API_KEY", "").strip()
     if anthropic_key:
+        if anthropic_key.startswith("sk-kimi-"):
+            raise RuntimeError(
+                "Invalid ANTHROPIC_API_KEY: detected Kimi-style key. Use OPENAI/MOONSHOT variables for Kimi-compatible endpoints."
+            )
         return ProviderConfig(
             provider="anthropic",
             api_key=anthropic_key,
@@ -69,6 +73,11 @@ def _resolve_provider_config(env_map: dict[str, str], default_model: str) -> Pro
     openai_key = env_map.get("OPENAI_API_KEY", "").strip()
     openai_base = env_map.get("OPENAI_BASE_URL", "").strip()
     openai_model = env_map.get("OPENAI_MODEL", "").strip()
+    openai_fields = [openai_key, openai_base, openai_model]
+    if any(openai_fields) and not all(openai_fields):
+        raise RuntimeError(
+            "Incomplete OPENAI configuration: OPENAI_API_KEY, OPENAI_BASE_URL, and OPENAI_MODEL are all required."
+        )
     if openai_key and openai_base and openai_model:
         return ProviderConfig(
             provider="openai-compatible",
@@ -80,6 +89,11 @@ def _resolve_provider_config(env_map: dict[str, str], default_model: str) -> Pro
     moonshot_key = env_map.get("MOONSHOT_API_KEY", "").strip()
     moonshot_base = env_map.get("MOONSHOT_BASE_URL", "").strip()
     moonshot_model = env_map.get("MOONSHOT_MODEL", "").strip()
+    moonshot_fields = [moonshot_key, moonshot_base, moonshot_model]
+    if any(moonshot_fields) and not all(moonshot_fields):
+        raise RuntimeError(
+            "Incomplete MOONSHOT configuration: MOONSHOT_API_KEY, MOONSHOT_BASE_URL, and MOONSHOT_MODEL are all required."
+        )
     if moonshot_key and moonshot_base and moonshot_model:
         return ProviderConfig(
             provider="moonshot",
@@ -98,6 +112,7 @@ def _call_openai_compatible(
     config: ProviderConfig,
     skill_text: str,
     prompt: dict[str, Any],
+    temperature: float,
 ) -> tuple[str, dict[str, int]]:
     endpoint = config.base_url.rstrip("/") + "/chat/completions"
     payload = {
@@ -106,7 +121,7 @@ def _call_openai_compatible(
             {"role": "system", "content": skill_text},
             {"role": "user", "content": json.dumps(prompt, ensure_ascii=False)},
         ],
-        "temperature": 0.4,
+        "temperature": temperature,
     }
     req = request.Request(
         endpoint,
@@ -393,11 +408,19 @@ def _normalize_variants(raw: Any, base_sections: list[dict[str, Any]]) -> tuple[
             variant_id = str(item.get("variant_id") or item.get("id") or "").strip().lower()
             if variant_id in {"a", "b", "c"}:
                 lookup[variant_id] = item
+    elif isinstance(raw, dict):
+        # model returned variants as {"a": {...}, "b": {...}, "c": {...}}
+        for key, val in raw.items():
+            k = str(key).strip().lower()
+            if k in {"a", "b", "c"} and isinstance(val, dict):
+                lookup[k] = val
 
     normalized: list[dict[str, Any]] = []
     for idx, (variant_id, pov) in enumerate(desired, start=1):
         source = lookup.get(variant_id, {})
         raw_sections = source.get("lyrics_by_section")
+        if raw_sections is None:
+            raw_sections = source.get("lyrics")
         if isinstance(raw_sections, dict):
             section_rows = _build_section_rows(raw_sections, [x for x in raw_sections.keys() if isinstance(x, str)])
         elif isinstance(raw_sections, list):
@@ -452,11 +475,18 @@ def _normalize_variants(raw: Any, base_sections: list[dict[str, Any]]) -> tuple[
         )
 
     chosen = "a"
-    for item in raw if isinstance(raw, list) else []:
-        if isinstance(item, dict):
-            candidate = str(item.get("variant_id") or item.get("id") or "").strip().lower()
-            if candidate in {"a", "b", "c"}:
-                chosen = candidate
+    if isinstance(raw, list):
+        for item in raw:
+            if isinstance(item, dict):
+                candidate = str(item.get("variant_id") or item.get("id") or "").strip().lower()
+                if candidate in {"a", "b", "c"}:
+                    chosen = candidate
+                    break
+    elif isinstance(raw, dict):
+        # dict format: pick first key as a proxy (actual chosen comes from payload level)
+        for k in ("a", "b", "c"):
+            if k in raw:
+                chosen = k
                 break
     return normalized, chosen
 
@@ -467,13 +497,24 @@ def _normalize_payload_dict(
     lyrics_by_section = _extract_base_sections(payload_dict)
     structure = _normalize_structure(payload_dict.get("structure"), [x["tag"] for x in lyrics_by_section])
     variants, chosen_from_variants = _normalize_variants(payload_dict.get("variants"), lyrics_by_section)
-    chosen = str(payload_dict.get("chosen_variant_id") or chosen_from_variants or "a").strip().lower()
+    chosen = str(
+        payload_dict.get("chosen_variant_id") or payload_dict.get("chosen_variant") or chosen_from_variants or "a"
+    ).strip().lower()
     if chosen not in {"a", "b", "c"}:
         chosen = "a"
     for item in variants:
         if item["variant_id"] == chosen:
-            lyrics_by_section = item["lyrics_by_section"]
+            candidate_sections = item.get("lyrics_by_section", [])
+            if isinstance(candidate_sections, list) and candidate_sections:
+                lyrics_by_section = candidate_sections
             break
+    if not lyrics_by_section:
+        for item in variants:
+            candidate_sections = item.get("lyrics_by_section", [])
+            if isinstance(candidate_sections, list) and candidate_sections:
+                lyrics_by_section = candidate_sections
+                chosen = str(item.get("variant_id", chosen)).strip().lower() or chosen
+                break
 
     synthesized = {
         "schema_version": "v2.1",
@@ -554,12 +595,6 @@ def generate_lyric_payload(
                 "exclude_tags",
             ],
         },
-        "structure_hard_constraints": {
-            "required_sections": ["[Verse 1]", "[Chorus]"],
-            "min_lines_per_required_section": 5,
-            "forbid_empty_lyrics_by_section": True,
-            "forbid_code_generated_lyrics_fallback": True,
-        },
         "few_shot_system_instruction": (
             "以下示例展示的是 craft 方法，不是模板。"
             "你需要学习它们的具象化手法、视角切换、留白节奏，"
@@ -571,6 +606,7 @@ def generate_lyric_payload(
     }
     if targeted_revise_prompt:
         prompt["targeted_revise_prompt"] = targeted_revise_prompt
+    generation_temperature = 0.6 if targeted_revise_prompt else 0.8
 
     if config.provider == "anthropic":
         from anthropic import Anthropic
@@ -579,7 +615,7 @@ def generate_lyric_payload(
         message = client.messages.create(
             model=config.model,
             max_tokens=4096,
-            temperature=0.4,
+            temperature=generation_temperature,
             system=skill_text,
             messages=[
                 {
@@ -605,6 +641,7 @@ def generate_lyric_payload(
             config=config,
             skill_text=skill_text,
             prompt=prompt,
+            temperature=generation_temperature,
         )
 
     payload_dict = _extract_json_block(raw_text)

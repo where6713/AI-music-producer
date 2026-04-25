@@ -232,6 +232,9 @@ def _fail_generation_error(
     if dry_run:
         typer.echo("dry-run complete")
         typer.echo("run_status=REJECTED generation error")
+        typer.echo(f"error_stage={stage}")
+        typer.echo(f"error_type={type(exc).__name__}")
+        typer.echo(f"error_message={str(exc)}")
         raise typer.Exit(code=2)
     write_trace_and_audit(target_dir, trace)
     raise typer.Exit(code=2)

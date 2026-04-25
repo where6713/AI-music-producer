@@ -400,6 +400,45 @@ def test_proof_check_pm_audit_checks_cover_required_items(tmp_path) -> None:
     assert all(bool(item.get("ok", False)) for item in checks.values())
 
 
+def test_pm_audit_allows_github_source_ids_with_digits(tmp_path) -> None:
+    out = tmp_path / "out"
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "lyrics.txt").write_text("[Verse 1]\nline one\nline two\nline three\nline four\nline five\n", encoding="utf-8")
+    (out / "style.txt").write_text("ok\n", encoding="utf-8")
+    (out / "exclude.txt").write_text("ok\n", encoding="utf-8")
+    (out / "lyric_payload.json").write_text("{}\n", encoding="utf-8")
+    (out / "audit.md").write_text("## 0.\n## 1.\n## 2.\n## 3.\n## 4.\n", encoding="utf-8")
+    (out / "trace.json").write_text(
+        json.dumps(
+            {
+                "llm_calls": 2,
+                "profile_source": "corpus_vote",
+                "few_shot_source_ids": [
+                    "github:gaussic/Chinese-Lyric-Corpus:path/track_123.txt",
+                    "github:gaussic/Chinese-Lyric-Corpus:path/track_456.txt",
+                ],
+                "lint_report": {
+                    "craft_score": 0.9,
+                    "is_dead": False,
+                    "violations": [],
+                    "hard_kill_rules": [],
+                },
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+    src_dir = tmp_path / "src"
+    src_dir.mkdir(parents=True, exist_ok=True)
+    (src_dir / "dummy.py").write_text("def ok():\n    return 1\n", encoding="utf-8")
+
+    result = _proof_check(tmp_path, strict_pm_audit=True)
+
+    assert result["pm_audit_checks"]["few_shot_no_numeric_ids"]["ok"] is True
+
+
 def test_check_gate_g7_uses_injected_proof_output_dir(tmp_path) -> None:
     out = tmp_path / "custom_out"
     out.mkdir(parents=True, exist_ok=True)

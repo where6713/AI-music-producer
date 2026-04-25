@@ -545,6 +545,34 @@ def test_produce_verbose_prints_profile_source(tmp_path, monkeypatch, capsys) ->
     assert "run_status=QUALITY_FLOOR_FAILED" in out
 
 
+def test_produce_dry_run_prints_generation_error_stage(tmp_path, monkeypatch, capsys) -> None:
+    from src import main as main_mod
+
+    def _raise_generate(*_args, **_kwargs):
+        raise ValueError("boom")
+
+    monkeypatch.setattr(main_mod, "generate_lyric_payload", _raise_generate)
+
+    with pytest.raises(Exception) as err:
+        main_mod.produce(
+            raw_intent="测试",
+            genre="",
+            mood="",
+            vocal="any",
+            profile="urban_introspective",
+            lang="zh-CN",
+            out_dir=str(tmp_path / "out"),
+            verbose=False,
+            dry_run=True,
+        )
+
+    assert getattr(err.value, "exit_code", None) == 2
+    out = capsys.readouterr().out
+    assert "run_status=REJECTED generation error" in out
+    assert "error_stage=initial_generation" in out
+    assert "error_type=ValueError" in out
+
+
 def test_apply_retrieval_profile_decision_uses_router_active_profile_when_present() -> None:
     trace = {
         "active_profile": "uplift_pop",

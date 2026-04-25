@@ -144,7 +144,9 @@ def retrieve_few_shot_examples(
 ) -> list[dict[str, Any]] | dict[str, Any]:
     corpus = _load_corpus(repo_root)
     if not corpus:
-        raise RuntimeError("few-shot corpus missing under corpus/")
+        raise InsufficientQualityFewShotError(
+            "insufficient quality few-shot samples after pre-injection validation"
+        )
 
     intent_tokens = set(_tokenize(user_input.raw_intent))
     hint_tokens = set(_tokenize(" ".join([user_input.genre_hint, user_input.mood_hint]).strip()))
