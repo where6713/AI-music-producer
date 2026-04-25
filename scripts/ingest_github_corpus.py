@@ -279,6 +279,7 @@ def main() -> int:
         json.dumps(
             {
                 "status": "ok",
+                "profile": "uplift_pop",
                 "repo": f"{args.owner}/{args.repo}",
                 "commit_sha": commit_sha,
                 "accepted": len(rows),
