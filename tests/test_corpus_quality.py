@@ -199,3 +199,48 @@ def test_ingestion_cli_strict_exits_non_zero_when_clean_empty(tmp_path) -> None:
     )
 
     assert proc.returncode == 1
+
+
+def test_run_ingestion_report_includes_github_uplift_proof_when_present(tmp_path) -> None:
+    corpus_dir = tmp_path / "corpus"
+    clean_dir = corpus_dir / "_clean"
+    corpus_dir.mkdir(parents=True, exist_ok=True)
+    clean_dir.mkdir(parents=True, exist_ok=True)
+
+    payload = [
+        {
+            "source_id": "github:dengxiuqi/Chinese-Lyric-Corpus:artist/song.txt",
+            "type": "modern_lyric",
+            "title": "向光走",
+            "emotion_tags": ["uplift", "get-up"],
+            "profile_tag": "uplift_pop",
+            "valence": "positive",
+            "learn_point": "保持动词推进并给出明亮场景",
+            "content": "把窗推开，朝着亮处走。",
+        }
+    ]
+    (corpus_dir / "lyrics_modern_zh.json").write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    (corpus_dir / "poetry_classical.json").write_text("[]", encoding="utf-8")
+
+    proof_payload = {
+        "repo": "https://github.com/dengxiuqi/Chinese-Lyric-Corpus",
+        "commit_sha": "abc123def456",
+        "fetched_at": "2026-04-25T00:00:00+00:00",
+        "accepted_count": 1,
+        "rejected_count": 0,
+        "sample_source_ids": ["github:dengxiuqi/Chinese-Lyric-Corpus:artist/song.txt"],
+    }
+    (clean_dir / "_github_uplift_pop_proof.json").write_text(
+        json.dumps(proof_payload, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+    run_ingestion(repo_root=tmp_path, strict=False)
+    report = (corpus_dir / "_ingestion_report.md").read_text(encoding="utf-8")
+
+    assert "## github_uplift_pop_proof" in report
+    assert "repo: https://github.com/dengxiuqi/Chinese-Lyric-Corpus" in report
+    assert "commit_sha: abc123def456" in report

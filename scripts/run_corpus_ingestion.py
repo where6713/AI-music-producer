@@ -54,6 +54,25 @@ def _render_report(summary: dict[str, Any]) -> str:
             lines.append(f"- {reason}: {count}")
     else:
         lines.append("- none: 0")
+    proof = summary.get("github_uplift_pop_proof")
+    if isinstance(proof, dict):
+        lines.append("")
+        lines.append("## github_uplift_pop_proof")
+        repo = str(proof.get("repo", "")).strip()
+        commit_sha = str(proof.get("commit_sha", "")).strip()
+        fetched_at = str(proof.get("fetched_at", "")).strip()
+        accepted = int(proof.get("accepted_count", 0) or 0)
+        rejected = int(proof.get("rejected_count", 0) or 0)
+        lines.append(f"- repo: {repo}")
+        lines.append(f"- commit_sha: {commit_sha}")
+        lines.append(f"- fetched_at: {fetched_at}")
+        lines.append(f"- accepted_count: {accepted}")
+        lines.append(f"- rejected_count: {rejected}")
+        sample_ids = proof.get("sample_source_ids", [])
+        if isinstance(sample_ids, list) and sample_ids:
+            lines.append("- sample_source_ids:")
+            for source_id in sample_ids[:20]:
+                lines.append(f"  - {source_id}")
     lines.append("")
     return "\n".join(lines)
 
@@ -106,6 +125,16 @@ def run_ingestion(*, repo_root: Path, strict: bool) -> dict[str, Any]:
         _write_json(rejected_root / filename, lint_rejected_rows + deduped_rejected)
 
     pass_rate = (accepted / total) if total else 0.0
+    proof_path = clean_root / "_github_uplift_pop_proof.json"
+    github_uplift_pop_proof: dict[str, Any] | None = None
+    if proof_path.exists():
+        try:
+            proof_payload = json.loads(proof_path.read_text(encoding="utf-8"))
+            if isinstance(proof_payload, dict):
+                github_uplift_pop_proof = proof_payload
+        except json.JSONDecodeError:
+            github_uplift_pop_proof = None
+
     summary = {
         "total": total,
         "accepted": accepted,
@@ -113,6 +142,7 @@ def run_ingestion(*, repo_root: Path, strict: bool) -> dict[str, Any]:
         "pass_rate": pass_rate,
         "profile_pass_counts": dict(profile_pass_counts),
         "reject_reason_top10": reject_reason_counter.most_common(10),
+        "github_uplift_pop_proof": github_uplift_pop_proof,
     }
 
     report_text = _render_report(summary)
