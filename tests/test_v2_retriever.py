@@ -227,6 +227,54 @@ def test_corpus_balance_check_reports_warnings_when_under_minimum(tmp_path) -> N
     assert "urban_introspective" in report["counts"]
 
 
+def test_corpus_balance_keeps_classical_rows_with_rule_c7_only(tmp_path) -> None:
+    corpus = tmp_path / "corpus"
+    corpus.mkdir(parents=True, exist_ok=True)
+    poetry_rows = [
+        {
+            "source_id": "github:chinese-poetry/chinese-poetry:json/poet.tang.1.json#1",
+            "type": "classical_poem",
+            "title": "春晓",
+            "author": "孟浩然",
+            "emotion_tags": ["nostalgia", "restraint", "imagery"],
+            "profile_tag": "classical_restraint",
+            "valence": "neutral",
+            "learn_point": "学习意象并置与留白表达，避免直白抒情",
+            "do_not_copy": "禁止复写来源文本原句与意象排列顺序",
+            "content": "春眠不觉晓，处处闻啼鸟。",
+        }
+    ]
+    lyric_rows = [
+        {
+            "source_id": "lyric-modern-101",
+            "type": "modern_lyric",
+            "title": "凌晨未发送",
+            "emotion_tags": ["breakup", "late-night"],
+            "profile_tag": "urban_introspective",
+            "valence": "negative",
+            "learn_point": "保留克制语气并用动作推进情绪",
+            "do_not_copy": "不要复写原句与段落顺序",
+            "content": "对话框停在最后一句，指尖仍然悬着。",
+        },
+        {
+            "source_id": "lyric-modern-102",
+            "type": "modern_lyric",
+            "title": "不再拨通",
+            "emotion_tags": ["distance", "regret"],
+            "profile_tag": "urban_introspective",
+            "valence": "negative",
+            "learn_point": "保留克制语气并用动作推进情绪",
+            "do_not_copy": "不要复写原句与段落顺序",
+            "content": "手在拨出前停住，呼吸也跟着发颤。",
+        },
+    ]
+    _write_clean_corpus(corpus, poetry_rows, lyric_rows)
+
+    report = corpus_balance_check(tmp_path)
+
+    assert report["counts"]["classical_restraint"] == 1
+
+
 def test_retriever_exposes_corpus_balance_and_monoculture_flags(tmp_path) -> None:
     corpus = tmp_path / "corpus"
     corpus.mkdir(parents=True, exist_ok=True)

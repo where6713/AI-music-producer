@@ -88,7 +88,9 @@ def _load_corpus(repo_root: Path) -> list[dict[str, Any]]:
                 if not isinstance(item, dict):
                     continue
                 report = lint_corpus_row(item, mode="runtime")
-                if report.passed:
+                row_type = str(item.get("type", "")).strip().lower()
+                failed_rules = set(report.failed_rules)
+                if report.passed or (row_type == "classical_poem" and failed_rules == {"RULE_C7"}):
                     rows.append(item)
     return rows
 
