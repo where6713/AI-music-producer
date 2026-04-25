@@ -26,3 +26,13 @@ def test_task011_skill_fragments_exist() -> None:
     }
     existing = {p.name for p in fragment_dir.glob("*.md")}
     assert required.issubset(existing)
+
+
+def test_urban_fragment_contains_positive_style_anchors() -> None:
+    fragment = Path(".claude/skills/lyric-craftsman/fragments/urban_introspective.md")
+    text = fragment.read_text(encoding="utf-8")
+
+    assert "Bedroom R&B" in text
+    assert "口语" in text
+    assert "长短句" in text
+    assert "节奏" in text
