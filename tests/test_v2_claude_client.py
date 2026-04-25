@@ -224,6 +224,8 @@ def test_generate_payload_uses_openai_compatible_path(tmp_path, monkeypatch) -> 
         assert "Generate lyric_payload JSON only" in prompt["task"]
         assert "以下示例展示的是 craft 方法" in prompt["few_shot_system_instruction"]
         assert "structure_hard_constraints" not in prompt
+        requirements = prompt.get("requirements", {})
+        assert "min_lines_per_section" not in requirements
         assert all(str(x.get("do_not_copy", "")).strip() for x in prompt["few_shot_examples"])
         assert temperature == 0.8
         return _payload_json(), {"input_tokens": 123, "output_tokens": 456, "total_tokens": 579}

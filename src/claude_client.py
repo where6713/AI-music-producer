@@ -581,7 +581,6 @@ def generate_lyric_payload(
         "input": user_input.model_dump(),
         "requirements": {
             "min_sections": 3,
-            "min_lines_per_section": 4,
             "variants": ["a", "b", "c"],
             "distinct_pov": ["first_person", "second_person", "third_person"],
             "required_fields": [
