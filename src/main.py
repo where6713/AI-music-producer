@@ -100,7 +100,8 @@ def _score_variants(payload: LyricPayload, *, trace: dict[str, Any] | None = Non
         payload.chosen_variant_id = chosen_variant_id
         for variant in payload.variants:
             if variant.variant_id == chosen_variant_id:
-                payload.lyrics_by_section = variant.lyrics_by_section
+                if variant.lyrics_by_section:
+                    payload.lyrics_by_section = variant.lyrics_by_section
                 break
 
     ranking_view = [(variant_id, passed_rules, rank) for rank, (variant_id, _, _, passed_rules, _) in enumerate(scored, start=1)]

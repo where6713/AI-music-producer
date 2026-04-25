@@ -644,6 +644,14 @@ def generate_lyric_payload(
         )
 
     payload_dict = _extract_json_block(raw_text)
+    # Unwrap if model enveloped the payload under a single key (e.g. {"lyric_payload": {...}})
+    _LYRIC_KEYS = {"lyrics_by_section", "variants", "distillation", "structure"}
+    if not any(k in payload_dict for k in _LYRIC_KEYS):
+        for _v in payload_dict.values():
+            if isinstance(_v, dict) and any(k in _v for k in _LYRIC_KEYS):
+                payload_dict = _v
+                break
+
     payload = LyricPayload.model_validate(
         _normalize_payload_dict(
             payload_dict,
