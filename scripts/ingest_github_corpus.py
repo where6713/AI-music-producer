@@ -29,6 +29,14 @@ _URBAN_INTROSPECTIVE_HINTS = {
     "夜", "深夜", "凌晨", "地铁", "街口", "手机", "消息", "删", "草稿", "回忆", "沉默", "没有", "不敢", "停", "口袋",
 }
 
+_CLUB_DANCE_HINTS = {
+    "跳", "舞", "摇", "燃", "夜", "节奏", "鼓点", "拍", "hands", "dance", "beat", "club",
+}
+
+_AMBIENT_MEDITATION_HINTS = {
+    "风", "月", "云", "水", "呼吸", "静", "慢", "空", "夜", "light", "calm", "breathe", "still",
+}
+
 _CLASSICAL_HINTS = {
     "月", "风", "山", "江", "云", "雨", "夜", "思", "归", "秋", "春", "寒", "梦", "霜", "柳",
 }
@@ -89,6 +97,20 @@ def _looks_urban_introspective(lines: list[str], title: str) -> bool:
     return any(token in joined for token in _URBAN_INTROSPECTIVE_HINTS)
 
 
+def _looks_club_dance(lines: list[str], title: str) -> bool:
+    if len(lines) < 4:
+        return False
+    joined = f"{title} {' '.join(lines)}".lower()
+    return any(token in joined for token in _CLUB_DANCE_HINTS)
+
+
+def _looks_ambient_meditation(lines: list[str], title: str) -> bool:
+    if len(lines) < 4:
+        return False
+    joined = f"{title} {' '.join(lines)}".lower()
+    return any(token in joined for token in _AMBIENT_MEDITATION_HINTS)
+
+
 def _looks_classical(lines: list[str], title: str) -> bool:
     if len(lines) < 2:
         return False
@@ -136,6 +158,50 @@ def _row_from_text_urban_introspective(*, owner: str, repo: str, rel_path: Path,
         "content": content,
         "valence": "negative",
         "learn_point": "学习克制表达中的动作推进与夜景叙事锚点",
+        "do_not_copy": "禁止复写来源文本原句与段落顺序",
+    }
+
+
+def _row_from_text_club_dance(*, owner: str, repo: str, rel_path: Path, text: str) -> dict[str, Any] | None:
+    lines = _normalize_lines(text)
+    title = rel_path.stem.strip() or rel_path.name
+    if not _looks_club_dance(lines, title):
+        return None
+
+    content = "\n".join(lines)
+    source_id = f"github:{owner}/{repo}:{str(rel_path).replace('\\', '/')}"
+    return {
+        "source_id": source_id,
+        "type": "modern_lyric",
+        "title": title,
+        "emotion_tags": ["dance", "release", "high-energy"],
+        "profile_tag": "club_dance",
+        "profile_confidence": 0.85,
+        "content": content,
+        "valence": "positive",
+        "learn_point": "学习短句动词驱动与节奏重复，强化身体感与拍点",
+        "do_not_copy": "禁止复写来源文本原句与段落顺序",
+    }
+
+
+def _row_from_text_ambient_meditation(*, owner: str, repo: str, rel_path: Path, text: str) -> dict[str, Any] | None:
+    lines = _normalize_lines(text)
+    title = rel_path.stem.strip() or rel_path.name
+    if not _looks_ambient_meditation(lines, title):
+        return None
+
+    content = "\n".join(lines)
+    source_id = f"github:{owner}/{repo}:{str(rel_path).replace('\\', '/')}"
+    return {
+        "source_id": source_id,
+        "type": "modern_lyric",
+        "title": title,
+        "emotion_tags": ["calm", "healing", "meditation"],
+        "profile_tag": "ambient_meditation",
+        "profile_confidence": 0.85,
+        "content": content,
+        "valence": "neutral",
+        "learn_point": "学习静态循环与自然意象并置，控制叙事推进",
         "do_not_copy": "禁止复写来源文本原句与段落顺序",
     }
 
@@ -305,6 +371,40 @@ def build_classical_restraint_rows_from_raw(
     return rows
 
 
+def build_club_dance_rows_from_raw(
+    raw_repo: Path,
+    *,
+    owner: str,
+    repo: str,
+    target_count: int,
+) -> list[dict[str, Any]]:
+    rows, _, _ = _build_rows_with_stats(
+        raw_repo,
+        owner=owner,
+        repo=repo,
+        target_count=target_count,
+        row_factory=_row_from_text_club_dance,
+    )
+    return rows
+
+
+def build_ambient_meditation_rows_from_raw(
+    raw_repo: Path,
+    *,
+    owner: str,
+    repo: str,
+    target_count: int,
+) -> list[dict[str, Any]]:
+    rows, _, _ = _build_rows_with_stats(
+        raw_repo,
+        owner=owner,
+        repo=repo,
+        target_count=target_count,
+        row_factory=_row_from_text_ambient_meditation,
+    )
+    return rows
+
+
 def _build_rows_with_stats(
     raw_repo: Path,
     *,
@@ -468,7 +568,13 @@ def main() -> int:
     parser.add_argument("--target-count", type=int, default=220)
     parser.add_argument(
         "--profile",
-        choices=["uplift_pop", "urban_introspective", "classical_restraint"],
+        choices=[
+            "uplift_pop",
+            "urban_introspective",
+            "classical_restraint",
+            "club_dance",
+            "ambient_meditation",
+        ],
         default="uplift_pop",
     )
     parser.add_argument("--repo-root", default=".")
@@ -480,7 +586,10 @@ def main() -> int:
 
     repo_root = Path(args.repo_root).resolve()
     raw_root = (repo_root / args.raw_root).resolve()
-    output_default = f"corpus/_clean/lyrics_modern_zh_{args.profile}.github.json"
+    if args.profile == "classical_restraint":
+        output_default = f"corpus/_clean/poetry_classical_{args.profile}.github.json"
+    else:
+        output_default = f"corpus/_clean/lyrics_modern_zh_{args.profile}.github.json"
     proof_default = f"corpus/_clean/_github_{args.profile}_proof.json"
     output_path = (repo_root / (args.output or output_default)).resolve()
     proof_path = (repo_root / (args.proof or proof_default)).resolve()
@@ -494,16 +603,31 @@ def main() -> int:
             repo=args.repo,
             target_count=args.target_count,
         )
-    else:
-        rows, rejected_count, total_candidates = _build_classical_rows_with_stats(
+    elif args.profile == "urban_introspective":
+        rows, rejected_count, total_candidates = _build_urban_introspective_rows_with_stats(
             raw_repo,
             owner=args.owner,
             repo=args.repo,
             target_count=args.target_count,
         )
-
-    if args.profile == "urban_introspective":
-        rows, rejected_count, total_candidates = _build_urban_introspective_rows_with_stats(
+    elif args.profile == "club_dance":
+        rows, rejected_count, total_candidates = _build_rows_with_stats(
+            raw_repo,
+            owner=args.owner,
+            repo=args.repo,
+            target_count=args.target_count,
+            row_factory=_row_from_text_club_dance,
+        )
+    elif args.profile == "ambient_meditation":
+        rows, rejected_count, total_candidates = _build_rows_with_stats(
+            raw_repo,
+            owner=args.owner,
+            repo=args.repo,
+            target_count=args.target_count,
+            row_factory=_row_from_text_ambient_meditation,
+        )
+    else:
+        rows, rejected_count, total_candidates = _build_classical_rows_with_stats(
             raw_repo,
             owner=args.owner,
             repo=args.repo,
@@ -516,6 +640,10 @@ def main() -> int:
             _replace_uplift_rows(repo_root / "corpus/lyrics_modern_zh.json", rows)
         elif args.profile == "urban_introspective":
             _replace_urban_rows(repo_root / "corpus/lyrics_modern_zh.json", rows)
+        elif args.profile == "club_dance":
+            _replace_club_rows(repo_root / "corpus/lyrics_modern_zh.json", rows)
+        elif args.profile == "ambient_meditation":
+            _replace_ambient_rows(repo_root / "corpus/lyrics_modern_zh.json", rows)
         else:
             _replace_classical_rows(repo_root / "corpus/poetry_classical.json", rows)
 
@@ -557,6 +685,30 @@ def _replace_urban_rows(main_corpus_path: Path, urban_rows: list[dict[str, Any]]
 
     kept = [row for row in existing if str(row.get("profile_tag", "")).strip() != "urban_introspective"]
     merged = kept + urban_rows
+    _write_rows(main_corpus_path, merged)
+
+
+def _replace_club_rows(main_corpus_path: Path, club_rows: list[dict[str, Any]]) -> None:
+    if main_corpus_path.exists():
+        data = json.loads(main_corpus_path.read_text(encoding="utf-8"))
+        existing = [row for row in data if isinstance(row, dict)]
+    else:
+        existing = []
+
+    kept = [row for row in existing if str(row.get("profile_tag", "")).strip() != "club_dance"]
+    merged = kept + club_rows
+    _write_rows(main_corpus_path, merged)
+
+
+def _replace_ambient_rows(main_corpus_path: Path, ambient_rows: list[dict[str, Any]]) -> None:
+    if main_corpus_path.exists():
+        data = json.loads(main_corpus_path.read_text(encoding="utf-8"))
+        existing = [row for row in data if isinstance(row, dict)]
+    else:
+        existing = []
+
+    kept = [row for row in existing if str(row.get("profile_tag", "")).strip() != "ambient_meditation"]
+    merged = kept + ambient_rows
     _write_rows(main_corpus_path, merged)
 
 

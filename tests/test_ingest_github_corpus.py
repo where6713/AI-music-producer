@@ -5,7 +5,9 @@ import zipfile
 from pathlib import Path
 
 from scripts.ingest_github_corpus import (
+    build_ambient_meditation_rows_from_raw,
     build_classical_restraint_rows_from_raw,
+    build_club_dance_rows_from_raw,
     build_urban_introspective_rows_from_raw,
     build_uplift_pop_rows_from_raw,
     write_proof_file,
@@ -180,3 +182,51 @@ def test_build_classical_restraint_rows_from_raw_generates_github_ids(tmp_path: 
     assert len(rows) == 2
     assert all(str(row["source_id"]).startswith("github:chinese-poetry/chinese-poetry:") for row in rows)
     assert all(row["profile_tag"] == "classical_restraint" for row in rows)
+
+
+def test_build_club_dance_rows_from_raw_generates_github_ids(tmp_path: Path) -> None:
+    raw_repo = tmp_path / "raw_repo"
+    (raw_repo / "artist_dance").mkdir(parents=True, exist_ok=True)
+    (raw_repo / "artist_dance" / "track_1.txt").write_text(
+        "把灯打开\n跟着节奏跳\n今夜不想停\n我们一起摇\n",
+        encoding="utf-8",
+    )
+    (raw_repo / "artist_dance" / "track_2.txt").write_text(
+        "鼓点往前推\n脚步贴着拍\n双手举起来\n让心继续燃\n",
+        encoding="utf-8",
+    )
+
+    rows = build_club_dance_rows_from_raw(
+        raw_repo,
+        owner="gaussic",
+        repo="Chinese-Lyric-Corpus",
+        target_count=2,
+    )
+
+    assert len(rows) == 2
+    assert all(str(row["source_id"]).startswith("github:gaussic/Chinese-Lyric-Corpus:") for row in rows)
+    assert all(row["profile_tag"] == "club_dance" for row in rows)
+
+
+def test_build_ambient_meditation_rows_from_raw_generates_github_ids(tmp_path: Path) -> None:
+    raw_repo = tmp_path / "raw_repo"
+    (raw_repo / "artist_ambient").mkdir(parents=True, exist_ok=True)
+    (raw_repo / "artist_ambient" / "calm_1.txt").write_text(
+        "风慢慢过\n呼吸也放轻\n把目光放远\n让心沉下来\n",
+        encoding="utf-8",
+    )
+    (raw_repo / "artist_ambient" / "calm_2.txt").write_text(
+        "月光落在肩\n水声贴着夜\n闭上眼听风\n让念头停住\n",
+        encoding="utf-8",
+    )
+
+    rows = build_ambient_meditation_rows_from_raw(
+        raw_repo,
+        owner="gaussic",
+        repo="Chinese-Lyric-Corpus",
+        target_count=2,
+    )
+
+    assert len(rows) == 2
+    assert all(str(row["source_id"]).startswith("github:gaussic/Chinese-Lyric-Corpus:") for row in rows)
+    assert all(row["profile_tag"] == "ambient_meditation" for row in rows)
