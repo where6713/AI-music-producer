@@ -244,3 +244,67 @@ def test_run_ingestion_report_includes_github_uplift_proof_when_present(tmp_path
     assert "## github_uplift_pop_proof" in report
     assert "repo: https://github.com/dengxiuqi/Chinese-Lyric-Corpus" in report
     assert "commit_sha: abc123def456" in report
+
+
+def test_run_ingestion_report_includes_multiple_github_profile_proofs(tmp_path) -> None:
+    corpus_dir = tmp_path / "corpus"
+    clean_dir = corpus_dir / "_clean"
+    corpus_dir.mkdir(parents=True, exist_ok=True)
+    clean_dir.mkdir(parents=True, exist_ok=True)
+
+    payload = [
+        {
+            "source_id": "github:gaussic/Chinese-Lyric-Corpus:path/a.txt",
+            "type": "modern_lyric",
+            "title": "夜里",
+            "emotion_tags": ["breakup"],
+            "profile_tag": "urban_introspective",
+            "valence": "negative",
+            "learn_point": "保持克制",
+            "content": "夜里走到街口，把话删掉。",
+        }
+    ]
+    (corpus_dir / "lyrics_modern_zh.json").write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    (corpus_dir / "poetry_classical.json").write_text("[]", encoding="utf-8")
+
+    (clean_dir / "_github_uplift_pop_proof.json").write_text(
+        json.dumps(
+            {
+                "repo": "https://github.com/gaussic/Chinese-Lyric-Corpus",
+                "commit_sha": "sha-up",
+                "fetched_at": "2026-04-25T00:00:00+00:00",
+                "accepted_count": 10,
+                "rejected_count": 3,
+                "sample_source_ids": ["github:gaussic/Chinese-Lyric-Corpus:path/up.txt"],
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    (clean_dir / "_github_urban_introspective_proof.json").write_text(
+        json.dumps(
+            {
+                "repo": "https://github.com/gaussic/Chinese-Lyric-Corpus",
+                "commit_sha": "sha-ui",
+                "fetched_at": "2026-04-25T00:00:00+00:00",
+                "accepted_count": 20,
+                "rejected_count": 5,
+                "sample_source_ids": ["github:gaussic/Chinese-Lyric-Corpus:path/ui.txt"],
+            },
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+    run_ingestion(repo_root=tmp_path, strict=False)
+    report = (corpus_dir / "_ingestion_report.md").read_text(encoding="utf-8")
+
+    assert "## github_uplift_pop_proof" in report
+    assert "## github_urban_introspective_proof" in report
+    assert "commit_sha: sha-up" in report
+    assert "commit_sha: sha-ui" in report

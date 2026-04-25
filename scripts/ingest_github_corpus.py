@@ -25,6 +25,10 @@ _UPLIFT_HINTS = {
     "亮", "光", "晴", "笑", "飞", "梦", "勇", "走", "唱", "跳", "风", "天", "星", "sun", "light", "rise",
 }
 
+_URBAN_INTROSPECTIVE_HINTS = {
+    "夜", "深夜", "凌晨", "地铁", "街口", "手机", "消息", "删", "草稿", "回忆", "沉默", "没有", "不敢", "停", "口袋",
+}
+
 
 def _run(command: list[str], *, cwd: Path | None = None) -> str:
     completed = subprocess.run(
@@ -74,6 +78,13 @@ def _looks_uplift(lines: list[str], title: str) -> bool:
     return any(token in joined for token in _UPLIFT_HINTS)
 
 
+def _looks_urban_introspective(lines: list[str], title: str) -> bool:
+    if len(lines) < 4:
+        return False
+    joined = f"{title} {' '.join(lines)}".lower()
+    return any(token in joined for token in _URBAN_INTROSPECTIVE_HINTS)
+
+
 def _row_from_text(*, owner: str, repo: str, rel_path: Path, text: str) -> dict[str, Any] | None:
     lines = _normalize_lines(text)
     title = rel_path.stem.strip() or rel_path.name
@@ -92,6 +103,28 @@ def _row_from_text(*, owner: str, repo: str, rel_path: Path, text: str) -> dict[
         "content": content,
         "valence": "positive",
         "learn_point": "学习明亮情绪的动词推进与正向抬升节奏",
+        "do_not_copy": "禁止复写来源文本原句与段落顺序",
+    }
+
+
+def _row_from_text_urban_introspective(*, owner: str, repo: str, rel_path: Path, text: str) -> dict[str, Any] | None:
+    lines = _normalize_lines(text)
+    title = rel_path.stem.strip() or rel_path.name
+    if not _looks_urban_introspective(lines, title):
+        return None
+
+    content = "\n".join(lines)
+    source_id = f"github:{owner}/{repo}:{str(rel_path).replace('\\', '/')}"
+    return {
+        "source_id": source_id,
+        "type": "modern_lyric",
+        "title": title,
+        "emotion_tags": ["breakup", "late-night", "self-control"],
+        "profile_tag": "urban_introspective",
+        "profile_confidence": 0.85,
+        "content": content,
+        "valence": "negative",
+        "learn_point": "学习克制表达中的动作推进与夜景叙事锚点",
         "do_not_copy": "禁止复写来源文本原句与段落顺序",
     }
 
@@ -166,19 +199,37 @@ def build_uplift_pop_rows_from_raw(
     return rows
 
 
-def _build_uplift_pop_rows_with_stats(
+def build_urban_introspective_rows_from_raw(
     raw_repo: Path,
     *,
     owner: str,
     repo: str,
     target_count: int,
+) -> list[dict[str, Any]]:
+    rows, _, _ = _build_rows_with_stats(
+        raw_repo,
+        owner=owner,
+        repo=repo,
+        target_count=target_count,
+        row_factory=_row_from_text_urban_introspective,
+    )
+    return rows
+
+
+def _build_rows_with_stats(
+    raw_repo: Path,
+    *,
+    owner: str,
+    repo: str,
+    target_count: int,
+    row_factory: Any,
 ) -> tuple[list[dict[str, Any]], int, int]:
     rows: list[dict[str, Any]] = []
     seen: set[str] = set()
     rejected_count = 0
     total_candidates = 0
     for rel_path, text in _extract_text_candidates(raw_repo):
-        row = _row_from_text(owner=owner, repo=repo, rel_path=rel_path, text=text)
+        row = row_factory(owner=owner, repo=repo, rel_path=rel_path, text=text)
         if row is None:
             continue
         total_candidates += 1
@@ -195,6 +246,38 @@ def _build_uplift_pop_rows_with_stats(
         if len(rows) >= target_count:
             break
     return rows, rejected_count, total_candidates
+
+
+def _build_uplift_pop_rows_with_stats(
+    raw_repo: Path,
+    *,
+    owner: str,
+    repo: str,
+    target_count: int,
+) -> tuple[list[dict[str, Any]], int, int]:
+    return _build_rows_with_stats(
+        raw_repo,
+        owner=owner,
+        repo=repo,
+        target_count=target_count,
+        row_factory=_row_from_text,
+    )
+
+
+def _build_urban_introspective_rows_with_stats(
+    raw_repo: Path,
+    *,
+    owner: str,
+    repo: str,
+    target_count: int,
+) -> tuple[list[dict[str, Any]], int, int]:
+    return _build_rows_with_stats(
+        raw_repo,
+        owner=owner,
+        repo=repo,
+        target_count=target_count,
+        row_factory=_row_from_text_urban_introspective,
+    )
 
 
 def write_proof_file(
@@ -241,30 +324,44 @@ def main() -> int:
     parser.add_argument("--owner", default="dengxiuqi")
     parser.add_argument("--repo", default="Chinese-Lyric-Corpus")
     parser.add_argument("--target-count", type=int, default=220)
+    parser.add_argument("--profile", choices=["uplift_pop", "urban_introspective"], default="uplift_pop")
     parser.add_argument("--repo-root", default=".")
     parser.add_argument("--raw-root", default="corpus/_raw/github")
-    parser.add_argument("--output", default="corpus/_clean/lyrics_modern_zh_uplift_pop.github.json")
-    parser.add_argument("--proof", default="corpus/_clean/_github_uplift_pop_proof.json")
+    parser.add_argument("--output", default="")
+    parser.add_argument("--proof", default="")
     parser.add_argument("--merge-into-main", action="store_true")
     args = parser.parse_args()
 
     repo_root = Path(args.repo_root).resolve()
     raw_root = (repo_root / args.raw_root).resolve()
-    output_path = (repo_root / args.output).resolve()
-    proof_path = (repo_root / args.proof).resolve()
+    output_default = f"corpus/_clean/lyrics_modern_zh_{args.profile}.github.json"
+    proof_default = f"corpus/_clean/_github_{args.profile}_proof.json"
+    output_path = (repo_root / (args.output or output_default)).resolve()
+    proof_path = (repo_root / (args.proof or proof_default)).resolve()
 
     raw_repo = clone_or_refresh_repo(owner=args.owner, repo=args.repo, raw_root=raw_root)
     commit_sha = get_commit_sha(raw_repo)
-    rows, rejected_count, total_candidates = _build_uplift_pop_rows_with_stats(
-        raw_repo,
-        owner=args.owner,
-        repo=args.repo,
-        target_count=args.target_count,
-    )
+    if args.profile == "uplift_pop":
+        rows, rejected_count, total_candidates = _build_uplift_pop_rows_with_stats(
+            raw_repo,
+            owner=args.owner,
+            repo=args.repo,
+            target_count=args.target_count,
+        )
+    else:
+        rows, rejected_count, total_candidates = _build_urban_introspective_rows_with_stats(
+            raw_repo,
+            owner=args.owner,
+            repo=args.repo,
+            target_count=args.target_count,
+        )
 
     _write_rows(output_path, rows)
     if args.merge_into_main:
-        _replace_uplift_rows(repo_root / "corpus/lyrics_modern_zh.json", rows)
+        if args.profile == "uplift_pop":
+            _replace_uplift_rows(repo_root / "corpus/lyrics_modern_zh.json", rows)
+        else:
+            _replace_urban_rows(repo_root / "corpus/lyrics_modern_zh.json", rows)
 
     write_proof_file(
         proof_path=proof_path,
@@ -280,6 +377,7 @@ def main() -> int:
             {
                 "status": "ok",
                 "profile": "uplift_pop",
+                "profile": args.profile,
                 "repo": f"{args.owner}/{args.repo}",
                 "commit_sha": commit_sha,
                 "accepted": len(rows),
@@ -293,6 +391,18 @@ def main() -> int:
         )
     )
     return 0
+
+
+def _replace_urban_rows(main_corpus_path: Path, urban_rows: list[dict[str, Any]]) -> None:
+    if main_corpus_path.exists():
+        data = json.loads(main_corpus_path.read_text(encoding="utf-8"))
+        existing = [row for row in data if isinstance(row, dict)]
+    else:
+        existing = []
+
+    kept = [row for row in existing if str(row.get("profile_tag", "")).strip() != "urban_introspective"]
+    merged = kept + urban_rows
+    _write_rows(main_corpus_path, merged)
 
 
 if __name__ == "__main__":

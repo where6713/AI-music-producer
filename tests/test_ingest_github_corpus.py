@@ -5,6 +5,7 @@ import zipfile
 from pathlib import Path
 
 from scripts.ingest_github_corpus import (
+    build_urban_introspective_rows_from_raw,
     build_uplift_pop_rows_from_raw,
     write_proof_file,
 )
@@ -116,3 +117,28 @@ def test_build_uplift_pop_rows_are_runtime_lint_clean(tmp_path: Path) -> None:
     assert len(rows) == 1
     assert rows[0]["source_id"].endswith("song_ok.txt")
     assert lint_corpus_row(rows[0]).passed is True
+
+
+def test_build_urban_introspective_rows_from_raw_generates_github_ids(tmp_path: Path) -> None:
+    raw_repo = tmp_path / "raw_repo"
+    (raw_repo / "artist_a").mkdir(parents=True, exist_ok=True)
+
+    (raw_repo / "artist_a" / "song_urban_1.txt").write_text(
+        "夜里走到街口\n把话删掉\n手机亮着又熄灭\n我还是没有按下发送\n",
+        encoding="utf-8",
+    )
+    (raw_repo / "artist_a" / "song_urban_2.txt").write_text(
+        "凌晨的地铁还在响\n把名字停在草稿\n呼吸慢下来\n我把手放回口袋\n",
+        encoding="utf-8",
+    )
+
+    rows = build_urban_introspective_rows_from_raw(
+        raw_repo,
+        owner="gaussic",
+        repo="Chinese-Lyric-Corpus",
+        target_count=2,
+    )
+
+    assert len(rows) == 2
+    assert all(str(row["source_id"]).startswith("github:gaussic/Chinese-Lyric-Corpus:") for row in rows)
+    assert all(row["profile_tag"] == "urban_introspective" for row in rows)
