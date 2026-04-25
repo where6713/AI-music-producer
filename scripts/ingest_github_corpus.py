@@ -131,6 +131,21 @@ def _profile_signal_score(profile: str, text: str) -> int:
     return 0
 
 
+def _profile_signal_evidence(profile: str, text: str) -> tuple[int, list[str]]:
+    if profile == "uplift_pop":
+        hints = _UPLIFT_HINTS
+    elif profile == "urban_introspective":
+        hints = _URBAN_INTROSPECTIVE_HINTS
+    elif profile == "club_dance":
+        hints = _CLUB_DANCE_HINTS
+    elif profile == "ambient_meditation":
+        hints = _AMBIENT_MEDITATION_HINTS
+    else:
+        hints = set()
+    matched = sorted([token for token in hints if token in text])
+    return len(matched), matched
+
+
 def _looks_classical(lines: list[str], title: str) -> bool:
     if len(lines) < 2:
         return False
@@ -453,6 +468,8 @@ def build_modern_disjoint_rows_from_raw(
         "candidate_rows": 0,
         "filtered_out": 0,
         "duplicate_source_id": 0,
+        "ambiguous_profile": 0,
+        "low_signal": 0,
     }
 
     def _all_targets_met() -> bool:
@@ -466,6 +483,10 @@ def build_modern_disjoint_rows_from_raw(
             break
 
         joined = f"{rel_path.stem} {_SPACE_RE.sub(' ', text)}".lower()
+        profile_evidence: dict[str, tuple[int, list[str]]] = {
+            profile: _profile_signal_evidence(profile, joined)
+            for profile in profile_order
+        }
         candidates: list[tuple[str, dict[str, Any], int]] = []
         for profile in profile_order:
             if len(rows_by_profile[profile]) >= int(targets.get(profile, 0)):
@@ -474,7 +495,7 @@ def build_modern_disjoint_rows_from_raw(
             row = factory(owner=owner, repo=repo, rel_path=rel_path, text=text)
             if row is None:
                 continue
-            score = _profile_signal_score(profile, joined)
+            score = profile_evidence[profile][0]
             candidates.append((profile, row, score))
 
         if not candidates:
@@ -489,8 +510,24 @@ def build_modern_disjoint_rows_from_raw(
             ),
             reverse=True,
         )
-        profile, chosen, _score = candidates[0]
+        profile, chosen, top_score = candidates[0]
+        scored = sorted(
+            [(name, score) for name, _row, score in candidates],
+            key=lambda x: x[1],
+            reverse=True,
+        )
+        second_score = scored[1][1] if len(scored) > 1 else 0
 
+        if top_score < 2:
+            stats["low_signal"] += 1
+            stats["filtered_out"] += 1
+            continue
+        if second_score > 0 and (top_score - second_score) <= 1:
+            stats["ambiguous_profile"] += 1
+            stats["filtered_out"] += 1
+            continue
+
+        chosen = dict(chosen)
         source_id = str(chosen.get("source_id", ""))
         if source_id in seen_source_ids:
             stats["duplicate_source_id"] += 1
@@ -500,6 +537,15 @@ def build_modern_disjoint_rows_from_raw(
         if not lint_report.passed:
             stats["filtered_out"] += 1
             continue
+
+        matched = profile_evidence.get(profile, (0, []))[1]
+        chosen["classification"] = {
+            "method": "hint_scoring_disjoint_v2",
+            "selected_profile": profile,
+            "top_score": int(top_score),
+            "second_score": int(second_score),
+            "matched_hints": matched,
+        }
 
         seen_source_ids.add(source_id)
         rows_by_profile[profile].append(chosen)

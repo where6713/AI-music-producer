@@ -290,3 +290,69 @@ def test_build_modern_disjoint_rows_from_raw_respects_targets(tmp_path: Path) ->
     assert len(rows_by_profile["urban_introspective"]) == 2
     assert len(rows_by_profile["club_dance"]) == 1
     assert len(rows_by_profile["ambient_meditation"]) == 1
+
+
+def test_modern_disjoint_rows_write_classification_evidence(tmp_path: Path) -> None:
+    raw_repo = tmp_path / "raw_repo"
+    src = raw_repo / "src"
+    src.mkdir(parents=True, exist_ok=True)
+    (src / "ui_strong.txt").write_text(
+        "\n".join([
+            "\u51cc\u6668\u5730\u94c1\u8fd8\u5728\u54cd",
+            "\u6d88\u606f\u5220\u6389\u53ea\u5269\u8349\u7a3f",
+            "\u624b\u673a\u5728\u53e3\u888b\u91cc\u53d1\u70eb",
+            "\u6211\u8fd8\u662f\u4e0d\u6562\u53d1\u9001",
+        ])
+        + "\n",
+        encoding="utf-8",
+    )
+
+    rows_by_profile, _stats = build_modern_disjoint_rows_from_raw(
+        raw_repo,
+        owner="gaussic",
+        repo="Chinese-Lyric-Corpus",
+        targets={
+            "uplift_pop": 0,
+            "urban_introspective": 1,
+            "club_dance": 0,
+            "ambient_meditation": 0,
+        },
+    )
+
+    row = rows_by_profile["urban_introspective"][0]
+    evidence = row.get("classification", {})
+    assert evidence.get("method") == "hint_scoring_disjoint_v2"
+    assert evidence.get("selected_profile") == "urban_introspective"
+    assert int(evidence.get("top_score", 0)) >= 2
+    assert isinstance(evidence.get("matched_hints", []), list)
+
+
+def test_modern_disjoint_rows_drop_ambiguous_cross_profile_candidate(tmp_path: Path) -> None:
+    raw_repo = tmp_path / "raw_repo"
+    src = raw_repo / "src"
+    src.mkdir(parents=True, exist_ok=True)
+    (src / "ambiguous.txt").write_text(
+        "\n".join([
+            "夜里风在街口",
+            "跟着节奏跳",
+            "消息还在手机里",
+            "鼓点把呼吸推着走",
+        ])
+        + "\n",
+        encoding="utf-8",
+    )
+
+    rows_by_profile, stats = build_modern_disjoint_rows_from_raw(
+        raw_repo,
+        owner="gaussic",
+        repo="Chinese-Lyric-Corpus",
+        targets={
+            "uplift_pop": 1,
+            "urban_introspective": 1,
+            "club_dance": 1,
+            "ambient_meditation": 1,
+        },
+    )
+
+    assert sum(len(v) for v in rows_by_profile.values()) == 0
+    assert int(stats.get("ambiguous_profile", 0)) >= 1
