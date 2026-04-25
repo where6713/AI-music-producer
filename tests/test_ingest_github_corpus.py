@@ -5,6 +5,7 @@ import zipfile
 from pathlib import Path
 
 from scripts.ingest_github_corpus import (
+    build_classical_restraint_rows_from_raw,
     build_urban_introspective_rows_from_raw,
     build_uplift_pop_rows_from_raw,
     write_proof_file,
@@ -142,3 +143,40 @@ def test_build_urban_introspective_rows_from_raw_generates_github_ids(tmp_path: 
     assert len(rows) == 2
     assert all(str(row["source_id"]).startswith("github:gaussic/Chinese-Lyric-Corpus:") for row in rows)
     assert all(row["profile_tag"] == "urban_introspective" for row in rows)
+
+
+def test_build_classical_restraint_rows_from_raw_generates_github_ids(tmp_path: Path) -> None:
+    raw_repo = tmp_path / "raw_repo"
+    poems_dir = raw_repo / "json"
+    poems_dir.mkdir(parents=True, exist_ok=True)
+
+    (poems_dir / "poems.json").write_text(
+        json.dumps(
+            [
+                {
+                    "title": "春晓",
+                    "author": "孟浩然",
+                    "paragraphs": ["春眠不觉晓", "处处闻啼鸟"],
+                },
+                {
+                    "title": "静夜思",
+                    "author": "李白",
+                    "paragraphs": ["床前明月光", "疑是地上霜", "举头望明月", "低头思故乡"],
+                },
+            ],
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+    rows = build_classical_restraint_rows_from_raw(
+        raw_repo,
+        owner="chinese-poetry",
+        repo="chinese-poetry",
+        target_count=2,
+    )
+
+    assert len(rows) == 2
+    assert all(str(row["source_id"]).startswith("github:chinese-poetry/chinese-poetry:") for row in rows)
+    assert all(row["profile_tag"] == "classical_restraint" for row in rows)

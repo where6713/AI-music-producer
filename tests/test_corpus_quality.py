@@ -308,3 +308,32 @@ def test_run_ingestion_report_includes_multiple_github_profile_proofs(tmp_path) 
     assert "## github_urban_introspective_proof" in report
     assert "commit_sha: sha-up" in report
     assert "commit_sha: sha-ui" in report
+
+
+def test_run_ingestion_allows_classical_rule_c7_only_rows(tmp_path) -> None:
+    corpus_dir = tmp_path / "corpus"
+    corpus_dir.mkdir(parents=True, exist_ok=True)
+
+    poetry_payload = [
+        {
+            "source_id": "github:chinese-poetry/chinese-poetry:json/poet.tang.1.json#1",
+            "type": "classical_poem",
+            "title": "春晓",
+            "author": "孟浩然",
+            "emotion_tags": ["nostalgia", "restraint", "imagery"],
+            "profile_tag": "classical_restraint",
+            "valence": "neutral",
+            "learn_point": "学习意象并置与留白表达，避免直白抒情",
+            "content": "春眠不觉晓\n处处闻啼鸟",
+        }
+    ]
+    (corpus_dir / "poetry_classical.json").write_text(
+        json.dumps(poetry_payload, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    (corpus_dir / "lyrics_modern_zh.json").write_text("[]", encoding="utf-8")
+
+    summary = run_ingestion(repo_root=tmp_path, strict=True)
+
+    assert summary["accepted"] == 1
+    assert summary["rejected"] == 0

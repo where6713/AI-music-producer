@@ -1,19 +1,47 @@
 # Corpus Ingestion Report
 
-- total: 1140
-- accepted: 1140
+- total: 1180
+- accepted: 1180
 - rejected: 0
 - pass_rate: 100.00%
 
 ## profile_pass_counts
 - ambient_meditation: 80
-- classical_restraint: 200
+- classical_restraint: 240
 - club_dance: 100
 - uplift_pop: 500
 - urban_introspective: 260
 
 ## reject_reason_top10
 - none: 0
+
+## github_classical_restraint_proof
+- repo: https://github.com/chinese-poetry/chinese-poetry
+- commit_sha: 909646524737b70544ee7ae17cb76868a0bc8a55
+- fetched_at: 2026-04-25T04:11:52.107829+00:00
+- accepted_count: 240
+- rejected_count: 0
+- sample_source_ids:
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#0
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#1
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#2
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#4
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#5
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#6
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#7
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#8
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#9
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#10
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#11
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#12
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#13
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#15
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#16
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#18
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#19
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#20
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#22
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#23
 
 ## github_uplift_pop_proof
 - repo: https://github.com/gaussic/Chinese-Lyric-Corpus

@@ -29,6 +29,10 @@ _URBAN_INTROSPECTIVE_HINTS = {
     "夜", "深夜", "凌晨", "地铁", "街口", "手机", "消息", "删", "草稿", "回忆", "沉默", "没有", "不敢", "停", "口袋",
 }
 
+_CLASSICAL_HINTS = {
+    "月", "风", "山", "江", "云", "雨", "夜", "思", "归", "秋", "春", "寒", "梦", "霜", "柳",
+}
+
 
 def _run(command: list[str], *, cwd: Path | None = None) -> str:
     completed = subprocess.run(
@@ -85,6 +89,13 @@ def _looks_urban_introspective(lines: list[str], title: str) -> bool:
     return any(token in joined for token in _URBAN_INTROSPECTIVE_HINTS)
 
 
+def _looks_classical(lines: list[str], title: str) -> bool:
+    if len(lines) < 2:
+        return False
+    joined = f"{title} {' '.join(lines)}"
+    return any(token in joined for token in _CLASSICAL_HINTS)
+
+
 def _row_from_text(*, owner: str, repo: str, rel_path: Path, text: str) -> dict[str, Any] | None:
     lines = _normalize_lines(text)
     title = rel_path.stem.strip() or rel_path.name
@@ -126,6 +137,36 @@ def _row_from_text_urban_introspective(*, owner: str, repo: str, rel_path: Path,
         "valence": "negative",
         "learn_point": "学习克制表达中的动作推进与夜景叙事锚点",
         "do_not_copy": "禁止复写来源文本原句与段落顺序",
+    }
+
+
+def _row_from_poem(
+    *,
+    owner: str,
+    repo: str,
+    rel_path: Path,
+    title: str,
+    author: str,
+    paragraphs: list[str],
+    index: int,
+) -> dict[str, Any] | None:
+    lines = [_SPACE_RE.sub(" ", str(x)).strip() for x in paragraphs if str(x).strip()]
+    if not _looks_classical(lines, title):
+        return None
+    content = "\n".join(lines)
+    source_id = f"github:{owner}/{repo}:{str(rel_path).replace('\\', '/')}#{index}"
+    return {
+        "source_id": source_id,
+        "type": "classical_poem",
+        "title": title,
+        "author": author,
+        "emotion_tags": ["nostalgia", "restraint", "imagery"],
+        "profile_tag": "classical_restraint",
+        "profile_confidence": 0.9,
+        "content": content,
+        "valence": "neutral",
+        "learn_point": "学习意象并置与留白表达，避免直白抒情",
+        "do_not_copy": "禁止复写来源文本原句与意象排列顺序",
     }
 
 
@@ -183,6 +224,38 @@ def _extract_text_candidates(raw_repo: Path) -> list[tuple[Path, str]]:
     return candidates
 
 
+def _extract_poem_candidates(raw_repo: Path) -> list[tuple[Path, str, str, list[str], int]]:
+    candidates: list[tuple[Path, str, str, list[str], int]] = []
+    for path in raw_repo.rglob("*.json"):
+        if not path.is_file():
+            continue
+        if ".git" in path.parts:
+            continue
+        text = path.read_text(encoding="utf-8", errors="ignore")
+        if not text.strip():
+            continue
+        try:
+            payload = json.loads(text)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(payload, list):
+            continue
+        rel = path.relative_to(raw_repo)
+        for idx, item in enumerate(payload):
+            if not isinstance(item, dict):
+                continue
+            title = str(item.get("title") or "").strip()
+            author = str(item.get("author") or item.get("name") or "unknown").strip()
+            paragraphs = item.get("paragraphs")
+            if not title or not isinstance(paragraphs, list):
+                continue
+            lines = [str(x).strip() for x in paragraphs if str(x).strip()]
+            if not lines:
+                continue
+            candidates.append((rel, title, author, lines, idx))
+    return candidates
+
+
 def build_uplift_pop_rows_from_raw(
     raw_repo: Path,
     *,
@@ -212,6 +285,22 @@ def build_urban_introspective_rows_from_raw(
         repo=repo,
         target_count=target_count,
         row_factory=_row_from_text_urban_introspective,
+    )
+    return rows
+
+
+def build_classical_restraint_rows_from_raw(
+    raw_repo: Path,
+    *,
+    owner: str,
+    repo: str,
+    target_count: int,
+) -> list[dict[str, Any]]:
+    rows, _, _ = _build_classical_rows_with_stats(
+        raw_repo,
+        owner=owner,
+        repo=repo,
+        target_count=target_count,
     )
     return rows
 
@@ -280,6 +369,47 @@ def _build_urban_introspective_rows_with_stats(
     )
 
 
+def _build_classical_rows_with_stats(
+    raw_repo: Path,
+    *,
+    owner: str,
+    repo: str,
+    target_count: int,
+) -> tuple[list[dict[str, Any]], int, int]:
+    rows: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    rejected_count = 0
+    total_candidates = 0
+    for rel_path, title, author, paragraphs, idx in _extract_poem_candidates(raw_repo):
+        row = _row_from_poem(
+            owner=owner,
+            repo=repo,
+            rel_path=rel_path,
+            title=title,
+            author=author,
+            paragraphs=paragraphs,
+            index=idx,
+        )
+        if row is None:
+            continue
+        total_candidates += 1
+        lint_report = lint_corpus_row(row, mode="runtime")
+        failed_rules = set(lint_report.failed_rules)
+        # Classical rows can be verb-sparse by style; keep other hard checks.
+        if failed_rules and failed_rules != {"RULE_C7"}:
+            rejected_count += 1
+            continue
+        digest = hashlib.sha1(row["content"].encode("utf-8")).hexdigest()
+        if digest in seen:
+            rejected_count += 1
+            continue
+        seen.add(digest)
+        rows.append(row)
+        if len(rows) >= target_count:
+            break
+    return rows, rejected_count, total_candidates
+
+
 def write_proof_file(
     *,
     proof_path: Path,
@@ -319,12 +449,28 @@ def _replace_uplift_rows(main_corpus_path: Path, uplift_rows: list[dict[str, Any
     _write_rows(main_corpus_path, merged)
 
 
+def _replace_classical_rows(main_corpus_path: Path, classical_rows: list[dict[str, Any]]) -> None:
+    if main_corpus_path.exists():
+        data = json.loads(main_corpus_path.read_text(encoding="utf-8"))
+        existing = [row for row in data if isinstance(row, dict)]
+    else:
+        existing = []
+
+    kept = [row for row in existing if str(row.get("profile_tag", "")).strip() != "classical_restraint"]
+    merged = kept + classical_rows
+    _write_rows(main_corpus_path, merged)
+
+
 def main() -> int:
-    parser = argparse.ArgumentParser(description="ingest real GitHub corpus for uplift_pop(get up)")
+    parser = argparse.ArgumentParser(description="ingest real GitHub corpus by profile")
     parser.add_argument("--owner", default="dengxiuqi")
     parser.add_argument("--repo", default="Chinese-Lyric-Corpus")
     parser.add_argument("--target-count", type=int, default=220)
-    parser.add_argument("--profile", choices=["uplift_pop", "urban_introspective"], default="uplift_pop")
+    parser.add_argument(
+        "--profile",
+        choices=["uplift_pop", "urban_introspective", "classical_restraint"],
+        default="uplift_pop",
+    )
     parser.add_argument("--repo-root", default=".")
     parser.add_argument("--raw-root", default="corpus/_raw/github")
     parser.add_argument("--output", default="")
@@ -349,6 +495,14 @@ def main() -> int:
             target_count=args.target_count,
         )
     else:
+        rows, rejected_count, total_candidates = _build_classical_rows_with_stats(
+            raw_repo,
+            owner=args.owner,
+            repo=args.repo,
+            target_count=args.target_count,
+        )
+
+    if args.profile == "urban_introspective":
         rows, rejected_count, total_candidates = _build_urban_introspective_rows_with_stats(
             raw_repo,
             owner=args.owner,
@@ -360,8 +514,10 @@ def main() -> int:
     if args.merge_into_main:
         if args.profile == "uplift_pop":
             _replace_uplift_rows(repo_root / "corpus/lyrics_modern_zh.json", rows)
-        else:
+        elif args.profile == "urban_introspective":
             _replace_urban_rows(repo_root / "corpus/lyrics_modern_zh.json", rows)
+        else:
+            _replace_classical_rows(repo_root / "corpus/poetry_classical.json", rows)
 
     write_proof_file(
         proof_path=proof_path,
@@ -376,7 +532,6 @@ def main() -> int:
         json.dumps(
             {
                 "status": "ok",
-                "profile": "uplift_pop",
                 "profile": args.profile,
                 "repo": f"{args.owner}/{args.repo}",
                 "commit_sha": commit_sha,
