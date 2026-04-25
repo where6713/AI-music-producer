@@ -111,6 +111,26 @@ def _looks_ambient_meditation(lines: list[str], title: str) -> bool:
     return any(token in joined for token in _AMBIENT_MEDITATION_HINTS)
 
 
+def _hint_score(text: str, hints: set[str]) -> int:
+    score = 0
+    for token in hints:
+        if token in text:
+            score += 1
+    return score
+
+
+def _profile_signal_score(profile: str, text: str) -> int:
+    if profile == "uplift_pop":
+        return _hint_score(text, _UPLIFT_HINTS)
+    if profile == "urban_introspective":
+        return _hint_score(text, _URBAN_INTROSPECTIVE_HINTS)
+    if profile == "club_dance":
+        return _hint_score(text, _CLUB_DANCE_HINTS)
+    if profile == "ambient_meditation":
+        return _hint_score(text, _AMBIENT_MEDITATION_HINTS)
+    return 0
+
+
 def _looks_classical(lines: list[str], title: str) -> bool:
     if len(lines) < 2:
         return False
@@ -405,6 +425,88 @@ def build_ambient_meditation_rows_from_raw(
     return rows
 
 
+def build_modern_disjoint_rows_from_raw(
+    raw_repo: Path,
+    *,
+    owner: str,
+    repo: str,
+    targets: dict[str, int],
+) -> tuple[dict[str, list[dict[str, Any]]], dict[str, int]]:
+    profile_order = [
+        "urban_introspective",
+        "club_dance",
+        "ambient_meditation",
+        "uplift_pop",
+    ]
+    row_factory_map = {
+        "uplift_pop": _row_from_text,
+        "urban_introspective": _row_from_text_urban_introspective,
+        "club_dance": _row_from_text_club_dance,
+        "ambient_meditation": _row_from_text_ambient_meditation,
+    }
+
+    rows_by_profile: dict[str, list[dict[str, Any]]] = {
+        profile: [] for profile in profile_order
+    }
+    seen_source_ids: set[str] = set()
+    stats = {
+        "candidate_rows": 0,
+        "filtered_out": 0,
+        "duplicate_source_id": 0,
+    }
+
+    def _all_targets_met() -> bool:
+        for profile in profile_order:
+            if len(rows_by_profile[profile]) < int(targets.get(profile, 0)):
+                return False
+        return True
+
+    for rel_path, text in _extract_text_candidates(raw_repo):
+        if _all_targets_met():
+            break
+
+        joined = f"{rel_path.stem} {_SPACE_RE.sub(' ', text)}".lower()
+        candidates: list[tuple[str, dict[str, Any], int]] = []
+        for profile in profile_order:
+            if len(rows_by_profile[profile]) >= int(targets.get(profile, 0)):
+                continue
+            factory = row_factory_map[profile]
+            row = factory(owner=owner, repo=repo, rel_path=rel_path, text=text)
+            if row is None:
+                continue
+            score = _profile_signal_score(profile, joined)
+            candidates.append((profile, row, score))
+
+        if not candidates:
+            continue
+
+        stats["candidate_rows"] += 1
+        candidates.sort(
+            key=lambda x: (
+                x[2],
+                -len(rows_by_profile[x[0]]) / max(int(targets.get(x[0], 1)), 1),
+                -profile_order.index(x[0]),
+            ),
+            reverse=True,
+        )
+        profile, chosen, _score = candidates[0]
+
+        source_id = str(chosen.get("source_id", ""))
+        if source_id in seen_source_ids:
+            stats["duplicate_source_id"] += 1
+            continue
+
+        lint_report = lint_corpus_row(chosen, mode="runtime")
+        if not lint_report.passed:
+            stats["filtered_out"] += 1
+            continue
+
+        seen_source_ids.add(source_id)
+        rows_by_profile[profile].append(chosen)
+
+    return rows_by_profile, stats
+
+
 def _build_rows_with_stats(
     raw_repo: Path,
     *,
@@ -574,6 +676,7 @@ def main() -> int:
             "classical_restraint",
             "club_dance",
             "ambient_meditation",
+            "all_modern",
         ],
         default="uplift_pop",
     )
@@ -582,10 +685,77 @@ def main() -> int:
     parser.add_argument("--output", default="")
     parser.add_argument("--proof", default="")
     parser.add_argument("--merge-into-main", action="store_true")
+    parser.add_argument("--uplift-target", type=int, default=500)
+    parser.add_argument("--urban-target", type=int, default=260)
+    parser.add_argument("--club-target", type=int, default=200)
+    parser.add_argument("--ambient-target", type=int, default=180)
     args = parser.parse_args()
 
     repo_root = Path(args.repo_root).resolve()
     raw_root = (repo_root / args.raw_root).resolve()
+    raw_repo = clone_or_refresh_repo(owner=args.owner, repo=args.repo, raw_root=raw_root)
+    commit_sha = get_commit_sha(raw_repo)
+    if args.profile == "all_modern":
+        targets = {
+            "uplift_pop": int(args.uplift_target),
+            "urban_introspective": int(args.urban_target),
+            "club_dance": int(args.club_target),
+            "ambient_meditation": int(args.ambient_target),
+        }
+        rows_by_profile, stats = build_modern_disjoint_rows_from_raw(
+            raw_repo,
+            owner=args.owner,
+            repo=args.repo,
+            targets=targets,
+        )
+        total_candidates = int(stats.get("candidate_rows", 0))
+        rejected_count = int(stats.get("filtered_out", 0)) + int(stats.get("duplicate_source_id", 0))
+
+        _write_modern_outputs_and_proofs(
+            repo_root=repo_root,
+            owner=args.owner,
+            repo=args.repo,
+            commit_sha=commit_sha,
+            rows_by_profile=rows_by_profile,
+            rejected_count=rejected_count,
+        )
+        if args.merge_into_main:
+            _replace_all_modern_rows(repo_root / "corpus/lyrics_modern_zh.json", rows_by_profile)
+
+        all_rows = []
+        for key in ["uplift_pop", "urban_introspective", "club_dance", "ambient_meditation"]:
+            all_rows.extend(list(rows_by_profile.get(key, [])))
+
+        summary_path = repo_root / "corpus/_clean/_github_all_modern_disjoint_summary.json"
+        summary_payload = {
+            "repo": f"https://github.com/{args.owner}/{args.repo}",
+            "commit_sha": commit_sha,
+            "targets": targets,
+            "accepted_by_profile": {k: len(v) for k, v in rows_by_profile.items()},
+            "candidate_rows": total_candidates,
+            "filtered_out": int(stats.get("filtered_out", 0)),
+            "duplicate_source_id": int(stats.get("duplicate_source_id", 0)),
+        }
+        summary_path.write_text(json.dumps(summary_payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+        print(
+            json.dumps(
+                {
+                    "status": "ok",
+                    "profile": "all_modern",
+                    "repo": f"{args.owner}/{args.repo}",
+                    "commit_sha": commit_sha,
+                    "accepted": len(all_rows),
+                    "candidate_rows": total_candidates,
+                    "filtered_out": rejected_count,
+                    "target": sum(targets.values()),
+                    "summary": str(summary_path),
+                },
+                ensure_ascii=False,
+            )
+        )
+        return 0
+
     if args.profile == "classical_restraint":
         output_default = f"corpus/_clean/poetry_classical_{args.profile}.github.json"
     else:
@@ -594,45 +764,28 @@ def main() -> int:
     output_path = (repo_root / (args.output or output_default)).resolve()
     proof_path = (repo_root / (args.proof or proof_default)).resolve()
 
-    raw_repo = clone_or_refresh_repo(owner=args.owner, repo=args.repo, raw_root=raw_root)
-    commit_sha = get_commit_sha(raw_repo)
-    if args.profile == "uplift_pop":
-        rows, rejected_count, total_candidates = _build_uplift_pop_rows_with_stats(
-            raw_repo,
-            owner=args.owner,
-            repo=args.repo,
-            target_count=args.target_count,
-        )
-    elif args.profile == "urban_introspective":
-        rows, rejected_count, total_candidates = _build_urban_introspective_rows_with_stats(
-            raw_repo,
-            owner=args.owner,
-            repo=args.repo,
-            target_count=args.target_count,
-        )
-    elif args.profile == "club_dance":
-        rows, rejected_count, total_candidates = _build_rows_with_stats(
-            raw_repo,
-            owner=args.owner,
-            repo=args.repo,
-            target_count=args.target_count,
-            row_factory=_row_from_text_club_dance,
-        )
-    elif args.profile == "ambient_meditation":
-        rows, rejected_count, total_candidates = _build_rows_with_stats(
-            raw_repo,
-            owner=args.owner,
-            repo=args.repo,
-            target_count=args.target_count,
-            row_factory=_row_from_text_ambient_meditation,
-        )
-    else:
+    if args.profile == "classical_restraint":
         rows, rejected_count, total_candidates = _build_classical_rows_with_stats(
             raw_repo,
             owner=args.owner,
             repo=args.repo,
             target_count=args.target_count,
         )
+    else:
+        rows_by_profile, stats = build_modern_disjoint_rows_from_raw(
+            raw_repo,
+            owner=args.owner,
+            repo=args.repo,
+            targets={
+                "uplift_pop": args.target_count if args.profile == "uplift_pop" else 0,
+                "urban_introspective": args.target_count if args.profile == "urban_introspective" else 0,
+                "club_dance": args.target_count if args.profile == "club_dance" else 0,
+                "ambient_meditation": args.target_count if args.profile == "ambient_meditation" else 0,
+            },
+        )
+        rows = list(rows_by_profile.get(args.profile, []))
+        total_candidates = int(stats.get("candidate_rows", 0))
+        rejected_count = int(stats.get("filtered_out", 0)) + int(stats.get("duplicate_source_id", 0))
 
     _write_rows(output_path, rows)
     if args.merge_into_main:
@@ -710,6 +863,45 @@ def _replace_ambient_rows(main_corpus_path: Path, ambient_rows: list[dict[str, A
     kept = [row for row in existing if str(row.get("profile_tag", "")).strip() != "ambient_meditation"]
     merged = kept + ambient_rows
     _write_rows(main_corpus_path, merged)
+
+
+def _replace_all_modern_rows(main_corpus_path: Path, rows_by_profile: dict[str, list[dict[str, Any]]]) -> None:
+    if main_corpus_path.exists():
+        data = json.loads(main_corpus_path.read_text(encoding="utf-8"))
+        existing = [row for row in data if isinstance(row, dict)]
+    else:
+        existing = []
+
+    modern_profiles = {"uplift_pop", "urban_introspective", "club_dance", "ambient_meditation"}
+    kept = [row for row in existing if str(row.get("profile_tag", "")).strip() not in modern_profiles]
+    merged = list(kept)
+    for profile in ["uplift_pop", "urban_introspective", "club_dance", "ambient_meditation"]:
+        merged.extend(list(rows_by_profile.get(profile, [])))
+    _write_rows(main_corpus_path, merged)
+
+
+def _write_modern_outputs_and_proofs(
+    *,
+    repo_root: Path,
+    owner: str,
+    repo: str,
+    commit_sha: str,
+    rows_by_profile: dict[str, list[dict[str, Any]]],
+    rejected_count: int,
+) -> None:
+    for profile in ["uplift_pop", "urban_introspective", "club_dance", "ambient_meditation"]:
+        rows = list(rows_by_profile.get(profile, []))
+        output_path = repo_root / f"corpus/_clean/lyrics_modern_zh_{profile}.github.json"
+        proof_path = repo_root / f"corpus/_clean/_github_{profile}_proof.json"
+        _write_rows(output_path, rows)
+        write_proof_file(
+            proof_path=proof_path,
+            owner=owner,
+            repo=repo,
+            commit_sha=commit_sha,
+            rows=rows,
+            rejected_count=rejected_count,
+        )
 
 
 if __name__ == "__main__":

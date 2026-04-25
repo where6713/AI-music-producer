@@ -5,6 +5,7 @@ import zipfile
 from pathlib import Path
 
 from scripts.ingest_github_corpus import (
+    build_modern_disjoint_rows_from_raw,
     build_ambient_meditation_rows_from_raw,
     build_classical_restraint_rows_from_raw,
     build_club_dance_rows_from_raw,
@@ -230,3 +231,62 @@ def test_build_ambient_meditation_rows_from_raw_generates_github_ids(tmp_path: P
     assert len(rows) == 2
     assert all(str(row["source_id"]).startswith("github:gaussic/Chinese-Lyric-Corpus:") for row in rows)
     assert all(row["profile_tag"] == "ambient_meditation" for row in rows)
+
+
+def test_build_modern_disjoint_rows_from_raw_has_no_cross_profile_overlap(tmp_path: Path) -> None:
+    raw_repo = tmp_path / "raw_repo"
+    (raw_repo / "src").mkdir(parents=True, exist_ok=True)
+    (raw_repo / "src" / "up.txt").write_text("把窗推开\n朝着亮处走\n一起唱\n今天发光\n", encoding="utf-8")
+    (raw_repo / "src" / "ui.txt").write_text("凌晨街口\n消息删掉\n把手放回口袋\n没有发送\n", encoding="utf-8")
+    (raw_repo / "src" / "cd.txt").write_text("鼓点往前\n跟着拍子跳\n让夜继续燃\n双手举起来\n", encoding="utf-8")
+    (raw_repo / "src" / "am.txt").write_text("风慢慢过\n呼吸放轻\n让目光沉下来\n夜色很静\n", encoding="utf-8")
+
+    rows_by_profile, _stats = build_modern_disjoint_rows_from_raw(
+        raw_repo,
+        owner="gaussic",
+        repo="Chinese-Lyric-Corpus",
+        targets={
+            "uplift_pop": 1,
+            "urban_introspective": 1,
+            "club_dance": 1,
+            "ambient_meditation": 1,
+        },
+    )
+
+    all_ids: list[str] = []
+    for profile in ["uplift_pop", "urban_introspective", "club_dance", "ambient_meditation"]:
+        assert len(rows_by_profile[profile]) == 1
+        all_ids.extend([str(x["source_id"]) for x in rows_by_profile[profile]])
+
+    assert len(all_ids) == len(set(all_ids))
+
+
+def test_build_modern_disjoint_rows_from_raw_respects_targets(tmp_path: Path) -> None:
+    raw_repo = tmp_path / "raw_repo"
+    src = raw_repo / "src"
+    src.mkdir(parents=True, exist_ok=True)
+    for i in range(6):
+        (src / f"up_{i}.txt").write_text("把窗推开\n朝着亮处走\n一起唱\n今天发光\n", encoding="utf-8")
+    for i in range(4):
+        (src / f"ui_{i}.txt").write_text("凌晨街口\n消息删掉\n把手放回口袋\n没有发送\n", encoding="utf-8")
+    for i in range(3):
+        (src / f"cd_{i}.txt").write_text("鼓点往前\n跟着拍子跳\n让夜继续燃\n双手举起来\n", encoding="utf-8")
+    for i in range(2):
+        (src / f"am_{i}.txt").write_text("风慢慢过\n呼吸放轻\n让目光沉下来\n夜色很静\n", encoding="utf-8")
+
+    rows_by_profile, _stats = build_modern_disjoint_rows_from_raw(
+        raw_repo,
+        owner="gaussic",
+        repo="Chinese-Lyric-Corpus",
+        targets={
+            "uplift_pop": 2,
+            "urban_introspective": 2,
+            "club_dance": 1,
+            "ambient_meditation": 1,
+        },
+    )
+
+    assert len(rows_by_profile["uplift_pop"]) == 2
+    assert len(rows_by_profile["urban_introspective"]) == 2
+    assert len(rows_by_profile["club_dance"]) == 1
+    assert len(rows_by_profile["ambient_meditation"]) == 1
