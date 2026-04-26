@@ -4,6 +4,7 @@ import pytest
 
 from src.main import (
     _apply_retrieval_profile_decision,
+    _guard_targeted_revise_scope,
     _merge_revise_trace_metadata,
     _score_variants,
 )
@@ -119,6 +120,41 @@ def test_score_variants_assigns_rank_and_chosen() -> None:
     assert len(evidence["ranking"]) == 3
     ranks = [v.lint_result.rank for v in out.variants]
     assert sorted(ranks) == [1, 2, 3]
+
+
+def test_guard_targeted_revise_scope_reverts_non_targeted_lines() -> None:
+    original = _payload()
+    revised = original.model_copy(deep=True)
+
+    revised.lyrics_by_section[0].lines[0].primary = "门只掩着，我把手慢慢收回来"
+    revised.lyrics_by_section[1].lines[0].primary = "把号码放下啊"
+
+    lint_report = {
+        "failed_rules": ["R01"],
+        "violations": [
+            {
+                "rule": "R01",
+                "detail": "hook line tail is not open-final with level tone",
+                "section": "[Chorus]",
+                "line": 1,
+            }
+        ],
+    }
+
+    _guard_targeted_revise_scope(original, revised, lint_report)
+
+    assert revised.lyrics_by_section[0].lines[0].primary == original.lyrics_by_section[0].lines[0].primary
+    assert revised.lyrics_by_section[1].lines[0].primary == "把号码放下啊"
+
+
+def test_guard_targeted_revise_scope_is_noop_without_targeted_violations() -> None:
+    original = _payload()
+    revised = original.model_copy(deep=True)
+    revised.lyrics_by_section[0].lines[0].primary = "门只掩着，我把手慢慢收回来"
+
+    _guard_targeted_revise_scope(original, revised, {"failed_rules": ["R14"], "violations": []})
+
+    assert revised.lyrics_by_section[0].lines[0].primary == "门只掩着，我把手慢慢收回来"
 
 
 def test_apply_retrieval_profile_decision_activates_when_vote_confident() -> None:
@@ -505,6 +541,9 @@ def test_produce_raises_ambiguous_profile_error(tmp_path, monkeypatch) -> None:
 
 
 def test_produce_verbose_prints_profile_source(tmp_path, monkeypatch, capsys) -> None:
+    # R01 was downgraded to SOFT_PENALTY. The _payload() fixture has an R01 violation
+    # (hook line tail "吧" is not open-final+level-tone), but with R01 as SOFT_PENALTY
+    # the craft_score stays above 0.85, so dry-run succeeds and prints profile info.
     from src import main as main_mod
 
     payload = _payload()
@@ -526,23 +565,50 @@ def test_produce_verbose_prints_profile_source(tmp_path, monkeypatch, capsys) ->
 
     monkeypatch.setattr(main_mod, "generate_lyric_payload", _fake_generate)
 
+    # dry-run now returns exit 0 because R01 soft-penalty keeps craft_score >= 0.85
+    main_mod.produce(
+        raw_intent="分手后夜里想发消息又忍住",
+        genre="",
+        mood="",
+        vocal="female",
+        profile="urban_introspective",
+        lang="zh-CN",
+        out_dir=str(tmp_path / "out"),
+        verbose=True,
+        dry_run=True,
+    )
+
+    out = capsys.readouterr().out
+    assert "active_profile=urban_introspective" in out
+    assert "profile_source=cli_override" in out
+
+
+def test_produce_dry_run_prints_generation_error_stage(tmp_path, monkeypatch, capsys) -> None:
+    from src import main as main_mod
+
+    def _raise_generate(*_args, **_kwargs):
+        raise ValueError("boom")
+
+    monkeypatch.setattr(main_mod, "generate_lyric_payload", _raise_generate)
+
     with pytest.raises(Exception) as err:
         main_mod.produce(
-            raw_intent="分手后夜里想发消息又忍住",
+            raw_intent="测试",
             genre="",
             mood="",
-            vocal="female",
+            vocal="any",
             profile="urban_introspective",
             lang="zh-CN",
             out_dir=str(tmp_path / "out"),
-            verbose=True,
+            verbose=False,
             dry_run=True,
         )
 
     assert getattr(err.value, "exit_code", None) == 2
-
     out = capsys.readouterr().out
-    assert "run_status=QUALITY_FLOOR_FAILED" in out
+    assert "run_status=REJECTED generation error" in out
+    assert "error_stage=initial_generation" in out
+    assert "error_type=ValueError" in out
 
 
 def test_apply_retrieval_profile_decision_uses_router_active_profile_when_present() -> None:
@@ -873,6 +939,105 @@ def test_produce_revises_when_compile_raises_structural_incomplete(tmp_path, mon
     assert observed["generate_calls"] == 2
     assert observed["write_calls"] == 2
     assert "下游要求 V/C/V/C/Bridge/C 中必须有 Verse 与 Chorus 各 >=1 段，每段 >=5 行" in str(observed["targeted_prompt"])
+    assert observed["targeted_prompt"] == main_mod.STRUCTURAL_REVISE_PROMPT
+
+
+def test_produce_uses_structural_revise_prompt_when_lint_r00(tmp_path, monkeypatch) -> None:
+    from src import main as main_mod
+
+    initial_payload = _payload()
+    initial_payload.lyrics_by_section = []
+    for variant in initial_payload.variants:
+        variant.lyrics_by_section = []
+
+    revised_payload = _payload()
+    for variant in revised_payload.variants:
+        variant.lyrics_by_section = revised_payload.lyrics_by_section
+
+    observed: dict[str, object] = {"targeted_prompt": "", "generate_calls": 0, "write_calls": 0}
+
+    def _fake_generate(_user_input, **kwargs):
+        observed["generate_calls"] = int(observed["generate_calls"]) + 1
+        targeted_prompt = kwargs.get("targeted_revise_prompt")
+        if targeted_prompt:
+            observed["targeted_prompt"] = targeted_prompt
+            return revised_payload.model_copy(deep=True), {
+                "provider": "openai-compatible",
+                "model_used": "gpt-5.3-codex",
+                "usage": {"input_tokens": 1, "output_tokens": 1, "total_tokens": 2},
+                "llm_calls": 1,
+                "few_shot_source_ids": ["lyric-modern-101", "lyric-modern-102", "poem-jys-001"],
+                "retrieval_profile_vote": "urban_introspective",
+                "retrieval_vote_confidence": 0.67,
+                "stage": "revise",
+            }
+        return initial_payload.model_copy(deep=True), {
+            "provider": "openai-compatible",
+            "model_used": "gpt-5.3-codex",
+            "usage": {"input_tokens": 1, "output_tokens": 1, "total_tokens": 2},
+            "llm_calls": 1,
+            "few_shot_source_ids": ["lyric-modern-101", "lyric-modern-102", "poem-jys-001"],
+            "retrieval_profile_vote": "urban_introspective",
+            "retrieval_vote_confidence": 0.67,
+            "stage": "initial",
+        }
+
+    def _fake_lint(payload, **_kwargs):
+        if not payload.lyrics_by_section:
+            return {
+                "pass": False,
+                "failed_rules": ["R00"],
+                "violations": [{"rule": "R00", "detail": "lyrics_by_section is empty", "section": "", "line": 0}],
+                "active_profile": "urban_introspective",
+                "skipped_rules_by_profile": [],
+                "profile_specific_violations": [],
+                "is_dead": False,
+                "death_reason": [],
+                "hard_kill_rules": [],
+                "hard_penalty_count": 0,
+                "soft_penalty_count": 0,
+                "penalty_score": 0,
+                "craft_score": 0.0,
+                "all_dead_run_status": "",
+            }
+        return {
+            "pass": True,
+            "failed_rules": [],
+            "violations": [],
+            "active_profile": "urban_introspective",
+            "skipped_rules_by_profile": [],
+            "profile_specific_violations": [],
+            "is_dead": False,
+            "death_reason": [],
+            "hard_kill_rules": [],
+            "hard_penalty_count": 0,
+            "soft_penalty_count": 0,
+            "penalty_score": 0,
+            "craft_score": 0.9,
+            "all_dead_run_status": "",
+        }
+
+    def _fake_write_outputs(_payload, _out_dir, _trace):
+        observed["write_calls"] = int(observed["write_calls"]) + 1
+
+    monkeypatch.setattr(main_mod, "generate_lyric_payload", _fake_generate)
+    monkeypatch.setattr(main_mod, "lint_payload", _fake_lint)
+    monkeypatch.setattr(main_mod, "write_outputs", _fake_write_outputs)
+
+    main_mod.produce(
+        raw_intent="分手后夜里想发消息又忍住",
+        genre="",
+        mood="",
+        vocal="female",
+        profile="urban_introspective",
+        lang="zh-CN",
+        out_dir=str(tmp_path / "out"),
+        verbose=False,
+        dry_run=False,
+    )
+
+    assert observed["generate_calls"] == 2
+    assert observed["write_calls"] == 1
     assert observed["targeted_prompt"] == main_mod.STRUCTURAL_REVISE_PROMPT
 
 

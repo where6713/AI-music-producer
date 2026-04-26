@@ -218,12 +218,16 @@ def test_generate_payload_uses_openai_compatible_path(tmp_path, monkeypatch) -> 
 
     monkeypatch.setattr(claude_client, "_load_skill_text", lambda _root, active_profile="": "skill")
 
-    def _fake_openai_call(*, config, skill_text, prompt):
+    def _fake_openai_call(*, config, skill_text, prompt, temperature):
         assert config.provider == "openai-compatible"
         assert skill_text == "skill"
         assert "Generate lyric_payload JSON only" in prompt["task"]
         assert "以下示例展示的是 craft 方法" in prompt["few_shot_system_instruction"]
+        assert "structure_hard_constraints" not in prompt
+        requirements = prompt.get("requirements", {})
+        assert "min_lines_per_section" not in requirements
         assert all(str(x.get("do_not_copy", "")).strip() for x in prompt["few_shot_examples"])
+        assert temperature == 0.8
         return _payload_json(), {"input_tokens": 123, "output_tokens": 456, "total_tokens": 579}
 
     monkeypatch.setattr(claude_client, "_call_openai_compatible", _fake_openai_call)
@@ -347,6 +351,70 @@ def test_generate_payload_includes_profile_trace_fields(tmp_path, monkeypatch) -
     assert trace["profile_source"] == "cli_override"
     assert "corpus_balance" in trace
     assert "corpus_monoculture_risk" in trace
+    assert "fallback_level" in trace
+
+
+def test_generate_payload_uses_lower_temperature_for_targeted_revise(tmp_path, monkeypatch) -> None:
+    repo_root = tmp_path
+    _seed_min_corpus(repo_root)
+    (repo_root / ".env").write_text(
+        "\n".join(
+            [
+                "OPENAI_API_KEY=key-openai",
+                "OPENAI_BASE_URL=https://code.ppchat.vip/v1",
+                "OPENAI_MODEL=gpt-5.3-codex",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(claude_client, "_load_skill_text", lambda _root, active_profile="": "skill")
+
+    seen = {"temperature": None}
+
+    def _fake_openai_call(*, config, skill_text, prompt, temperature):
+        seen["temperature"] = temperature
+        return _payload_json(), {"input_tokens": 1, "output_tokens": 1, "total_tokens": 2}
+
+    monkeypatch.setattr(claude_client, "_call_openai_compatible", _fake_openai_call)
+
+    claude_client.generate_lyric_payload(
+        UserInput(raw_intent="失恋三个月想联系但知道不能"),
+        repo_root=repo_root,
+        targeted_revise_prompt="Targeted revise",
+    )
+
+    assert seen["temperature"] == 0.6
+
+
+def test_resolve_provider_config_rejects_kimi_key_for_anthropic() -> None:
+    try:
+        claude_client._resolve_provider_config(
+            {"ANTHROPIC_API_KEY": "sk-kimi-abc", "ANTHROPIC_MODEL": "claude-opus"},
+            default_model="claude-opus-4-1-20250805",
+        )
+        raised = False
+    except RuntimeError as exc:
+        raised = True
+        assert "ANTHROPIC_API_KEY" in str(exc)
+        assert "Kimi" in str(exc)
+    assert raised is True
+
+
+def test_resolve_provider_config_rejects_incomplete_openai_tuple() -> None:
+    try:
+        claude_client._resolve_provider_config(
+            {
+                "OPENAI_API_KEY": "key-openai",
+                "OPENAI_BASE_URL": "https://code.ppchat.vip/v1",
+            },
+            default_model="claude-opus-4-1-20250805",
+        )
+        raised = False
+    except RuntimeError as exc:
+        raised = True
+        assert "OPENAI" in str(exc)
+    assert raised is True
 
 
 def test_normalize_structure_falls_back_when_order_missing() -> None:
@@ -373,6 +441,27 @@ def test_normalize_variants_skips_sections_without_tag_or_lines() -> None:
     assert variants[0]["lyrics_by_section"][0]["tag"] == "[Verse 1]"
 
 
+def test_normalize_variants_accepts_dict_payload_shape() -> None:
+    variants, chosen = claude_client._normalize_variants(
+        {
+            "a": {
+                "lyrics_by_section": {
+                    "Verse 1": ["line one", "line two"],
+                    "Chorus": ["hook one", "hook two"],
+                }
+            },
+            "b": {"lyrics_by_section": []},
+            "c": {"lyrics_by_section": []},
+        },
+        base_sections=[],
+    )
+
+    assert chosen == "a"
+    assert len(variants) == 3
+    assert variants[0]["variant_id"] == "a"
+    assert variants[0]["lyrics_by_section"]
+
+
 def test_extract_base_sections_accepts_name_and_text_fields() -> None:
     rows = claude_client._extract_base_sections(
         {
@@ -392,3 +481,120 @@ def test_extract_base_sections_accepts_name_and_text_fields() -> None:
     tags = [row["tag"] for row in rows]
     assert "[Verse 1]" in tags
     assert "[Chorus]" in tags
+
+
+def test_extract_base_sections_recurses_variant_id_dict_payload() -> None:
+    rows = claude_client._extract_base_sections(
+        {
+            "lyrics_by_section": {
+                "a": {
+                    "Verse 1": ["line one", "line two"],
+                    "Chorus": ["hook one", "hook two"],
+                },
+                "b": {
+                    "Verse 1": ["alt one"],
+                },
+            }
+        }
+    )
+
+    tags = [row["tag"] for row in rows]
+    assert "[Verse 1]" in tags
+    assert "[Chorus]" in tags
+    assert "a" not in tags
+
+
+def test_build_section_rows_skips_nested_section_objects() -> None:
+    rows = claude_client._build_section_rows(
+        {
+            "a": [
+                {
+                    "tag": "[Verse 1]",
+                    "lines": [{"primary": "line one"}],
+                }
+            ]
+        },
+        ["a"],
+    )
+
+    assert rows == []
+
+
+def test_normalize_payload_keeps_base_sections_when_chosen_variant_empty() -> None:
+    user_input = UserInput(raw_intent="测试")
+    normalized = claude_client._normalize_payload_dict(
+        {
+            "structure": {"section_order": ["[Verse 1]", "[Chorus]"], "hook_section": "[Chorus]", "hook_line_index": 1},
+            "lyrics_by_section": {
+                "Verse 1": ["line v1", "line v2"],
+                "Chorus": ["line c1", "line c2"],
+            },
+            "variants": [
+                {
+                    "variant_id": "a",
+                    "lyrics_by_section": [],
+                },
+                {
+                    "variant_id": "b",
+                    "lyrics_by_section": [],
+                },
+                {
+                    "variant_id": "c",
+                    "lyrics_by_section": [],
+                },
+            ],
+            "chosen_variant_id": "a",
+        },
+        user_input=user_input,
+        model_used="gpt-5.3-codex",
+        few_shot_examples=[],
+    )
+
+    assert normalized["lyrics_by_section"]
+    assert normalized["lyrics_by_section"][0]["tag"] == "[Verse 1]"
+
+
+def test_normalize_payload_falls_back_to_non_empty_variant_when_chosen_empty() -> None:
+    user_input = UserInput(raw_intent="测试")
+    normalized = claude_client._normalize_payload_dict(
+        {
+            "variants": [
+                {"variant_id": "a", "lyrics_by_section": []},
+                {
+                    "variant_id": "b",
+                    "lyrics_by_section": [
+                        {
+                            "tag": "[Verse 1]",
+                            "lines": [{"primary": "line b1"}],
+                        }
+                    ],
+                },
+                {"variant_id": "c", "lyrics_by_section": []},
+            ],
+            "chosen_variant_id": "a",
+        },
+        user_input=user_input,
+        model_used="gpt-5.3-codex",
+        few_shot_examples=[],
+    )
+
+    assert normalized["lyrics_by_section"]
+    assert normalized["lyrics_by_section"][0]["tag"] == "[Verse 1]"
+
+
+def test_normalize_variants_accepts_lyrics_alias_field() -> None:
+    variants, chosen = claude_client._normalize_variants(
+        [
+            {
+                "variant_id": "a",
+                "lyrics": {
+                    "Verse 1": ["line one", "line two"],
+                    "Chorus": ["hook one", "hook two"],
+                },
+            }
+        ],
+        base_sections=[],
+    )
+
+    assert chosen == "a"
+    assert variants[0]["lyrics_by_section"]

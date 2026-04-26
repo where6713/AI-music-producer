@@ -121,3 +121,170 @@ def test_read_git_output_decodes_non_utf8_bytes(monkeypatch, tmp_path) -> None:
     monkeypatch.setattr(gate_g1.subprocess, "check_output", _fake_check_output)
     output = gate_g1._read_git_output(tmp_path, ["show", "--name-only"])
     assert "整改task.json" in output
+
+
+def test_check_gate_g1_uses_latest_non_merge_commit_when_head_is_merge(
+    monkeypatch, tmp_path
+) -> None:
+    responses = {
+        ("log", "-1", "--pretty=%s"): "Merge branch 'main' into feature\n",
+        ("show", "--name-only", "--pretty=", "-1"): "apps/cli/main.py\n",
+        ("rev-list", "--no-merges", "-n", "1", "HEAD"): "abc123\n",
+        ("show", "-s", "--format=%s", "abc123"): "feat(g7): add pm-audit table with strict exit codes\n",
+        ("show", "--name-only", "--pretty=", "abc123"): "apps/cli/main.py\nsrc/producer_tools/self_check/gate_g7.py\n",
+    }
+
+    def _fake_read_git_output(_workspace_root, args):
+        key = tuple(args)
+        if key not in responses:
+            raise RuntimeError(f"unexpected args: {args}")
+        return responses[key]
+
+    monkeypatch.setattr(gate_g1, "_read_git_output", _fake_read_git_output)
+
+    result = gate_g1.check_gate_g1(tmp_path)
+
+    assert result["status"] == "pass"
+    assert result["failed_checks"] == []
+
+
+def test_check_gate_g1_prefers_pr_head_parent_on_merge_head(monkeypatch, tmp_path) -> None:
+    responses = {
+        ("log", "-1", "--pretty=%s"): "Merge 123abc into main\n",
+        ("show", "--name-only", "--pretty=", "-1"): "apps/cli/main.py\n",
+        ("show", "-s", "--format=%s", "HEAD^2"): "test(g7): tighten structural revise contract\n",
+        ("show", "--name-only", "--pretty=", "HEAD^2"): "src/main.py\ntests/test_v2_main_variants.py\n",
+    }
+
+    def _fake_read_git_output(_workspace_root, args):
+        key = tuple(args)
+        if key not in responses:
+            raise RuntimeError(f"unexpected args: {args}")
+        return responses[key]
+
+    monkeypatch.setattr(gate_g1, "_read_git_output", _fake_read_git_output)
+
+    result = gate_g1.check_gate_g1(tmp_path)
+
+    assert result["status"] == "pass"
+    assert result["failed_checks"] == []
+
+
+def test_check_gate_g1_uses_explicit_target_commit_when_provided(monkeypatch, tmp_path) -> None:
+    responses = {
+        ("show", "-s", "--format=%s", "prsha123"): "fix(g1): pin scope check to pr head sha\n",
+        ("show", "--name-only", "--pretty=", "prsha123"): "src/producer_tools/self_check/gate_g1.py\ntests/test_v2_g1.py\n",
+    }
+
+    def _fake_read_git_output(_workspace_root, args):
+        key = tuple(args)
+        if key not in responses:
+            raise RuntimeError(f"unexpected args: {args}")
+        return responses[key]
+
+    monkeypatch.setattr(gate_g1, "_read_git_output", _fake_read_git_output)
+
+    result = gate_g1.check_gate_g1(tmp_path, target_commit="prsha123")
+
+    assert result["status"] == "pass"
+    assert result["failed_checks"] == []
+
+
+def test_check_gate_g1_ignores_env_when_target_not_explicit(monkeypatch, tmp_path) -> None:
+    responses = {
+        ("log", "-1", "--pretty=%s"): "feat(g1): add scope validator and cli entry\n",
+        ("show", "--name-only", "--pretty=", "-1"): "src/producer_tools/self_check/gate_g1.py\napps/cli/main.py\n",
+    }
+
+    def _fake_read_git_output(_workspace_root, args):
+        key = tuple(args)
+        if key not in responses:
+            raise RuntimeError(f"unexpected args: {args}")
+        return responses[key]
+
+    monkeypatch.setenv("G1_TARGET_SHA", "envsha789")
+    monkeypatch.setattr(gate_g1, "_read_git_output", _fake_read_git_output)
+
+    result = gate_g1.check_gate_g1(tmp_path)
+
+    assert result["status"] == "pass"
+    assert result["failed_checks"] == []
+
+
+def test_check_gate_g1_falls_back_when_target_commit_unavailable(monkeypatch, tmp_path) -> None:
+    responses = {
+        ("log", "-1", "--pretty=%s"): "fix(g1): stabilize fallback chain\n",
+        ("show", "--name-only", "--pretty=", "-1"): "src/producer_tools/self_check/gate_g1.py\n",
+    }
+
+    def _fake_read_git_output(_workspace_root, args):
+        key = tuple(args)
+        if key == ("show", "-s", "--format=%s", "missing123"):
+            raise RuntimeError("unknown revision")
+        if key == ("show", "--name-only", "--pretty=", "missing123"):
+            raise RuntimeError("unknown revision")
+        if key not in responses:
+            raise RuntimeError(f"unexpected args: {args}")
+        return responses[key]
+
+    monkeypatch.setattr(gate_g1, "_read_git_output", _fake_read_git_output)
+
+    result = gate_g1.check_gate_g1(tmp_path, target_commit="missing123")
+
+    assert result["status"] == "pass"
+    assert result["failed_checks"] == []
+
+
+def test_check_gate_g1_preserves_git_metadata_unavailable_semantics_with_bad_target(
+    monkeypatch, tmp_path
+) -> None:
+    def _raise(*_args, **_kwargs):
+        raise RuntimeError("git error")
+
+    monkeypatch.setattr(gate_g1, "_read_git_output", _raise)
+
+    result = gate_g1.check_gate_g1(tmp_path, target_commit="missing123")
+
+    assert result["status"] == "fail"
+    assert result["failed_checks"] == ["git_metadata_unavailable"]
+
+
+def test_check_gate_g1_fails_when_target_required_but_missing(tmp_path) -> None:
+    result = gate_g1.check_gate_g1(tmp_path, require_target=True)
+
+    assert result["status"] == "fail"
+    assert result["failed_checks"] == ["target_commit_required"]
+
+
+def test_check_gate_g1_fails_when_target_required_but_unavailable(monkeypatch, tmp_path) -> None:
+    def _raise(*_args, **_kwargs):
+        raise RuntimeError("unknown revision")
+
+    monkeypatch.setattr(gate_g1, "_read_git_output", _raise)
+
+    result = gate_g1.check_gate_g1(tmp_path, target_commit="missing123", require_target=True)
+
+    assert result["status"] == "fail"
+    assert result["failed_checks"] == ["target_commit_unavailable"]
+
+
+def test_check_gate_g1_requires_target_and_fails_scope_when_target_invalid(monkeypatch, tmp_path) -> None:
+    responses = {
+        ("show", "-s", "--format=%s", "badsha"): "Merge deadbeef into main\n",
+        ("show", "--name-only", "--pretty=", "badsha"): "apps/.gitkeep\napps/cli/main.py\n",
+    }
+
+    def _fake_read_git_output(_workspace_root, args):
+        key = tuple(args)
+        if key not in responses:
+            raise RuntimeError(f"unexpected args: {args}")
+        return responses[key]
+
+    monkeypatch.setattr(gate_g1, "_read_git_output", _fake_read_git_output)
+
+    result = gate_g1.check_gate_g1(tmp_path, target_commit="badsha", require_target=True)
+
+    assert result["status"] == "fail"
+    assert "commit_message_format" in result["failed_checks"]
+    assert "commit_scope_gate" in result["failed_checks"]
+    assert "mixed_gitkeep_cleanup" in result["failed_checks"]

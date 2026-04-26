@@ -17,9 +17,7 @@
     "复杂度结论": {
       "LLM调用次数": "仍然 1.1 次（上限 2 次）",
       "新增代码": "retriever 约 30 行（纯字典过滤 + random）",
-      "新增依赖": "0 个（json / random 为标准库）",
-      "开发工期": "2 天 -> 2.5 天",
-      "单次成本": "$0.05 -> $0.09（相对旧多调用方案仍显著更低）"
+      "新增依赖": "0 个（json / random 为标准库）"
     }
   },
   "复杂度红线": {
@@ -46,8 +44,7 @@
           "C. 基于情感标签与 valence 检索 corpus",
           "D. 取 2-3 条示例注入 Skill 上下文"
         ],
-        "duration_estimate": "<0.5s",
-        "cost": "$0.00"
+        "notes": "无需新增运行时依赖"
       },
       {
         "step": 2,
@@ -59,7 +56,7 @@
           "模型在单次调用内执行 Phase A -> B -> B.5 -> C -> D -> E",
           "输出 3 个 variants"
         ],
-        "duration_estimate": "25-40s"
+        "notes": "单次 LLM 调用内完成三变体输出"
       },
       {
         "step": 3,
@@ -159,7 +156,6 @@
       "fields": {
         "schema_version": "v2.1",
         "generation_id": "uuid",
-        "model_used": "claude-opus-4-7",
         "skill_used": "lyric-craftsman@v2.1",
         "few_shot_examples_used": [
           {
@@ -273,8 +269,7 @@
       "AC_13": "few_shot_examples_used 非空且 >=2，保证示例可追溯。",
       "AC_14": "3 个 variants 的 narrative_pov 必须各不相同，保证视角独立。",
       "AC_15": "3 个 variants 主题具象名词重合率 <=30%，保证分布差异。",
-      "AC_16": "10 个典型 intent 回归中，retriever 命中 >=2 条示例比例 = 100%（10/10）。",
-      "AC_17": "单次 run API 成本 <=$0.10。"
+      "AC_16": "10 个典型 intent 回归中，retriever 命中 >=2 条示例比例 = 100%（10/10）。"
     },
     "功能性": [
       "AC-01 同一 intent 跑 3 次，平均 LLM 调用次数 <= 1.3",
@@ -287,21 +282,8 @@
       "AC-13 few_shot_examples_used >= 2",
       "AC-14 三个 variants 的 POV 字段各不相同",
       "AC-15 三个 variants 主题名词重合率 <= 30%",
-      "AC-16 retriever 在 10 个典型 intent 上 100% 命中 >=2 条示例（10/10）",
-      "AC-17 单次 run API 成本 <= $0.10"
+      "AC-16 retriever 在 10 个典型 intent 上 100% 命中 >=2 条示例（10/10）"
     ]
-  },
-  "成本对比": {
-    "计价快照日期": "2026-04-20",
-    "计价口径": "按 claude-opus-4-7 官方 Input/Output token 单价估算；不计缓存命中优惠与重试异常开销。",
-    "成本公式": "estimated_cost_usd = input_tokens * input_price_per_1m / 1_000_000 + output_tokens * output_price_per_1m / 1_000_000",
-    "v2_0_单次调用输入token": "约 800",
-    "v2_0_单次调用输出token": "约 1200",
-    "v2_1_单次调用输入token": "约 2000（+1200 few-shot 示例）",
-    "v2_1_单次调用输出token": "约 3200（+2000 三变体）",
-    "v2_1_相对v2_0_成本增幅": "约 1.8-2.2 倍（单次 $0.05 -> $0.09）",
-    "v2_1_相对v1_1_成本降幅": "仍为 6-7 倍（v1.1 基线约 $0.60）",
-    "结论": "单次成本 <$0.10，对 MCN 运营规模可忽略。"
   },
   "github_语料源建议": {
     "古典诗词": [
@@ -314,22 +296,8 @@
     ],
     "标签策略": "仅允许一次性离线脚本批处理补齐 emotion_tags；运行时语料永远只读。"
   },
-  "执行顺序_自检清单": [
-    "Day 1 AM：生成 corpus/poetry_classical.json；自检文件 <=30MB 且 emotion_tags/valence 完整。",
-    "Day 1 PM：生成 corpus/lyrics_modern_zh.json；自检同上。",
-    "Day 2 AM：完成 retriever.py + prompt 注入；自检 0 外部模型依赖，10 个样例命中率达标。",
-    "Day 2 PM：更新 SKILL.md（Phase B.5 + Section 8）与 lint.py（三变体）；自检 SKILL 未无序膨胀。",
-    "Day 3：执行 AC-01 至 AC-17 回归 + 盲评；自检无任何红线触发。"
-  ],
-  "迁移路径": {
-    "Day_1_AM": "下载并离线处理古典诗词语料，生成 poetry_classical.json",
-    "Day_1_PM": "下载并离线处理现代中文歌词语料，生成 lyrics_modern_zh.json",
-    "Day_2_AM": "实现 retriever.py 与 prompt 注入",
-    "Day_2_PM": "更新 SKILL.md（Phase B.5 + Section 8）与 lint.py（3 variants）",
-    "Day_3": "执行 AC-01 至 AC-17 回归测试与盲评"
-  },
   "签字": {
-    "结论": "坚持极简架构，不引入动态 RAG，不牺牲可审计性，保证输出分布质量与工程成本共同最优。",
+    "结论": "坚持极简架构，不引入动态 RAG，不牺牲可审计性，保证输出分布质量与可复现性。",
     "issued_by": "顶级 AI 音乐产品经理",
     "date": "2026-04-20"
   }

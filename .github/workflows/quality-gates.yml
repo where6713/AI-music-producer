@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -26,6 +28,9 @@ jobs:
 
       - name: Run mirrored quality gates
         shell: bash
+        env:
+          G1_TARGET_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          G1_REQUIRE_TARGET_SHA: "true"
         run: |
           chmod +x tools/scripts/run_quality_gates_ci.sh
           tools/scripts/run_quality_gates_ci.sh

@@ -26,7 +26,7 @@ def test_g5_hook_contract_pass() -> None:
     pre_commit = "git diff --cached --name-only --diff-filter=ACMRD"
     pre_push = "oost-hook-ledger\npytest -q\npython -m apps.cli.main pm-audit\nout/lyrics.txt\nout/style.txt\nout/exclude.txt\ngit commit --amend --no-edit"
     commit_msg = "type(scope): summary"
-    ci = "placeholder/mock markers detected\npytest -q\npython -m apps.cli.main pm-audit\nout/lyrics.txt\nout/style.txt\nout/exclude.txt\npyproject.toml"
+    ci = "placeholder/mock markers detected\npytest -q\npython -m apps.cli.main pm-audit --run-id ci-gate-audit\nout/lyrics.txt\nout/style.txt\nout/exclude.txt\npyproject.toml"
 
     result = validate_hook_contract(
         pre_commit_text=pre_commit,

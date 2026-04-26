@@ -230,12 +230,12 @@
   ],
 
   "执行顺序": [
-    "Day 1：PR-012-01（corpus 门禁）→ 必须先做，否则后续测试都被毒源污染",
-    "Day 2 AM：PR-012-02（lint 硬门）",
-    "Day 2 PM：PR-012-03（quality floor）+ PR-012-05（few-shot 防御）",
-    "Day 3 AM：PR-012-04（拆后处理 + 下游脆化）",
-    "Day 3 PM：PR-012-06（profile 可观测）+ PR-012-07（pm-audit）",
-    "Day 4：10 个跨 profile intent 全回归 + Candice 终审"
+    "PR-012-01（corpus 门禁）→ 必须先做，否则后续测试都被毒源污染",
+    "PR-012-02（lint 硬门）",
+    "PR-012-03（quality floor）+ PR-012-05（few-shot 防御）",
+    "PR-012-04（拆后处理 + 下游脆化）",
+    "PR-012-06（profile 可观测）+ PR-012-07（pm-audit）",
+    "10 个跨 profile intent 全回归 + Candice 终审"
   ],
 
   "下次提交_PR_必须随附": [

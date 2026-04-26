@@ -19,6 +19,11 @@ description: Generate Suno-ready lyric triplet from raw intent with single-pass 
 4. Self-check hard rules.
 5. Output structured payload.
 
+## 写作规范
+
+- 全局叙事铁律（一镜到底与因果链）：
+  歌词必须具有流畅的心理推演或时间推移。严禁为了堆砌具象名词或强行押韵而导致意象断层。相邻的两行歌词之间，必须存在天然的动作承接、视觉转移或因果关系。写每一句前，先阅读上一句，确保当前句是对上一句的情绪回应或场景推进。保持同一首歌的画面感统一，拒绝无逻辑的词汇拼贴。
+
 ## Hard Rules
 
 1. Chorus hook line ending must be open-vowel and level-tone when language is zh-CN.
@@ -27,6 +32,10 @@ description: Generate Suno-ready lyric triplet from raw intent with single-pass 
 4. Section tags must stay in approved whitelist.
 5. Keep line lengths stable within section-level tolerance.
 6. Avoid AI cliche phrases listed below.
+7. `lyrics_by_section` must not be empty.
+8. Output must include at least one Verse section and one Chorus section, with at least 5 lines in each required section.
+9. If revise is requested for structure, fix structure in model output; do not rely on parser or code fallback to add lyric content.
+10. The final line of the last section (Outro or equivalent closing section) must be a complete, self-contained statement. It must not end with a dangling connective, preposition, or half-clause (e.g. ending on 的/在/让/和/与/而). Read the last line aloud — if it feels unfinished, rewrite it.
 
 ## Cliche Blacklist
 

@@ -59,6 +59,10 @@ class ProviderConfig:
 def _resolve_provider_config(env_map: dict[str, str], default_model: str) -> ProviderConfig:
     anthropic_key = env_map.get("ANTHROPIC_API_KEY", "").strip()
     if anthropic_key:
+        if anthropic_key.startswith("sk-kimi-"):
+            raise RuntimeError(
+                "Invalid ANTHROPIC_API_KEY: detected Kimi-style key. Use OPENAI/MOONSHOT variables for Kimi-compatible endpoints."
+            )
         return ProviderConfig(
             provider="anthropic",
             api_key=anthropic_key,
@@ -69,6 +73,11 @@ def _resolve_provider_config(env_map: dict[str, str], default_model: str) -> Pro
     openai_key = env_map.get("OPENAI_API_KEY", "").strip()
     openai_base = env_map.get("OPENAI_BASE_URL", "").strip()
     openai_model = env_map.get("OPENAI_MODEL", "").strip()
+    openai_fields = [openai_key, openai_base, openai_model]
+    if any(openai_fields) and not all(openai_fields):
+        raise RuntimeError(
+            "Incomplete OPENAI configuration: OPENAI_API_KEY, OPENAI_BASE_URL, and OPENAI_MODEL are all required."
+        )
     if openai_key and openai_base and openai_model:
         return ProviderConfig(
             provider="openai-compatible",
@@ -80,6 +89,11 @@ def _resolve_provider_config(env_map: dict[str, str], default_model: str) -> Pro
     moonshot_key = env_map.get("MOONSHOT_API_KEY", "").strip()
     moonshot_base = env_map.get("MOONSHOT_BASE_URL", "").strip()
     moonshot_model = env_map.get("MOONSHOT_MODEL", "").strip()
+    moonshot_fields = [moonshot_key, moonshot_base, moonshot_model]
+    if any(moonshot_fields) and not all(moonshot_fields):
+        raise RuntimeError(
+            "Incomplete MOONSHOT configuration: MOONSHOT_API_KEY, MOONSHOT_BASE_URL, and MOONSHOT_MODEL are all required."
+        )
     if moonshot_key and moonshot_base and moonshot_model:
         return ProviderConfig(
             provider="moonshot",
@@ -98,6 +112,7 @@ def _call_openai_compatible(
     config: ProviderConfig,
     skill_text: str,
     prompt: dict[str, Any],
+    temperature: float,
 ) -> tuple[str, dict[str, int]]:
     endpoint = config.base_url.rstrip("/") + "/chat/completions"
     payload = {
@@ -106,7 +121,7 @@ def _call_openai_compatible(
             {"role": "system", "content": skill_text},
             {"role": "user", "content": json.dumps(prompt, ensure_ascii=False)},
         ],
-        "temperature": 0.4,
+        "temperature": temperature,
     }
     req = request.Request(
         endpoint,
@@ -156,16 +171,29 @@ def _build_section_rows(raw_lyrics: dict[str, Any], section_order: list[str]) ->
             val = [x for x in val.splitlines() if x.strip()]
         if not isinstance(val, list):
             continue
-        lines = [
-            {
-                "primary": str(item).strip(),
-                "backing": "",
-                "tail_pinyin": "",
-                "char_count": len(str(item).strip()),
-            }
-            for item in val
-            if str(item).strip()
-        ]
+        lines: list[dict[str, Any]] = []
+        for item in val:
+            if isinstance(item, str):
+                text = item.strip()
+                char_count = len(text)
+            elif isinstance(item, dict):
+                # nested section object, not line object
+                if any(k in item for k in ("tag", "name", "section")):
+                    continue
+                text = str(item.get("primary") or item.get("text") or item.get("line") or "").strip()
+                char_count = int(item.get("char_count", 0) or len(text))
+            else:
+                continue
+            if not text:
+                continue
+            lines.append(
+                {
+                    "primary": text,
+                    "backing": "",
+                    "tail_pinyin": "",
+                    "char_count": char_count,
+                }
+            )
         if not lines:
             continue
         rows.append({"tag": _normalize_tag(tag), "voice_tags_inline": [], "lines": lines})
@@ -340,6 +368,29 @@ def _extract_base_sections(payload_dict: dict[str, Any]) -> list[dict[str, Any]]
     raw_sections = payload_dict.get("lyrics_by_section")
     if isinstance(raw_sections, dict):
         rows = _build_section_rows(raw_sections, [x for x in raw_sections.keys() if isinstance(x, str)])
+        if not rows:
+            chosen_variant = str(payload_dict.get("chosen_variant_id") or payload_dict.get("chosen_variant") or "").strip().lower()
+            candidate_values: list[Any] = []
+            if chosen_variant and isinstance(raw_sections.get(chosen_variant), (dict, list)):
+                candidate_values.append(raw_sections.get(chosen_variant))
+            for key in ("a", "b", "c"):
+                val = raw_sections.get(key)
+                if isinstance(val, (dict, list)) and val not in candidate_values:
+                    candidate_values.append(val)
+            for _, val in raw_sections.items():
+                if isinstance(val, (dict, list)) and val not in candidate_values:
+                    candidate_values.append(val)
+
+            for candidate in candidate_values:
+                if isinstance(candidate, dict):
+                    candidate_rows = _build_section_rows(candidate, [x for x in candidate.keys() if isinstance(x, str)])
+                elif isinstance(candidate, list):
+                    candidate_rows = [x for x in candidate if isinstance(x, dict)]
+                else:
+                    candidate_rows = []
+                if candidate_rows:
+                    rows = candidate_rows
+                    break
     elif isinstance(raw_sections, list):
         rows = [x for x in raw_sections if isinstance(x, dict)]
     else:
@@ -393,11 +444,19 @@ def _normalize_variants(raw: Any, base_sections: list[dict[str, Any]]) -> tuple[
             variant_id = str(item.get("variant_id") or item.get("id") or "").strip().lower()
             if variant_id in {"a", "b", "c"}:
                 lookup[variant_id] = item
+    elif isinstance(raw, dict):
+        # model returned variants as {"a": {...}, "b": {...}, "c": {...}}
+        for key, val in raw.items():
+            k = str(key).strip().lower()
+            if k in {"a", "b", "c"} and isinstance(val, dict):
+                lookup[k] = val
 
     normalized: list[dict[str, Any]] = []
     for idx, (variant_id, pov) in enumerate(desired, start=1):
         source = lookup.get(variant_id, {})
         raw_sections = source.get("lyrics_by_section")
+        if raw_sections is None:
+            raw_sections = source.get("lyrics")
         if isinstance(raw_sections, dict):
             section_rows = _build_section_rows(raw_sections, [x for x in raw_sections.keys() if isinstance(x, str)])
         elif isinstance(raw_sections, list):
@@ -452,11 +511,18 @@ def _normalize_variants(raw: Any, base_sections: list[dict[str, Any]]) -> tuple[
         )
 
     chosen = "a"
-    for item in raw if isinstance(raw, list) else []:
-        if isinstance(item, dict):
-            candidate = str(item.get("variant_id") or item.get("id") or "").strip().lower()
-            if candidate in {"a", "b", "c"}:
-                chosen = candidate
+    if isinstance(raw, list):
+        for item in raw:
+            if isinstance(item, dict):
+                candidate = str(item.get("variant_id") or item.get("id") or "").strip().lower()
+                if candidate in {"a", "b", "c"}:
+                    chosen = candidate
+                    break
+    elif isinstance(raw, dict):
+        # dict format: pick first key as a proxy (actual chosen comes from payload level)
+        for k in ("a", "b", "c"):
+            if k in raw:
+                chosen = k
                 break
     return normalized, chosen
 
@@ -467,13 +533,24 @@ def _normalize_payload_dict(
     lyrics_by_section = _extract_base_sections(payload_dict)
     structure = _normalize_structure(payload_dict.get("structure"), [x["tag"] for x in lyrics_by_section])
     variants, chosen_from_variants = _normalize_variants(payload_dict.get("variants"), lyrics_by_section)
-    chosen = str(payload_dict.get("chosen_variant_id") or chosen_from_variants or "a").strip().lower()
+    chosen = str(
+        payload_dict.get("chosen_variant_id") or payload_dict.get("chosen_variant") or chosen_from_variants or "a"
+    ).strip().lower()
     if chosen not in {"a", "b", "c"}:
         chosen = "a"
     for item in variants:
         if item["variant_id"] == chosen:
-            lyrics_by_section = item["lyrics_by_section"]
+            candidate_sections = item.get("lyrics_by_section", [])
+            if isinstance(candidate_sections, list) and candidate_sections:
+                lyrics_by_section = candidate_sections
             break
+    if not lyrics_by_section:
+        for item in variants:
+            candidate_sections = item.get("lyrics_by_section", [])
+            if isinstance(candidate_sections, list) and candidate_sections:
+                lyrics_by_section = candidate_sections
+                chosen = str(item.get("variant_id", chosen)).strip().lower() or chosen
+                break
 
     synthesized = {
         "schema_version": "v2.1",
@@ -519,6 +596,7 @@ def generate_lyric_payload(
         profile_vote_counts = retrieval.get("profile_vote_counts", {}) if isinstance(retrieval.get("profile_vote_counts", {}), dict) else {}
         corpus_balance = retrieval.get("corpus_balance", {}) if isinstance(retrieval.get("corpus_balance", {}), dict) else {}
         corpus_monoculture_risk = bool(retrieval.get("corpus_monoculture_risk", False))
+        fallback_level = str(retrieval.get("fallback_level", "none") or "none")
     else:
         few_shot_examples = retrieval
         profile_vote = ""
@@ -526,6 +604,7 @@ def generate_lyric_payload(
         profile_vote_counts = {}
         corpus_balance = {}
         corpus_monoculture_risk = False
+        fallback_level = "none"
 
     active_profile, profile_source, profile_vote_confidence = resolve_active_profile(
         user_input,
@@ -540,7 +619,6 @@ def generate_lyric_payload(
         "input": user_input.model_dump(),
         "requirements": {
             "min_sections": 3,
-            "min_lines_per_section": 4,
             "variants": ["a", "b", "c"],
             "distinct_pov": ["first_person", "second_person", "third_person"],
             "required_fields": [
@@ -565,6 +643,7 @@ def generate_lyric_payload(
     }
     if targeted_revise_prompt:
         prompt["targeted_revise_prompt"] = targeted_revise_prompt
+    generation_temperature = 0.6 if targeted_revise_prompt else 0.8
 
     if config.provider == "anthropic":
         from anthropic import Anthropic
@@ -573,7 +652,7 @@ def generate_lyric_payload(
         message = client.messages.create(
             model=config.model,
             max_tokens=4096,
-            temperature=0.4,
+            temperature=generation_temperature,
             system=skill_text,
             messages=[
                 {
@@ -599,9 +678,18 @@ def generate_lyric_payload(
             config=config,
             skill_text=skill_text,
             prompt=prompt,
+            temperature=generation_temperature,
         )
 
     payload_dict = _extract_json_block(raw_text)
+    # Unwrap if model enveloped the payload under a single key (e.g. {"lyric_payload": {...}})
+    _LYRIC_KEYS = {"lyrics_by_section", "variants", "distillation", "structure"}
+    if not any(k in payload_dict for k in _LYRIC_KEYS):
+        for _v in payload_dict.values():
+            if isinstance(_v, dict) and any(k in _v for k in _LYRIC_KEYS):
+                payload_dict = _v
+                break
+
     payload = LyricPayload.model_validate(
         _normalize_payload_dict(
             payload_dict,
@@ -637,6 +725,7 @@ def generate_lyric_payload(
         "retrieval_profile_vote": profile_vote,
         "retrieval_vote_confidence": vote_confidence,
         "retrieval_profile_vote_counts": profile_vote_counts,
+        "fallback_level": fallback_level,
         "active_profile": active_profile,
         "profile_source": profile_source,
         "profile_vote_confidence": profile_vote_confidence,

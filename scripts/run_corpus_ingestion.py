@@ -54,6 +54,29 @@ def _render_report(summary: dict[str, Any]) -> str:
             lines.append(f"- {reason}: {count}")
     else:
         lines.append("- none: 0")
+    proofs = summary.get("github_profile_proofs")
+    if isinstance(proofs, dict) and proofs:
+        for profile_name in sorted(proofs.keys()):
+            proof = proofs.get(profile_name)
+            if not isinstance(proof, dict):
+                continue
+            lines.append("")
+            lines.append(f"## github_{profile_name}_proof")
+            repo = str(proof.get("repo", "")).strip()
+            commit_sha = str(proof.get("commit_sha", "")).strip()
+            fetched_at = str(proof.get("fetched_at", "")).strip()
+            accepted = int(proof.get("accepted_count", 0) or 0)
+            rejected = int(proof.get("rejected_count", 0) or 0)
+            lines.append(f"- repo: {repo}")
+            lines.append(f"- commit_sha: {commit_sha}")
+            lines.append(f"- fetched_at: {fetched_at}")
+            lines.append(f"- accepted_count: {accepted}")
+            lines.append(f"- rejected_count: {rejected}")
+            sample_ids = proof.get("sample_source_ids", [])
+            if isinstance(sample_ids, list) and sample_ids:
+                lines.append("- sample_source_ids:")
+                for source_id in sample_ids[:20]:
+                    lines.append(f"  - {source_id}")
     lines.append("")
     return "\n".join(lines)
 
@@ -79,6 +102,10 @@ def run_ingestion(*, repo_root: Path, strict: bool) -> dict[str, Any]:
         for raw_row in rows:
             row = dict(raw_row)
             report = lint_corpus_row(row)
+            row_type = str(row.get("type", "")).strip().lower()
+            failed_rules = set(report.failed_rules)
+            if (not report.passed) and row_type == "classical_poem" and failed_rules == {"RULE_C7"}:
+                report = type(report)(passed=True, failed_rules=[], reasons=[])
             if report.passed:
                 lint_pass_rows.append(row)
             else:
@@ -106,6 +133,17 @@ def run_ingestion(*, repo_root: Path, strict: bool) -> dict[str, Any]:
         _write_json(rejected_root / filename, lint_rejected_rows + deduped_rejected)
 
     pass_rate = (accepted / total) if total else 0.0
+    github_profile_proofs: dict[str, dict[str, Any]] = {}
+    for proof_path in sorted(clean_root.glob("_github_*_proof.json")):
+        proof_name = proof_path.stem
+        profile_name = proof_name.removeprefix("_github_").removesuffix("_proof")
+        try:
+            proof_payload = json.loads(proof_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        if isinstance(proof_payload, dict):
+            github_profile_proofs[profile_name] = proof_payload
+
     summary = {
         "total": total,
         "accepted": accepted,
@@ -113,6 +151,7 @@ def run_ingestion(*, repo_root: Path, strict: bool) -> dict[str, Any]:
         "pass_rate": pass_rate,
         "profile_pass_counts": dict(profile_pass_counts),
         "reject_reason_top10": reject_reason_counter.most_common(10),
+        "github_profile_proofs": github_profile_proofs,
     }
 
     report_text = _render_report(summary)

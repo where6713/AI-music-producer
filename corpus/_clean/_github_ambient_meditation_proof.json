@@ -1,0 +1,29 @@
+{
+  "repo": "https://github.com/gaussic/Chinese-Lyric-Corpus",
+  "commit_sha": "85e4d1eb8cc07e36c8f7ed7a13f00f7e73811cad",
+  "fetched_at": "2026-04-25T06:13:18.777300+00:00",
+  "accepted_count": 180,
+  "rejected_count": 982,
+  "sample_source_ids": [
+    "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/τ╗êΣ║ÄµÿÄτÖ╜_351039.txt",
+    "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/µêæΦïÑΣ╕ìµ¢╛τê▒Φ┐çΣ╜á_351176.txt",
+    "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/Θòçσ«êτê▒µâà_351124.txt",
+    "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/σÉ¼µ╡╖_351240.txt",
+    "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/Σ╜áµÿ»µêæτÜäτ£╝_you_are_my_eyes(live)_-_live_351019.txt",
+    "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/ΦâîσÅ¢µâàµ¡î_351205.txt",
+    "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/σå▓σè¿_351126.txt",
+    "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/Θ╗äσôüµ║É_3079/Σ╛¥µùºτÜäµêæ_95132.txt",
+    "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/Θ╗äσôüµ║É_3079/µ╡üµ╡¬τÜäσ┐â_95216.txt",
+    "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/Θ╗äσôüµ║É_3079/τÖ╜Θ╣¡Θ╕╢_94454.txt",
+    "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/Θ╗äσôüµ║É_3079/Σ╕ÇσÄ╗Σ╕ìσ¢₧τÜäΣ║║_94867.txt",
+    "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/Θ╗äσôüµ║É_3079/σæ╖Φî╢_94938.txt",
+    "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/Θ╗äσôüµ║É_3079/µïåµòú_94928.txt",
+    "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/µ¼ºΘÿ│ΦÅ▓ΦÅ▓_9103/ΦÄÄσôƒσô¬σòª_281007.txt",
+    "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/µ¼ºΘÿ│ΦÅ▓ΦÅ▓_9103/µêæµùáµëÇΦ░ô_281241.txt",
+    "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/µ¼ºΘÿ│ΦÅ▓ΦÅ▓_9103/µÿ¿σñ£µóªΣ╕¡_281083.txt",
+    "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/µ¼ºΘÿ│ΦÅ▓ΦÅ▓_9103/µ░╕Σ╕ìσÉÄµéö_281245.txt",
+    "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/τ▒│Θ¢à_9620/Φ»╖Σ╜áµü░µü░_299212.txt",
+    "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/τ▒│Θ¢à_9620/ΘªÖµ░┤µ£ëµ»Æ∩╝êcover∩╝ÜΦâíµë¼τÉ│∩╝ë_450056404.txt",
+    "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/τ▒│Θ¢à_9620/Φè▒µ▓Ö_298751.txt"
+  ]
+}
