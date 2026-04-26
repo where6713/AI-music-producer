@@ -482,6 +482,43 @@ def test_extract_base_sections_accepts_name_and_text_fields() -> None:
     assert "[Chorus]" in tags
 
 
+def test_extract_base_sections_recurses_variant_id_dict_payload() -> None:
+    rows = claude_client._extract_base_sections(
+        {
+            "lyrics_by_section": {
+                "a": {
+                    "Verse 1": ["line one", "line two"],
+                    "Chorus": ["hook one", "hook two"],
+                },
+                "b": {
+                    "Verse 1": ["alt one"],
+                },
+            }
+        }
+    )
+
+    tags = [row["tag"] for row in rows]
+    assert "[Verse 1]" in tags
+    assert "[Chorus]" in tags
+    assert "a" not in tags
+
+
+def test_build_section_rows_skips_nested_section_objects() -> None:
+    rows = claude_client._build_section_rows(
+        {
+            "a": [
+                {
+                    "tag": "[Verse 1]",
+                    "lines": [{"primary": "line one"}],
+                }
+            ]
+        },
+        ["a"],
+    )
+
+    assert rows == []
+
+
 def test_normalize_payload_keeps_base_sections_when_chosen_variant_empty() -> None:
     user_input = UserInput(raw_intent="测试")
     normalized = claude_client._normalize_payload_dict(

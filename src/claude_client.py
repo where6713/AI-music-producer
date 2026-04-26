@@ -171,16 +171,29 @@ def _build_section_rows(raw_lyrics: dict[str, Any], section_order: list[str]) ->
             val = [x for x in val.splitlines() if x.strip()]
         if not isinstance(val, list):
             continue
-        lines = [
-            {
-                "primary": str(item).strip(),
-                "backing": "",
-                "tail_pinyin": "",
-                "char_count": len(str(item).strip()),
-            }
-            for item in val
-            if str(item).strip()
-        ]
+        lines: list[dict[str, Any]] = []
+        for item in val:
+            if isinstance(item, str):
+                text = item.strip()
+                char_count = len(text)
+            elif isinstance(item, dict):
+                # nested section object, not line object
+                if any(k in item for k in ("tag", "name", "section")):
+                    continue
+                text = str(item.get("primary") or item.get("text") or item.get("line") or "").strip()
+                char_count = int(item.get("char_count", 0) or len(text))
+            else:
+                continue
+            if not text:
+                continue
+            lines.append(
+                {
+                    "primary": text,
+                    "backing": "",
+                    "tail_pinyin": "",
+                    "char_count": char_count,
+                }
+            )
         if not lines:
             continue
         rows.append({"tag": _normalize_tag(tag), "voice_tags_inline": [], "lines": lines})
@@ -355,6 +368,29 @@ def _extract_base_sections(payload_dict: dict[str, Any]) -> list[dict[str, Any]]
     raw_sections = payload_dict.get("lyrics_by_section")
     if isinstance(raw_sections, dict):
         rows = _build_section_rows(raw_sections, [x for x in raw_sections.keys() if isinstance(x, str)])
+        if not rows:
+            chosen_variant = str(payload_dict.get("chosen_variant_id") or payload_dict.get("chosen_variant") or "").strip().lower()
+            candidate_values: list[Any] = []
+            if chosen_variant and isinstance(raw_sections.get(chosen_variant), (dict, list)):
+                candidate_values.append(raw_sections.get(chosen_variant))
+            for key in ("a", "b", "c"):
+                val = raw_sections.get(key)
+                if isinstance(val, (dict, list)) and val not in candidate_values:
+                    candidate_values.append(val)
+            for _, val in raw_sections.items():
+                if isinstance(val, (dict, list)) and val not in candidate_values:
+                    candidate_values.append(val)
+
+            for candidate in candidate_values:
+                if isinstance(candidate, dict):
+                    candidate_rows = _build_section_rows(candidate, [x for x in candidate.keys() if isinstance(x, str)])
+                elif isinstance(candidate, list):
+                    candidate_rows = [x for x in candidate if isinstance(x, dict)]
+                else:
+                    candidate_rows = []
+                if candidate_rows:
+                    rows = candidate_rows
+                    break
     elif isinstance(raw_sections, list):
         rows = [x for x in raw_sections if isinstance(x, dict)]
     else:
