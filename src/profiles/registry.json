@@ -6,8 +6,8 @@
       "display_name": "都市内省",
       "typical_genres": ["中文民谣", "都市流行", "indie pop"],
       "typical_moods": ["哀愁", "怀旧", "克制释怀"],
-      "craft_focus": "具象化身体记账 + 场景锚定",
-      "R15_concrete_density": {"verse_min": 3, "chorus_min": 1, "enforced": true},
+      "craft_focus": "情绪锚定 + 具象托底（具象是手段，不是目的）",
+      "R15_concrete_density": {"verse_min": 2, "chorus_min": 1, "enforced": true},
       "R16_profile_forbidden": [
         "学会放下",
         "慢慢放下",
@@ -26,7 +26,7 @@
       "narrative_style": "linear_progression",
       "variant_differentiation": "POV + 场景框架（内景/外景/对照）",
       "chorus_repetition_allowed": false,
-      "abstraction_tolerance": "low"
+      "abstraction_tolerance": "medium"
     },
     "classical_restraint": {
       "display_name": "古风留白",
