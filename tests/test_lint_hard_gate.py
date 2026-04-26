@@ -103,14 +103,18 @@ def _make_payload(*, chorus_line: str) -> LyricPayload:
     )
 
 
-def test_lint_marks_r14_phrase_as_dead() -> None:
+def test_lint_marks_r14_phrase_as_soft_violation() -> None:
+    # R14 was downgraded from HARD_KILL to SOFT_PENALTY:
+    # 3 hardcoded phrases are too brittle to justify a one-strike kill.
+    # The check still fires and affects craft_score, but does not mark is_dead.
     payload = _make_payload(chorus_line="我把想念折成静默")
 
     report = lint_payload(payload)
 
-    assert report["is_dead"] is True
-    assert "R14" in report["hard_kill_rules"]
-    assert any("折成静默" in row for row in report["death_reason"])
+    assert report["is_dead"] is False
+    assert "R14" not in report["hard_kill_rules"]
+    assert "R14" in report["failed_rules"]
+    assert any("折成静默" in v["detail"] for v in report["violations"])
 
 
 def test_lint_marks_r03_forbidden_literal_as_dead() -> None:

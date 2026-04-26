@@ -4,6 +4,7 @@ import pytest
 
 from src.main import (
     _apply_retrieval_profile_decision,
+    _guard_targeted_revise_scope,
     _merge_revise_trace_metadata,
     _score_variants,
 )
@@ -119,6 +120,41 @@ def test_score_variants_assigns_rank_and_chosen() -> None:
     assert len(evidence["ranking"]) == 3
     ranks = [v.lint_result.rank for v in out.variants]
     assert sorted(ranks) == [1, 2, 3]
+
+
+def test_guard_targeted_revise_scope_reverts_non_targeted_lines() -> None:
+    original = _payload()
+    revised = original.model_copy(deep=True)
+
+    revised.lyrics_by_section[0].lines[0].primary = "门只掩着，我把手慢慢收回来"
+    revised.lyrics_by_section[1].lines[0].primary = "把号码放下啊"
+
+    lint_report = {
+        "failed_rules": ["R01"],
+        "violations": [
+            {
+                "rule": "R01",
+                "detail": "hook line tail is not open-final with level tone",
+                "section": "[Chorus]",
+                "line": 1,
+            }
+        ],
+    }
+
+    _guard_targeted_revise_scope(original, revised, lint_report)
+
+    assert revised.lyrics_by_section[0].lines[0].primary == original.lyrics_by_section[0].lines[0].primary
+    assert revised.lyrics_by_section[1].lines[0].primary == "把号码放下啊"
+
+
+def test_guard_targeted_revise_scope_is_noop_without_targeted_violations() -> None:
+    original = _payload()
+    revised = original.model_copy(deep=True)
+    revised.lyrics_by_section[0].lines[0].primary = "门只掩着，我把手慢慢收回来"
+
+    _guard_targeted_revise_scope(original, revised, {"failed_rules": ["R14"], "violations": []})
+
+    assert revised.lyrics_by_section[0].lines[0].primary == "门只掩着，我把手慢慢收回来"
 
 
 def test_apply_retrieval_profile_decision_activates_when_vote_confident() -> None:
@@ -505,6 +541,9 @@ def test_produce_raises_ambiguous_profile_error(tmp_path, monkeypatch) -> None:
 
 
 def test_produce_verbose_prints_profile_source(tmp_path, monkeypatch, capsys) -> None:
+    # R01 was downgraded to SOFT_PENALTY. The _payload() fixture has an R01 violation
+    # (hook line tail "吧" is not open-final+level-tone), but with R01 as SOFT_PENALTY
+    # the craft_score stays above 0.85, so dry-run succeeds and prints profile info.
     from src import main as main_mod
 
     payload = _payload()
@@ -526,23 +565,22 @@ def test_produce_verbose_prints_profile_source(tmp_path, monkeypatch, capsys) ->
 
     monkeypatch.setattr(main_mod, "generate_lyric_payload", _fake_generate)
 
-    with pytest.raises(Exception) as err:
-        main_mod.produce(
-            raw_intent="分手后夜里想发消息又忍住",
-            genre="",
-            mood="",
-            vocal="female",
-            profile="urban_introspective",
-            lang="zh-CN",
-            out_dir=str(tmp_path / "out"),
-            verbose=True,
-            dry_run=True,
-        )
-
-    assert getattr(err.value, "exit_code", None) == 2
+    # dry-run now returns exit 0 because R01 soft-penalty keeps craft_score >= 0.85
+    main_mod.produce(
+        raw_intent="分手后夜里想发消息又忍住",
+        genre="",
+        mood="",
+        vocal="female",
+        profile="urban_introspective",
+        lang="zh-CN",
+        out_dir=str(tmp_path / "out"),
+        verbose=True,
+        dry_run=True,
+    )
 
     out = capsys.readouterr().out
-    assert "run_status=QUALITY_FLOOR_FAILED" in out
+    assert "active_profile=urban_introspective" in out
+    assert "profile_source=cli_override" in out
 
 
 def test_produce_dry_run_prints_generation_error_stage(tmp_path, monkeypatch, capsys) -> None:
