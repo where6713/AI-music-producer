@@ -596,6 +596,7 @@ def generate_lyric_payload(
         profile_vote_counts = retrieval.get("profile_vote_counts", {}) if isinstance(retrieval.get("profile_vote_counts", {}), dict) else {}
         corpus_balance = retrieval.get("corpus_balance", {}) if isinstance(retrieval.get("corpus_balance", {}), dict) else {}
         corpus_monoculture_risk = bool(retrieval.get("corpus_monoculture_risk", False))
+        fallback_level = str(retrieval.get("fallback_level", "none") or "none")
     else:
         few_shot_examples = retrieval
         profile_vote = ""
@@ -603,6 +604,7 @@ def generate_lyric_payload(
         profile_vote_counts = {}
         corpus_balance = {}
         corpus_monoculture_risk = False
+        fallback_level = "none"
 
     active_profile, profile_source, profile_vote_confidence = resolve_active_profile(
         user_input,
@@ -723,6 +725,7 @@ def generate_lyric_payload(
         "retrieval_profile_vote": profile_vote,
         "retrieval_vote_confidence": vote_confidence,
         "retrieval_profile_vote_counts": profile_vote_counts,
+        "fallback_level": fallback_level,
         "active_profile": active_profile,
         "profile_source": profile_source,
         "profile_vote_confidence": profile_vote_confidence,

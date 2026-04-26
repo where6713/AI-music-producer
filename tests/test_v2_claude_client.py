@@ -351,6 +351,7 @@ def test_generate_payload_includes_profile_trace_fields(tmp_path, monkeypatch) -
     assert trace["profile_source"] == "cli_override"
     assert "corpus_balance" in trace
     assert "corpus_monoculture_risk" in trace
+    assert "fallback_level" in trace
 
 
 def test_generate_payload_uses_lower_temperature_for_targeted_revise(tmp_path, monkeypatch) -> None:

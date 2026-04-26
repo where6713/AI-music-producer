@@ -174,12 +174,33 @@ def retrieve_few_shot_examples(
 
     selected: list[dict[str, Any]] = []
     target_max = max(2, min(top_k, 3))
-    for _, row in scored:
-        if not _quality_pass(row):
-            continue
-        selected.append(row)
-        if len(selected) >= target_max:
-            break
+    fallback_level = "none"
+
+    profile_override = str(user_input.profile_override or "").strip()
+    if profile_override in PROFILE_IDS:
+        override_selected: list[dict[str, Any]] = []
+        for _, row in scored:
+            if _infer_profile_tag(row) != profile_override:
+                continue
+            if not _quality_pass(row):
+                continue
+            override_selected.append(row)
+            if len(override_selected) >= target_max:
+                break
+
+        if len(override_selected) >= 2:
+            selected = override_selected
+            fallback_level = "override_profile_only"
+        else:
+            fallback_level = "fallback_to_global"
+
+    if not selected:
+        for _, row in scored:
+            if not _quality_pass(row):
+                continue
+            selected.append(row)
+            if len(selected) >= target_max:
+                break
 
     if len(selected) < 2:
         raise InsufficientQualityFewShotError(
@@ -236,4 +257,5 @@ def retrieve_few_shot_examples(
         "profile_vote_counts": dict(votes),
         "corpus_balance": _corpus_balance_from_rows(corpus),
         "corpus_monoculture_risk": monoculture_risk,
+        "fallback_level": fallback_level,
     }
