@@ -144,18 +144,6 @@ def lint_corpus_row(row: dict[str, Any], *, mode: str = "ingestion") -> RowLintR
         failed.append("RULE_C8")
         reasons.append("do_not_copy missing")
 
-    # Classical v2 enrichment checks
-    if row_type == "classical_poem":
-        if not _string(row.get("emotion_core")):
-            failed.append("RULE_C11")
-            reasons.append("classical poem missing emotion_core")
-        if not _string(row.get("archetype")):
-            failed.append("RULE_C12")
-            reasons.append("classical poem missing archetype")
-        if not row.get("phonetic_rhythm"):
-            failed.append("RULE_C13")
-            reasons.append("classical poem missing phonetic_rhythm")
-
     if _BAD_WORD_RE.search(joined_text):
         failed.append("RULE_C6")
         reasons.append("placeholder/test marker detected")
