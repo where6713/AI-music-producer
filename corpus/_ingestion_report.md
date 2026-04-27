@@ -1,16 +1,65 @@
-# Corpus Ingestion Report
+# 古典诗词语料库重建审计报告
 
-- total: 730
-- accepted: 730
-- rejected: 0
-- pass_rate: 100.00%
+## 执行摘要
 
-## profile_pass_counts
-- ambient_meditation: 80
-- classical_restraint: 200
-- club_dance: 100
-- uplift_pop: 150
-- urban_introspective: 200
+- **执行时间**: 2026-04-27
+- **最终总量**: 1,992 条
+- **Lint 通过率**: 100.0% (1992/1992)
+- **元曲精简**: 2,467 → 200 (删除 2,267 条)
+- **新增语料**: 1,018 条 (诗经/宋词/纳兰/唐诗)
 
-## reject_reason_top10
-- none: 0
+## 来源分布
+
+| 来源 | 数量 | 说明 |
+|------|------|------|
+| 菜根谭 (caigentan) | 363 | 哲学升华锚点 |
+| 诗经 (shijing) | 305 | 先秦诗歌，国风为主 |
+| 成语 (chengyu) | 283 | 短句锚点与意象压缩 |
+| 宋词三百首 (song_ci_300) | 280 | 宋代词作 |
+| 纳兰词 (nalan) | 257 | 清代纳兰性德 |
+| 元曲精选 (poetry_2000) | 200 | 已精简的元曲 |
+| 水墨唐诗 (tang_shui_mo) | 176 | 唐代诗歌 |
+| 增广贤文 (zengguangxianwen) | 128 | 哲学升华锚点 |
+
+## 元曲清理标准
+
+已删除：
+- 无名氏作品
+- 杂剧曲牌（含舞台指令）
+- 粗俗/脏话内容
+- 咏史/边塞/闺怨/政治讽喻题材
+- 过长套数（>180字）
+- 质量评分较低的作品
+
+保留：
+- 写景、抒情、意境类小令
+- 马致远/白朴/关汉卿等经典作者
+- 有明确情感价值和音乐性的作品
+
+## 新标签体系
+
+每条古典诗词现已包含：
+
+| 字段 | 说明 |
+|------|------|
+| `emotion_core` | 情感内核（如：求而不得的怅惘） |
+| `archetype` | 神话原型（失乐园/浮士德/西西弗斯/普罗米修斯/纳西索斯/俄耳甫斯） |
+| `musical_traits` | 音乐性映射（留白/节奏/音域/织体/速度/和声） |
+| `phonetic_rhythm` | 拼音押韵分析（韵脚/声调/节奏型/押韵模式） |
+| `core_imagery` | 核心意象词（月/风/花/雪/雁等） |
+| `lyric_strategies` | 歌词化用策略（意象直取/意境转换/情感提纯/节奏移植） |
+| `learn_point` | 作曲/作词可学点 |
+| `quotability` | 可引用性（direct/adapt/inspire） |
+
+## 技术说明
+
+- **当前标注方式**: 规则引擎 fallback（因 LLM API 暂时不可用）
+- **后续优化**: API 恢复后可用 `--mode classical_v2` 跑 LLM 精标替换
+- **do_not_copy**: 已移除——古诗词为公共领域，标注重点在"怎么用"
+
+## 文件位置
+
+- 主库: `corpus/poetry_classical.json`
+- 被拒元曲: `corpus/_rejected/yuanqu_pruned.json`
+- 新增未标注: `corpus/_raw/new_classical_unenriched.json`
+- 规则标注版: `corpus/_raw/new_classical_rule_enriched.json`

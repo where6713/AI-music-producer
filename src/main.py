@@ -50,12 +50,103 @@ def _infer_profile_confidence_from_source_ids(source_ids: list[str], profile_vot
 
 
 def _build_targeted_revise_prompt(payload: dict[str, Any], lint_report: dict[str, Any]) -> str:
+    # Only send the failing lines themselves, not the entire payload.
+    # The full payload is ~4000 tokens of noise; the model only needs to know
+    # which specific lines are wrong and why.
+    violations = lint_report.get("violations", [])
+
+    # Build a compact map: section -> {line_no -> (rule, detail)}
+    failing_lines: dict[str, dict[int, list[str]]] = {}
+    for v in violations:
+        if not isinstance(v, dict):
+            continue
+        section = str(v.get("section", "")).strip()
+        line_no = int(v.get("line", 0) or 0)
+        rule = str(v.get("rule", "")).strip()
+        detail = str(v.get("detail", "")).strip()
+        if section and line_no > 0:
+            failing_lines.setdefault(section, {}).setdefault(line_no, []).append(f"{rule}: {detail}")
+
+    # Extract the actual text of each failing line from the payload
+    sections_by_tag: dict[str, list[str]] = {}
+    for s in payload.get("lyrics_by_section", []):
+        tag = str(s.get("tag", ""))
+        sections_by_tag[tag] = [str(ln.get("primary", "")) for ln in s.get("lines", [])]
+
+    lines_context: list[str] = []
+    for section, line_map in failing_lines.items():
+        section_lines = sections_by_tag.get(section, [])
+        for line_no, issues in sorted(line_map.items()):
+            text = section_lines[line_no - 1] if 0 < line_no <= len(section_lines) else "(line not found)"
+            lines_context.append(f"  [{section}] line {line_no}: \"{text}\" — {'; '.join(issues)}")
+
+    if lines_context:
+        lines_block = "\n".join(lines_context)
+    else:
+        # Fallback for violations without section/line (e.g. R02 global token overuse)
+        lines_block = "\n".join(
+            f"  {v.get('rule','?')}: {v.get('detail','')}"
+            for v in violations if isinstance(v, dict)
+        )
+
     return (
-        "Targeted revise only for failing lines. Keep unchanged lines untouched.\n"
-        f"Failed rules: {lint_report.get('failed_rules', [])}\n"
-        f"Violations: {lint_report.get('violations', [])}\n"
-        f"Current payload: {payload}"
+        "Targeted revise: fix only the specific failing lines listed below. "
+        "All other lines must remain exactly unchanged.\n\n"
+        f"Failed rules: {lint_report.get('failed_rules', [])}\n\n"
+        f"Failing lines to fix:\n{lines_block}"
     )
+
+
+def _guard_targeted_revise_scope(
+    original_payload: LyricPayload,
+    revised_payload: LyricPayload,
+    lint_report: dict[str, Any],
+) -> None:
+    failed_rules_raw = lint_report.get("failed_rules", []) if isinstance(lint_report, dict) else []
+    failed_rules = {str(x).strip() for x in failed_rules_raw if str(x).strip()}
+    targeted_rules = {"R01", "R05", "R06"}
+    if not failed_rules or not failed_rules.issubset(targeted_rules):
+        return
+
+    raw_violations = lint_report.get("violations", []) if isinstance(lint_report, dict) else []
+    violations = [x for x in raw_violations if isinstance(x, dict)]
+    if not violations:
+        return
+
+    allowed_slots: set[tuple[str, int]] = set()
+    for item in violations:
+        rule = str(item.get("rule", "")).strip()
+        section = str(item.get("section", "")).strip()
+        try:
+            line_no = int(item.get("line", 0) or 0)
+        except (TypeError, ValueError):
+            line_no = 0
+        if rule in targeted_rules and section and line_no > 0:
+            allowed_slots.add((section, line_no))
+    if not allowed_slots:
+        return
+
+    original_map: dict[tuple[str, int], str] = {}
+    for section in original_payload.lyrics_by_section:
+        for idx, line in enumerate(section.lines, start=1):
+            original_map[(section.tag, idx)] = line.primary
+
+    for section in revised_payload.lyrics_by_section:
+        for idx, line in enumerate(section.lines, start=1):
+            slot = (section.tag, idx)
+            if slot in allowed_slots:
+                continue
+            original_text = original_map.get(slot)
+            if original_text is not None:
+                line.primary = original_text
+
+
+def _choose_targeted_revise_prompt(payload: LyricPayload, lint_report: dict[str, Any]) -> str:
+    failed_rules_raw = lint_report.get("failed_rules", []) if isinstance(lint_report, dict) else []
+    failed_rules = [str(x).strip() for x in failed_rules_raw] if isinstance(failed_rules_raw, list) else []
+    if "R00" in failed_rules or (not payload.lyrics_by_section):
+        return STRUCTURAL_REVISE_PROMPT
+    return _build_targeted_revise_prompt(payload.model_dump(), lint_report)
 
 
 def _score_variants(payload: LyricPayload, *, trace: dict[str, Any] | None = None) -> tuple[LyricPayload, dict[str, Any]]:
@@ -92,7 +183,8 @@ def _score_variants(payload: LyricPayload, *, trace: dict[str, Any] | None = Non
         payload.chosen_variant_id = chosen_variant_id
         for variant in payload.variants:
             if variant.variant_id == chosen_variant_id:
-                payload.lyrics_by_section = variant.lyrics_by_section
+                if variant.lyrics_by_section:
+                    payload.lyrics_by_section = variant.lyrics_by_section
                 break
 
     ranking_view = [(variant_id, passed_rules, rank) for rank, (variant_id, _, _, passed_rules, _) in enumerate(scored, start=1)]
@@ -190,8 +282,29 @@ def _merge_revise_trace_metadata(trace: dict[str, Any], revise_trace: dict[str, 
         trace["retrieval_profile_vote_counts"] = {str(k): int(v) for k, v in revise_vote_counts.items()}
         updated = True
 
+    revise_fallback_level = str(revise_trace.get("fallback_level", "")).strip()
+    if revise_fallback_level:
+        trace["fallback_level"] = revise_fallback_level
+        updated = True
+
+    revise_fallback_reason = str(revise_trace.get("fallback_reason", "")).strip()
+    if revise_fallback_reason:
+        trace["fallback_reason"] = revise_fallback_reason
+        updated = True
+
     if updated:
         trace["retrieval_profile_source"] = "revise"
+
+
+def _shape_gate_from_trace(trace: dict[str, Any]) -> dict[str, Any]:
+    raw = trace.get("shape_validation_report", {}) if isinstance(trace, dict) else {}
+    report = raw if isinstance(raw, dict) else {}
+    if not report:
+        return {"ok": True, "reason_code": "none", "shape": "legacy_no_report"}
+    ok = bool(report.get("ok", False))
+    reason_code = str(report.get("reason_code", "shape_validation_missing")).strip() or "shape_validation_missing"
+    shape = str(report.get("shape", "unknown")).strip() or "unknown"
+    return {"ok": ok, "reason_code": reason_code, "shape": shape}
 
 
 def _write_rejected_trace(out_dir: Path, trace: dict[str, Any]) -> None:
@@ -224,6 +337,9 @@ def _fail_generation_error(
     if dry_run:
         typer.echo("dry-run complete")
         typer.echo("run_status=REJECTED generation error")
+        typer.echo(f"error_stage={stage}")
+        typer.echo(f"error_type={type(exc).__name__}")
+        typer.echo(f"error_message={str(exc)}")
         raise typer.Exit(code=2)
     write_trace_and_audit(target_dir, trace)
     raise typer.Exit(code=2)
@@ -253,6 +369,7 @@ def produce(
         profile_override=profile,
     )
 
+    llm_calls = 1
     try:
         payload, trace = generate_lyric_payload(user_input, repo_root=repo_root)
     except InsufficientQualityFewShotError as exc:
@@ -260,6 +377,49 @@ def produce(
     except Exception as exc:
         _fail_generation_error(target_dir, stage="initial_generation", exc=exc, dry_run=dry_run)
     trace.setdefault("retrieval_profile_source", "initial")
+
+    shape_gate = _shape_gate_from_trace(trace)
+    trace["payload_shape_gate"] = shape_gate
+    if not shape_gate["ok"]:
+        try:
+            revised_payload, revise_trace = generate_lyric_payload(
+                user_input,
+                repo_root=repo_root,
+                targeted_revise_prompt=STRUCTURAL_REVISE_PROMPT,
+            )
+        except InsufficientQualityFewShotError as exc:
+            _fail_generation_error(target_dir, stage="few_shot_quality_gate", exc=exc, dry_run=dry_run)
+        except Exception as exc:
+            _fail_generation_error(target_dir, stage="shape_targeted_revise_generation", exc=exc, dry_run=dry_run)
+
+        payload = revised_payload
+        llm_calls = 2
+        usage_prev = trace.get("usage", {})
+        usage_next = revise_trace.get("usage", {})
+        trace["usage"] = {
+            "input_tokens": int(usage_prev.get("input_tokens", 0)) + int(usage_next.get("input_tokens", 0)),
+            "output_tokens": int(usage_prev.get("output_tokens", 0)) + int(usage_next.get("output_tokens", 0)),
+            "total_tokens": int(usage_prev.get("total_tokens", 0)) + int(usage_next.get("total_tokens", 0)),
+        }
+        _merge_revise_trace_metadata(trace, revise_trace)
+        trace["revise_trace"] = revise_trace
+        shape_gate = _shape_gate_from_trace(revise_trace)
+        trace["payload_shape_gate"] = shape_gate
+
+        if not shape_gate["ok"]:
+            trace["run_status"] = "REJECTED"
+            trace["error_stage"] = "payload_shape_gate"
+            trace["reason_code"] = shape_gate["reason_code"]
+            trace["llm_calls"] = llm_calls
+            trace["max_llm_calls_per_run"] = 2
+            if dry_run:
+                typer.echo("dry-run complete")
+                typer.echo("run_status=REJECTED payload shape gate")
+                typer.echo(f"reason_code={shape_gate['reason_code']}")
+                raise typer.Exit(code=2)
+            _write_rejected_trace(target_dir, trace)
+            raise typer.Exit(code=2)
+
     active_profile, profile_source, profile_vote_confidence = resolve_active_profile(
         user_input,
         repo_root=repo_root,
@@ -275,16 +435,16 @@ def produce(
     payload, variant_rank = _score_variants(payload, trace=trace)
     lint_report = lint_payload(payload, trace=trace)
 
-    llm_calls = 1
     warning_report = ""
     revise_evidence: dict[str, Any] = {}
     craft_score = float(lint_report.get("craft_score", 0.0) or 0.0)
     needs_quality_revise = craft_score < 0.85
-    should_revise = bool(variant_rank.get("all_dead", False)) or (not lint_report["pass"]) or needs_quality_revise
+    should_revise = llm_calls < 2 and (
+        bool(variant_rank.get("all_dead", False)) or (not lint_report["pass"]) or needs_quality_revise
+    )
     if should_revise:
-        targeted_prompt = _build_targeted_revise_prompt(
-            payload.model_dump(), lint_report
-        )
+        targeted_prompt = _choose_targeted_revise_prompt(payload, lint_report)
+        original_payload = payload.model_copy(deep=True)
         try:
             revised_payload, revise_trace = generate_lyric_payload(
                 user_input,
@@ -295,6 +455,7 @@ def produce(
             _fail_generation_error(target_dir, stage="few_shot_quality_gate", exc=exc, dry_run=dry_run)
         except Exception as exc:
             _fail_generation_error(target_dir, stage="targeted_revise_generation", exc=exc, dry_run=dry_run)
+        _guard_targeted_revise_scope(original_payload, revised_payload, lint_report)
         revised_payload, revised_rank = _score_variants(revised_payload, trace=trace)
         revised_lint = lint_payload(revised_payload, trace=trace)
         payload = revised_payload

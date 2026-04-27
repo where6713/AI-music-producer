@@ -33,7 +33,8 @@ TAG_WHITELIST = {
 }
 
 OPEN_FINALS = {"a", "ang", "ai", "ao", "ou"}
-OPEN_TONES = {"1", "2"}
+# Include tone 0/5 (neutral/light tone) so modal particles like 啊/呀/哦/嘛 are accepted
+OPEN_TONES = {"1", "2", "0", "5"}
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 PROFILES_REGISTRY_PATH = ROOT_DIR / "src" / "profiles" / "registry.json"
@@ -55,12 +56,12 @@ class RuleSeverity(str, Enum):
 
 
 RULE_DEFINITIONS: dict[str, RuleSeverity] = {
-    "R01": RuleSeverity.HARD_PENALTY,
+    "R01": RuleSeverity.SOFT_PENALTY,  # downgraded: proxy metric, should not single-handedly kill craft score
     "R02": RuleSeverity.SOFT_PENALTY,
     "R03": RuleSeverity.HARD_KILL,
     "R05": RuleSeverity.SOFT_PENALTY,
     "R06": RuleSeverity.SOFT_PENALTY,
-    "R14": RuleSeverity.HARD_KILL,
+    "R14": RuleSeverity.SOFT_PENALTY,  # downgraded: 3 hardcoded phrases are too brittle for HARD_KILL
     "R15": RuleSeverity.HARD_PENALTY,
     "R16_global": RuleSeverity.HARD_KILL,
     "R16_profile": RuleSeverity.HARD_PENALTY,
@@ -314,15 +315,24 @@ def lint_payload(
                 Violation(rule="R02", detail=f"token overused: {token} x{count}")
             )
 
-    # R05 per-section line-length +/-2 around mean
+    # R05 per-section line-length +/-3 around mean, with short-line exemption
+    # Lines of <=5 chars are treated as intentional "breath-pause" lines (urban profile rhythm
+    # calls for short-punch + long-flow cadence) and are excluded from the mean calculation.
+    SHORT_LINE_EXEMPT = 5
+    TOLERANCE = 3
     for section in payload.lyrics_by_section:
-        lengths = [len(line.primary.strip()) for line in section.lines if line.primary.strip()]
-        if not lengths:
+        all_lengths = [(idx, len(line.primary.strip())) for idx, line in enumerate(section.lines, start=1) if line.primary.strip()]
+        non_short = [sz for _, sz in all_lengths if sz > SHORT_LINE_EXEMPT]
+        if not non_short:
             continue
-        mean_len = sum(lengths) / len(lengths)
+        mean_len = sum(non_short) / len(non_short)
         for idx, line in enumerate(section.lines, start=1):
             size = len(line.primary.strip())
-            if abs(size - mean_len) > 2:
+            if size == 0:
+                continue
+            if size <= SHORT_LINE_EXEMPT:
+                continue  # intentional short line, exempt from mean-based tolerance
+            if abs(size - mean_len) > TOLERANCE:
                 violations.append(
                     Violation(
                         rule="R05",

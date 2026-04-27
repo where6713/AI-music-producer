@@ -26,7 +26,7 @@ def test_g5_hook_contract_pass() -> None:
     pre_commit = "git diff --cached --name-only --diff-filter=ACMRD"
     pre_push = "oost-hook-ledger\npytest -q\npython -m apps.cli.main pm-audit\nout/lyrics.txt\nout/style.txt\nout/exclude.txt\ngit commit --amend --no-edit"
     commit_msg = "type(scope): summary"
-    ci = "placeholder/mock markers detected\npytest -q\npython -m apps.cli.main pm-audit\nout/lyrics.txt\nout/style.txt\nout/exclude.txt\npyproject.toml"
+    ci = "placeholder/mock markers detected\npytest -q\npython -m apps.cli.main pm-audit --run-id ci-gate-audit\nout/lyrics.txt\nout/style.txt\nout/exclude.txt\npyproject.toml"
 
     result = validate_hook_contract(
         pre_commit_text=pre_commit,
@@ -128,6 +128,18 @@ def test_ci_legacy_residue_scan_excludes_ci_script_self_match() -> None:
     )
     assert legacy_block is not None
     assert "':!tools/scripts/run_quality_gates_ci.sh'" in legacy_block.group(1)
+
+
+def test_ci_root_whitelist_includes_reshaping_docs() -> None:
+    script = Path("tools/scripts/run_quality_gates_ci.sh").read_text(encoding="utf-8")
+    root_guard = re.search(
+        r"# 3\) root clutter guard \(RULE-15\)\n(.*?)(?:\n\n# 4\)|\Z)",
+        script,
+        flags=re.DOTALL,
+    )
+    assert root_guard is not None
+    assert "CLAUDE\\.md" in root_guard.group(1)
+    assert "SKILLS\\.md" in root_guard.group(1)
 
 
 def test_pytest_asyncio_default_loop_scope_is_configured() -> None:

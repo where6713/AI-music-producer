@@ -42,7 +42,7 @@ staged_root_candidates="$(git diff --cached --name-only --diff-filter=ACMR | gre
 if [ -n "$staged_root_candidates" ]; then
   root_files="$staged_root_candidates"
   if [ -n "$root_files" ]; then
-    disallowed_root="$(printf '%s\n' "$root_files" | grep -Ev '^(one law\.md|目录框架规范\.md|README\.md|LICENSE|CHANGELOG\.md|\.gitignore|\.env|pyproject\.toml)$' || true)"
+    disallowed_root="$(printf '%s\n' "$root_files" | grep -Ev '^(one law\.md|目录框架规范\.md|README\.md|LICENSE|CHANGELOG\.md|\.gitignore|\.env|pyproject\.toml|CLAUDE\.md|SKILLS\.md)$' || true)"
     if [ -n "$disallowed_root" ]; then
       echo "[pre-commit][BLOCK] 根目录出现非核心入口文件（违反 RULE-15）："
       printf '%s\n' "$disallowed_root"

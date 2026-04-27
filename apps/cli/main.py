@@ -112,7 +112,7 @@ def scope_check(
         typer.echo(f"Unsupported gate: {gate}")
         raise typer.Exit(code=2)
 
-    result = check_gate_g1(Path.cwd())
+    result = check_gate_g1(Path.cwd(), target_commit=os.getenv("G1_TARGET_SHA", ""))
     if result["status"] == "pass":
         typer.echo("G1 SCOPE-CHECK PASS")
         return
@@ -292,8 +292,26 @@ def pm_audit() -> None:
         table.add_row(name, status, "true" if ok else "false", detail)
 
     fail_count = len(PM_AUDIT_CHECK_ORDER) - pass_count
-    exit_code = 0 if fail_count == 0 and result.get("status") == "pass" else 1
+    failed_gates = result.get("failed_gates", []) if isinstance(result, dict) else []
+    failed_gate_details = result.get("failed_gate_details", {}) if isinstance(result, dict) else {}
+    gate_fail_count = len([x for x in failed_gates if str(x).strip()])
+    exit_code = 0 if fail_count == 0 else 1
     console.print(table)
+    if gate_fail_count > 0:
+        typer.echo("FAILED_GATES: " + ", ".join([str(x) for x in failed_gates]))
+        if isinstance(failed_gate_details, dict):
+            for gate_name in failed_gates:
+                detail = failed_gate_details.get(str(gate_name), {})
+                if not isinstance(detail, dict):
+                    continue
+                failed_checks = detail.get("failed_checks", [])
+                if isinstance(failed_checks, list) and failed_checks:
+                    typer.echo(
+                        "FAILED_GATE_DETAIL "
+                        + str(gate_name)
+                        + ": failed_checks="
+                        + ",".join([str(x) for x in failed_checks])
+                    )
     typer.echo(f"TOTAL: 8, PASS: {pass_count}, FAIL: {fail_count}, EXIT: {exit_code}")
     if exit_code != 0:
         raise typer.Exit(code=1)

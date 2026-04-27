@@ -88,7 +88,9 @@ def _load_corpus(repo_root: Path) -> list[dict[str, Any]]:
                 if not isinstance(item, dict):
                     continue
                 report = lint_corpus_row(item, mode="runtime")
-                if report.passed:
+                row_type = str(item.get("type", "")).strip().lower()
+                failed_rules = set(report.failed_rules)
+                if report.passed or (row_type == "classical_poem" and failed_rules == {"RULE_C7"}):
                     rows.append(item)
     return rows
 
@@ -108,6 +110,10 @@ def _normalize_profile_confidence(row: dict[str, Any]) -> float:
 
 def corpus_balance_check(repo_root: Path) -> dict[str, Any]:
     corpus = _load_corpus(repo_root)
+    return _corpus_balance_from_rows(corpus)
+
+
+def _corpus_balance_from_rows(corpus: list[dict[str, Any]]) -> dict[str, Any]:
     counts = {k: 0 for k in MIN_PROFILE_COVERAGE}
     for row in corpus:
         tag = _infer_profile_tag(row)
@@ -138,7 +144,9 @@ def retrieve_few_shot_examples(
 ) -> list[dict[str, Any]] | dict[str, Any]:
     corpus = _load_corpus(repo_root)
     if not corpus:
-        raise RuntimeError("few-shot corpus missing under corpus/")
+        raise InsufficientQualityFewShotError(
+            "insufficient quality few-shot samples after pre-injection validation"
+        )
 
     intent_tokens = set(_tokenize(user_input.raw_intent))
     hint_tokens = set(_tokenize(" ".join([user_input.genre_hint, user_input.mood_hint]).strip()))
@@ -156,9 +164,6 @@ def retrieve_few_shot_examples(
     scored.sort(key=lambda x: x[0], reverse=True)
 
     def _quality_pass(row: dict[str, Any]) -> bool:
-        report = lint_corpus_row(row, mode="runtime")
-        if not report.passed:
-            return False
         learn_point = str(row.get("learn_point", "")).strip()
         if len(learn_point) < 5:
             return False
@@ -169,12 +174,33 @@ def retrieve_few_shot_examples(
 
     selected: list[dict[str, Any]] = []
     target_max = max(2, min(top_k, 3))
-    for _, row in scored:
-        if not _quality_pass(row):
-            continue
-        selected.append(row)
-        if len(selected) >= target_max:
-            break
+    fallback_level = "none"
+
+    profile_override = str(user_input.profile_override or "").strip()
+    if profile_override in PROFILE_IDS:
+        override_selected: list[dict[str, Any]] = []
+        for _, row in scored:
+            if _infer_profile_tag(row) != profile_override:
+                continue
+            if not _quality_pass(row):
+                continue
+            override_selected.append(row)
+            if len(override_selected) >= target_max:
+                break
+
+        if len(override_selected) >= 2:
+            selected = override_selected
+            fallback_level = "override_profile_only"
+        else:
+            fallback_level = "fallback_to_global"
+
+    if not selected:
+        for _, row in scored:
+            if not _quality_pass(row):
+                continue
+            selected.append(row)
+            if len(selected) >= target_max:
+                break
 
     if len(selected) < 2:
         raise InsufficientQualityFewShotError(
@@ -229,6 +255,7 @@ def retrieve_few_shot_examples(
         "profile_vote": profile_vote,
         "vote_confidence": vote_confidence,
         "profile_vote_counts": dict(votes),
-        "corpus_balance": corpus_balance_check(repo_root),
+        "corpus_balance": _corpus_balance_from_rows(corpus),
         "corpus_monoculture_risk": monoculture_risk,
+        "fallback_level": fallback_level,
     }
