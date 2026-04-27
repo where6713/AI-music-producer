@@ -130,6 +130,18 @@ def test_ci_legacy_residue_scan_excludes_ci_script_self_match() -> None:
     assert "':!tools/scripts/run_quality_gates_ci.sh'" in legacy_block.group(1)
 
 
+def test_ci_root_whitelist_includes_reshaping_docs() -> None:
+    script = Path("tools/scripts/run_quality_gates_ci.sh").read_text(encoding="utf-8")
+    root_guard = re.search(
+        r"# 3\) root clutter guard \(RULE-15\)\n(.*?)(?:\n\n# 4\)|\Z)",
+        script,
+        flags=re.DOTALL,
+    )
+    assert root_guard is not None
+    assert "CLAUDE\\.md" in root_guard.group(1)
+    assert "SKILLS\\.md" in root_guard.group(1)
+
+
 def test_pytest_asyncio_default_loop_scope_is_configured() -> None:
     pyproject = Path("pyproject.toml").read_text(encoding="utf-8")
     assert "asyncio_default_fixture_loop_scope" in pyproject
