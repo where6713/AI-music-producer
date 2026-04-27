@@ -5,6 +5,7 @@ projects/_shared/corpus/Chinese_Lyrics.zip
 # Runtime/transient artifacts
 .tmp/
 .sisyphus/
+.worktrees/
 **/__pycache__/
 
 # Generated outputs
