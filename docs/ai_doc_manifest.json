@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "2.1.1",
   "policy": {
     "mode": "ai-oriented",
     "single_source_required": true,
@@ -8,25 +8,51 @@
   },
   "canonical_topics": [
     {
+      "topic_id": "product_prd",
+      "owner_file": "docs/映月工厂_极简歌词工坊_PRD.json",
+      "owner_marker": "\"version\": \"v2.1\"",
+      "forbidden_fulltext_outside_owner": [
+        "Skill-Driven Single-Pass Generation with Dynamic Few-Shot and Surgical Lint",
+        "复杂度红线",
+        "max_llm_calls_per_run",
+        "机制阐释"
+      ]
+    },
+    {
+      "topic_id": "pm_role_rules",
+      "owner_file": "docs/🎵 AI 音乐生成系统产品经理 (PM) Role & Rule.md",
+      "owner_marker": "### 🎵 AI 音乐生成系统产品经理 (PM) Role & Rule",
+      "forbidden_fulltext_outside_owner": [
+        "开发审计补充铁律",
+        "禁止旁路生成，必须走产品主链路",
+        "v2.1 关键字段缺失即一票否决"
+      ]
+    },
+    {
+      "topic_id": "dev_remediation_checklist",
+      "owner_file": "docs/整改task - 02.json",
+      "owner_marker": "\"task_id\": \"TASK-012\"",
+      "forbidden_fulltext_outside_owner": [
+        "映月工厂 · 质量信号链重建（hard gate 化）",
+        "把系统从『软排序+兜底』重写为『硬门禁+fail-loud』",
+        "PR-012-01",
+        "PR-012-07",
+        "hard-kill",
+        "QUALITY_FLOOR_FAILED"
+      ]
+    },
+    {
       "topic_id": "one_law",
       "owner_file": "one law.md",
       "owner_marker": "## 唯一法则",
       "forbidden_fulltext_outside_owner": [
-        "凡新增内容，必须同时满足三条"
-      ]
-    },
-    {
-      "topic_id": "dev_order_law",
-      "owner_file": "one law.md",
-      "owner_marker": "## 开发顺序法则",
-      "forbidden_fulltext_outside_owner": [
-        "先法则，后 Hook；先测试，后实现；先通过 Hook，再允许流程扩张"
+        "凡新增内容，必须同时满足四条"
       ]
     },
     {
       "topic_id": "rule_13_18",
       "owner_file": "目录框架规范.md",
-      "owner_marker": "## 7. RULE-13 ~ RULE-18（最优解版本）",
+      "owner_marker": "## 7. RULE-13 ~ RULE-18",
       "forbidden_fulltext_outside_owner": [
         "RULE-13（命名规范）",
         "RULE-14（单一输出）",
@@ -34,15 +60,6 @@
         "RULE-16（反漂移）",
         "RULE-17（最小复杂度）",
         "RULE-18（可安装性）"
-      ]
-    },
-    {
-      "topic_id": "violation_handling",
-      "owner_file": "目录框架规范.md",
-      "owner_marker": "## 9. 违规处理流程（Violation Handling）",
-      "forbidden_fulltext_outside_owner": [
-        "立即停止当前 Task",
-        "清理异常产物并回滚到最近可验证状态"
       ]
     }
   ]

@@ -1,0 +1,416 @@
+{
+  "task_id": "TASK-011",
+  "codename": "映月工厂 · Profile 路由整改复议",
+  "version": "v1.0",
+  "issued_date": "2026-04-22",
+  "issued_by": "顶级 Suno/MiniMax 填词专家 + AI 音乐管线架构师",
+  "supersedes": "TASK-010 中 P-010-01 / P-010-02 / P-010-03 / P-010-06",
+  "preserves_from_TASK_010": [
+    "P-010-04（删除 _polish_readability / _force_hook_line_pass，后处理禁止语义改写）",
+    "P-010-05（废除 DEFAULT_FILLER_POOL 模板句池填充）",
+    "P-010-07（corpus 扩展 learn_point / do_not_copy / craft_signature）",
+    "P-010-08（compile audit.md 可读审计报告）"
+  ],
+
+  "诊断结论": {
+    "TASK_010_错误范畴": "把单一音乐语域的 craft 共识全局化，导致系统带有隐性偏见：默认所有歌都是都市内省慢歌。",
+    "后果": [
+      "古筝/冥想/古风类产出被迫塞入都市具象名词（公交卡、备忘录），出现跨语域缝合怪",
+      "club dance / uplift pop 被 R15（具象密度）和 R16（陈词黑名单）误伤",
+      "corporate event 歌词的功能性重复被判违规",
+      "语料覆盖的单一性（若真的只抽到都市内省样本）会进一步强化这个偏见"
+    ],
+    "架构级修正": "Profile 一等公民 + 语料投票路由 + 规则参数化，不改管线方向，不加 LLM 调用"
+  },
+
+  "架构原则": {
+    "原则_1_策略模式分派": "lint 规则表（R01-R17）保持全局不变，每条规则的参数由 profile 提供；不同 profile 触发不同阈值、不同黑名单、不同容忍度。",
+    "原则_2_语料投票": "profile 由 retriever 返回的样本多数票决定，不由用户声明决定；--profile 仅作 override。",
+    "原则_3_语料多元化防腐": "corpus 必须按 profile 均衡覆盖，任何 profile 样本数 < 最小阈值 即 corpus 失衡告警；profile 缺席 = 那个风格永远抽不到 = 系统永远不会误生成。",
+    "原则_4_黑名单分层": "极少量全局黑名单（纯 AI 幻觉 N-gram）+ profile 级黑名单（语域内陈词）。",
+    "原则_5_Skill 模块化": "SKILL.md 拆成『核心骨架』+『profile fragments』，运行时拼接；fragment 由 profile_id 选择。",
+    "原则_6_fallback_显式化": "profile 推断失败 → 不静默降级到都市内省 → 抛 ambiguous_profile 事件，让 CLI 追问或走 --profile override。"
+  },
+
+  "PM_测试成功标准_绑定": {
+    "single_source": "docs/🎵 AI 音乐生成系统产品经理 (PM) Role & Rule.md",
+    "说明": "所有 test pass 结论必须同时满足 PM Role & Rule 第五/六/七/八/九法则，代码测试通过不等于 PM 放行。",
+    "必须同时成立": [
+      "pytest 通过统计可复现",
+      "G0..G7 gate 通过且可复现",
+      "pm-audit 命令通过",
+      "真实主链路产物五件套齐全（lyrics/style/exclude/lyric_payload/trace）",
+      "trace 字段满足 llm_calls<=2，且 few_shot_examples_used/variants/chosen_variant_id 可追溯",
+      "禁止 Mock 数据与旁路脚本证据",
+      "配置生效证据（.env 指定 endpoint/model 被实际使用，无静默 fallback）"
+    ]
+  },
+
+  "patch_list": [
+    {
+      "patch_id": "P-011-01",
+      "target": "src/profiles/registry.json（新增）",
+      "action": "建立 Profile Registry，注册 5 个初始 profile",
+      "content_示例_简写": {
+        "urban_introspective": {
+          "display_name": "都市内省",
+          "typical_genres": ["中文民谣", "都市流行", "indie pop"],
+          "typical_moods": ["哀愁", "怀旧", "克制释怀"],
+          "craft_focus": "具象化身体记账 + 场景锚定",
+          "R15_concrete_density": {"verse_min": 3, "chorus_min": 1, "enforced": true},
+          "R16_profile_forbidden": [
+            "学会放下", "慢慢放下", "默默走远", "各自安好",
+            "回到原点", "回原点", "归零", "归位",
+            "应停的位置", "该在的位置", "慢慢习惯", "终究会习惯"
+          ],
+          "R17_first_person_ratio_max": 0.4,
+          "narrative_style": "linear_progression",
+          "variant_differentiation": "POV + 场景框架（内景/外景/对照）",
+          "chorus_repetition_allowed": false,
+          "abstraction_tolerance": "low"
+        },
+        "classical_restraint": {
+          "display_name": "古风留白",
+          "typical_genres": ["古风", "新古典", "国风", "禅意"],
+          "typical_moods": ["意境", "空寂", "怀古", "禅思"],
+          "craft_focus": "意象并置 + 留白 + 典故克制",
+          "R15_concrete_density": {"verse_min": 0, "chorus_min": 0, "enforced": false, "alternative_check": "意象独特性"},
+          "R16_profile_forbidden": [
+            "繁华落尽", "红尘滚滚", "一纸离愁",
+            "岁月如梭", "时光荏苒", "此情可待成追忆"
+          ],
+          "R17_first_person_ratio_max": 0.2,
+          "narrative_style": "imagery_juxtaposition",
+          "variant_differentiation": "意象系统（山水/宫阙/禅寺）",
+          "chorus_repetition_allowed": false,
+          "abstraction_tolerance": "high",
+          "additional_constraints": "禁止都市具象名词（手机/电梯/地铁/备忘录/充电线），除非刻意对照"
+        },
+        "uplift_pop": {
+          "display_name": "明亮流行",
+          "typical_genres": ["华语流行", "K-pop 风", "青春 pop"],
+          "typical_moods": ["愉悦", "悸动", "阳光", "勇敢"],
+          "craft_focus": "画面感 + 朗朗上口 + 情绪直给",
+          "R15_concrete_density": {"verse_min": 1, "chorus_min": 0, "enforced": true},
+          "R16_profile_forbidden": [
+            "霓虹天空", "电流心动", "带电的心", "燃烧星空"
+          ],
+          "R17_first_person_ratio_max": 0.6,
+          "narrative_style": "emotional_arc_ABAB",
+          "variant_differentiation": "叙事时间点（初见/热恋/回望）",
+          "chorus_repetition_allowed": true,
+          "abstraction_tolerance": "medium",
+          "note": "本 profile 允许适度『美丽陈词』，因为口语化温度比独创性优先"
+        },
+        "club_dance": {
+          "display_name": "律动舞曲",
+          "typical_genres": ["EDM", "house", "dance pop", "tropical"],
+          "typical_moods": ["热烈", "释放", "躁动"],
+          "craft_focus": "口感 + 重复 + 动词驱动",
+          "R15_concrete_density": {"enforced": false},
+          "R16_profile_forbidden": [],
+          "R17_first_person_ratio_max": 1.0,
+          "narrative_style": "hook_repetition_dominant",
+          "variant_differentiation": "Hook 口号差异 + BPM 感差异",
+          "chorus_repetition_allowed": true,
+          "chorus_repetition_encouraged": true,
+          "abstraction_tolerance": "high",
+          "additional_constraints": "严禁 Verse 叙事过满；Pre-Chorus 必须有起势动词；Hook <=6 个字的短句优先"
+        },
+        "ambient_meditation": {
+          "display_name": "环境冥想",
+          "typical_genres": ["ambient", "new age", "冥想配乐", "ASMR 人声"],
+          "typical_moods": ["平静", "空灵", "冥想", "疗愈"],
+          "craft_focus": "抽象意象 + 呼吸节奏 + 静态循环",
+          "R15_concrete_density": {"verse_max": 1, "enforced": true, "direction": "upper_bound"},
+          "R16_profile_forbidden": [
+            "心安之处", "此心安处", "慢慢好起来", "一切都会好"
+          ],
+          "R17_first_person_ratio_max": 0.15,
+          "narrative_style": "static_circulation",
+          "variant_differentiation": "自然元素主轴（水/光/风）",
+          "chorus_repetition_allowed": true,
+          "abstraction_tolerance": "very_high",
+          "additional_constraints": "鼓励留白；允许不完整句；禁止叙事推进感"
+        }
+      },
+      "registry_元字段": {
+        "version": "profile-registry/v1.0",
+        "extensible": "研发团队可追加新 profile，但必须先提交 profile_spec PR，不允许在代码里写死未注册 profile"
+      }
+    },
+
+    {
+      "patch_id": "P-011-02",
+      "target": "src/profiles/global_rules.json（新增）",
+      "action": "建立极小的全局黑名单（纯 AI 幻觉 N-gram）",
+      "content": {
+        "global_always_forbidden": [
+          "霓虹天空", "霓虹之城", "电流般的心", "带电的心",
+          "数字洪流", "比特之海",
+          "灵魂共振", "频率相同的灵魂",
+          "平行时空的你", "另一个宇宙的我"
+        ],
+        "规则": "此列表只收录『无论什么音乐 profile 都恶心』的 LLM 幻觉 N-gram；『学会放下』级别的词归各 profile 自己管"
+      }
+    },
+
+    {
+      "patch_id": "P-011-03",
+      "target": "src/retriever.py",
+      "action": "retriever 返回结果新增 profile_vote 字段",
+      "新逻辑": [
+        "语料 item 新增 profile_tag 字段（枚举 registry 中的 profile_id）",
+        "retriever 返回 2-3 条样本时，按 profile_tag 计多数票",
+        "返回结构：{samples: [...], profile_vote: 'urban_introspective', vote_confidence: 0.67}",
+        "vote_confidence = 多数票样本数 / 总样本数"
+      ],
+      "硬规则": ["无 ML", "纯字典过滤 + Counter", "< 30 行代码新增"]
+    },
+
+    {
+      "patch_id": "P-011-04",
+      "target": "src/profile_router.py（新增）",
+      "action": "实现 profile 分派器",
+      "分派优先级": [
+        "1. CLI --profile 显式指定（最高优先级，人类 override）",
+        "2. genre_hint 命中 registry 中某 profile 的 typical_genres（精确映射）",
+        "3. retriever 返回的 profile_vote，且 vote_confidence >= 0.67",
+        "4. mood_hint 单独推断（模糊匹配）",
+        "5. 以上全部失败 → 抛 AmbiguousProfileError"
+      ],
+      "错误处理": {
+        "AmbiguousProfileError": "CLI 层捕获 → 打印候选 profile 列表 → 要求用户 --profile 指定 → 绝不静默 fallback 到任何默认 profile",
+        "理由": "静默 fallback 就是系统性偏见的源头；显式报错强制操作者意识到歧义"
+      },
+      "代码规模": "约 50 行，纯字典查找 + if/else 优先级"
+    },
+
+    {
+      "patch_id": "P-011-05",
+      "target": ".claude/skills/lyric-craftsman/（目录结构改造）",
+      "action": "SKILL.md 模块化拆分",
+      "新目录结构": {
+        "SKILL.md": "核心骨架：加载顺序、POV 稳定性、动宾合法性 self-check（保留 TASK-010 P-010-01 中的动宾合法性章节，这部分跨 profile 通用）、三变体 Phase B.5 骨架",
+        "fragments/urban_introspective.md": "都市内省专属：具象密度要求、叙事推进节奏、陈词红旗",
+        "fragments/classical_restraint.md": "古风留白专属：意象系统、典故克制、留白节奏",
+        "fragments/uplift_pop.md": "明亮流行专属：情绪直给、口语化权衡",
+        "fragments/club_dance.md": "律动舞曲专属：Hook 重复、口感优先、动词驱动",
+        "fragments/ambient_meditation.md": "环境冥想专属：抽象许可、不完整句许可、静态循环"
+      },
+      "加载逻辑": {
+        "step_1": "永远加载 SKILL.md 核心骨架",
+        "step_2": "根据 profile_router 的输出，加载对应 fragments/{profile_id}.md 追加",
+        "step_3": "core + fragment 组合作为系统提示注入单次 LLM 调用"
+      },
+      "跨 profile 通用的铁律（保留在 SKILL.md 核心）": [
+        "动宾搭配合法性（折成静默 / 浇浅 / 收回来 这类概念动词幻觉跨 profile 都禁）",
+        "POV 选定后不漂移",
+        "三变体差异框架（具体差异维度由 fragment 定义）",
+        "禁止抄袭 few-shot 示例连续 >4 字",
+        "输出严格遵循 lyric_payload JSON schema"
+      ]
+    },
+
+    {
+      "patch_id": "P-011-06",
+      "target": "src/lint.py",
+      "action": "R01-R17 全部接受 profile 参数，规则体保持不变",
+      "签名改造": "所有 rule_check_function(variant, profile) → 从 profile 读取阈值/黑名单",
+      "关键规则参数化": {
+        "R14_动宾合法性": "跨 profile 通用，规则表不变（折成/浇浅/收回来 这类都是跨 profile 违规）",
+        "R15_具象密度": {
+          "行为": "读 profile.R15_concrete_density；若 enforced=false，规则跳过并在 lint_report 标 'skipped_by_profile'",
+          "direction=upper_bound 时": "ambient_meditation 下具象密度 > 上限反而算违规"
+        },
+        "R16_陈词检测": {
+          "行为": "合并 global_always_forbidden + profile.R16_profile_forbidden 为本次黑名单",
+          "违规报告": "必须注明命中的是全局还是 profile 级别"
+        },
+        "R17_代词堆叠": "读 profile.R17_first_person_ratio_max；ambient_meditation 下阈值自然更严"
+      },
+      "lint_report_新增字段": {
+        "active_profile": "本次 lint 使用的 profile_id",
+        "skipped_rules_by_profile": "因 profile 豁免而跳过的规则列表",
+        "profile_specific_violations": "区分全局违规 / profile 违规"
+      },
+      "红线": ["lint 仍然只评分不改写", "lint 仍然不调 LLM"]
+    },
+
+    {
+      "patch_id": "P-011-07",
+      "target": "corpus/ 目录",
+      "action": "语料多元化防腐补齐（本补丁是整改有效性的前提条件）",
+      "最低覆盖要求": {
+        "urban_introspective": ">= 200 条",
+        "classical_restraint": ">= 200 条（古典诗词主力承担）",
+        "uplift_pop": ">= 150 条",
+        "club_dance": ">= 100 条（含英文 dance 歌词许可）",
+        "ambient_meditation": ">= 80 条（最少；此类语料稀缺是已知事实）"
+      },
+      "item_schema_扩展": {
+        "新增字段": {
+          "profile_tag": "枚举：urban_introspective / classical_restraint / uplift_pop / club_dance / ambient_meditation",
+          "profile_confidence": "浮点 0-1，标注时人工给出的归属置信度"
+        }
+      },
+      "启动自检": {
+        "corpus_balance_check": "系统启动时扫描 corpus，任何 profile 样本数 < 最低要求 → 打印 WARNING 但不阻塞运行",
+        "运行时检查": "若 retriever 命中的样本全来自同一 profile 但置信度低 → 日志记录 'corpus_monoculture_risk'"
+      },
+      "来源建议": {
+        "classical_restraint": "原 PRD 已指定的 chinese-poetry 仓库",
+        "urban_introspective": "原 PRD 已指定的 Chinese-Lyric-Corpus",
+        "uplift_pop": "Chinese-Lyric-Corpus 中高 valence 子集",
+        "club_dance": "需新增英文 Billboard Dance / 华语电音子集（离线一次性爬取）",
+        "ambient_meditation": "冥想 / new age / 禅意歌词（可能需人工挑选 50-80 条起步）"
+      },
+      "规则演进": "语料标注永远是离线批处理一次性工作，运行时语料只读（继承 PRD 红线 3）"
+    },
+
+    {
+      "patch_id": "P-011-08",
+      "target": "src/cli/main.py",
+      "action": "CLI 新增 --profile 参数 + ambiguous 错误提示",
+      "新增参数": "--profile [urban_introspective|classical_restraint|uplift_pop|club_dance|ambient_meditation]",
+      "新增交互": [
+        "AmbiguousProfileError 捕获 → 打印候选 profile 及其 display_name + craft_focus → 提示 --profile 重试",
+        "verbose 模式打印：active_profile + profile_source（来自 --profile / genre_hint / retriever_vote / mood_hint）"
+      ]
+    },
+
+    {
+      "patch_id": "P-011-09",
+      "target": "src/compile.py::audit.md",
+      "action": "audit.md 新增 profile 决策追溯段",
+      "新增段落": {
+        "第_0_节_Profile 决策": [
+          "active_profile + display_name",
+          "profile_source（谁决定的）",
+          "vote_confidence（若来自 retriever vote）",
+          "本次 lint 跳过的规则及原因（profile 豁免）"
+        ]
+      },
+      "rationale": "让终审在 3 秒内验证：模型用对语域了吗？规则配对了吗？"
+    },
+
+    {
+      "patch_id": "P-011-10",
+      "target": "tools/githooks/* + tools/scripts/install_hook_chain.ps1 + tools/scripts/run_quality_gates_ci.sh",
+      "action": "将 Hooks 纳入整改计划并设为默认执行护栏",
+      "目标": [
+        "pre-commit：执行 docs 一致性、红线扫描、关键契约快速校验",
+        "commit-msg：校验提交消息格式与 gate scope 约束",
+        "pre-push：强制最小回归（pytest -q + gate-check --all）",
+        "post-commit：仅做可观测性回写，不做语义改写"
+      ],
+      "硬约束": [
+        "禁止 --no-verify",
+        "禁止绕过 hooks 直接推送",
+        "本地 hooks 与 CI quality-gates 必须语义一致"
+      ]
+    },
+
+    {
+      "patch_id": "P-011-11",
+      "target": "tests/ + 开发流程（Red-Green-Refactor）",
+      "action": "将 TDD 纳入整改计划并作为默认研发流程",
+      "要求": [
+        "所有功能性改动先写失败测试（Red）再写实现（Green）再回归重构（Refactor）",
+        "每个 patch 至少包含 1 个新增或更新的可复现测试用例",
+        "BUG 修复必须附带回归测试，禁止仅靠手工验证",
+        "PR 回传中必须附测试证据（专项测试 + 全量 pytest）"
+      ],
+      "验收口径": {
+        "最低要求": [
+          "python -m pytest -q 全绿",
+          "python -m apps.cli.main gate-check --all 通过",
+          "python -m apps.cli.main pm-audit 通过"
+        ],
+        "PM_命令基线": [
+          "pytest -q",
+          "python -m apps.cli.main gate-check --all",
+          "python -m apps.cli.main pm-audit",
+          "对应 Gate 专项命令（scope-check/failure-evidence-check/pass-evidence-check/docs-alignment-check）"
+        ],
+        "证据": "评论中粘贴命令 + 输出摘要 + 产物路径 + 关键 trace 字段"
+      }
+    }
+  ],
+
+  "data_schemas_增量": {
+    "user_input_v1_新增": {
+      "profile_override": "enum[urban_introspective,classical_restraint,uplift_pop,club_dance,ambient_meditation,null]"
+    },
+    "lyric_payload_v2_2_新增": {
+      "active_profile": "enum",
+      "profile_source": "enum[cli_override,genre_match,corpus_vote,mood_inference]",
+      "profile_vote_confidence": "float 0-1 | null",
+      "skipped_rules_by_profile": "array of rule_id"
+    }
+  },
+
+  "新增_AC": {
+    "AC_25": "五个 profile 各跑 3 个 intent 回归（共 15 次），active_profile 匹配人工预期 >= 14/15",
+    "AC_26": "corpus 各 profile 样本数达到最低覆盖要求，启动自检无 corpus_monoculture WARNING",
+    "AC_27": "古筝冥想 / 古风留白 intent 产出中，lint 不再误报 R15 具象密度违规（skipped_by_profile 生效）",
+    "AC_28": "uplift pop / club dance intent 产出中，『学会放下』等都市内省黑名单词汇不被误杀",
+    "AC_29": "5 个跨 profile 盲评（各 1 首）：人类评委判『这像这个风格的歌』>= 4/5",
+    "AC_30": "AmbiguousProfileError 触发后必须显式报错 + 候选提示，禁止静默 fallback（代码 grep 验证无 hardcoded default）",
+    "AC_31": "audit.md 第 0 节 Profile 决策完整，profile_source 可追溯",
+    "AC_32": "Hooks 全链路生效：pre-commit / commit-msg / pre-push / post-commit 可在本地复现，且与 CI 规则一致",
+    "AC_33": "TDD 证据完整：新增功能或修复均有 Red->Green 的测试链路，且 PR 回传含专项+全量测试通过证据",
+    "AC_34": "PM 审计标准闭环：pytest/gate-check/pm-audit 同时通过 + 五件套产物齐全 + llm_calls<=2 + few_shot_examples_used/variants/chosen_variant_id 齐全",
+    "AC_35": "法则六/七落地：真实主链路、真实数据、禁止静默 fallback（配置异常必须显式失败）"
+  },
+
+  "复杂度核查": {
+    "新增 LLM 调用": 0,
+    "新增外部依赖": 0,
+    "新增代码行数": {
+      "profile_router.py": "~50 行",
+      "profiles/registry.json": "数据文件，~400 行 JSON",
+      "profiles/global_rules.json": "~30 行",
+      "SKILL.md fragments × 5": "每个约 40-80 行 markdown",
+      "retriever.py 扩展": "~30 行",
+      "lint.py 参数化改造": "~100 行（签名变更遍布但逻辑不变）",
+      "compile.py audit 段": "~30 行",
+      "cli 扩展": "~40 行"
+    },
+    "SKILL core + fragment 复合加载增量 tokens": "单 fragment 约 500-800 tokens，相对 v2.1 的 2000 input tokens 增幅 <40%",
+    "corpus 补齐": "离线一次性工作"
+  },
+
+  "不准做的事": [
+    "不准把 profile 写死在 lint/retriever/SKILL 代码里（必须从 registry 读）",
+    "不准给 profile_router 加隐式 default fallback（ambiguous 必须显式报错）",
+    "不准跨 profile 共享 R16 陈词黑名单（除 global_rules.json 外）",
+    "不准在 corpus 失衡时静默继续（必须 WARNING）",
+    "不准因为 ambient_meditation 样本难找就把它归并到 classical_restraint（两个 profile 的 craft_focus 本质不同）",
+    "不准在后处理层插入任何 profile 判别代码（profile 只在 retriever/router/lint/SKILL 加载处出现）",
+    "不准把 profile 决策交给 LLM（必须规则 + 投票硬路由，保可审计）",
+    "不准使用 --no-verify 跳过 hooks",
+    "不准提交无测试证据的功能改动（必须遵循 TDD）",
+    "不准引入新依赖（Counter 是 collections 标准库，json 也是）"
+  ],
+
+  "执行顺序": [
+    "安装并验证 hooks 链（install_hook_chain + pre-commit/pre-push 本地演练）",
+    "建立 TDD 基线（定义 Red->Green->Refactor 回传模板）",
+    "profiles/registry.json + global_rules.json 初稿（5 个 profile 完整定义）",
+    "SKILL.md 核心骨架 + 5 个 fragment markdown 撰写",
+    "profile_router.py + retriever.py 扩展（profile_vote）",
+    "lint.py R01-R17 参数化改造 + lint_report 结构升级",
+    "compile.py audit 第 0 节 + CLI --profile 参数 + 错误交互",
+    "corpus item_schema 扩展 + 离线脚本给已有样本打 profile_tag",
+    "corpus 补齐（uplift_pop / club_dance / ambient_meditation 采集）",
+    "5 profile × 3 intent = 15 次回归，AC-25 至 AC-35 验收",
+    "跨 profile 盲评 + Candice 终审"
+  ],
+
+  "签字": {
+    "结论": "TASK-010 的 craft 层诊断正确但药方单一化。TASK-011 把 craft 规则从编译期常量降级为运行期参数，由语料投票路由分派。管线主干仍然严谨如 DAG，但 craft 层面承认『不同音乐有不同 craft 共识』这个基本事实。这既消灭了 AI 恶心拼凑词（在各自 profile 内 craft 仍然严格约束），又保留了跨语域创作活力（不把都市内省的偏见强加给古筝和舞曲）。语料多元化是这个架构的免疫系统——profile 缺样本=那个风格永远生不出来，腐化从源头拦截。",
+    "issued_by": "顶级 Suno/MiniMax 填词专家 + AI 音乐管线架构师",
+    "date": "2026-04-22"
+  }
+}

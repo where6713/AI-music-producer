@@ -1,0 +1,19 @@
+{
+  "repo": "https://github.com/gaussic/Chinese-Lyric-Corpus",
+  "commit_sha": "85e4d1eb8cc07e36c8f7ed7a13f00f7e73811cad",
+  "targets": {
+    "uplift_pop": 500,
+    "urban_introspective": 260,
+    "club_dance": 200,
+    "ambient_meditation": 180
+  },
+  "accepted_by_profile": {
+    "urban_introspective": 260,
+    "club_dance": 200,
+    "ambient_meditation": 180,
+    "uplift_pop": 500
+  },
+  "candidate_rows": 2122,
+  "filtered_out": 982,
+  "duplicate_source_id": 0
+}
