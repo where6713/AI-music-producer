@@ -30,6 +30,10 @@ TAG_WHITELIST = {
     "[Breakdown]",
     "[Instrumental]",
     "[Final Chorus]",
+    "[Beat Break]",
+    "(Pause)",
+    "(Breathe)",
+    "(...)",
 }
 
 OPEN_FINALS = {"a", "ang", "ai", "ao", "ou"}
@@ -66,6 +70,7 @@ RULE_DEFINITIONS: dict[str, RuleSeverity] = {
     "R16_global": RuleSeverity.HARD_KILL,
     "R16_profile": RuleSeverity.HARD_PENALTY,
     "R17": RuleSeverity.SOFT_PENALTY,
+    "R18": RuleSeverity.HARD_PENALTY,
 }
 
 RULE_WEIGHTS: dict[str, int] = {
@@ -79,6 +84,7 @@ RULE_WEIGHTS: dict[str, int] = {
     "R16_global": 10,
     "R16_profile": 5,
     "R17": 3,
+    "R18": 5,
 }
 
 R14_FORBIDDEN_PHRASES = [
@@ -275,31 +281,36 @@ def lint_payload(
                 )
 
     # R01 chorus hook line tail (zh-CN)
+    # Skipped for profiles that use oblique-tone rhyme schemes (e.g. classical_restraint)
+    skip_r01 = bool(profile_cfg.get("skip_R01", False)) if isinstance(profile_cfg, dict) else False
+    if skip_r01:
+        skipped_rules_by_profile.append("R01")
     hook_section = payload.structure.hook_section
     hook_idx = payload.structure.hook_line_index
-    for section in payload.lyrics_by_section:
-        if section.tag != hook_section:
-            continue
-        if 1 <= hook_idx <= len(section.lines):
-            line_text = section.lines[hook_idx - 1].primary.strip()
-            if not _line_tail_ok_zh(line_text):
+    if not skip_r01:
+        for section in payload.lyrics_by_section:
+            if section.tag != hook_section:
+                continue
+            if 1 <= hook_idx <= len(section.lines):
+                line_text = section.lines[hook_idx - 1].primary.strip()
+                if not _line_tail_ok_zh(line_text):
+                    violations.append(
+                        Violation(
+                            rule="R01",
+                            detail="hook line tail is not open-final with level tone",
+                            section=section.tag,
+                            line=hook_idx,
+                        )
+                    )
+            else:
                 violations.append(
                     Violation(
                         rule="R01",
-                        detail="hook line tail is not open-final with level tone",
+                        detail="hook_line_index out of range",
                         section=section.tag,
                         line=hook_idx,
                     )
                 )
-        else:
-            violations.append(
-                Violation(
-                    rule="R01",
-                    detail="hook_line_index out of range",
-                    section=section.tag,
-                    line=hook_idx,
-                )
-            )
 
     # R02 concrete noun overuse <= 3
     tokens: list[str] = []
@@ -393,6 +404,55 @@ def lint_payload(
         ratio = _first_person_ratio(text_lines)
         if ratio > float(max_ratio):
             violations.append(Violation(rule="R17", detail=f"first-person ratio {ratio:.3f} exceeds max {float(max_ratio):.3f}"))
+
+    # R18 prosody symmetry and budget alignment (HARD_PENALTY)
+    SYMMETRY_DELTA_MAX = 2
+    SHORT_LINE_EXEMPT_R18 = 5
+    for section in payload.lyrics_by_section:
+        lines = section.lines
+        for i in range(len(lines) - 1):
+            curr_len = len(lines[i].primary.strip())
+            next_len = len(lines[i + 1].primary.strip())
+            if curr_len <= SHORT_LINE_EXEMPT_R18 or next_len <= SHORT_LINE_EXEMPT_R18:
+                continue
+            if abs(curr_len - next_len) > SYMMETRY_DELTA_MAX:
+                violations.append(
+                    Violation(
+                        rule="R18",
+                        detail=f"prosody symmetry delta {abs(curr_len - next_len)} > {SYMMETRY_DELTA_MAX} between line {i+1} ({curr_len}) and line {i+2} ({next_len})",
+                        section=section.tag,
+                        line=i + 1,
+                    )
+                )
+
+    # R18 prosody budget check
+    if isinstance(trace, dict):
+        prosody = trace.get("prosody_contract", {})
+        if isinstance(prosody, dict):
+            budget_min = prosody.get("syllable_budget_min")
+            budget_max = prosody.get("syllable_budget_max")
+            bpm = prosody.get("bpm")
+            if budget_min is not None or budget_max is not None or bpm is not None:
+                total_syllables = 0
+                for section in payload.lyrics_by_section:
+                    for line in section.lines:
+                        text = line.primary.strip()
+                        if text:
+                            total_syllables += len(text)
+                if budget_min is not None and total_syllables < int(budget_min):
+                    violations.append(
+                        Violation(
+                            rule="R18",
+                            detail=f"total syllables {total_syllables} below budget_min {budget_min}",
+                        )
+                    )
+                if budget_max is not None and total_syllables > int(budget_max):
+                    violations.append(
+                        Violation(
+                            rule="R18",
+                            detail=f"total syllables {total_syllables} exceeds budget_max {budget_max}",
+                        )
+                    )
 
     failed_rules = sorted({v.rule for v in violations})
     severity = evaluate_violation_severity(violations)

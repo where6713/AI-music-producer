@@ -52,14 +52,14 @@ def _payload() -> LyricPayload:
                         {"primary": "夜色还在窗沿徘徊", "backing": "", "tail_pinyin": "", "char_count": 8},
                         {"primary": "指尖悬在未发的对白", "backing": "", "tail_pinyin": "", "char_count": 9},
                         {"primary": "理智把冲动轻轻按开", "backing": "", "tail_pinyin": "", "char_count": 9},
-                        {"primary": "把号码放下吧", "backing": "", "tail_pinyin": "", "char_count": 6},
+                        {"primary": "放下吧", "backing": "", "tail_pinyin": "", "char_count": 3},
                     ],
                 },
                 {
                     "tag": "[Chorus]",
                     "voice_tags_inline": [],
                     "lines": [
-                        {"primary": "把号码放下吧", "backing": "", "tail_pinyin": "", "char_count": 6},
+                        {"primary": "放下吧", "backing": "", "tail_pinyin": "", "char_count": 3},
                         {"primary": "未寄出的月光沉在口袋", "backing": "", "tail_pinyin": "", "char_count": 10},
                         {"primary": "你听不见我学着离开", "backing": "", "tail_pinyin": "", "char_count": 9},
                         {"primary": "我把晚安留给未来", "backing": "", "tail_pinyin": "", "char_count": 8},
@@ -633,25 +633,27 @@ def test_produce_rejects_when_all_variants_dead_after_targeted_revise(tmp_path, 
     from src import main as main_mod
 
     payload = _payload()
+    # Force R03 HARD_KILL by adding a forbidden phrase that exists in lyrics
+    payload.distillation.forbidden_literal_phrases = ["夜色还在窗沿徘徊"]
     dead_sections = [
         {
             "tag": "[Verse 1]",
             "voice_tags_inline": [],
             "lines": [
-                {"primary": "夜色还在窗沿徘徊", "backing": "", "tail_pinyin": "", "char_count": 8},
-                {"primary": "指尖悬在未发的对白", "backing": "", "tail_pinyin": "", "char_count": 9},
-                {"primary": "理智把冲动轻轻按开", "backing": "", "tail_pinyin": "", "char_count": 9},
-                {"primary": "我把想念折成静默", "backing": "", "tail_pinyin": "", "char_count": 8},
-            ],
-        },
-        {
-            "tag": "[Chorus]",
-            "voice_tags_inline": [],
-            "lines": [
-                {"primary": "我把想念折成静默", "backing": "", "tail_pinyin": "", "char_count": 8},
-                {"primary": "未寄出的月光沉在口袋", "backing": "", "tail_pinyin": "", "char_count": 10},
-                {"primary": "你听不见我学着离开", "backing": "", "tail_pinyin": "", "char_count": 9},
-                {"primary": "我把晚安留给未来", "backing": "", "tail_pinyin": "", "char_count": 8},
+                        {"primary": "夜色还在窗沿徘徊", "backing": "", "tail_pinyin": "", "char_count": 8},
+                        {"primary": "指尖悬在未发的对白", "backing": "", "tail_pinyin": "", "char_count": 9},
+                        {"primary": "理智把冲动轻轻按开", "backing": "", "tail_pinyin": "", "char_count": 9},
+                        {"primary": "放下吧", "backing": "", "tail_pinyin": "", "char_count": 3},
+                    ],
+                },
+                {
+                    "tag": "[Chorus]",
+                    "voice_tags_inline": [],
+                    "lines": [
+                        {"primary": "放下吧", "backing": "", "tail_pinyin": "", "char_count": 3},
+                        {"primary": "未寄出的月光沉在口袋", "backing": "", "tail_pinyin": "", "char_count": 10},
+                        {"primary": "你听不见我学着离开", "backing": "", "tail_pinyin": "", "char_count": 9},
+                        {"primary": "我把晚安留给未来", "backing": "", "tail_pinyin": "", "char_count": 8},
             ],
         },
         {

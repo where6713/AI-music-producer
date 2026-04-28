@@ -36,6 +36,7 @@ PM_AUDIT_CHECK_ORDER = [
     "lyrics_no_residuals",
     "postprocess_symbols_absent",
     "profile_source_recorded",
+    "prosody_matrix_aligned",
 ]
 
 
@@ -312,7 +313,7 @@ def pm_audit() -> None:
                         + ": failed_checks="
                         + ",".join([str(x) for x in failed_checks])
                     )
-    typer.echo(f"TOTAL: 8, PASS: {pass_count}, FAIL: {fail_count}, EXIT: {exit_code}")
+    typer.echo(f"TOTAL: 9, PASS: {pass_count}, FAIL: {fail_count}, EXIT: {exit_code}")
     if exit_code != 0:
         raise typer.Exit(code=1)
 

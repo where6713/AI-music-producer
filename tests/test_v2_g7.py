@@ -380,6 +380,8 @@ def test_proof_check_pm_audit_checks_cover_required_items(tmp_path) -> None:
                     "violations": [],
                     "hard_kill_rules": [],
                 },
+                "prosody_matrix_aligned": True,
+                "prosody_contract": {"bpm": 85, "syllable_budget_min": 180, "syllable_budget_max": 240},
             },
             ensure_ascii=False,
             indent=2,
@@ -396,7 +398,7 @@ def test_proof_check_pm_audit_checks_cover_required_items(tmp_path) -> None:
     assert result["status"] == "pass"
     assert result["pm_audit_checks_ok"] is True
     checks = result["pm_audit_checks"]
-    assert len(checks) == 8
+    assert len(checks) == 9
     assert all(bool(item.get("ok", False)) for item in checks.values())
 
 
@@ -467,6 +469,8 @@ def test_check_gate_g7_uses_injected_proof_output_dir(tmp_path) -> None:
                     "violations": [],
                     "hard_kill_rules": [],
                 },
+                "prosody_matrix_aligned": True,
+                "prosody_contract": {"bpm": 85, "syllable_budget_min": 180, "syllable_budget_max": 240},
             },
             ensure_ascii=False,
             indent=2,

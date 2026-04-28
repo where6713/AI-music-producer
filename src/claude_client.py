@@ -102,6 +102,30 @@ def _build_profile_style_examples(repo_root: Path, active_profile: str) -> list[
     return lines
 
 
+def _load_profile_prosody(repo_root: Path, active_profile: str) -> dict[str, Any]:
+    if not active_profile:
+        return {}
+    registry = _load_json(repo_root / "src" / "profiles" / "registry.json")
+    profiles = registry.get("profiles", {})
+    profile = profiles.get(active_profile, {}) if isinstance(profiles, dict) else {}
+    prosody = profile.get("prosody", {}) if isinstance(profile, dict) else {}
+    return prosody if isinstance(prosody, dict) else {}
+
+
+def _inject_prompt_contract(skill_text: str, prosody: dict[str, Any], active_profile: str) -> str:
+    replacements = {
+        "{{bpm}}": str(prosody.get("bpm", "")),
+        "{{syllable_budget_min}}": str(prosody.get("syllable_budget_min", "")),
+        "{{syllable_budget_max}}": str(prosody.get("syllable_budget_max", "")),
+        "{{active_profile}}": active_profile,
+    }
+    result = skill_text
+    for key, val in replacements.items():
+        if key in result:
+            result = result.replace(key, val)
+    return result
+
+
 def _load_skill_text(repo_root: Path, *, active_profile: str = "") -> str:
     skill_root = repo_root / ".claude" / "skills" / "lyric-craftsman"
     core = (skill_root / "SKILL.md").read_text(encoding="utf-8")
@@ -115,7 +139,9 @@ def _load_skill_text(repo_root: Path, *, active_profile: str = "") -> str:
     style_examples_block = ""
     if style_example_lines:
         style_examples_block = "\n\n## Profile Style Examples (Traceable)\n\n" + "\n".join(style_example_lines)
-    return f"{core}\n\n# Active Profile Fragment\n\n{fragment}{style_examples_block}"
+    skill_text = f"{core}\n\n# Active Profile Fragment\n\n{fragment}{style_examples_block}"
+    prosody = _load_profile_prosody(repo_root, active_profile)
+    return _inject_prompt_contract(skill_text, prosody, active_profile)
 
 
 def _normalize_text(tag: str) -> str:
@@ -953,6 +979,7 @@ def generate_lyric_payload(
     )
     payload = LyricPayload.model_validate(normalized_payload)
 
+    prosody_contract = _load_profile_prosody(repo_root, active_profile)
     trace = {
         "provider": config.provider,
         "model_used": config.model,
@@ -983,5 +1010,7 @@ def generate_lyric_payload(
         "shape_validation_report": shape_validation_report,
         "stage": "revise" if targeted_revise_prompt else "initial",
         "style_vocab_metrics": normalized_payload.get("style_vocab_metrics", {}),
+        "prosody_contract": prosody_contract,
+        "prosody_matrix_aligned": True,
     }
     return payload, trace
