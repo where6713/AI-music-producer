@@ -15,6 +15,8 @@ def _write_clean_corpus(corpus_dir, poetry_rows, lyric_rows) -> None:
     clean_dir = corpus_dir / "_clean"
     clean_dir.mkdir(parents=True, exist_ok=True)
 
+    long_learn_point = "Use concrete actions and scene anchors to advance emotion with causal continuity while avoiding template phrasing and direct declarations."
+
     def _normalize(row: dict) -> dict:
         out = dict(row)
         row_type = str(out.get("type", "")).strip().lower()
@@ -26,7 +28,7 @@ def _write_clean_corpus(corpus_dir, poetry_rows, lyric_rows) -> None:
             "valence",
             "neutral" if out.get("profile_tag") == "classical_restraint" else "negative",
         )
-        out.setdefault("learn_point", "保持具象化并避免模板化复写")
+        out.setdefault("learn_point", long_learn_point)
         out.setdefault("do_not_copy", "不要复写原句与段落顺序")
         return out
 
@@ -239,7 +241,7 @@ def test_corpus_balance_keeps_classical_rows_with_rule_c7_only(tmp_path) -> None
             "emotion_tags": ["nostalgia", "restraint", "imagery"],
             "profile_tag": "classical_restraint",
             "valence": "neutral",
-            "learn_point": "学习意象并置与留白表达，避免直白抒情",
+            "learn_point": "Use concrete actions and scene anchors to advance emotion with causal continuity while avoiding template phrasing and direct declarations.",
             "do_not_copy": "禁止复写来源文本原句与意象排列顺序",
             "content": "春眠不觉晓，处处闻啼鸟。",
         }
@@ -252,7 +254,7 @@ def test_corpus_balance_keeps_classical_rows_with_rule_c7_only(tmp_path) -> None
             "emotion_tags": ["breakup", "late-night"],
             "profile_tag": "urban_introspective",
             "valence": "negative",
-            "learn_point": "保留克制语气并用动作推进情绪",
+            "learn_point": "Use concrete actions and scene anchors to advance emotion with causal continuity while avoiding template phrasing and direct declarations.",
             "do_not_copy": "不要复写原句与段落顺序",
             "content": "对话框停在最后一句，指尖仍然悬着。",
         },
@@ -263,7 +265,7 @@ def test_corpus_balance_keeps_classical_rows_with_rule_c7_only(tmp_path) -> None
             "emotion_tags": ["distance", "regret"],
             "profile_tag": "urban_introspective",
             "valence": "negative",
-            "learn_point": "保留克制语气并用动作推进情绪",
+            "learn_point": "Use concrete actions and scene anchors to advance emotion with causal continuity while avoiding template phrasing and direct declarations.",
             "do_not_copy": "不要复写原句与段落顺序",
             "content": "手在拨出前停住，呼吸也跟着发颤。",
         },
@@ -408,6 +410,7 @@ def test_retriever_profile_override_fallbacks_when_same_profile_insufficient(tmp
 
     assert isinstance(result, dict)
     assert result.get("fallback_level") == "fallback_to_global"
+    assert str(result.get("fallback_reason", "")).strip() == "override_profile_insufficient"
     assert len(result["samples"]) >= 2
 
 
@@ -445,7 +448,7 @@ def test_retriever_prefers_clean_corpus_when_available(tmp_path) -> None:
                     "emotion_tags": ["breakup", "late-night"],
                     "profile_tag": "urban_introspective",
                     "valence": "negative",
-                    "learn_point": "保留克制语气并用动作推进情绪",
+                        "learn_point": "Use concrete actions and scene anchors to advance emotion with causal continuity while avoiding template phrasing and direct declarations.",
                     "do_not_copy": "不要复写原句与段落顺序",
                     "profile_confidence": 0.9,
                     "content": "对话框停在最后一句，指尖仍然悬着。",
@@ -457,7 +460,7 @@ def test_retriever_prefers_clean_corpus_when_available(tmp_path) -> None:
                     "emotion_tags": ["distance", "regret"],
                     "profile_tag": "urban_introspective",
                     "valence": "negative",
-                    "learn_point": "保留克制语气并用动作推进情绪",
+                        "learn_point": "Use concrete actions and scene anchors to advance emotion with causal continuity while avoiding template phrasing and direct declarations.",
                     "do_not_copy": "不要复写原句与段落顺序",
                     "profile_confidence": 0.9,
                     "content": "手在拨出前停住，呼吸也跟着发颤。",
@@ -549,7 +552,7 @@ def test_retriever_does_not_relint_rows_on_selection_path(monkeypatch, tmp_path)
             "emotion_tags": ["breakup", "late-night"],
             "profile_tag": "urban_introspective",
             "valence": "negative",
-            "learn_point": "保留克制语气并用动作推进情绪",
+            "learn_point": "Use concrete actions and scene anchors to advance emotion with causal continuity while avoiding template phrasing and direct declarations.",
             "do_not_copy": "不要复写原句与段落顺序",
             "profile_confidence": 0.9,
             "content": "对话框停在最后一句，指尖仍然悬着。",
@@ -561,7 +564,7 @@ def test_retriever_does_not_relint_rows_on_selection_path(monkeypatch, tmp_path)
             "emotion_tags": ["distance", "regret"],
             "profile_tag": "urban_introspective",
             "valence": "negative",
-            "learn_point": "保留克制语气并用动作推进情绪",
+            "learn_point": "Use concrete actions and scene anchors to advance emotion with causal continuity while avoiding template phrasing and direct declarations.",
             "do_not_copy": "不要复写原句与段落顺序",
             "profile_confidence": 0.9,
             "content": "手在拨出前停住，呼吸也跟着发颤。",

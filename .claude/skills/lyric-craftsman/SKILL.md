@@ -26,6 +26,7 @@ description: Generate Suno-ready lyric triplet from raw intent with single-pass 
 
 - 副歌押韵铁律：
   副歌各行的行尾字必须形成可感知的韵脚系统。推荐偶数行同韵（2/4/6行压同一韵部），或全段同韵。写完副歌后逐行朗读行尾字——如果听不出共同韵感，必须重写，直到能哼唱为止。押韵优先于具象密度。
+  **严禁语气词押韵**：禁止用"啊/哦/呢/嘛/嗯/哟"等语气词充当行尾韵脚或节拍填充。韵脚必须落在有语义重量的实词/动词上（如"茶/家/下/画"），语气词只能偶尔出现在行中停顿处，不能作为每行结尾的统一收束。
 
 - Bridge / 尾段升华铁律：
   Bridge 或全曲最后一个有歌词的段落，必须有1句"把前文某个具体意象（光/声音/温度/动作）升华为情绪状态"的句子。禁止用鸡汤式自我宣言（"我终于…"/"我学会了…"/"一切都会好"）替代升华。升华的标准是：听众能在这句话里认出自己的感受，而不是被教导。
@@ -67,25 +68,50 @@ description: Generate Suno-ready lyric triplet from raw intent with single-pass 
 
 ## Suno Tag Whitelist
 
+Section tags may include a production note: `[Chorus - full band, emotional peak]`
+
 - [Intro]
-- [Verse]
-- [Verse 1]
-- [Verse 2]
+- [Verse] / [Verse 1] / [Verse 2]
 - [Pre-Chorus]
 - [Chorus]
 - [Post-Chorus]
 - [Bridge]
 - [Outro]
 - [Hook]
-- [Drop]
+- [Drop]  ← EDM / club_dance ONLY
 - [Build-up]
 - [Breakdown]
 - [Instrumental]
+- [Final Chorus]
+
+## Style Tag Generation Rules
+
+**CRITICAL: Style tags must use Suno-verified vocabulary, not free-form invention.**
+
+Hard constraints for style output:
+- Primary vocabulary must come from `corpus/_knowledge/suno_style_vocab.json`.
+- Secondary vocabulary may come from `corpus/_knowledge/minimax_style_vocab.json` only as supplement.
+- Never let secondary vocab override primary vocab when both exist.
+- OOV terms are blocked from `style_tags` output; replace with in-vocab nearest/profile-default term.
+- Style examples injected by runtime must be traceable with `source_repo` + `source_path`.
+
+When generating `style_tags`, follow this mandatory order (GMIV format):
+1. **Genre** — pick from `suno_style_vocab[profile].genre` (e.g. "chill R&B", "ancient Chinese")
+2. **Mood** — pick from `suno_style_vocab[profile].mood` (e.g. "bittersweet", "ethereal")
+3. **Instruments** — pick 2-3 from `suno_style_vocab[profile].instruments`
+4. **Vocal** — pick from `suno_style_vocab[profile].vocal`
+5. **Production** — pick 1-2 from `suno_style_vocab[profile].production`
+
+Rules:
+- Total style string ≤ 200 characters (Suno hard limit)
+- Prefer specific production terms over emotional adjectives: "soft reverb" beats "sad"
+- Use `example_combos` from vocab as your reference point, then customize
+- Do NOT invent new tags not in the vocab unless user explicitly requests a niche genre
 
 ## Output Contract
 
 - `lyrics.txt`: section-tagged lyrics for Suno lyrics box.
-- `style.txt`: 4-8 GMIV style tags.
+- `style.txt`: GMIV-ordered style string, ≤200 chars, using verified Suno vocabulary.
 - `exclude.txt`: negative tags.
 - `lyric_payload.json`: structured debug payload.
 - `trace.json`: run trace and timing.

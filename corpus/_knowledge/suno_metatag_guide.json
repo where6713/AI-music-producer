@@ -1,0 +1,102 @@
+{
+  "_meta": {
+    "version": "2.0",
+    "generated_at": "2026-04-28",
+    "source": [
+      "entrepeneur4lyf/suno_ai_meta_tags_guide",
+      "danlex/suno-lab",
+      "VRVirtuosos/awesome-suno-prompts"
+    ],
+    "schema": "records-v1"
+  },
+  "records": [
+    {
+      "source_repo": "entrepeneur4lyf/suno_ai_meta_tags_guide",
+      "source_path": "README.md#core-meta-tag-categories",
+      "profile": "urban_introspective",
+      "genre_tags": ["R&B", "indie pop", "lo-fi pop"],
+      "mood_tags": ["melancholic", "nostalgic", "intimate"],
+      "instrument_tags": ["piano", "acoustic guitar", "warm bass"],
+      "production_tags": ["room reverb", "tape saturation", "close mic"],
+      "meta_tags": {
+        "structure": ["[Intro]", "[Verse]", "[Pre-Chorus]", "[Chorus]", "[Bridge]", "[Outro]"],
+        "vocal": ["breathy", "female vocals", "smooth vocals"],
+        "effect": ["reverb", "delay", "warm"],
+        "placement_rules": [
+          "structure tags in lyrics field",
+          "style descriptors in style field",
+          "keep 3-8 tags per section"
+        ]
+      },
+      "example_style_lines": [
+        "[Verse | intimate | close mic]",
+        "[Chorus | emotional peak | harmonies]",
+        "[Bridge | stripped back | reflective]"
+      ],
+      "confidence": "high"
+    },
+    {
+      "source_repo": "entrepeneur4lyf/suno_ai_meta_tags_guide",
+      "source_path": "README.md#classical",
+      "profile": "classical_restraint",
+      "genre_tags": ["classical", "Chinese traditional", "orchestral"],
+      "mood_tags": ["serene", "meditative", "dramatic"],
+      "instrument_tags": ["guqin", "pipa", "strings", "flute"],
+      "production_tags": ["hall reverb", "dynamic range", "natural"],
+      "meta_tags": {
+        "structure": ["[Intro]", "[Verse]", "[Bridge]", "[Outro]"],
+        "vocal": ["traditional Chinese female vocals", "clear voice"],
+        "effect": ["hall reverb", "crescendo", "diminuendo"],
+        "placement_rules": [
+          "classical sections can use theme labels",
+          "avoid over-tagging above 5 tags per section"
+        ]
+      },
+      "example_style_lines": [
+        "[Intro | adagio | spacious]",
+        "[Verse | guqin and pipa | restrained dynamics]",
+        "[Outro | natural reverb | stillness]"
+      ],
+      "confidence": "high"
+    },
+    {
+      "source_repo": "entrepeneur4lyf/suno_ai_meta_tags_guide",
+      "source_path": "README.md#electronic--edm",
+      "profile": "club_dance",
+      "genre_tags": ["EDM", "house", "electronic"],
+      "mood_tags": ["high energy", "euphoric", "explosive"],
+      "instrument_tags": ["synth lead", "sub bass", "electronic drums"],
+      "production_tags": ["sidechain compression", "filter sweep", "impact"],
+      "meta_tags": {
+        "structure": ["[Build-up]", "[Drop]", "[Breakdown]", "[Outro]"],
+        "vocal": ["vocal chops", "processed vocals"],
+        "effect": ["riser", "reverse reverb", "sidechaining"],
+        "placement_rules": [
+          "drop tags only in dance profile",
+          "declare BPM and drop timing when possible"
+        ]
+      },
+      "example_style_lines": [
+        "[Build-up | rising tension | filter sweep]",
+        "[Drop | full synth | sidechain bass]",
+        "[Breakdown | minimal | breath before second drop]"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "structure_tags": {
+    "tags": [
+      "[Intro]",
+      "[Verse]",
+      "[Pre-Chorus]",
+      "[Chorus]",
+      "[Post-Chorus]",
+      "[Bridge]",
+      "[Outro]",
+      "[Build-up]",
+      "[Drop]",
+      "[Breakdown]",
+      "[Instrumental]"
+    ]
+  }
+}

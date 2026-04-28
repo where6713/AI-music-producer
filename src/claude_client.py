@@ -11,6 +11,97 @@ from src.retriever import retrieve_few_shot_examples
 from src.schemas import LyricPayload, UserInput
 
 
+PROFILE_IDS = {
+    "urban_introspective",
+    "uplift_pop",
+    "club_dance",
+    "ambient_meditation",
+    "classical_restraint",
+}
+
+
+def _load_json(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    try:
+        loaded = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+    return loaded if isinstance(loaded, dict) else {}
+
+
+def _style_records_to_profile_vocab(records: list[dict[str, Any]]) -> dict[str, dict[str, list[str]]]:
+    out: dict[str, dict[str, list[str]]] = {}
+    for row in records:
+        profile = str(row.get("profile", "")).strip()
+        if profile not in PROFILE_IDS:
+            continue
+        slot = out.setdefault(profile, {
+            "genre": [], "mood": [], "instruments": [], "vocals": [], "production": [], "examples": []
+        })
+        mappings = {
+            "genre": row.get("genre_tags", []),
+            "mood": row.get("mood_tags", []),
+            "instruments": row.get("instrument_tags", []),
+            "production": row.get("production_tags", []),
+            "vocals": list((row.get("meta_tags") or {}).get("vocal", [])) if isinstance(row.get("meta_tags"), dict) else [],
+            "examples": row.get("example_style_lines", []),
+        }
+        for key, raw in mappings.items():
+            if not isinstance(raw, list):
+                continue
+            for item in raw:
+                text = str(item).strip()
+                if text and text not in slot[key]:
+                    slot[key].append(text)
+    return out
+
+
+def _load_style_knowledge(repo_root: Path) -> dict[str, Any]:
+    knowledge_dir = repo_root / "corpus" / "_knowledge"
+    suno = _load_json(knowledge_dir / "suno_style_vocab.json")
+    minimax = _load_json(knowledge_dir / "minimax_style_vocab.json")
+
+    def _extract_vocab(payload: dict[str, Any]) -> dict[str, dict[str, list[str]]]:
+        by_profile = payload.get("by_profile", {})
+        if isinstance(by_profile, dict) and by_profile:
+            normalized: dict[str, dict[str, list[str]]] = {}
+            for profile, vals in by_profile.items():
+                if str(profile).strip() not in PROFILE_IDS or not isinstance(vals, dict):
+                    continue
+                normalized[str(profile)] = {
+                    "genre": [str(x).strip() for x in vals.get("genre", []) if str(x).strip()],
+                    "mood": [str(x).strip() for x in vals.get("mood", []) if str(x).strip()],
+                    "instruments": [str(x).strip() for x in vals.get("instruments", []) if str(x).strip()],
+                    "vocals": [str(x).strip() for x in vals.get("vocal", vals.get("vocals", [])) if str(x).strip()],
+                    "production": [str(x).strip() for x in vals.get("production", []) if str(x).strip()],
+                    "examples": [str(x).strip() for x in vals.get("example_combos", vals.get("example_style_lines", [])) if str(x).strip()],
+                }
+            return normalized
+        records = payload.get("records", [])
+        if isinstance(records, list):
+            return _style_records_to_profile_vocab([x for x in records if isinstance(x, dict)])
+        return {}
+
+    return {
+        "primary": _extract_vocab(suno),
+        "secondary": _extract_vocab(minimax),
+    }
+
+
+def _build_profile_style_examples(repo_root: Path, active_profile: str) -> list[str]:
+    knowledge = _load_style_knowledge(repo_root)
+    primary = knowledge.get("primary", {}).get(active_profile, {}) if active_profile else {}
+    examples = [str(x).strip() for x in primary.get("examples", []) if str(x).strip()] if isinstance(primary, dict) else []
+    selected = examples[:3]
+    lines: list[str] = []
+    for idx, ex in enumerate(selected, start=1):
+        lines.append(
+            f"{idx}. {ex} (source_repo=danlex/suno-lab|VRVirtuosos/awesome-suno-prompts, source_path=corpus/_knowledge/suno_style_vocab.json)"
+        )
+    return lines
+
+
 def _load_skill_text(repo_root: Path, *, active_profile: str = "") -> str:
     skill_root = repo_root / ".claude" / "skills" / "lyric-craftsman"
     core = (skill_root / "SKILL.md").read_text(encoding="utf-8")
@@ -20,7 +111,85 @@ def _load_skill_text(repo_root: Path, *, active_profile: str = "") -> str:
     if not fragment_path.exists():
         return core
     fragment = fragment_path.read_text(encoding="utf-8")
-    return f"{core}\n\n# Active Profile Fragment\n\n{fragment}"
+    style_example_lines = _build_profile_style_examples(repo_root, active_profile)
+    style_examples_block = ""
+    if style_example_lines:
+        style_examples_block = "\n\n## Profile Style Examples (Traceable)\n\n" + "\n".join(style_example_lines)
+    return f"{core}\n\n# Active Profile Fragment\n\n{fragment}{style_examples_block}"
+
+
+def _normalize_text(tag: str) -> str:
+    return str(tag or "").strip().lower()
+
+
+def _enforce_vocab_style_tags(style_tags: dict[str, Any], user_input: UserInput, repo_root: Path, active_profile: str) -> tuple[dict[str, Any], dict[str, Any]]:
+    knowledge = _load_style_knowledge(repo_root)
+    primary_profile = knowledge.get("primary", {}).get(active_profile, {}) if active_profile else {}
+    secondary_profile = knowledge.get("secondary", {}).get(active_profile, {}) if active_profile else {}
+
+    allowed_by_key: dict[str, list[str]] = {}
+    for key in ("genre", "mood", "instruments", "vocals", "production"):
+        p = primary_profile.get(key, []) if isinstance(primary_profile, dict) else []
+        s = secondary_profile.get(key, []) if isinstance(secondary_profile, dict) else []
+        allowed: list[str] = []
+        for item in [*p, *s]:
+            text = str(item).strip()
+            if text and text not in allowed:
+                allowed.append(text)
+        allowed_by_key[key] = allowed
+
+    fallback_hint = {
+        "genre": user_input.genre_hint,
+        "mood": user_input.mood_hint,
+        "instruments": "",
+        "vocals": "",
+        "production": "",
+    }
+    out: dict[str, list[str]] = {}
+    total = 0
+    hit = 0
+    oov = 0
+    replacements = 0
+    for key in ("genre", "mood", "instruments", "vocals", "production"):
+        requested = [str(x).strip() for x in style_tags.get(key, []) if str(x).strip()]
+        total += len(requested)
+        allowed = allowed_by_key[key]
+        allowed_norm = {_normalize_text(x): x for x in allowed}
+        selected: list[str] = []
+        for tag in requested:
+            mapped = allowed_norm.get(_normalize_text(tag))
+            if mapped:
+                hit += 1
+                if mapped not in selected:
+                    selected.append(mapped)
+            else:
+                oov += 1
+        if not selected:
+            hinted = str(fallback_hint.get(key, "")).strip()
+            mapped_hint = allowed_norm.get(_normalize_text(hinted)) if hinted else None
+            if mapped_hint:
+                selected = [mapped_hint]
+                replacements += 1
+            elif allowed:
+                selected = [allowed[0]]
+                replacements += 1
+        out[key] = selected
+
+    hit_rate = float(hit / total) if total else 1.0
+    oov_ratio = float(oov / total) if total else 0.0
+    metrics = {
+        "active_profile": active_profile,
+        "style_vocab_total_tags": total,
+        "style_vocab_hits": hit,
+        "style_vocab_oov": oov,
+        "style_vocab_hit_rate": hit_rate,
+        "style_oov_ratio": oov_ratio,
+        "style_replacements": replacements,
+        "primary_vocab_source": "corpus/_knowledge/suno_style_vocab.json",
+        "secondary_vocab_source": "corpus/_knowledge/minimax_style_vocab.json",
+        "injected_profile_examples": min(3, len(primary_profile.get("examples", []))) if isinstance(primary_profile, dict) else 0,
+    }
+    return out, metrics
 
 
 def _extract_json_block(text: str) -> dict[str, Any]:
@@ -164,8 +333,33 @@ def _build_section_rows(raw_lyrics: dict[str, Any], section_order: list[str]) ->
             return "[Bridge]"
         return clean
 
+    def _looks_like_section_key(tag: str) -> bool:
+        clean = tag.strip()
+        if not clean:
+            return False
+        if clean.startswith("[") and clean.endswith("]"):
+            return True
+        lower = clean.lower()
+        return lower.startswith((
+            "verse",
+            "chorus",
+            "pre-chorus",
+            "post-chorus",
+            "bridge",
+            "outro",
+            "intro",
+            "hook",
+            "drop",
+            "build-up",
+            "breakdown",
+            "instrumental",
+            "final chorus",
+        ))
+
     rows: list[dict[str, Any]] = []
     for tag in section_order:
+        if not _looks_like_section_key(tag):
+            continue
         val = raw_lyrics.get(tag, [])
         if isinstance(val, str):
             val = [x for x in val.splitlines() if x.strip()]
@@ -204,9 +398,20 @@ def _normalize_section_tag(raw_tag: object) -> str:
     clean = str(raw_tag or "").strip()
     if not clean:
         return ""
+    lower = clean.lower()
+    if lower in {
+        "pov",
+        "narrative_pov",
+        "lint_result",
+        "variant_id",
+        "id",
+        "rank",
+        "passed_rules",
+        "failed_rules",
+    }:
+        return ""
     if clean.startswith("[") and clean.endswith("]"):
         return clean
-    lower = clean.lower()
     if lower.startswith("verse"):
         suffix = clean[len("verse") :].strip() or "1"
         return f"[Verse {suffix}]"
@@ -298,6 +503,37 @@ def _normalize_style_tags(raw: Any, user_input: UserInput) -> dict[str, Any]:
         "instruments": tags[2:3],
         "vocals": tags[3:4],
         "production": tags[4:5],
+    }
+
+
+def _validate_payload_shape(payload_dict: dict[str, Any]) -> dict[str, Any]:
+    raw = payload_dict.get("lyrics_by_section")
+
+    if isinstance(raw, list):
+        return {
+            "ok": True,
+            "shape": "array<section>",
+            "reason_code": "none",
+        }
+
+    if isinstance(raw, dict):
+        keys = [str(k).strip().lower() for k in raw.keys()]
+        if keys and all(k in {"a", "b", "c"} for k in keys):
+            return {
+                "ok": True,
+                "shape": "object<variant_id,section_like>",
+                "reason_code": "none",
+            }
+        return {
+            "ok": False,
+            "shape": "object<unknown>",
+            "reason_code": "shape_lyrics_dict_not_variant_keyed",
+        }
+
+    return {
+        "ok": False,
+        "shape": "missing_or_invalid",
+        "reason_code": "shape_missing_lyrics_by_section",
     }
 
 
@@ -458,7 +694,11 @@ def _normalize_variants(raw: Any, base_sections: list[dict[str, Any]]) -> tuple[
         if raw_sections is None:
             raw_sections = source.get("lyrics")
         if isinstance(raw_sections, dict):
-            section_rows = _build_section_rows(raw_sections, [x for x in raw_sections.keys() if isinstance(x, str)])
+            sections_list = raw_sections.get("sections")
+            if isinstance(sections_list, list):
+                section_rows = [x for x in sections_list if isinstance(x, dict)]
+            else:
+                section_rows = _build_section_rows(raw_sections, [x for x in raw_sections.keys() if isinstance(x, str)])
         elif isinstance(raw_sections, list):
             section_rows = [x for x in raw_sections if isinstance(x, dict)]
         else:
@@ -528,7 +768,7 @@ def _normalize_variants(raw: Any, base_sections: list[dict[str, Any]]) -> tuple[
 
 
 def _normalize_payload_dict(
-    payload_dict: dict[str, Any], *, user_input: UserInput, model_used: str, few_shot_examples: list[dict[str, Any]]
+    payload_dict: dict[str, Any], *, user_input: UserInput, model_used: str, few_shot_examples: list[dict[str, Any]], repo_root: Path, active_profile: str
 ) -> dict[str, Any]:
     lyrics_by_section = _extract_base_sections(payload_dict)
     structure = _normalize_structure(payload_dict.get("structure"), [x["tag"] for x in lyrics_by_section])
@@ -552,6 +792,9 @@ def _normalize_payload_dict(
                 chosen = str(item.get("variant_id", chosen)).strip().lower() or chosen
                 break
 
+    normalized_style = _normalize_style_tags(payload_dict.get("style_tags"), user_input)
+    constrained_style, style_metrics = _enforce_vocab_style_tags(normalized_style, user_input, repo_root, active_profile)
+
     synthesized = {
         "schema_version": "v2.1",
         "model_used": model_used,
@@ -562,12 +805,13 @@ def _normalize_payload_dict(
         "lyrics_by_section": lyrics_by_section,
         "variants": variants,
         "chosen_variant_id": chosen,
-        "style_tags": _normalize_style_tags(payload_dict.get("style_tags"), user_input),
+        "style_tags": constrained_style,
         "exclude_tags": [
             str(x).strip()
             for x in (payload_dict.get("exclude_tags") if isinstance(payload_dict.get("exclude_tags"), list) else [])
             if str(x).strip()
         ],
+        "style_vocab_metrics": style_metrics,
     }
     return synthesized
 
@@ -690,22 +934,24 @@ def generate_lyric_payload(
                 payload_dict = _v
                 break
 
-    payload = LyricPayload.model_validate(
-        _normalize_payload_dict(
-            payload_dict,
-            user_input=user_input,
-            model_used=config.model,
-            few_shot_examples=[
-                {
-                    "source_id": ex["source_id"],
-                    "type": ex["type"],
-                    "title": ex["title"],
-                    "emotion_tags_matched": ex["emotion_tags_matched"],
-                }
-                for ex in few_shot_examples
-            ],
-        )
+    shape_validation_report = _validate_payload_shape(payload_dict)
+    normalized_payload = _normalize_payload_dict(
+        payload_dict,
+        user_input=user_input,
+        model_used=config.model,
+        repo_root=repo_root,
+        active_profile=active_profile,
+        few_shot_examples=[
+            {
+                "source_id": ex["source_id"],
+                "type": ex["type"],
+                "title": ex["title"],
+                "emotion_tags_matched": ex["emotion_tags_matched"],
+            }
+            for ex in few_shot_examples
+        ],
     )
+    payload = LyricPayload.model_validate(normalized_payload)
 
     trace = {
         "provider": config.provider,
@@ -726,11 +972,16 @@ def generate_lyric_payload(
         "retrieval_vote_confidence": vote_confidence,
         "retrieval_profile_vote_counts": profile_vote_counts,
         "fallback_level": fallback_level,
+        "fallback_reason": str(retrieval.get("fallback_reason", "none") if isinstance(retrieval, dict) else "none"),
         "active_profile": active_profile,
         "profile_source": profile_source,
         "profile_vote_confidence": profile_vote_confidence,
         "corpus_balance": corpus_balance,
         "corpus_monoculture_risk": corpus_monoculture_risk,
+        "raw_model_output": raw_text,
+        "normalized_payload": normalized_payload,
+        "shape_validation_report": shape_validation_report,
         "stage": "revise" if targeted_revise_prompt else "initial",
+        "style_vocab_metrics": normalized_payload.get("style_vocab_metrics", {}),
     }
     return payload, trace
