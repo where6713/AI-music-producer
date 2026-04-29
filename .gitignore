@@ -19,3 +19,4 @@ out/*
 
 # Local secrets
 .env
+.claude/settings.local.json

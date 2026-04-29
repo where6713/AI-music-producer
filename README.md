@@ -26,7 +26,7 @@ ANTHROPIC_API_KEY=...
 3) 运行主命令（示例）：
 
 ```powershell
-music-producer "失恋三个月想联系但知道不能"
+python -m apps.cli.main produce "失恋三个月想联系但知道不能"
 ```
 
 ## Output Contract

@@ -40,7 +40,7 @@
 - status: done
 - evidence_id: EVD-014
 - command: `python -m pytest -q`
-- result: `179 passed`
+- result: `182 passed`
 - command: `python -m apps.cli.main produce "门缝漏进楼道里的回声" --profile urban_introspective --verbose --out-dir "out/task011_runs/issue19_run"`
 - result: generated outputs and trace
 - command: `python -m apps.cli.main pm-audit --run-id issue19_run`

@@ -117,11 +117,43 @@
       "poetry_max": 2000,
       "modern_max": 3000,
       "single_file_mb_max": 30
+    },
+    "source_contracts": {
+      "基础意象底座": {
+        "成语字典": [
+          "成语词条库（用于短句锚点与意象压缩）"
+        ],
+        "古诗词": [
+          "chinese-poetry/chinese-poetry（2000+ 首清洗入库）"
+        ]
+      },
+      "哲学升华锚点": {
+        "增广贤文": [
+          "liuxiaoxiao666/zeng_guang_xian_wen"
+        ],
+        "菜根谭": [
+          "hanzhaodeng/chinese-ancient-text"
+        ]
+      },
+      "现代歌词黄金锚点": {
+        "华语顶级作词人库": [
+          "林夕代表作语料",
+          "方文山代表作语料"
+        ],
+        "用途约束": [
+          "仅离线清洗与打标入库",
+          "仅学习叙事手法/修辞策略",
+          "禁止复写连续原句"
+        ]
+      }
     }
   },
   "retriever_module": {
     "path": "src/retriever.py",
     "核心逻辑": [
+      "当 CLI 显式传入 profile 时，第一阶段必须 strict filter: profile_tag == target_profile",
+      "strict filter 命中不足 2 条时，才允许进入可审计降级路径（fallback）",
+      "fallback 必须写入 trace.fallback_level 与 trace.fallback_reason",
       "标签交集 + valence 一致",
       "命中不足时降级到仅 valence",
       "1 条古典 + 1-2 条现代，最多 3 条",
@@ -189,15 +221,41 @@
             }
           }
         },
+        "lyrics_by_section": {
+          "allowed_shapes": [
+            "array<section>",
+            "object<variant_id, array<section>> where variant_id in {a,b,c}"
+          ],
+          "normalization_contract": "解析器必须先识别 shape；若为 variant-keyed dict，则提取 chosen_variant 对应 sections；禁止将 section 对象 stringify 为歌词行。"
+        },
         "chosen_variant_id": "enum[a,b,c]",
         "style_tags": "object",
         "exclude_tags": "array"
       }
     }
   },
+  "runtime_contracts": {
+    "payload_shape_gate": {
+      "position": "在 lint/craft 之前",
+      "rule": "只有通过 shape+semantic 校验的 payload 才可进入 lint",
+      "fail_loud": "shape 非法时必须返回明确 reason_code，并最多触发 1 次定向重生；不得带病评分"
+    },
+    "audit_boundary": {
+      "rule": "pm-audit 仅对 8 项业务质量指标给出 exit code",
+      "engineering_gates": "G1/Gx 仅在 gate-check/CI 汇报，不得污染 pm-audit 业务结论"
+    },
+    "failure_evidence": {
+      "required_on_quality_fail": [
+        "raw_model_output_redacted",
+        "normalized_payload_snapshot",
+        "shape_validation_report"
+      ]
+    }
+  },
   "lint_logic": {
     "path": "src/lint.py",
     "rules": [
+      "lint 输入前置条件：payload_shape_gate == pass",
       "输入从单个 payload 改为 variants[3]",
       "每个 variant 跑完整 13 条规则",
       "排序：passed_count DESC -> len(failed_rules) ASC -> variant_id ASC",
@@ -269,7 +327,10 @@
       "AC_13": "few_shot_examples_used 非空且 >=2，保证示例可追溯。",
       "AC_14": "3 个 variants 的 narrative_pov 必须各不相同，保证视角独立。",
       "AC_15": "3 个 variants 主题具象名词重合率 <=30%，保证分布差异。",
-      "AC_16": "10 个典型 intent 回归中，retriever 命中 >=2 条示例比例 = 100%（10/10）。"
+      "AC_16": "10 个典型 intent 回归中，retriever 命中 >=2 条示例比例 = 100%（10/10）。",
+      "AC_18": "显式 profile 模式下，retriever 必须先 strict filter 同 profile；若触发降级，trace 必须包含 fallback_level/fallback_reason。",
+      "AC_19": "lyric_payload 解析必须兼容 array<section> 与 variant-keyed dict 两种 shape；不得出现将 section 对象 stringify 为歌词行的行为。",
+      "AC_20": "pm-audit exit code 仅由 8 项业务检查决定；工程门禁失败不应改变 pm-audit 的业务退出语义。"
     },
     "功能性": [
       "AC-01 同一 intent 跑 3 次，平均 LLM 调用次数 <= 1.3",
@@ -282,7 +343,10 @@
       "AC-13 few_shot_examples_used >= 2",
       "AC-14 三个 variants 的 POV 字段各不相同",
       "AC-15 三个 variants 主题名词重合率 <= 30%",
-      "AC-16 retriever 在 10 个典型 intent 上 100% 命中 >=2 条示例（10/10）"
+      "AC-16 retriever 在 10 个典型 intent 上 100% 命中 >=2 条示例（10/10）",
+      "AC-18 显式 profile 模式优先 strict filter 同 profile，不足时降级且降级可审计",
+      "AC-19 payload shape 兼容 array<section> 与 variant-keyed dict，解析失败必须 fail-loud",
+      "AC-20 pm-audit 业务退出语义与 Gx 工程门禁解耦"
     ]
   },
   "github_语料源建议": {
@@ -290,9 +354,14 @@
       "chewzhiyuan/chinese-poetry",
       "chinese-poetry/chinese-poetry"
     ],
+    "哲学文本": [
+      "liuxiaoxiao666/zeng_guang_xian_wen",
+      "hanzhaodeng/chinese-ancient-text"
+    ],
     "现代中文歌词": [
       "dengxiuqi/Chinese-Lyric-Corpus",
-      "gaussic/Chinese-Lyric-Corpus"
+      "gaussic/Chinese-Lyric-Corpus",
+      "华语顶级作词人库（林夕、方文山）"
     ],
     "标签策略": "仅允许一次性离线脚本批处理补齐 emotion_tags；运行时语料永远只读。"
   },

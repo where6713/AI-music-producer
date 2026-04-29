@@ -1,1 +1,94 @@
-[]
+[
+  {
+    "source_id": "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics/刘德华_3691/永远寂寞_111940.txt#林夕",
+    "type": "modern_lyric",
+    "title": "永远寂寞_111940",
+    "emotion_tags": [
+      "nostalgia",
+      "imagery",
+      "narrative"
+    ],
+    "profile_tag": "urban_introspective",
+    "valence": "mixed",
+    "learn_point": "用日常物件与动作细节映射情绪起伏，避免直白宣告",
+    "do_not_copy": "禁止复写林夕原句；仅学习物件隐喻与叙事转折手法。",
+    "content": "热闹的深夜一个归家\n此刻终于不必说话\n闭上眼睛 别了风沙\n前尘如耀恨烟花\n刹那间涌上再飘下\n熟睡的天地得我一个\n多想躺于屋顶仰卧",
+    "source_family": "golden_lyricist",
+    "author": "林夕",
+    "_rejected_rules": [
+      "RULE_C7"
+    ],
+    "_rejected_reasons": [
+      "verb ratio below 10%"
+    ]
+  },
+  {
+    "source_id": "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics/张智成_6476/明知故问_191620.txt#方文山",
+    "type": "modern_lyric",
+    "title": "明知故问_191620",
+    "emotion_tags": [
+      "nostalgia",
+      "imagery",
+      "narrative"
+    ],
+    "profile_tag": "urban_introspective",
+    "valence": "mixed",
+    "learn_point": "将画面意象串联成时间推进链，让副歌形成可回环的记忆点",
+    "do_not_copy": "禁止复写方文山原句；仅学习意象串联与节奏落点。",
+    "content": "~明知故问~\n【专辑】凌晨三点钟\n词 方文山曲 ahn sung il\n刚经过那路灯\n街上落叶缤纷\n我一直被牺牲\n在冬天的早晨\n咖啡已经变冷",
+    "source_family": "golden_lyricist",
+    "author": "方文山",
+    "_rejected_rules": [
+      "RULE_C7"
+    ],
+    "_rejected_reasons": [
+      "verb ratio below 10%"
+    ]
+  },
+  {
+    "source_id": "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics/张国荣_6457/妄想_28442712.txt#林夕",
+    "type": "modern_lyric",
+    "title": "妄想_28442712",
+    "emotion_tags": [
+      "nostalgia",
+      "imagery",
+      "narrative"
+    ],
+    "profile_tag": "urban_introspective",
+    "valence": "mixed",
+    "learn_point": "用日常物件与动作细节映射情绪起伏，避免直白宣告",
+    "do_not_copy": "禁止复写林夕原句；仅学习物件隐喻与叙事转折手法。",
+    "content": "随便踱步 夜半街道甚冷傲 太好\n无奈寂寞 没法出卖自觉失败 太坏\n垟边的海暴堆积太紧迫\n但只得空气作伴又太闷\n如果她此处此刻对我讲\n别半夜 到处闯\n(太妄想）她早已不知去向",
+    "source_family": "golden_lyricist",
+    "author": "林夕",
+    "_rejected_rules": [
+      "RULE_C7"
+    ],
+    "_rejected_reasons": [
+      "verb ratio below 10%"
+    ]
+  },
+  {
+    "source_id": "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics/容祖儿_9269/特别嘉宾_287926.txt#林夕",
+    "type": "modern_lyric",
+    "title": "特别嘉宾_287926",
+    "emotion_tags": [
+      "nostalgia",
+      "imagery",
+      "narrative"
+    ],
+    "profile_tag": "urban_introspective",
+    "valence": "mixed",
+    "learn_point": "用日常物件与动作细节映射情绪起伏，避免直白宣告",
+    "do_not_copy": "禁止复写林夕原句；仅学习物件隐喻与叙事转折手法。",
+    "content": "特别嘉宾-容祖儿\n曲barry chung\n想无论甚么都也不想甜品使我心痒\n亦期待你共我愉快分享\n如果甜蜜是最后才出场\n情感多少笔帐全部等压轴那位登场\n无论甚么东西使我痛快开心\n仍期待你是我特别嘉宾",
+    "source_family": "golden_lyricist",
+    "author": "林夕",
+    "_rejected_rules": [
+      "RULE_C7"
+    ],
+    "_rejected_reasons": [
+      "verb ratio below 10%"
+    ]
+  }
+]

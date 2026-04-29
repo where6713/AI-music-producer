@@ -1,0 +1,349 @@
+[
+  {
+    "source_id": "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics/刘德华_3691/永远寂寞_111940.txt#林夕",
+    "type": "modern_lyric",
+    "title": "永远寂寞_111940",
+    "emotion_tags": [
+      "nostalgia",
+      "imagery",
+      "narrative"
+    ],
+    "profile_tag": "urban_introspective",
+    "valence": "mixed",
+    "learn_point": "【分析】：把“热闹的深夜一”作为场景触发点，再让“个归家”承接心理变化，能让情绪递进更可感。【原文佐证】：「热闹的深夜一个归家」｜「闭上眼睛 别了风沙」｜「熟睡的天地得我一个」",
+    "do_not_copy": "【分析】：避免直接复写“热闹的深夜一”“个归家”这组搭配，改写时需替换意象并重排句间关系。【原文佐证】：「热闹的深夜一个归家」｜「闭上眼睛 别了风沙」",
+    "content": "热闹的深夜一个归家\n此刻终于不必说话\n闭上眼睛 别了风沙\n前尘如耀恨烟花\n刹那间涌上再飘下\n熟睡的天地得我一个\n多想躺于屋顶仰卧",
+    "source_family": "golden_lyricist",
+    "author": "林夕",
+    "_rejected_rules": [
+      "RULE_C7"
+    ],
+    "_rejected_reasons": [
+      "verb ratio below 10%"
+    ]
+  },
+  {
+    "source_id": "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics/张智成_6476/明知故问_191620.txt#方文山",
+    "type": "modern_lyric",
+    "title": "明知故问_191620",
+    "emotion_tags": [
+      "nostalgia",
+      "imagery",
+      "narrative"
+    ],
+    "profile_tag": "urban_introspective",
+    "valence": "mixed",
+    "learn_point": "【分析】：把“专辑”作为场景触发点，再让“凌晨三点钟”承接心理变化，能让情绪递进更可感。【原文佐证】：「【专辑】凌晨三点钟」｜「~明知故问~」｜「刚经过那路灯」",
+    "do_not_copy": "【分析】：避免直接复写“专辑”“凌晨三点钟”这组搭配，改写时需替换意象并重排句间关系。【原文佐证】：「【专辑】凌晨三点钟」｜「~明知故问~」",
+    "content": "~明知故问~\n【专辑】凌晨三点钟\n词 方文山曲 ahn sung il\n刚经过那路灯\n街上落叶缤纷\n我一直被牺牲\n在冬天的早晨\n咖啡已经变冷",
+    "source_family": "golden_lyricist",
+    "author": "方文山",
+    "_rejected_rules": [
+      "RULE_C7"
+    ],
+    "_rejected_reasons": [
+      "verb ratio below 10%"
+    ]
+  },
+  {
+    "source_id": "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics/张国荣_6457/妄想_28442712.txt#林夕",
+    "type": "modern_lyric",
+    "title": "妄想_28442712",
+    "emotion_tags": [
+      "nostalgia",
+      "imagery",
+      "narrative"
+    ],
+    "profile_tag": "urban_introspective",
+    "valence": "mixed",
+    "learn_point": "【分析】：把“无奈寂寞”作为场景触发点，再让“没法出卖自觉”承接心理变化，能让情绪递进更可感。【原文佐证】：「无奈寂寞 没法出卖自觉失败 太坏」｜「随便踱步 夜半街道甚冷傲 太好」｜「(太妄想）她早已不知去向」",
+    "do_not_copy": "【分析】：避免直接复写“无奈寂寞”“没法出卖自觉”这组搭配，改写时需替换意象并重排句间关系。【原文佐证】：「无奈寂寞 没法出卖自觉失败 太坏」｜「随便踱步 夜半街道甚冷傲 太好」",
+    "content": "随便踱步 夜半街道甚冷傲 太好\n无奈寂寞 没法出卖自觉失败 太坏\n垟边的海暴堆积太紧迫\n但只得空气作伴又太闷\n如果她此处此刻对我讲\n别半夜 到处闯\n(太妄想）她早已不知去向",
+    "source_family": "golden_lyricist",
+    "author": "林夕",
+    "_rejected_rules": [
+      "RULE_C7"
+    ],
+    "_rejected_reasons": [
+      "verb ratio below 10%"
+    ]
+  },
+  {
+    "source_id": "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics/容祖儿_9269/特别嘉宾_287926.txt#林夕",
+    "type": "modern_lyric",
+    "title": "特别嘉宾_287926",
+    "emotion_tags": [
+      "nostalgia",
+      "imagery",
+      "narrative"
+    ],
+    "profile_tag": "urban_introspective",
+    "valence": "mixed",
+    "learn_point": "【分析】：把“想无论甚么都”作为场景触发点，再让“也不想甜品使”承接心理变化，能让情绪递进更可感。【原文佐证】：「想无论甚么都也不想甜品使我心痒」｜「情感多少笔帐全部等压轴那位登场」｜「曲barry chung」",
+    "do_not_copy": "【分析】：避免直接复写“想无论甚么都”“也不想甜品使”这组搭配，改写时需替换意象并重排句间关系。【原文佐证】：「想无论甚么都也不想甜品使我心痒」｜「情感多少笔帐全部等压轴那位登场」",
+    "content": "特别嘉宾-容祖儿\n曲barry chung\n想无论甚么都也不想甜品使我心痒\n亦期待你共我愉快分享\n如果甜蜜是最后才出场\n情感多少笔帐全部等压轴那位登场\n无论甚么东西使我痛快开心\n仍期待你是我特别嘉宾",
+    "source_family": "golden_lyricist",
+    "author": "林夕",
+    "_rejected_rules": [
+      "RULE_C7"
+    ],
+    "_rejected_reasons": [
+      "verb ratio below 10%"
+    ]
+  },
+  {
+    "source_id": "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics/ΦìëΦ£ó_11265/τ½Öσç║µ¥Ñ_(σ¢╜)_25641613.txt#林夕",
+    "type": "modern_lyric",
+    "title": "τ½Öσç║µ¥Ñ_(σ¢╜)_25641613",
+    "emotion_tags": [
+      "nostalgia",
+      "imagery",
+      "narrative"
+    ],
+    "profile_tag": "urban_introspective",
+    "valence": "mixed",
+    "learn_point": "【分析】：“千言万语说出”与“来可以互相安”组合适合做桥段转场，既保留画面感又能推进叙事时间。【原文佐证】：「千言万语说出来可以互相安抚」｜「我以为要是唱得用心良苦」｜「我以为虽然爱情已成往事」",
+    "do_not_copy": "【分析】：避免直接套用“千言万语说出”到“来可以互相安”的转场句法，改成新的时序与语义连接。【原文佐证】：「千言万语说出来可以互相安抚」｜「我以为要是唱得用心良苦」",
+    "content": "歌曲国语版k 歌之王\n曲陈辉阳词林夕\n我以为要是唱得用心良苦\n你总会对我多点在乎\n我以为虽然爱情已成往事\n千言万语说出来可以互相安抚\n真实的我们难相处\n唱出你要的幸福",
+    "source_family": "golden_lyricist",
+    "author": "林夕",
+    "_rejected_rules": [
+      "RULE_C7"
+    ],
+    "_rejected_reasons": [
+      "verb ratio below 10%"
+    ]
+  },
+  {
+    "source_id": "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics/σêÿσ╛╖σìÄ_3691/µ░╕Φ┐£σ»éσ»₧_111940.txt#林夕",
+    "type": "modern_lyric",
+    "title": "µ░╕Φ┐£σ»éσ»₧_111940",
+    "emotion_tags": [
+      "nostalgia",
+      "imagery",
+      "narrative"
+    ],
+    "profile_tag": "urban_introspective",
+    "valence": "mixed",
+    "learn_point": "【分析】：学习通过“热闹的深夜一→个归家”的意象递进制造时间感，避免一句话把情绪直接说死。【原文佐证】：「热闹的深夜一个归家」｜「闭上眼睛 别了风沙」｜「熟睡的天地得我一个」",
+    "do_not_copy": "【分析】：“热闹的深夜一”与“个归家”属于高识别片段，保留其功能时必须替换表层词汇。【原文佐证】：「热闹的深夜一个归家」｜「闭上眼睛 别了风沙」",
+    "content": "曲 Sada Mosashi 词 林夕\n热闹的深夜一个归家\n此刻终于不必说话\n闭上眼睛 别了风沙\n前尘如耀恨烟花\n刹那间涌上再飘下\n熟睡的天地得我一个\n多想躺于屋顶仰卧",
+    "source_family": "golden_lyricist",
+    "author": "林夕",
+    "_rejected_rules": [
+      "RULE_C7"
+    ],
+    "_rejected_reasons": [
+      "verb ratio below 10%"
+    ]
+  },
+  {
+    "source_id": "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics/Θ╗äΣ╣ÖτÄ▓_7914/τö▓Σ╜áΣ╜£Σ╝┤_240911.txt#姚若龙",
+    "type": "modern_lyric",
+    "title": "τö▓Σ╜áΣ╜£Σ╝┤_240911",
+    "emotion_tags": [
+      "nostalgia",
+      "imagery",
+      "narrative"
+    ],
+    "profile_tag": "urban_introspective",
+    "valence": "mixed",
+    "learn_point": "【分析】：把“恋情干若火车”作为场景触发点，再让“就要盘山过岭”承接心理变化，能让情绪递进更可感。【原文佐证】：「恋情干若火车 就要盘山过岭」｜「甲你作伴 -- 黄乙玲」｜「情路决心永远乎你带」",
+    "do_not_copy": "【分析】：避免直接复写“恋情干若火车”“就要盘山过岭”这组搭配，改写时需替换意象并重排句间关系。【原文佐证】：「恋情干若火车 就要盘山过岭」｜「甲你作伴 -- 黄乙玲」",
+    "content": "甲你作伴 -- 黄乙玲\n曲 黄中原 词 姚若龙\n明知影世事多变化\n无论将来按怎\n情路决心永远乎你带\n有风景咱就逗阵看\n有风沙咱就作伙行\n恋情干若火车 就要盘山过岭",
+    "source_family": "golden_lyricist",
+    "author": "姚若龙",
+    "_rejected_rules": [
+      "RULE_C7"
+    ],
+    "_rejected_reasons": [
+      "verb ratio below 10%"
+    ]
+  },
+  {
+    "source_id": "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics/µ¥ÄτÄƒ_8331/µùáσñäΦ║▓Θ¢¿_25642164.txt#厉曼婷",
+    "type": "modern_lyric",
+    "title": "µùáσñäΦ║▓Θ¢¿_25642164",
+    "emotion_tags": [
+      "nostalgia",
+      "imagery",
+      "narrative"
+    ],
+    "profile_tag": "urban_introspective",
+    "valence": "mixed",
+    "learn_point": "【分析】：把“几天几夜哭个”作为场景触发点，再让“不停”承接心理变化，能让情绪递进更可感。【原文佐证】：「几天几夜哭个不停」｜「一颗一颗泪眼婆娑」｜「这是第几个雨季」",
+    "do_not_copy": "【分析】：避免直接复写“几天几夜哭个”“不停”这组搭配，改写时需替换意象并重排句间关系。【原文佐证】：「几天几夜哭个不停」｜「一颗一颗泪眼婆娑」",
+    "content": "那是谁的眼泪\n天空落下的雨\n几天几夜哭个不停\n这是第几个雨季\n一颗一颗泪眼婆娑\n来得惊天动地\n淹没了整个世界\n叫我不能不信",
+    "source_family": "golden_lyricist",
+    "author": "厉曼婷",
+    "_rejected_rules": [
+      "RULE_C7"
+    ],
+    "_rejected_reasons": [
+      "verb ratio below 10%"
+    ]
+  },
+  {
+    "source_id": "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics/σ╝áµÖ║µêÉ_6476/µÿÄτƒÑµòàΘù«_191620.txt#方文山",
+    "type": "modern_lyric",
+    "title": "µÿÄτƒÑµòàΘù«_191620",
+    "emotion_tags": [
+      "nostalgia",
+      "imagery",
+      "narrative"
+    ],
+    "profile_tag": "urban_introspective",
+    "valence": "mixed",
+    "learn_point": "【分析】：可复用“专辑”先抑后扬、再落到“凌晨三点钟”的写法，把情绪变化拆成可演唱的两步。【原文佐证】：「【专辑】凌晨三点钟」｜「~明知故问~」｜「刚经过那路灯」",
+    "do_not_copy": "【分析】：“专辑”和“凌晨三点钟”不应原封照搬，建议替换其中至少一个意象并改写句间逻辑。【原文佐证】：「【专辑】凌晨三点钟」｜「~明知故问~」",
+    "content": "~明知故问~\n【专辑】凌晨三点钟\n词 方文山曲 ahn sung il\n刚经过那路灯\n街上落叶缤纷\n我一直被牺牲\n在冬天的早晨\n咖啡已经变冷",
+    "source_family": "golden_lyricist",
+    "author": "方文山",
+    "_rejected_rules": [
+      "RULE_C7"
+    ],
+    "_rejected_reasons": [
+      "verb ratio below 10%"
+    ]
+  },
+  {
+    "source_id": "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics/σ╝áσ¢╜Φìú_6457/σªäµâ│_28442712.txt#林夕",
+    "type": "modern_lyric",
+    "title": "σªäµâ│_28442712",
+    "emotion_tags": [
+      "nostalgia",
+      "imagery",
+      "narrative"
+    ],
+    "profile_tag": "urban_introspective",
+    "valence": "mixed",
+    "learn_point": "【分析】：用“无奈寂寞”做外部场景、用“没法出卖自觉”做内心回声，形成内外对照而非直白表态。【原文佐证】：「无奈寂寞 没法出卖自觉失败 太坏」｜「随便踱步 夜半街道甚冷傲 太好」｜「(太妄想）她早已不知去向」",
+    "do_not_copy": "【分析】：避免重复“无奈寂寞”“没法出卖自觉”这组高辨识组合，防止生成结果出现来源痕迹。【原文佐证】：「无奈寂寞 没法出卖自觉失败 太坏」｜「随便踱步 夜半街道甚冷傲 太好」",
+    "content": "曲 唐奕聪 词 林夕\n随便踱步 夜半街道甚冷傲 太好\n无奈寂寞 没法出卖自觉失败 太坏\n垟边的海暴堆积太紧迫\n但只得空气作伴又太闷\n如果她此处此刻对我讲\n别半夜 到处闯\n(太妄想）她早已不知去向",
+    "source_family": "golden_lyricist",
+    "author": "林夕",
+    "_rejected_rules": [
+      "RULE_C7"
+    ],
+    "_rejected_reasons": [
+      "verb ratio below 10%"
+    ]
+  },
+  {
+    "source_id": "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics/σ«╣τÑûσä┐_9269/show_up_288036.txt#黄伟文",
+    "type": "modern_lyric",
+    "title": "show_up_288036",
+    "emotion_tags": [
+      "nostalgia",
+      "imagery",
+      "narrative"
+    ],
+    "profile_tag": "urban_introspective",
+    "valence": "mixed",
+    "learn_point": "【分析】：把“容祖儿”作为场景触发点，再让“粤语版”承接心理变化，能让情绪递进更可感。【原文佐证】：「【容祖儿show up 】（粤语版）」｜「人人疑问个个在担心天太暗会有事发生」｜「人人像天天九一一般过敏哪个能安枕」",
+    "do_not_copy": "【分析】：避免直接复写“容祖儿”“粤语版”这组搭配，改写时需替换意象并重排句间关系。【原文佐证】：「【容祖儿show up 】（粤语版）」｜「人人疑问个个在担心天太暗会有事发生」",
+    "content": "【容祖儿show up 】（粤语版）\n监制张佳添／舒文\n人人疑问个个在担心天太暗会有事发生\n人人像天天九一一般过敏哪个能安枕\n这都市尚未沦陷还剩一盏灯\n不需要派补给品其实你在已经安心\n这晚约了你够钟请Show Up\n你要答应我赴约不脱失",
+    "source_family": "golden_lyricist",
+    "author": "黄伟文",
+    "_rejected_rules": [
+      "RULE_C1",
+      "RULE_C7"
+    ],
+    "_rejected_reasons": [
+      "content contains >=3 consecutive digits",
+      "verb ratio below 10%"
+    ]
+  },
+  {
+    "source_id": "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics/σ«╣τÑûσä┐_9269/τë╣σê½σÿëσ«╛_287926.txt#林夕",
+    "type": "modern_lyric",
+    "title": "τë╣σê½σÿëσ«╛_287926",
+    "emotion_tags": [
+      "nostalgia",
+      "imagery",
+      "narrative"
+    ],
+    "profile_tag": "urban_introspective",
+    "valence": "mixed",
+    "learn_point": "【分析】：先写“想无论甚么都”的动作或状态，再转到“也不想甜品使”的结果感，可增强句间牵引力。【原文佐证】：「想无论甚么都也不想甜品使我心痒」｜「情感多少笔帐全部等压轴那位登场」｜「曲barry chung」",
+    "do_not_copy": "【分析】：避免沿用“想无论甚么都”与“也不想甜品使”的同位表达，可保留功能但必须改写词面与顺序。【原文佐证】：「想无论甚么都也不想甜品使我心痒」｜「情感多少笔帐全部等压轴那位登场」",
+    "content": "特别嘉宾-容祖儿\n曲barry chung\n想无论甚么都也不想甜品使我心痒\n亦期待你共我愉快分享\n如果甜蜜是最后才出场\n情感多少笔帐全部等压轴那位登场\n无论甚么东西使我痛快开心\n仍期待你是我特别嘉宾",
+    "source_family": "golden_lyricist",
+    "author": "林夕",
+    "_rejected_rules": [
+      "RULE_C7"
+    ],
+    "_rejected_reasons": [
+      "verb ratio below 10%"
+    ]
+  },
+  {
+    "source_id": "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics/τæ₧Θ╕úσö▒τëç_840421/σñ£µ¢▓_5235782.txt#方文山",
+    "type": "modern_lyric",
+    "title": "σñ£µ¢▓_5235782",
+    "emotion_tags": [
+      "nostalgia",
+      "imagery",
+      "narrative"
+    ],
+    "profile_tag": "urban_introspective",
+    "valence": "mixed",
+    "learn_point": "【分析】：围绕“一群嗜血的蚂”“被腐肉所吸引”建立前后呼应，可把零散情绪组织成完整的情感弧线。【原文佐证】：「一群嗜血的蚂蚁 被腐肉所吸引」｜「我面无表情 看孤独的风景」｜「失去你 还有什N事好关心」",
+    "do_not_copy": "【分析】：“一群嗜血的蚂”“被腐肉所吸引”这组句法痕迹明显，使用时需打散重排并更换至少半数词面。【原文佐证】：「一群嗜血的蚂蚁 被腐肉所吸引」｜「我面无表情 看孤独的风景」",
+    "content": "词 方文山 曲 周杰伦\n一群嗜血的蚂蚁 被腐肉所吸引\n我面无表情 看孤独的风景\n失去你 爱恨开始分明\n失去你 还有什N事好关心\n当鸽子不再象征和平\n我终于被提醒\n广场上喂食的是秃鹰",
+    "source_family": "golden_lyricist",
+    "author": "方文山",
+    "_rejected_rules": [
+      "RULE_C7"
+    ],
+    "_rejected_reasons": [
+      "verb ratio below 10%"
+    ]
+  },
+  {
+    "source_id": "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics/Θ╗ÄµÿÄ_3701/Σ╕ÇΦ¿ÇΣ╕║σ«Ü_20931479.txt#黄伟文",
+    "type": "modern_lyric",
+    "title": "Σ╕ÇΦ¿ÇΣ╕║σ«Ü_20931479",
+    "emotion_tags": [
+      "nostalgia",
+      "imagery",
+      "narrative"
+    ],
+    "profile_tag": "urban_introspective",
+    "valence": "mixed",
+    "learn_point": "【分析】：把“热吻间为何仍”作为场景触发点，再让“像有幅墙”承接心理变化，能让情绪递进更可感。【原文佐证】：「热吻间为何仍像有幅墙」｜「我心中未来甜蜜那影像」｜「词黄伟文制作郭伟立」",
+    "do_not_copy": "【分析】：避免直接复写“热吻间为何仍”“像有幅墙”这组搭配，改写时需替换意象并重排句间关系。【原文佐证】：「热吻间为何仍像有幅墙」｜「我心中未来甜蜜那影像」",
+    "content": "歌名一言为定\n词黄伟文制作郭伟立\n热吻间为何仍像有幅墙\n我问谁令你感伤\n为何仍然是这样\n门关起不准我入场\n我心中未来甜蜜那影像\n如你分不到半张",
+    "source_family": "golden_lyricist",
+    "author": "黄伟文",
+    "_rejected_rules": [
+      "RULE_C7"
+    ],
+    "_rejected_reasons": [
+      "verb ratio below 10%"
+    ]
+  },
+  {
+    "source_id": "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics/ΦîâτÄ«τÉ¬_7652/Σ╜áµÿ»τ¡öµíê_28936036.txt#姚若龙",
+    "type": "modern_lyric",
+    "title": "Σ╜áµÿ»τ¡öµíê_28936036",
+    "emotion_tags": [
+      "nostalgia",
+      "imagery",
+      "narrative"
+    ],
+    "profile_tag": "urban_introspective",
+    "valence": "mixed",
+    "learn_point": "【分析】：把“谁还会向她许”作为场景触发点，再让“愿期待她陪伴”承接心理变化，能让情绪递进更可感。【原文佐证】：「谁还会向她许愿期待她陪伴」｜「谁用春光让冬夜温暖」｜「如果星星不那么灿烂」",
+    "do_not_copy": "【分析】：避免直接复写“谁还会向她许”“愿期待她陪伴”这组搭配，改写时需替换意象并重排句间关系。【原文佐证】：「谁还会向她许愿期待她陪伴」｜「谁用春光让冬夜温暖」",
+    "content": "词姚若龙曲王雅君\n如果世界忘了旋转\n谁用春光让冬夜温暖\n如果星星不那么灿烂\n谁还会向她许愿期待她陪伴\n如果今天泪光闪闪\n谁让明天值得我乐观\n如果怕风少了安全感",
+    "source_family": "golden_lyricist",
+    "author": "姚若龙",
+    "_rejected_rules": [
+      "RULE_C7"
+    ],
+    "_rejected_reasons": [
+      "verb ratio below 10%"
+    ]
+  }
+]

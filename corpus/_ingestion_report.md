@@ -1,65 +1,193 @@
-# 古典诗词语料库重建审计报告
+# Corpus Ingestion Report
 
-## 执行摘要
+- total: 2479
+- accepted: 2468
+- rejected: 11
+- pass_rate: 99.56%
 
-- **执行时间**: 2026-04-27
-- **最终总量**: 1,992 条
-- **Lint 通过率**: 100.0% (1992/1992)
-- **元曲精简**: 2,467 → 200 (删除 2,267 条)
-- **新增语料**: 1,018 条 (诗经/宋词/纳兰/唐诗)
+## profile_pass_counts
+- classical_restraint: 2120
+- urban_introspective: 320
+- 一首“体力叙事化的思念歌”：通过重复攀登动作和生理疲惫，把抽象相思具象为可听见的喘息循环；适合主歌递进、预副歌收紧、副歌释放但不解脱的结构。: 1
+- 一首把王朝灰烬倒进二人重逢碗底的歌，用砍伐声代替心跳 BPM: 1
+- 上古哭诉调与当代艺术民谣的混血；以二二节拍为骨骼，以'兮'字断裂为气口，在日月运行的缓慢轨迹中展开一场私人的神圣审判: 1
+- 两字顿与四字顿交替的原始咏叹体: 1
+- 以环境音起兴的压迫性咏叹，中段通过空间微差位移（阳/侧/下）展开纵深追问，终以叠句咒语收束，形成' thunder roll - spatial anxiety - vocal invocation '的三层声响结构: 1
+- 以自然物象为情感掩护，在克制的身体语言中爆发未完成的亲密: 1
+- 以虫鸣为环境底噪的等待者独白，四言骨架内嵌现代口语的顿挫，在三次循环中完成从生理心悸到灵魂降噪的治愈过程。: 1
+- 仪式性重章叠句，虚字「之」作为韵锚，以物象侵占隐喻身份转移，四言二字顿构建进行感: 1
+- 低信息密度的仪式化文本，适合作为loop-based电子乐或冷爵士的念白采样，以重复对抗意义: 1
+- 冷冽的地理抒情与灼热的旁观视角相撕扯，用测量江水的方式测绘心渊，所有重复都是未拆封的情书: 1
+- 动词驱动的劳动咒语，以身体为节拍的田野复调: 1
+- 压抑型独白，以极简短句制造内在张力，适合低音域气声演绎，强调词与词之间的沉默: 1
+- 四言断句，冷峻白描，以天象写人世，以短句藏长叹: 1
+- 四言金石体，重章叠咏，上景下人的镜像结构，以狩猎器械起兴而终于政治身体的器官化隐喻: 1
+- 回旋锁韵的冷峻预言诗: 1
+- 婚礼颂歌与生命礼赞的叠合，以植物生长的时序（花-实-叶）对应人伦建立的仪式，语言简净而炽烈: 1
+- 情绪底色温暖、克制、笃定；适合写“长期关系中的善意托举”。可做循环副歌：每轮只替换一个动词，听众会在重复中感到“祝福不断加码”。旋律上以窄音域级进为主，副句末留延音，配器可用持续性和声垫底叠加点状拨弦，模拟“藤蔓缠木”的层层附着感。: 1
+- 情绪走向为“明亮铺陈→踏实劳作→温柔归向”，适合做具画面感的叙事抒情歌；主歌写景与动作并行，副歌聚焦“归宁”这一情感按钮，桥段可加入“是否浣衣”的自问，制造临行前的轻微踟蹰。: 1
+- 水泽祭祀劳作的复调叙事——在庄严合唱中渗入疲惫的裂隙: 1
+- 洁净仪式的诗性咏叹，以四言问答构建祭祀前的神圣倒计时: 1
+- 禁忌咏叹调，以'不动作'为动作，以'重复'为时间，适合作为专辑中承上启下的圣歌间奏: 1
+- 诘问式起兴、重章叠句的ritual march词格，以盛放植物包裹冰冷政治语义，宜作反复loop的hook而不给予旋律解决: 1
+- 这是一部用反问锻造成刀刃的凌晨抗辩书，以露水湿重为前奏，以'不'字为终章，在'家'与'狱'的辩证中完成对自由边界的血色确权: 1
+- 这是一首“礼制外壳下的私人沉迷”型文本：表层端庄、内里高热。最适合做成‘循环动机+层层加码’的歌：先以自然群像开场，再把镜头推近到个体夜晚，最终给出带仪式感的光亮结尾。: 1
+- 这是一首“祝福型群唱内核”的歌词母本：核心不是戏剧冲突，而是稳定、明亮、可重复的生命礼赞；适合写成具仪式感的合唱段落与婚庆/家族主题文本。: 1
+- 遗物叙事体，以织物为墓碑的克制止痛独白，每一句都是手抚旧衣时的指腹触觉: 1
+- 重章叠唱的三段燕飞起兴，末章突然转入对人品德行的白描，以乐景写哀情，以礼制收束私情，形成天地自然与人伦秩序的剧烈对位: 1
+- 青铜礼器般的凝重复沓，玉磬余音般的虚字留白，如宗庙晨钟的三次同鸣: 1
 
-## 来源分布
+## source_family_pass_counts
+- caigentan: 363
+- chengyu: 283
+- golden_lyricist: 320
+- nalan: 257
+- poetry_2000: 200
+- shijing: 305
+- song_ci_300: 273
+- tang_shui_mo: 176
+- zengguangxianwen: 291
 
-| 来源 | 数量 | 说明 |
-|------|------|------|
-| 菜根谭 (caigentan) | 363 | 哲学升华锚点 |
-| 诗经 (shijing) | 305 | 先秦诗歌，国风为主 |
-| 成语 (chengyu) | 283 | 短句锚点与意象压缩 |
-| 宋词三百首 (song_ci_300) | 280 | 宋代词作 |
-| 纳兰词 (nalan) | 257 | 清代纳兰性德 |
-| 元曲精选 (poetry_2000) | 200 | 已精简的元曲 |
-| 水墨唐诗 (tang_shui_mo) | 176 | 唐代诗歌 |
-| 增广贤文 (zengguangxianwen) | 128 | 哲学升华锚点 |
+## reject_reason_top10
+- RULE_C2: 7
+- RULE_C7: 4
 
-## 元曲清理标准
+## github_ambient_meditation_proof
+- repo: https://github.com/gaussic/Chinese-Lyric-Corpus
+- commit_sha: 85e4d1eb8cc07e36c8f7ed7a13f00f7e73811cad
+- fetched_at: 2026-04-26T12:33:04.218030+00:00
+- accepted_count: 180
+- rejected_count: 7216
+- sample_source_ids:
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/τ╗êΣ║ÄµÿÄτÖ╜_351039.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/Σ╜áµÿ»µêæτÜäτ£╝_you_are_my_eyes(live)_-_live_351019.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/Θ╗äσôüµ║É_3079/σæ╖Φî╢_94938.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/τ╛╜┬╖µ│ë_13418/σÅ╢σ¡É_390965.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/Θé¥τ╛ÄΣ║æ_8304/τê▒Σ╜áσâÅτê▒ΘúÄ_253643.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σæ¿µ¥░Σ╝ª_6452/τÅèτæÜµ╡╖_185920.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σæ¿µ¥░Σ╝ª_6452/σÇÆσ╕ª(live)_185982.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σå╖µ╝á_4015/τê▒µâàτ«ùΣ╗ÇΣ╣êΣ╕£ΦÑ┐_530801522.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σå╖µ╝á_4015/τê▒µâàΘ║╗σ░å_130466.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σå╖µ╝á_4015/σªéµ₧£Σ╜áµÿ»ΦÉ╜σàÑµêæτ£╝Σ╕¡τÜäσ░ÿσƒâ_28556122.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σå╖µ╝á_4015/σêåµëïΣ╛¥τä╢τê▒Σ╜á_26599185.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/ΘÖêσ░ÅΣ║æ_7346/σìüΣ╕ÇσôÑ_221563.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/ΘÖêτæ₧_7228/τ¡ëΣ╜áΣ╕ÇΦ╡╖µ¥Ñτ£ïµ╡╖_421137717.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/ΘÖêτæ₧_7228/µÇ¥σ┐╡_212290.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σà¡σà¡_1131016/µÿÑµ¥Ñ_33854436.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σº£Φé▓µüÆ_3456/τê▒Σ╕ìσê░τÜäµ╗ïσæ│_103710.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/ΦöíτÉ┤_7220/µêæΦªüσªéΣ╜òΣ╕ìµâ│Σ╗û_209839.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/ΦöíτÉ┤_7220/τö¿σ┐âΦë»Φïª_209858.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/µ₧ùσ┐åΦÄ▓_8336/σÅ░σîù_256559.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/µ₧ùσ┐åΦÄ▓_8336/τ¼¢σ¡Éσºæσ¿ÿ_413142582.txt
 
-已删除：
-- 无名氏作品
-- 杂剧曲牌（含舞台指令）
-- 粗俗/脏话内容
-- 咏史/边塞/闺怨/政治讽喻题材
-- 过长套数（>180字）
-- 质量评分较低的作品
+## github_classical_restraint_proof
+- repo: https://github.com/chinese-poetry/chinese-poetry
+- commit_sha: 909646524737b70544ee7ae17cb76868a0bc8a55
+- fetched_at: 2026-04-26T05:40:48.351035+00:00
+- accepted_count: 2000
+- rejected_count: 27
+- sample_source_ids:
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#0
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#1
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#2
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#4
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#5
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#6
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#7
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#8
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#9
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#10
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#11
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#12
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#13
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#15
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#16
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#18
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#19
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#20
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#22
+  - github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#23
 
-保留：
-- 写景、抒情、意境类小令
-- 马致远/白朴/关汉卿等经典作者
-- 有明确情感价值和音乐性的作品
+## github_club_dance_proof
+- repo: https://github.com/gaussic/Chinese-Lyric-Corpus
+- commit_sha: 85e4d1eb8cc07e36c8f7ed7a13f00f7e73811cad
+- fetched_at: 2026-04-26T12:33:04.215938+00:00
+- accepted_count: 200
+- rejected_count: 7216
+- sample_source_ids:
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/τ╛╜┬╖µ│ë_13418/σ░ÿσƒâ_390752.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/Φâíσ╜ªµûî_3066/ΦÇüτê╕Σ╜áσê½ΦúàΘà╖_93235.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σìùσ╛üσîùµêÿ_189873/µêæσÅ¬µâ│ΦªüΘƒ│Σ╣É_438462855.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/ΦìëΦ£ó_11265/σ┐ÿµâàµú«σ╖┤Φê₧_349836.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/ΦìëΦ£ó_11265/µêæΣ╗¼_348938.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/ΦìëΦ£ó_11265/Σ╕çΣ╝ùµ£ƒσ╛à_348944.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σæ¿Φë│µ│ô_10635/µÜûµÿÑ2017_479979583.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/Σ║öµ£êσñ⌐_13193/µæçµ╗Üµ£¼Σ║ï_386591.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/Σ║öµ£êσñ⌐_13193/µæçµ╗ÜΦê₧σÅ░_386809.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/Φ░óσ«ëτÉ¬_9952/σæÉσûè_459159622.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σ╛Éσ░Åσçñ_9968/σèƒσñ½Φê₧_309714.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/A-Lin_7063/µêæσ┐âσ╖▓µëôτâè_29897533.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/Φ╡╡Σ╝á_6463/µëôΘ╝ôτÜäτö╖σ¡⌐_528272282.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/µ¥ÄΦòÖµòÅ_8385/τá░τä╢σ┐âΦ╖│_262975.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σ╝áµ¥░_6472/µêæτÜäΦê₧σÅ░_191146.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σ╖½σÉ»Φ┤ñ_5359/σöçΦ╛╣τÜäτ¼æµäÅ_157368.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σ╖½σÉ»Φ┤ñ_5359/µêæΣ╗¼µÿ»µ£ÇσÑ╜τÜäµ£ïσÅï_158141.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σ¡Öτçòσº┐_9272/σñ¬Θÿ│σ║òΣ╕ï_287328.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σ¡Öτçòσº┐_9272/τê▒µâàτÜäΦè▒µá╖_287069.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/ΘÆƒΘòçµ╢¢_6495/σ£¿σ▒ïµ¬ÉΣ╕èΦ╖│Φê₧_193553.txt
 
-## 新标签体系
+## github_uplift_pop_proof
+- repo: https://github.com/gaussic/Chinese-Lyric-Corpus
+- commit_sha: 85e4d1eb8cc07e36c8f7ed7a13f00f7e73811cad
+- fetched_at: 2026-04-26T12:33:04.210713+00:00
+- accepted_count: 500
+- rejected_count: 7216
+- sample_source_ids:
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/τÖ╜σàë_7160/µÇÇσ┐╡_207115.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/ΘÖñΣ║åτê▒Σ╜áΦ┐ÿΦâ╜τê▒Φ░ü_351200.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/Σ╕ìµ¡╗σ┐âΦ┐ÿσ£¿_351031.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/σ┐áσ¡¥Σ╕£Φ╖»Φ╡░Σ╣¥Θüì_351175.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/σñûσÑù_351111.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/ya_power_351157.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/high_power_351155.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/Σ╜áµÇÄΣ╣êΦêìσ╛ùµêæΘÜ╛Φ┐ç_351252.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/Φ╖ƒΦç¬σ╖▒σÉêσö▒_444267127.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/ΘàÆΘåëτÜäµÄóµêê_351114.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/Θéúσ░▒Φ┐Öµá╖σÉº_351271.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/τê▒σ£¿Σ╕Çτ₧¼Θù┤_29812169.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/σêåµëïσ┐½Σ╣É_351053.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/σ╜⌐ΦÖ╣_351047.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/Σ╕£µû╣τÜäσàë_351004.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/σàë_25986121.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/Σ╗ûΣ╕Çσ«Üσ╛êτê▒Σ╜á_351055.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/Σ╕ïΣ╕Çτ½Ö_sampling_title_:_τü½Φ╜ª_440403955.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/Θ╗äσôüµ║É_3079/τê▒µâàΘªÖ_94832.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/Θ╗äσôüµ║É_3079/Σ╕ìµâ│Φ»┤σåìΦºü_36308983.txt
 
-每条古典诗词现已包含：
-
-| 字段 | 说明 |
-|------|------|
-| `emotion_core` | 情感内核（如：求而不得的怅惘） |
-| `archetype` | 神话原型（失乐园/浮士德/西西弗斯/普罗米修斯/纳西索斯/俄耳甫斯） |
-| `musical_traits` | 音乐性映射（留白/节奏/音域/织体/速度/和声） |
-| `phonetic_rhythm` | 拼音押韵分析（韵脚/声调/节奏型/押韵模式） |
-| `core_imagery` | 核心意象词（月/风/花/雪/雁等） |
-| `lyric_strategies` | 歌词化用策略（意象直取/意境转换/情感提纯/节奏移植） |
-| `learn_point` | 作曲/作词可学点 |
-| `quotability` | 可引用性（direct/adapt/inspire） |
-
-## 技术说明
-
-- **当前标注方式**: 规则引擎 fallback（因 LLM API 暂时不可用）
-- **后续优化**: API 恢复后可用 `--mode classical_v2` 跑 LLM 精标替换
-- **do_not_copy**: 已移除——古诗词为公共领域，标注重点在"怎么用"
-
-## 文件位置
-
-- 主库: `corpus/poetry_classical.json`
-- 被拒元曲: `corpus/_rejected/yuanqu_pruned.json`
-- 新增未标注: `corpus/_raw/new_classical_unenriched.json`
-- 规则标注版: `corpus/_raw/new_classical_rule_enriched.json`
+## github_urban_introspective_proof
+- repo: https://github.com/gaussic/Chinese-Lyric-Corpus
+- commit_sha: 85e4d1eb8cc07e36c8f7ed7a13f00f7e73811cad
+- fetched_at: 2026-04-26T12:33:04.213674+00:00
+- accepted_count: 260
+- rejected_count: 7216
+- sample_source_ids:
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σè¿σè¢τü½Φ╜ª_11363/τê▒Σ╕èΣ╜áΣ╕ìσªéτê▒Σ╕èµ╡╖_351040.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/τ╛╜┬╖µ│ë_13418/µ┤╗Φ»Ñ_390724.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/τ╛╜┬╖µ│ë_13418/Φè▒Φçé_36664945.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σæ¿µ¥░Σ╝ª_6452/τê▒Σ╜áµ▓íσ╖«_25653004.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σæ¿µ¥░Σ╝ª_6452/Θ╗æΦë▓µ»¢Φíú_185908.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σæ¿µ¥░Σ╝ª_6452/Φç¬σ»╝Φç¬µ╝ö_185680.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σå╖µ╝á_4015/µêæΦ┐ÿτê▒τ¥ÇΣ╜á_130681.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σå╖µ╝á_4015/Φç¬Φíîτª╗σ╝Ç_26601186.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σå╖µ╝á_4015/τê▒µêÉσÅ╣µü»_25641055.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/Φâíσ╜ªµûî_3066/Σ╕ìµÿ»Σ╕ìµâ│_93283.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σìóσç»σ╜ñ_8512/σæèΦ»ëµêæ_27646607.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/ΘÖêτæ₧_7228/σ┐âΘçîµÿ»Σ╕ìµÿ»µ£ëσê½Σ║║_25643326.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/ΘÖêτæ₧_7228/σçäτ╛ÄτÜäσ¢₧σ┐å_451412264.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σà¡σà¡_1131016/µÇºµäƒΘôâΘƒ│_33781687.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σà¡σà¡_1131016/τê▒µâàµëïµ£║_33854605.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σà¡σà¡_1131016/µêæΣ╗Äµ▓íσü£µ¡óτê▒Σ╜á_33781187.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σà¡σà¡_1131016/Φ░üµÿ»Σ╜áτÜäσæ╜Σ╕¡µ│¿σ«Ü_33781693.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σà¡σà¡_1131016/Σ╕ëσñ⌐Σ╕ëσñ£_33781429.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σº£Φé▓µüÆ_3456/σ¢₧τ£╕_104712.txt
+  - github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/σº£Φé▓µüÆ_3456/σâÅµêæΦ┐Öµá╖τÜäΣ║║_104283.txt

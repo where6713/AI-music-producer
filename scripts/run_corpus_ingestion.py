@@ -48,6 +48,11 @@ def _render_report(summary: dict[str, Any]) -> str:
         lines.append(f"- {profile}: {count}")
 
     lines.append("")
+    lines.append("## source_family_pass_counts")
+    for family, count in sorted(summary["source_family_pass_counts"].items()):
+        lines.append(f"- {family}: {count}")
+
+    lines.append("")
     lines.append("## reject_reason_top10")
     if summary["reject_reason_top10"]:
         for reason, count in summary["reject_reason_top10"]:
@@ -91,6 +96,7 @@ def run_ingestion(*, repo_root: Path, strict: bool) -> dict[str, Any]:
     rejected = 0
     reject_reason_counter: Counter[str] = Counter()
     profile_pass_counts: Counter[str] = Counter()
+    source_family_pass_counts: Counter[str] = Counter()
 
     for filename in SOURCE_FILES:
         rows = _load_rows(corpus_root / filename)
@@ -128,6 +134,9 @@ def run_ingestion(*, repo_root: Path, strict: bool) -> dict[str, Any]:
             profile = str(row.get("profile_tag", "")).strip()
             if profile:
                 profile_pass_counts[profile] += 1
+            source_family = str(row.get("source_family", "")).strip()
+            if source_family:
+                source_family_pass_counts[source_family] += 1
 
         _write_json(clean_root / filename, deduped_rows)
         _write_json(rejected_root / filename, lint_rejected_rows + deduped_rejected)
@@ -150,6 +159,7 @@ def run_ingestion(*, repo_root: Path, strict: bool) -> dict[str, Any]:
         "rejected": rejected,
         "pass_rate": pass_rate,
         "profile_pass_counts": dict(profile_pass_counts),
+        "source_family_pass_counts": dict(source_family_pass_counts),
         "reject_reason_top10": reject_reason_counter.most_common(10),
         "github_profile_proofs": github_profile_proofs,
     }

@@ -20,6 +20,9 @@ class UserInput(BaseModel):
         "club_dance",
         "ambient_meditation",
     ] = ""
+    ref_audio_path: str = ""
+    syllable_budget_min: int = 0
+    syllable_budget_max: int = 0
 
 
 class Distillation(BaseModel):

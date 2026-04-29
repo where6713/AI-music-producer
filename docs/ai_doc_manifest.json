@@ -42,6 +42,16 @@
       ]
     },
     {
+      "topic_id": "cli_runbook",
+      "owner_file": "docs/runbook_cli_commands.md",
+      "owner_marker": "# CLI Runbook (Current Canonical Commands)",
+      "forbidden_fulltext_outside_owner": [
+        "Avoid using `--last` for final acceptance claims.",
+        "Acceptance requires explicit run-id evidence.",
+        "## Evidence Pack (Minimum)"
+      ]
+    },
+    {
       "topic_id": "one_law",
       "owner_file": "one law.md",
       "owner_marker": "## 唯一法则",

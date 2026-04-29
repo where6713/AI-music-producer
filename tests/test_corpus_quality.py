@@ -382,3 +382,128 @@ def test_run_ingestion_allows_classical_rule_c7_only_rows(tmp_path) -> None:
 
     assert summary["accepted"] == 1
     assert summary["rejected"] == 0
+
+
+def test_run_ingestion_report_includes_source_family_pass_counts(tmp_path) -> None:
+    corpus_dir = tmp_path / "corpus"
+    corpus_dir.mkdir(parents=True, exist_ok=True)
+    (corpus_dir / "lyrics_modern_zh.json").write_text(
+        json.dumps(
+            [
+                {
+                    "source_id": "github:gaussic/Chinese-Lyric-Corpus:a.txt",
+                    "type": "modern_lyric",
+                    "title": "向光走",
+                    "emotion_tags": ["uplift", "joy", "forward"],
+                    "profile_tag": "uplift_pop",
+                    "valence": "positive",
+                    "learn_point": "用动作动词推进句群并在副歌处抬升情绪落点",
+                    "do_not_copy": "不要复写原句与段落顺序",
+                    "content": "把门推开\n朝着亮处走\n把今天唱开\n我们一起向前",
+                    "source_family": "golden_lyricist",
+                }
+            ],
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    (corpus_dir / "poetry_classical.json").write_text(
+        json.dumps(
+            [
+                {
+                    "source_id": "github:Li1Fan/chinese-idiom:data/idiom.json#1",
+                    "type": "classical_poem",
+                    "title": "榜上无名",
+                    "emotion_tags": ["imagery", "compression", "restraint"],
+                    "profile_tag": "classical_restraint",
+                    "valence": "mixed",
+                    "learn_point": "短语锚点用于副歌收束时的高压缩表达",
+                    "do_not_copy": "不要复写原句与段落顺序",
+                    "content": "榜上无名",
+                    "source_family": "chengyu",
+                }
+            ],
+            ensure_ascii=False,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+
+    run_ingestion(repo_root=tmp_path, strict=False)
+    report = (corpus_dir / "_ingestion_report.md").read_text(encoding="utf-8")
+
+    assert "## source_family_pass_counts" in report
+    assert "- chengyu: 1" in report
+    assert "- golden_lyricist: 1" in report
+
+
+def test_corpus_quality_lint_rejects_idiom_entry_longer_than_eight_chars() -> None:
+    row = {
+        "source_id": "idiom:custom:0001",
+        "type": "classical_poem",
+        "title": "晴天总会在明早到来呀",
+        "emotion_tags": ["hope"],
+        "profile_tag": "classical_restraint",
+        "valence": "mixed",
+        "learn_point": "短句锚点要凝练",
+        "do_not_copy": "不要复写原句与段落顺序",
+        "content": "晴天总会在明早到来呀",
+        "source_family": "chengyu",
+    }
+
+    report = lint_corpus_row(row)
+
+    assert report.passed is False
+    assert "RULE_C9" in report.failed_rules
+
+
+def test_corpus_quality_lint_rejects_garbled_idiom_text() -> None:
+    row = {
+        "source_id": "idiom:custom:0002",
+        "type": "classical_poem",
+        "title": "风月无边",
+        "emotion_tags": ["nostalgia"],
+        "profile_tag": "classical_restraint",
+        "valence": "mixed",
+        "learn_point": "意象句要避免乱码",
+        "do_not_copy": "不要复写原句与段落顺序",
+        "content": "风月無邊��",
+        "source_family": "chengyu",
+    }
+
+    report = lint_corpus_row(row)
+
+    assert report.passed is False
+    assert "RULE_C10" in report.failed_rules
+
+
+def test_classical_rows_do_not_trigger_modern_r16_blacklist() -> None:
+    classical_row = {
+        "source_id": "classical:caigentan:001",
+        "type": "classical_poem",
+        "title": "菜根谭语录",
+        "emotion_tags": ["restraint"],
+        "profile_tag": "classical_restraint",
+        "valence": "mixed",
+        "learn_point": "文言句法用于哲学升华",
+        "do_not_copy": "不要复写原句与段落顺序",
+        "content": "各自安好，且看浮云，且听松风。",
+    }
+    modern_row = {
+        "source_id": "modern:urban:001",
+        "type": "modern_lyric",
+        "title": "都市夜话",
+        "emotion_tags": ["breakup"],
+        "profile_tag": "urban_introspective",
+        "valence": "negative",
+        "learn_point": "口语化叙事避免模板陈词",
+        "do_not_copy": "不要复写原句与段落顺序",
+        "content": "我们说好各自安好，再走回原点。",
+    }
+
+    classical_report = lint_corpus_row(classical_row)
+    modern_report = lint_corpus_row(modern_row)
+
+    assert "RULE_R16_MODERN" not in classical_report.failed_rules
+    assert "RULE_R16_MODERN" in modern_report.failed_rules
