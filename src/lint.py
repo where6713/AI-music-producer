@@ -405,40 +405,64 @@ def lint_payload(
         if ratio > float(max_ratio):
             violations.append(Violation(rule="R17", detail=f"first-person ratio {ratio:.3f} exceeds max {float(max_ratio):.3f}"))
 
-    # R18 prosody symmetry and budget alignment (HARD_PENALTY)
-    SYMMETRY_DELTA_MAX = 2
-    SHORT_LINE_EXEMPT_R18 = 5
-    for section in payload.lyrics_by_section:
-        lines = section.lines
-        for i in range(len(lines) - 1):
-            curr_len = len(lines[i].primary.strip())
-            next_len = len(lines[i + 1].primary.strip())
-            if curr_len <= SHORT_LINE_EXEMPT_R18 or next_len <= SHORT_LINE_EXEMPT_R18:
-                continue
-            if abs(curr_len - next_len) > SYMMETRY_DELTA_MAX:
-                violations.append(
-                    Violation(
-                        rule="R18",
-                        detail=f"prosody symmetry delta {abs(curr_len - next_len)} > {SYMMETRY_DELTA_MAX} between line {i+1} ({curr_len}) and line {i+2} ({next_len})",
-                        section=section.tag,
-                        line=i + 1,
-                    )
-                )
+    # R18 per-line prosody budget gate (HARD_PENALTY)
+    # Checks each lyric line against section-appropriate per-line char budget from profile registry.
+    # Does NOT enforce symmetry between adjacent lines — long-short verse variation is intentional.
+    _SECTION_TAG_TO_BUDGET_KEY: dict[str, str] = {
+        "[Verse]": "verse_line_max",
+        "[Verse 1]": "verse_line_max",
+        "[Verse 2]": "verse_line_max",
+        "[Pre-Chorus]": "chorus_line_max",
+        "[Chorus]": "chorus_line_max",
+        "[Final Chorus]": "chorus_line_max",
+        "[Bridge]": "bridge_line_max",
+        "[Outro]": "bridge_line_max",
+    }
+    _PER_LINE_TOLERANCE = 2  # allow up to budget+2 before hard penalty
 
-    # R18 prosody budget check
+    if isinstance(trace, dict):
+        prosody = trace.get("prosody_contract", {})
+        if isinstance(prosody, dict) and any(
+            k in prosody for k in ("verse_line_max", "chorus_line_max", "bridge_line_max")
+        ):
+            for section in payload.lyrics_by_section:
+                budget_key = _SECTION_TAG_TO_BUDGET_KEY.get(section.tag)
+                if budget_key is None:
+                    continue
+                line_max = prosody.get(budget_key)
+                if line_max is None:
+                    continue
+                hard_limit = int(line_max) + _PER_LINE_TOLERANCE
+                for idx, line in enumerate(section.lines, start=1):
+                    text = line.primary.strip()
+                    # strip punctuation for char count (Chinese punct ≈ 0 phonetic weight)
+                    bare = "".join(c for c in text if c.strip() and c not in "，。？！、；：""''《》【】…—～·")
+                    if len(bare) > hard_limit:
+                        violations.append(
+                            Violation(
+                                rule="R18",
+                                detail=(
+                                    f"line {idx} in {section.tag} has {len(bare)} chars "
+                                    f"(budget={line_max}+{_PER_LINE_TOLERANCE}={hard_limit}): {text[:20]}…"
+                                ),
+                                section=section.tag,
+                                line=idx,
+                            )
+                        )
+
+    # R18 total syllable budget check (soft guard, separate from per-line gate above)
     if isinstance(trace, dict):
         prosody = trace.get("prosody_contract", {})
         if isinstance(prosody, dict):
             budget_min = prosody.get("syllable_budget_min")
             budget_max = prosody.get("syllable_budget_max")
-            bpm = prosody.get("bpm")
-            if budget_min is not None or budget_max is not None or bpm is not None:
-                total_syllables = 0
-                for section in payload.lyrics_by_section:
-                    for line in section.lines:
-                        text = line.primary.strip()
-                        if text:
-                            total_syllables += len(text)
+            if budget_min is not None or budget_max is not None:
+                total_syllables = sum(
+                    len(line.primary.strip())
+                    for section in payload.lyrics_by_section
+                    for line in section.lines
+                    if line.primary.strip()
+                )
                 if budget_min is not None and total_syllables < int(budget_min):
                     violations.append(
                         Violation(

@@ -27,7 +27,7 @@
       "variant_differentiation": "POV + 场景框架（内景/外景/对照）",
       "chorus_repetition_allowed": false,
       "abstraction_tolerance": "medium",
-      "prosody": {"bpm": 85, "syllable_budget_min": 180, "syllable_budget_max": 240}
+      "prosody": {"bpm": 85, "syllable_budget_min": 180, "syllable_budget_max": 240, "verse_line_max": 10, "chorus_line_max": 8, "bridge_line_max": 12}
     },
     "classical_restraint": {
       "display_name": "古风留白",
@@ -43,7 +43,7 @@
       "chorus_repetition_allowed": false,
       "abstraction_tolerance": "high",
       "additional_constraints": "禁止都市具象名词（手机/电梯/地铁/备忘录/充电线），除非刻意对照",
-      "prosody": {"bpm": 72, "syllable_budget_min": 160, "syllable_budget_max": 220}
+      "prosody": {"bpm": 72, "syllable_budget_min": 160, "syllable_budget_max": 220, "verse_line_max": 9, "chorus_line_max": 7, "bridge_line_max": 13}
     },
     "uplift_pop": {
       "display_name": "明亮流行",
@@ -58,7 +58,7 @@
       "chorus_repetition_allowed": true,
       "abstraction_tolerance": "medium",
       "note": "本 profile 允许适度『美丽陈词』，因为口语化温度比独创性优先",
-      "prosody": {"bpm": 120, "syllable_budget_min": 200, "syllable_budget_max": 280}
+      "prosody": {"bpm": 120, "syllable_budget_min": 200, "syllable_budget_max": 280, "verse_line_max": 8, "chorus_line_max": 6, "bridge_line_max": 10}
     },
     "club_dance": {
       "display_name": "律动舞曲",
@@ -74,7 +74,7 @@
       "chorus_repetition_encouraged": true,
       "abstraction_tolerance": "high",
       "additional_constraints": "严禁 Verse 叙事过满；Pre-Chorus 必须有起势动词；Hook <=6 个字的短句优先",
-      "prosody": {"bpm": 128, "syllable_budget_min": 180, "syllable_budget_max": 260}
+      "prosody": {"bpm": 128, "syllable_budget_min": 180, "syllable_budget_max": 260, "verse_line_max": 7, "chorus_line_max": 6, "bridge_line_max": 8}
     },
     "ambient_meditation": {
       "display_name": "环境冥想",
@@ -89,7 +89,7 @@
       "chorus_repetition_allowed": true,
       "abstraction_tolerance": "very_high",
       "additional_constraints": "鼓励留白；允许不完整句；禁止叙事推进感",
-      "prosody": {"bpm": 60, "syllable_budget_min": 140, "syllable_budget_max": 200}
+      "prosody": {"bpm": 60, "syllable_budget_min": 140, "syllable_budget_max": 200, "verse_line_max": 11, "chorus_line_max": 8, "bridge_line_max": 15}
     }
   }
 }
