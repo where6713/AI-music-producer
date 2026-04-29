@@ -75,6 +75,22 @@ def _prosody_matrix_aligned(prosody_contract: dict[str, Any], output_dir: Path) 
     if not sections:
         return False, "lyrics_sections_missing"
 
+    payload_sections: dict[str, dict[str, Any]] = {}
+    payload_path = output_dir / "lyric_payload.json"
+    if payload_path.exists():
+        try:
+            payload_obj = json.loads(payload_path.read_text(encoding="utf-8", errors="ignore"))
+            raw_sections = payload_obj.get("lyrics_by_section", []) if isinstance(payload_obj, dict) else []
+            if isinstance(raw_sections, list):
+                for sec in raw_sections:
+                    if not isinstance(sec, dict):
+                        continue
+                    tag = str(sec.get("tag", "")).strip()
+                    if tag:
+                        payload_sections[tag] = sec
+        except json.JSONDecodeError:
+            payload_sections = {}
+
     mapping: dict[str, tuple[str, str]] = {
         "[Verse]": ("verse_line_min", "verse_line_max"),
         "[Verse 1]": ("verse_line_min", "verse_line_max"),
@@ -114,6 +130,14 @@ def _prosody_matrix_aligned(prosody_contract: dict[str, Any], output_dir: Path) 
         joined = "\n".join(lines)
         has_lower = any(t in joined for t in lower_tags)
         has_upper = any(t in joined for t in upper_tags)
+        section_obj = payload_sections.get(tag, {})
+        inline = section_obj.get("voice_tags_inline", []) if isinstance(section_obj, dict) else []
+        if isinstance(inline, list):
+            inline_set = {str(x).strip() for x in inline if str(x).strip()}
+            if inline_set & lower_tags:
+                has_lower = True
+            if inline_set & upper_tags:
+                has_upper = True
         if has_explicit_min and any(x <= line_min for x in lengths) and not has_lower:
             return False, f"missing_lower_metatag:{tag}"
         if any(x >= line_max for x in lengths) and not has_upper:
