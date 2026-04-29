@@ -33,10 +33,10 @@
 2. `.ruff_cache/`
 3. `.tmp/`
 4. `.sisyphus/`
-5. `.worktrees/`
+5. `.worktrees/`（仅删除已确认孤儿路径，禁止整目录一刀切）
 6. 全仓 `__pycache__/`
 
-说明：A 类不涉及业务事实，不影响主链路语义。
+说明：A 类不涉及业务事实，不影响主链路语义。`worktrees` 必须逐路径执行安全检查后再删。
 
 ### B 类：文档收敛（唯一归属）
 
@@ -100,6 +100,13 @@
 
 任何一步失败，停止并回滚当前步。
 
+每步执行纪律：
+
+1. 先快照（目录清单 + `git worktree list`）
+2. 先验证（见第 5 节步进门）
+3. 再执行当前步动作
+4. 再验证并留档（命令原文 + 输出摘要）
+
 ---
 
 ## 5. 验证命令（每步后必跑）
@@ -107,7 +114,6 @@
 ```powershell
 python -m pytest -q
 python -m apps.cli.main pm-audit
-python -m apps.cli.main gate-check --all
 powershell -NoProfile -ExecutionPolicy Bypass -File "tools/scripts/check_docs_consistency.ps1"
 ```
 
@@ -115,7 +121,31 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "tools/scripts/check_docs_co
 
 - 功能测试不过：不进入下一步
 - 文档一致性不过：不进入下一步
-- 审计与门禁输出需完整留档
+- 审计输出需完整留档
+
+门禁分层：
+
+1. **步进门（每步执行）**：`pytest -q`、`pm-audit`、docs consistency
+2. **收口门（阶段末执行）**：`python -m apps.cli.main gate-check --all`
+   - 若 `G1` 因仓库策略（`commit_scope_gate`）失败，单独标注为策略门未闭环，不得伪装成功能回归。
+
+### 5.1 worktree 清理安全流程（强制）
+
+删除任何 worktree 前必须逐项执行：
+
+```powershell
+git worktree list
+git -C "<worktree_path>" status --short
+```
+
+仅当目标路径状态为空（无改动）时，允许删除：
+
+```powershell
+git worktree remove "<worktree_path>"
+git worktree list
+```
+
+若 `status --short` 非空：禁止删除，先迁移或提交该工作区改动。
 
 ---
 
