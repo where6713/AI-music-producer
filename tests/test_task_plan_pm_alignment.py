@@ -5,7 +5,12 @@ from pathlib import Path
 
 
 def test_rectification_task_plan_matches_pm_baseline() -> None:
-    task_plan = json.loads(Path("docs/整改task.json").read_text(encoding="utf-8"))
+    index = json.loads(Path("docs/current_task_index.json").read_text(encoding="utf-8"))
+    owner = str(index.get("current_task_owner", "")).strip()
+    assert owner
+    task_plan = json.loads(Path(owner).read_text(encoding="utf-8"))
+    if task_plan.get("deprecated") and isinstance(task_plan.get("legacy_payload"), dict):
+        task_plan = task_plan["legacy_payload"]
 
     pm_binding = task_plan.get("PM_测试成功标准_绑定", {})
     assert pm_binding.get("single_source") == "docs/🎵 AI 音乐生成系统产品经理 (PM) Role & Rule.md"

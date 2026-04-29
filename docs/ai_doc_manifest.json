@@ -71,6 +71,14 @@
         "RULE-17（最小复杂度）",
         "RULE-18（可安装性）"
       ]
+    },
+    {
+      "topic_id": "task_index",
+      "owner_file": "docs/current_task_index.json",
+      "owner_marker": "\"current_task_owner\"",
+      "forbidden_fulltext_outside_owner": [
+        "Task canonical routing entry for tests/scripts"
+      ]
     }
   ]
 }
