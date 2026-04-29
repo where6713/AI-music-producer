@@ -101,7 +101,10 @@ def _build_targeted_revise_prompt(payload: dict[str, Any], lint_report: dict[str
         "3. 未修改的段落必须原样保留，不得省略或截断。\n"
         "4. 严禁输出 Markdown、解释文字或代码块，只输出符合既有 schema 的 JSON 实体。\n"
         "5. 字段必须覆盖：few_shot_examples_used, distillation, structure, "
-        "lyrics_by_section, variants, chosen_variant_id, style_tags, exclude_tags。"
+        "lyrics_by_section, variants, chosen_variant_id, style_tags, exclude_tags。\n"
+        "6. 若 failed rules 含 R18，必须按 section 级别修复：每个触及下边界的段落在 voice_tags_inline 中包含 "
+        "(Pause) 或 (Breathe)；每个触及上边界的段落在 voice_tags_inline 中包含 [Fast Flow]。\n"
+        "7. R18 修复必须写入 voice_tags_inline，不能只把标签留在行文本里。"
     )
 
 
@@ -155,6 +158,19 @@ def _choose_targeted_revise_prompt(payload: LyricPayload, lint_report: dict[str,
     if "R00" in failed_rules or (not payload.lyrics_by_section):
         return STRUCTURAL_REVISE_PROMPT
     return _build_targeted_revise_prompt(payload.model_dump(), lint_report)
+
+
+def _derive_prosody_matrix_aligned(payload: LyricPayload, lint_report: dict[str, Any], trace: dict[str, Any]) -> bool:
+    if not payload.lyrics_by_section:
+        return False
+    failed = lint_report.get("failed_rules", []) if isinstance(lint_report, dict) else []
+    failed_set = {str(x).strip() for x in failed} if isinstance(failed, list) else set()
+    if "R18" in failed_set:
+        return False
+    prosody = trace.get("prosody_contract", {}) if isinstance(trace, dict) else {}
+    if not isinstance(prosody, dict) or not prosody:
+        return False
+    return any(k in prosody for k in ("verse_line_max", "chorus_line_max", "bridge_line_max"))
 
 
 def _score_variants(payload: LyricPayload, *, trace: dict[str, Any] | None = None) -> tuple[LyricPayload, dict[str, Any]]:
@@ -535,6 +551,7 @@ def produce(
     if revise_evidence:
         trace["revise_evidence"] = revise_evidence
     trace["lint_report"] = lint_report
+    trace["prosody_matrix_aligned"] = _derive_prosody_matrix_aligned(payload, lint_report, trace)
     trace["llm_calls"] = llm_calls
     trace["max_llm_calls_per_run"] = 2
     _apply_retrieval_profile_decision(trace)
@@ -608,6 +625,7 @@ def produce(
         trace["structural_revise_triggered"] = True
         trace["variant_rank"] = variant_rank
         trace["lint_report"] = lint_report
+        trace["prosody_matrix_aligned"] = _derive_prosody_matrix_aligned(payload, lint_report, trace)
         trace["llm_calls"] = llm_calls
         trace["max_llm_calls_per_run"] = 2
         _apply_retrieval_profile_decision(trace)

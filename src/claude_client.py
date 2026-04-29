@@ -123,6 +123,25 @@ def _inject_prompt_contract(skill_text: str, prosody: dict[str, Any], active_pro
     for key, val in replacements.items():
         if key in result:
             result = result.replace(key, val)
+    if isinstance(prosody, dict) and prosody:
+        verse_min = prosody.get("verse_line_min", "")
+        verse_max = prosody.get("verse_line_max", "")
+        chorus_min = prosody.get("chorus_line_min", "")
+        chorus_max = prosody.get("chorus_line_max", "")
+        bridge_min = prosody.get("bridge_line_min", "")
+        bridge_max = prosody.get("bridge_line_max", "")
+        contract_block = (
+            "\n\n## Absolute Prosody Contract\n"
+            "- 逐段执行行级字数范围，不得机械等长。\n"
+            f"- Verse 行字数建议范围: {verse_min}-{verse_max}\n"
+            f"- Chorus 行字数建议范围: {chorus_min}-{chorus_max}\n"
+            f"- Bridge/Outro 行字数建议范围: {bridge_min}-{bridge_max}\n"
+            "- 若某行触及下边界，必须在该段加 (Pause) 或 (Breathe)。\n"
+            "- 若某行触及上边界，必须在该段加 [Fast Flow]。\n"
+            "- 输出必须保留这些标签，禁止在后处理阶段移除。\n"
+        )
+        if "## Absolute Prosody Contract" not in result:
+            result = result + contract_block
     return result
 
 
@@ -345,11 +364,30 @@ def _call_openai_compatible(
 
 
 def _build_section_rows(raw_lyrics: dict[str, Any], section_order: list[str]) -> list[dict[str, Any]]:
+    def _extract_inline_metatags(text: str) -> tuple[str, list[str]]:
+        raw = str(text or "")
+        found: list[str] = []
+        for tag in ("(Pause)", "(Breathe)", "[Fast Flow]"):
+            if tag in raw and tag not in found:
+                found.append(tag)
+                raw = raw.replace(tag, "")
+        return raw.strip(), found
+
     def _normalize_tag(tag: str) -> str:
         clean = tag.strip()
         if clean.startswith("[") and clean.endswith("]"):
             return clean
         lower = clean.lower()
+        if lower.startswith("pre-chorus"):
+            return "[Pre-Chorus]"
+        if lower.startswith("post-chorus"):
+            return "[Post-Chorus]"
+        if lower.startswith("final chorus"):
+            return "[Final Chorus]"
+        if lower.startswith("outro"):
+            return "[Outro]"
+        if lower.startswith("intro"):
+            return "[Intro]"
         if lower.startswith("verse"):
             suffix = clean[len("verse") :].strip() or "1"
             return f"[Verse {suffix}]"
@@ -392,15 +430,24 @@ def _build_section_rows(raw_lyrics: dict[str, Any], section_order: list[str]) ->
         if not isinstance(val, list):
             continue
         lines: list[dict[str, Any]] = []
+        voice_tags_inline: list[str] = []
         for item in val:
             if isinstance(item, str):
                 text = item.strip()
+                text, tags = _extract_inline_metatags(text)
+                for t in tags:
+                    if t not in voice_tags_inline:
+                        voice_tags_inline.append(t)
                 char_count = len(text)
             elif isinstance(item, dict):
                 # nested section object, not line object
                 if any(k in item for k in ("tag", "name", "section")):
                     continue
                 text = str(item.get("primary") or item.get("text") or item.get("line") or "").strip()
+                text, tags = _extract_inline_metatags(text)
+                for t in tags:
+                    if t not in voice_tags_inline:
+                        voice_tags_inline.append(t)
                 char_count = int(item.get("char_count", 0) or len(text))
             else:
                 continue
@@ -416,7 +463,7 @@ def _build_section_rows(raw_lyrics: dict[str, Any], section_order: list[str]) ->
             )
         if not lines:
             continue
-        rows.append({"tag": _normalize_tag(tag), "voice_tags_inline": [], "lines": lines})
+        rows.append({"tag": _normalize_tag(tag), "voice_tags_inline": voice_tags_inline, "lines": lines})
     return rows
 
 
@@ -438,6 +485,16 @@ def _normalize_section_tag(raw_tag: object) -> str:
         return ""
     if clean.startswith("[") and clean.endswith("]"):
         return clean
+    if lower.startswith("pre-chorus"):
+        return "[Pre-Chorus]"
+    if lower.startswith("post-chorus"):
+        return "[Post-Chorus]"
+    if lower.startswith("final chorus"):
+        return "[Final Chorus]"
+    if lower.startswith("outro"):
+        return "[Outro]"
+    if lower.startswith("intro"):
+        return "[Intro]"
     if lower.startswith("verse"):
         suffix = clean[len("verse") :].strip() or "1"
         return f"[Verse {suffix}]"
@@ -446,6 +503,16 @@ def _normalize_section_tag(raw_tag: object) -> str:
     if lower.startswith("bridge"):
         return "[Bridge]"
     return clean
+
+
+def _extract_inline_metatags(text: str) -> tuple[str, list[str]]:
+    raw = str(text or "")
+    found: list[str] = []
+    for tag in ("(Pause)", "(Breathe)", "[Fast Flow]"):
+        if tag in raw and tag not in found:
+            found.append(tag)
+            raw = raw.replace(tag, "")
+    return raw.strip(), found
 
 
 def _normalize_distillation(raw: Any, user_input: UserInput) -> dict[str, Any]:
@@ -671,13 +738,26 @@ def _extract_base_sections(payload_dict: dict[str, Any]) -> list[dict[str, Any]]
         lines_raw = section.get("lines", []) if isinstance(section, dict) else []
         if not isinstance(lines_raw, list):
             lines_raw = []
+        section_voice_tags: list[str] = [
+            str(x).strip()
+            for x in (section.get("voice_tags_inline", []) if isinstance(section, dict) else [])
+            if str(x).strip()
+        ]
         lines: list[dict[str, Any]] = []
         for row in lines_raw:
             if isinstance(row, str):
                 text = row.strip()
+                text, tags = _extract_inline_metatags(text)
+                for t in tags:
+                    if t not in section_voice_tags:
+                        section_voice_tags.append(t)
                 row_obj: dict[str, Any] = {}
             elif isinstance(row, dict):
                 text = str(row.get("primary") or row.get("text") or row.get("line") or "").strip()
+                text, tags = _extract_inline_metatags(text)
+                for t in tags:
+                    if t not in section_voice_tags:
+                        section_voice_tags.append(t)
                 row_obj = row
             else:
                 continue
@@ -692,7 +772,7 @@ def _extract_base_sections(payload_dict: dict[str, Any]) -> list[dict[str, Any]]
                 }
             )
         if lines:
-            normalized_rows.append({"tag": tag, "voice_tags_inline": [], "lines": lines})
+            normalized_rows.append({"tag": tag, "voice_tags_inline": section_voice_tags, "lines": lines})
     return normalized_rows
 
 
@@ -741,12 +821,25 @@ def _normalize_variants(raw: Any, base_sections: list[dict[str, Any]]) -> tuple[
             if not isinstance(lines_raw, list):
                 lines_raw = []
 
-            new_section = {"tag": tag, "voice_tags_inline": [], "lines": []}
+            section_voice_tags: list[str] = [
+                str(x).strip()
+                for x in (section.get("voice_tags_inline", []) if isinstance(section, dict) else [])
+                if str(x).strip()
+            ]
+            new_section = {"tag": tag, "voice_tags_inline": section_voice_tags, "lines": []}
             for row in lines_raw:
                 if isinstance(row, str):
                     text = row.strip()
+                    text, tags = _extract_inline_metatags(text)
+                    for t in tags:
+                        if t not in new_section["voice_tags_inline"]:
+                            new_section["voice_tags_inline"].append(t)
                 elif isinstance(row, dict):
                     text = str(row.get("primary") or row.get("text") or row.get("line") or "").strip()
+                    text, tags = _extract_inline_metatags(text)
+                    for t in tags:
+                        if t not in new_section["voice_tags_inline"]:
+                            new_section["voice_tags_inline"].append(t)
                 else:
                     continue
                 if not text:
@@ -839,7 +932,77 @@ def _normalize_payload_dict(
         ],
         "style_vocab_metrics": style_metrics,
     }
+    prosody_contract = _load_profile_prosody(repo_root, active_profile)
+    _apply_prosody_metatag_contract(synthesized, prosody_contract)
     return synthesized
+
+
+def _apply_prosody_metatag_contract(payload: dict[str, Any], prosody_contract: dict[str, Any]) -> None:
+    if not isinstance(payload, dict) or not isinstance(prosody_contract, dict):
+        return
+
+    section_key_map: dict[str, tuple[str, str]] = {
+        "[Verse]": ("verse_line_min", "verse_line_max"),
+        "[Verse 1]": ("verse_line_min", "verse_line_max"),
+        "[Verse 2]": ("verse_line_min", "verse_line_max"),
+        "[Pre-Chorus]": ("chorus_line_min", "chorus_line_max"),
+        "[Chorus]": ("chorus_line_min", "chorus_line_max"),
+        "[Final Chorus]": ("chorus_line_min", "chorus_line_max"),
+        "[Bridge]": ("bridge_line_min", "bridge_line_max"),
+        "[Outro]": ("bridge_line_min", "bridge_line_max"),
+    }
+
+    def _bare_len(text: str) -> int:
+        raw = str(text or "")
+        for tag in ("(Pause)", "(Breathe)", "[Fast Flow]"):
+            raw = raw.replace(tag, "")
+        cleaned = "".join(c for c in raw.strip() if c.strip() and c not in "，。？！、；：""''《》【】…—～·")
+        return len(cleaned)
+
+    def _enforce_on_sections(sections: Any) -> None:
+        if not isinstance(sections, list):
+            return
+        for section in sections:
+            if not isinstance(section, dict):
+                continue
+            tag = str(section.get("tag", "")).strip()
+            keys = section_key_map.get(tag)
+            if keys is None:
+                continue
+            min_key, max_key = keys
+            line_max = prosody_contract.get(max_key)
+            if line_max is None:
+                continue
+            line_min = prosody_contract.get(min_key, max(1, int(line_max) - 3))
+            try:
+                line_min_i = int(line_min)
+                line_max_i = int(line_max)
+            except (TypeError, ValueError):
+                continue
+
+            lines = section.get("lines", [])
+            if not isinstance(lines, list):
+                continue
+            lengths = [_bare_len(str((line or {}).get("primary", ""))) for line in lines if isinstance(line, dict)]
+            if not lengths:
+                continue
+
+            tags = [str(x).strip() for x in section.get("voice_tags_inline", []) if str(x).strip()]
+            if any(x <= line_min_i for x in lengths):
+                if "(Pause)" not in tags and "(Breathe)" not in tags:
+                    tags.append("(Pause)")
+            if any(x >= line_max_i for x in lengths):
+                if "[Fast Flow]" not in tags:
+                    tags.append("[Fast Flow]")
+            section["voice_tags_inline"] = tags
+
+    _enforce_on_sections(payload.get("lyrics_by_section"))
+    variants = payload.get("variants", [])
+    if isinstance(variants, list):
+        for variant in variants:
+            if not isinstance(variant, dict):
+                continue
+            _enforce_on_sections(variant.get("lyrics_by_section"))
 
 
 def generate_lyric_payload(
@@ -1011,6 +1174,6 @@ def generate_lyric_payload(
         "stage": "revise" if targeted_revise_prompt else "initial",
         "style_vocab_metrics": normalized_payload.get("style_vocab_metrics", {}),
         "prosody_contract": prosody_contract,
-        "prosody_matrix_aligned": True,
+        "prosody_matrix_aligned": False,
     }
     return payload, trace

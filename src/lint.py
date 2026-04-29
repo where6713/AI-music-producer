@@ -36,6 +36,34 @@ TAG_WHITELIST = {
     "(...)",
 }
 
+_INLINE_METATAGS = ("(Pause)", "(Breathe)", "[Fast Flow]")
+
+
+def _strip_inline_metatags(text: str) -> str:
+    out = str(text or "")
+    for token in _INLINE_METATAGS:
+        out = out.replace(token, "")
+    return out.strip()
+
+
+def _normalize_section_tag(tag: str) -> str:
+    raw = str(tag or "").strip()
+    if not raw:
+        return raw
+    if raw in TAG_WHITELIST:
+        return raw
+    bare_to_bracket = {
+        "Verse": "[Verse]",
+        "Verse 1": "[Verse 1]",
+        "Verse 2": "[Verse 2]",
+        "Pre-Chorus": "[Pre-Chorus]",
+        "Chorus": "[Chorus]",
+        "Bridge": "[Bridge]",
+        "Outro": "[Outro]",
+        "Final Chorus": "[Final Chorus]",
+    }
+    return bare_to_bracket.get(raw, raw)
+
 OPEN_FINALS = {"a", "ang", "ai", "ao", "ou"}
 # Include tone 0/5 (neutral/light tone) so modal particles like 啊/呀/哦/嘛 are accepted
 OPEN_TONES = {"1", "2", "0", "5"}
@@ -247,17 +275,18 @@ def lint_payload(
 
     # R06 tag whitelist
     for section in payload.lyrics_by_section:
-        if section.tag not in TAG_WHITELIST:
+        if _normalize_section_tag(section.tag) not in TAG_WHITELIST:
             violations.append(
                 Violation(rule="R06", detail=f"tag not in whitelist: {section.tag}")
             )
 
     # R03 forbidden literal phrases (fuzzy threshold 92)
-    text_lines = [x[2] for x in rows if x[2]]
+    text_lines = [_strip_inline_metatags(x[2]) for x in rows if _strip_inline_metatags(x[2])]
     forbidden = [x.strip() for x in payload.distillation.forbidden_literal_phrases if x.strip()]
     for phrase in forbidden:
         for section, idx, line in rows:
-            if line and fuzz.partial_ratio(phrase, line) >= 92:
+            clean_line = _strip_inline_metatags(line)
+            if clean_line and fuzz.partial_ratio(phrase, clean_line) >= 92:
                 violations.append(
                     Violation(
                         rule="R03",
@@ -270,7 +299,8 @@ def lint_payload(
     # R14 hard kill phrase check (动宾合法性)
     for section, idx, line in rows:
         for phrase in R14_FORBIDDEN_PHRASES:
-            if phrase in line:
+            clean_line = _strip_inline_metatags(line)
+            if phrase in clean_line:
                 violations.append(
                     Violation(
                         rule="R14",
@@ -378,7 +408,8 @@ def lint_payload(
             merged.append(phrase)
     for section, idx, line in rows:
         for phrase in merged:
-            if phrase and phrase in line:
+            clean_line = _strip_inline_metatags(line)
+            if phrase and phrase in clean_line:
                 source = "global" if phrase in global_forbidden else "profile"
                 violations.append(
                     Violation(
@@ -405,78 +436,94 @@ def lint_payload(
         if ratio > float(max_ratio):
             violations.append(Violation(rule="R17", detail=f"first-person ratio {ratio:.3f} exceeds max {float(max_ratio):.3f}"))
 
-    # R18 per-line prosody budget gate (HARD_PENALTY)
-    # Checks each lyric line against section-appropriate per-line char budget from profile registry.
-    # Does NOT enforce symmetry between adjacent lines — long-short verse variation is intentional.
-    _SECTION_TAG_TO_BUDGET_KEY: dict[str, str] = {
-        "[Verse]": "verse_line_max",
-        "[Verse 1]": "verse_line_max",
-        "[Verse 2]": "verse_line_max",
-        "[Pre-Chorus]": "chorus_line_max",
-        "[Chorus]": "chorus_line_max",
-        "[Final Chorus]": "chorus_line_max",
-        "[Bridge]": "bridge_line_max",
-        "[Outro]": "bridge_line_max",
+    # R18 section-level rhythm contract (HARD_PENALTY)
+    # 1) line-length span within each section must be <= 2
+    # 2) when touching lower/upper line boundary, required metatags must exist
+    _SECTION_TAG_TO_KEYS: dict[str, tuple[str, str]] = {
+        "[Verse]": ("verse_line_min", "verse_line_max"),
+        "[Verse 1]": ("verse_line_min", "verse_line_max"),
+        "[Verse 2]": ("verse_line_min", "verse_line_max"),
+        "[Pre-Chorus]": ("chorus_line_min", "chorus_line_max"),
+        "[Chorus]": ("chorus_line_min", "chorus_line_max"),
+        "[Final Chorus]": ("chorus_line_min", "chorus_line_max"),
+        "[Bridge]": ("bridge_line_min", "bridge_line_max"),
+        "[Outro]": ("bridge_line_min", "bridge_line_max"),
     }
-    _PER_LINE_TOLERANCE = 2  # allow up to budget+2 before hard penalty
+    _SPAN_LIMIT = 2
+    _LOWER_TAGS = {"(Pause)", "(Breathe)"}
+    _UPPER_TAGS = {"[Fast Flow]"}
+
+    def _bare_len(raw: str) -> int:
+        text = raw.strip()
+        return len("".join(c for c in text if c.strip() and c not in "，。？！、；：""''《》【】…—～·"))
 
     if isinstance(trace, dict):
         prosody = trace.get("prosody_contract", {})
-        if isinstance(prosody, dict) and any(
-            k in prosody for k in ("verse_line_max", "chorus_line_max", "bridge_line_max")
-        ):
+        if isinstance(prosody, dict):
             for section in payload.lyrics_by_section:
-                budget_key = _SECTION_TAG_TO_BUDGET_KEY.get(section.tag)
-                if budget_key is None:
+                key_pair = _SECTION_TAG_TO_KEYS.get(section.tag)
+                if key_pair is None:
                     continue
-                line_max = prosody.get(budget_key)
-                if line_max is None:
+                lower_key, upper_key = key_pair
+                line_min = prosody.get(lower_key)
+                line_max = prosody.get(upper_key)
+                if line_min is None or line_max is None:
                     continue
-                hard_limit = int(line_max) + _PER_LINE_TOLERANCE
+
+                line_lengths: list[tuple[int, int, str]] = []
                 for idx, line in enumerate(section.lines, start=1):
-                    text = line.primary.strip()
-                    # strip punctuation for char count (Chinese punct ≈ 0 phonetic weight)
-                    bare = "".join(c for c in text if c.strip() and c not in "，。？！、；：""''《》【】…—～·")
-                    if len(bare) > hard_limit:
+                    text = _strip_inline_metatags(line.primary)
+                    if not text:
+                        continue
+                    line_lengths.append((idx, _bare_len(text), text))
+                if not line_lengths:
+                    continue
+
+                min_len = min(x[1] for x in line_lengths)
+                max_len = max(x[1] for x in line_lengths)
+                if (max_len - min_len) > _SPAN_LIMIT:
+                    violations.append(
+                        Violation(
+                            rule="R18",
+                            detail=f"line span exceeds 2 in {section.tag}: min={min_len}, max={max_len}",
+                            section=section.tag,
+                            line=0,
+                        )
+                    )
+
+                inline_tags = {str(t).strip() for t in section.voice_tags_inline if str(t).strip()}
+                joined_raw = "\n".join(str(line.primary or "") for line in section.lines)
+                if "(Pause)" in joined_raw:
+                    inline_tags.add("(Pause)")
+                if "(Breathe)" in joined_raw:
+                    inline_tags.add("(Breathe)")
+                if "[Fast Flow]" in joined_raw:
+                    inline_tags.add("[Fast Flow]")
+                for idx, bare_len, text in line_lengths:
+                    if bare_len <= int(line_min) and not (inline_tags & _LOWER_TAGS):
                         violations.append(
                             Violation(
                                 rule="R18",
                                 detail=(
-                                    f"line {idx} in {section.tag} has {len(bare)} chars "
-                                    f"(budget={line_max}+{_PER_LINE_TOLERANCE}={hard_limit}): {text[:20]}…"
+                                    f"missing required metatag for lower-bound line in {section.tag} line {idx}: "
+                                    f"len={bare_len}, min={line_min}, require one of {sorted(_LOWER_TAGS)}"
                                 ),
                                 section=section.tag,
                                 line=idx,
                             )
                         )
-
-    # R18 total syllable budget check (soft guard, separate from per-line gate above)
-    if isinstance(trace, dict):
-        prosody = trace.get("prosody_contract", {})
-        if isinstance(prosody, dict):
-            budget_min = prosody.get("syllable_budget_min")
-            budget_max = prosody.get("syllable_budget_max")
-            if budget_min is not None or budget_max is not None:
-                total_syllables = sum(
-                    len(line.primary.strip())
-                    for section in payload.lyrics_by_section
-                    for line in section.lines
-                    if line.primary.strip()
-                )
-                if budget_min is not None and total_syllables < int(budget_min):
-                    violations.append(
-                        Violation(
-                            rule="R18",
-                            detail=f"total syllables {total_syllables} below budget_min {budget_min}",
+                    if bare_len >= int(line_max) and not (inline_tags & _UPPER_TAGS):
+                        violations.append(
+                            Violation(
+                                rule="R18",
+                                detail=(
+                                    f"missing required metatag for upper-bound line in {section.tag} line {idx}: "
+                                    f"len={bare_len}, max={line_max}, require one of {sorted(_UPPER_TAGS)}"
+                                ),
+                                section=section.tag,
+                                line=idx,
+                            )
                         )
-                    )
-                if budget_max is not None and total_syllables > int(budget_max):
-                    violations.append(
-                        Violation(
-                            rule="R18",
-                            detail=f"total syllables {total_syllables} exceeds budget_max {budget_max}",
-                        )
-                    )
 
     failed_rules = sorted({v.rule for v in violations})
     severity = evaluate_violation_severity(violations)

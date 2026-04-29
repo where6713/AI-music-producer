@@ -147,3 +147,50 @@ def test_lint_reports_craft_score_in_range() -> None:
 
     assert "craft_score" in report
     assert 0.0 <= float(report["craft_score"]) <= 1.0
+
+
+def test_r18_fails_when_section_line_span_exceeds_two() -> None:
+    payload = _payload("再把手放开", forbidden=[])
+    payload.lyrics_by_section[0].lines = [
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "短句", "char_count": 2}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "这是一个非常非常长的句子", "char_count": 12}),
+    ]
+    report = lint_payload(
+        payload,
+        trace={
+            "prosody_contract": {
+                "verse_line_min": 5,
+                "verse_line_max": 8,
+                "chorus_line_min": 5,
+                "chorus_line_max": 8,
+                "bridge_line_min": 5,
+                "bridge_line_max": 10,
+            }
+        },
+    )
+    assert "R18" in report["failed_rules"]
+    assert any("line span exceeds 2" in v["detail"] for v in report["violations"])
+
+
+def test_r18_requires_pause_tag_when_line_hits_lower_bound() -> None:
+    payload = _payload("再把手放开", forbidden=[])
+    payload.lyrics_by_section[0].lines = [
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "刚好五字句", "char_count": 5}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "稍长一点句子", "char_count": 6}),
+    ]
+    payload.lyrics_by_section[0].voice_tags_inline = []
+    report = lint_payload(
+        payload,
+        trace={
+            "prosody_contract": {
+                "verse_line_min": 5,
+                "verse_line_max": 8,
+                "chorus_line_min": 5,
+                "chorus_line_max": 8,
+                "bridge_line_min": 5,
+                "bridge_line_max": 10,
+            }
+        },
+    )
+    assert "R18" in report["failed_rules"]
+    assert any("missing required metatag" in v["detail"] for v in report["violations"])
