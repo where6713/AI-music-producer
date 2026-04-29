@@ -1,5 +1,0 @@
-{
-  "deprecated": true,
-  "redirect_to": "docs/整改task - 02.json",
-  "note": "Legacy task013 path retained as compatibility redirect. Canonical routing must go through docs/current_task_index.json."
-}
