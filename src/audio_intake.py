@@ -77,8 +77,10 @@ def _infer_bpm_with_llm(repo_root: Path, filename: str) -> int | None:
         return None
     prompt = (
         f"请根据歌名和歌手 \"{filename}\"，推断其原曲的近似 BPM。"
-        "如果无法推断，请根据该歌手的典型曲风给出一个大概率的 BPM。"
-        "只需输出一个纯数字，禁止输出其他文字。"
+        "请使用音乐常识区间做约束："
+        "indie pop 常见 90-115、dance/edm 常见 120-140、ambient 常见 60-90。"
+        "如果歌曲信息不足，优先按最可能曲风在对应区间内给出保守值。"
+        "只输出一个 60-190 之间的纯数字 BPM，禁止输出任何解释。"
     )
     try:
         if cfg.get("provider") == "anthropic":
@@ -153,6 +155,12 @@ def _budget_from_bpm(bpm: int, fallback: dict[str, Any]) -> tuple[int, int]:
     return bmin, bmax
 
 
+def _line_min_max_from_source(source_max: int, default_delta: int = 3) -> tuple[int, int]:
+    upper = int(source_max)
+    lower = max(1, upper - default_delta)
+    return lower, upper
+
+
 def resolve_prosody_from_ref_audio(ref_audio_path: str, fallback: dict[str, Any], repo_root: Path) -> dict[str, Any]:
     out = dict(fallback or {})
     path = Path(str(ref_audio_path or "").strip())
@@ -203,10 +211,22 @@ def resolve_prosody_from_ref_audio(ref_audio_path: str, fallback: dict[str, Any]
 
     if bpm is not None:
         bmin, bmax = _budget_from_bpm(bpm, fallback)
+        verse_max = int(fallback.get("verse_line_max", 8) or 8)
+        chorus_max = int(fallback.get("chorus_line_max", 8) or 8)
+        bridge_max = int(fallback.get("bridge_line_max", 10) or 10)
+        verse_min, verse_max = _line_min_max_from_source(verse_max)
+        chorus_min, chorus_max = _line_min_max_from_source(chorus_max)
+        bridge_min, bridge_max = _line_min_max_from_source(bridge_max)
         out["bpm"] = bpm
         out["bpm_source"] = source
         out["syllable_budget_min"] = bmin
         out["syllable_budget_max"] = bmax
+        out["verse_line_min"] = verse_min
+        out["verse_line_max"] = verse_max
+        out["chorus_line_min"] = chorus_min
+        out["chorus_line_max"] = chorus_max
+        out["bridge_line_min"] = bridge_min
+        out["bridge_line_max"] = bridge_max
         out["audio_intake"] = {"ok": True, "source": source, "path": str(path)}
         return out
 

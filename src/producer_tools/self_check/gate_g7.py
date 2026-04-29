@@ -18,15 +18,8 @@ from src.producer_tools.self_check.gate_g6 import check_gate_g6
 def _resolve_prosody_contract(workspace_root: Path, trace_payload: dict[str, Any]) -> dict[str, Any]:
     raw = trace_payload.get("prosody_contract", {})
     if isinstance(raw, dict):
-        bpm = raw.get("bpm")
-        bmin = raw.get("syllable_budget_min")
-        bmax = raw.get("syllable_budget_max")
-        if bpm is not None and bmin is not None and bmax is not None:
-            return {
-                "bpm": bpm,
-                "syllable_budget_min": bmin,
-                "syllable_budget_max": bmax,
-            }
+        if raw:
+            return dict(raw)
 
     active_profile = str(trace_payload.get("active_profile", "")).strip()
     if not active_profile:
@@ -48,16 +41,81 @@ def _resolve_prosody_contract(workspace_root: Path, trace_payload: dict[str, Any
     prosody = profile.get("prosody", {}) if isinstance(profile, dict) else {}
     if not isinstance(prosody, dict):
         return {}
-    bpm = prosody.get("bpm")
-    bmin = prosody.get("syllable_budget_min")
-    bmax = prosody.get("syllable_budget_max")
-    if bpm is None or bmin is None or bmax is None:
+    if not prosody:
         return {}
-    return {
-        "bpm": bpm,
-        "syllable_budget_min": bmin,
-        "syllable_budget_max": bmax,
+    return dict(prosody)
+
+
+def _parse_lyrics_sections(lyrics_path: Path) -> dict[str, list[str]]:
+    text = _read_text_safe(lyrics_path)
+    sections: dict[str, list[str]] = {}
+    current = ""
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        if line.startswith("[") and line.endswith("]"):
+            current = line
+            sections.setdefault(current, [])
+            continue
+        if current:
+            sections.setdefault(current, []).append(line)
+    return sections
+
+
+def _prosody_matrix_aligned(prosody_contract: dict[str, Any], output_dir: Path) -> tuple[bool, str]:
+    if not isinstance(prosody_contract, dict) or not prosody_contract:
+        return False, "prosody_contract_missing"
+
+    lyrics_path = output_dir / "lyrics.txt"
+    if not lyrics_path.exists():
+        return False, "lyrics.txt missing"
+
+    sections = _parse_lyrics_sections(lyrics_path)
+    if not sections:
+        return False, "lyrics_sections_missing"
+
+    mapping: dict[str, tuple[str, str]] = {
+        "[Verse]": ("verse_line_min", "verse_line_max"),
+        "[Verse 1]": ("verse_line_min", "verse_line_max"),
+        "[Verse 2]": ("verse_line_min", "verse_line_max"),
+        "[Pre-Chorus]": ("chorus_line_min", "chorus_line_max"),
+        "[Chorus]": ("chorus_line_min", "chorus_line_max"),
+        "[Final Chorus]": ("chorus_line_min", "chorus_line_max"),
+        "[Bridge]": ("bridge_line_min", "bridge_line_max"),
+        "[Outro]": ("bridge_line_min", "bridge_line_max"),
     }
+    lower_tags = {"(Pause)", "(Breathe)"}
+    upper_tags = {"[Fast Flow]"}
+
+    def _line_len(line: str) -> int:
+        cleaned = "".join(c for c in line.strip() if c.strip() and c not in "，。？！、；：""''《》【】…—～·")
+        return len(cleaned)
+
+    for tag, lines in sections.items():
+        keys = mapping.get(tag)
+        if keys is None:
+            continue
+        min_key, max_key = keys
+        if min_key not in prosody_contract or max_key not in prosody_contract:
+            return False, f"missing_budget_keys:{min_key}/{max_key}"
+        line_min = int(prosody_contract[min_key])
+        line_max = int(prosody_contract[max_key])
+
+        lengths = [_line_len(x) for x in lines if x.strip()]
+        if not lengths:
+            continue
+        if max(lengths) - min(lengths) > 2:
+            return False, f"section_span_exceeds_2:{tag}"
+        joined = "\n".join(lines)
+        has_lower = any(t in joined for t in lower_tags)
+        has_upper = any(t in joined for t in upper_tags)
+        if any(x <= line_min for x in lengths) and not has_lower:
+            return False, f"missing_lower_metatag:{tag}"
+        if any(x >= line_max for x in lengths) and not has_upper:
+            return False, f"missing_upper_metatag:{tag}"
+
+    return True, "aligned"
 
 
 def _run_g2_check() -> dict[str, Any]:
@@ -193,8 +251,7 @@ def _pm_audit_checks(
 ) -> dict[str, dict[str, Any]]:
     out = output_dir
     prosody_contract = _resolve_prosody_contract(workspace_root, trace_payload)
-    prosody_aligned_flag = bool(trace_payload.get("prosody_matrix_aligned", False))
-    prosody_aligned = prosody_aligned_flag or bool(prosody_contract)
+    prosody_aligned, prosody_detail = _prosody_matrix_aligned(prosody_contract, out)
     lint_report = trace_payload.get("lint_report", {}) if isinstance(trace_payload.get("lint_report", {}), dict) else {}
     r14_r16_hits = _count_rule_hits(lint_report, {"R14", "R16_global"})
     craft_score = float(lint_report.get("craft_score", 0.0) or 0.0)
@@ -250,7 +307,7 @@ def _pm_audit_checks(
         },
         "prosody_matrix_aligned": {
             "ok": prosody_aligned,
-            "detail": f"prosody_matrix_aligned={prosody_aligned_flag} prosody_contract={prosody_contract}",
+            "detail": f"prosody_matrix_aligned={prosody_aligned} detail={prosody_detail} prosody_contract={prosody_contract}",
         },
     }
     return checks

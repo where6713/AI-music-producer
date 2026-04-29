@@ -109,7 +109,16 @@ def _load_profile_prosody(repo_root: Path, active_profile: str) -> dict[str, Any
     profiles = registry.get("profiles", {})
     profile = profiles.get(active_profile, {}) if isinstance(profiles, dict) else {}
     prosody = profile.get("prosody", {}) if isinstance(profile, dict) else {}
-    return prosody if isinstance(prosody, dict) else {}
+    if not isinstance(prosody, dict):
+        return {}
+    out = dict(prosody)
+    if out.get("verse_line_min") is None and out.get("verse_line_max") is not None:
+        out["verse_line_min"] = max(1, int(out["verse_line_max"]) - 3)
+    if out.get("chorus_line_min") is None and out.get("chorus_line_max") is not None:
+        out["chorus_line_min"] = max(1, int(out["chorus_line_max"]) - 3)
+    if out.get("bridge_line_min") is None and out.get("bridge_line_max") is not None:
+        out["bridge_line_min"] = max(1, int(out["bridge_line_max"]) - 3)
+    return out
 
 
 def _inject_prompt_contract(skill_text: str, prosody: dict[str, Any], active_profile: str) -> str:
@@ -123,6 +132,25 @@ def _inject_prompt_contract(skill_text: str, prosody: dict[str, Any], active_pro
     for key, val in replacements.items():
         if key in result:
             result = result.replace(key, val)
+    if isinstance(prosody, dict) and prosody:
+        verse_min = prosody.get("verse_line_min", "")
+        verse_max = prosody.get("verse_line_max", "")
+        chorus_min = prosody.get("chorus_line_min", "")
+        chorus_max = prosody.get("chorus_line_max", "")
+        bridge_min = prosody.get("bridge_line_min", "")
+        bridge_max = prosody.get("bridge_line_max", "")
+        contract_block = (
+            "\n\n## Absolute Prosody Contract\n"
+            "- 逐段执行行级字数范围，不得机械等长。\n"
+            f"- Verse 行字数建议范围: {verse_min}-{verse_max}\n"
+            f"- Chorus 行字数建议范围: {chorus_min}-{chorus_max}\n"
+            f"- Bridge/Outro 行字数建议范围: {bridge_min}-{bridge_max}\n"
+            "- 若某行触及下边界，必须在该段加 (Pause) 或 (Breathe)。\n"
+            "- 若某行触及上边界，必须在该段加 [Fast Flow]。\n"
+            "- 输出必须保留这些标签，禁止在后处理阶段移除。\n"
+        )
+        if "## Absolute Prosody Contract" not in result:
+            result = result + contract_block
     return result
 
 
@@ -1011,6 +1039,6 @@ def generate_lyric_payload(
         "stage": "revise" if targeted_revise_prompt else "initial",
         "style_vocab_metrics": normalized_payload.get("style_vocab_metrics", {}),
         "prosody_contract": prosody_contract,
-        "prosody_matrix_aligned": True,
+        "prosody_matrix_aligned": False,
     }
     return payload, trace
