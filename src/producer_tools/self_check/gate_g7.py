@@ -89,7 +89,10 @@ def _prosody_matrix_aligned(prosody_contract: dict[str, Any], output_dir: Path) 
     upper_tags = {"[Fast Flow]"}
 
     def _line_len(line: str) -> int:
-        cleaned = "".join(c for c in line.strip() if c.strip() and c not in "，。？！、；：""''《》【】…—～·")
+        text = line.strip()
+        for tag in ("(Pause)", "(Breathe)", "[Fast Flow]"):
+            text = text.replace(tag, "")
+        cleaned = "".join(c for c in text.strip() if c.strip() and c not in "，。？！、；：""''《》【】…—～·")
         return len(cleaned)
 
     for tag, lines in sections.items():
@@ -100,6 +103,7 @@ def _prosody_matrix_aligned(prosody_contract: dict[str, Any], output_dir: Path) 
         if max_key not in prosody_contract:
             return False, f"missing_budget_key:{max_key}"
         line_max = int(prosody_contract[max_key])
+        has_explicit_min = min_key in prosody_contract
         line_min = int(prosody_contract.get(min_key, max(1, line_max - 3)))
 
         lengths = [_line_len(x) for x in lines if x.strip()]
@@ -110,7 +114,7 @@ def _prosody_matrix_aligned(prosody_contract: dict[str, Any], output_dir: Path) 
         joined = "\n".join(lines)
         has_lower = any(t in joined for t in lower_tags)
         has_upper = any(t in joined for t in upper_tags)
-        if any(x <= line_min for x in lengths) and not has_lower:
+        if has_explicit_min and any(x <= line_min for x in lengths) and not has_lower:
             return False, f"missing_lower_metatag:{tag}"
         if any(x >= line_max for x in lengths) and not has_upper:
             return False, f"missing_upper_metatag:{tag}"

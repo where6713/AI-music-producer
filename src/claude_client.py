@@ -109,16 +109,7 @@ def _load_profile_prosody(repo_root: Path, active_profile: str) -> dict[str, Any
     profiles = registry.get("profiles", {})
     profile = profiles.get(active_profile, {}) if isinstance(profiles, dict) else {}
     prosody = profile.get("prosody", {}) if isinstance(profile, dict) else {}
-    if not isinstance(prosody, dict):
-        return {}
-    out = dict(prosody)
-    if out.get("verse_line_min") is None and out.get("verse_line_max") is not None:
-        out["verse_line_min"] = max(1, int(out["verse_line_max"]) - 3)
-    if out.get("chorus_line_min") is None and out.get("chorus_line_max") is not None:
-        out["chorus_line_min"] = max(1, int(out["chorus_line_max"]) - 3)
-    if out.get("bridge_line_min") is None and out.get("bridge_line_max") is not None:
-        out["bridge_line_min"] = max(1, int(out["bridge_line_max"]) - 3)
-    return out
+    return prosody if isinstance(prosody, dict) else {}
 
 
 def _inject_prompt_contract(skill_text: str, prosody: dict[str, Any], active_profile: str) -> str:
