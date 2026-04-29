@@ -101,7 +101,10 @@ def _build_targeted_revise_prompt(payload: dict[str, Any], lint_report: dict[str
         "3. 未修改的段落必须原样保留，不得省略或截断。\n"
         "4. 严禁输出 Markdown、解释文字或代码块，只输出符合既有 schema 的 JSON 实体。\n"
         "5. 字段必须覆盖：few_shot_examples_used, distillation, structure, "
-        "lyrics_by_section, variants, chosen_variant_id, style_tags, exclude_tags。"
+        "lyrics_by_section, variants, chosen_variant_id, style_tags, exclude_tags。\n"
+        "6. 若 failed rules 含 R18，必须按 section 级别修复：每个触及下边界的段落在 voice_tags_inline 中包含 "
+        "(Pause) 或 (Breathe)；每个触及上边界的段落在 voice_tags_inline 中包含 [Fast Flow]。\n"
+        "7. R18 修复必须写入 voice_tags_inline，不能只把标签留在行文本里。"
     )
 
 
