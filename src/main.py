@@ -94,7 +94,14 @@ def _build_targeted_revise_prompt(payload: dict[str, Any], lint_report: dict[str
         "Targeted revise: fix only the specific failing lines listed below. "
         "All other lines must remain exactly unchanged.\n\n"
         f"Failed rules: {lint_report.get('failed_rules', [])}\n\n"
-        f"Failing lines to fix:\n{lines_block}"
+        f"Failing lines to fix:\n{lines_block}\n\n"
+        "【输出契约——必须严格遵守】\n"
+        "1. 你必须输出完整的、包含 3 个 variants 及完整歌词段落的 JSON 结构。\n"
+        "2. 绝不能只输出修改片段。\n"
+        "3. 未修改的段落必须原样保留，不得省略或截断。\n"
+        "4. 严禁输出 Markdown、解释文字或代码块，只输出符合既有 schema 的 JSON 实体。\n"
+        "5. 字段必须覆盖：few_shot_examples_used, distillation, structure, "
+        "lyrics_by_section, variants, chosen_variant_id, style_tags, exclude_tags。"
     )
 
 
