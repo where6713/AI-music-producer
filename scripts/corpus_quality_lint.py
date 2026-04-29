@@ -11,6 +11,23 @@ _DIGIT_3_RE = re.compile(r"\d{3,}")
 _CN_DIGIT_3_RE = re.compile(r"[零〇一二三四五六七八九十百千万两壹贰叁肆伍陆柒捌玖拾佰仟]{3,}")
 _BAD_WORD_RE = re.compile(r"placeholder|todo|test|示例|sample", re.IGNORECASE)
 _CN_RE = re.compile(r"[\u4e00-\u9fff]")
+_GARBLED_RE = re.compile(r"�|\ufffd|��")
+
+_IDIOM_MAX_LEN = 8
+_MODERN_R16_BLACKLIST = {
+    "学会放下",
+    "慢慢放下",
+    "默默走远",
+    "各自安好",
+    "回到原点",
+    "回原点",
+    "归零",
+    "归位",
+    "应停的位置",
+    "该在的位置",
+    "慢慢习惯",
+    "终究会习惯",
+}
 
 _VERB_CHARS = {
     "是",
@@ -73,6 +90,16 @@ def _verb_ratio(text: str) -> float:
     return verbs / len(chars)
 
 
+def _is_idiom_row(row: dict[str, Any]) -> bool:
+    source_family = _string(row.get("source_family")).lower()
+    source_id = _string(row.get("source_id")).lower()
+    return source_family == "chengyu" or source_id.startswith("idiom:")
+
+
+def _contains_modern_blacklist(text: str) -> bool:
+    return any(phrase in text for phrase in _MODERN_R16_BLACKLIST)
+
+
 def lint_corpus_row(row: dict[str, Any], *, mode: str = "ingestion") -> RowLintReport:
     failed: list[str] = []
     reasons: list[str] = []
@@ -83,17 +110,24 @@ def lint_corpus_row(row: dict[str, Any], *, mode: str = "ingestion") -> RowLintR
     emotion_tags = row.get("emotion_tags")
     profile_tag = _string(row.get("profile_tag"))
     valence = _string(row.get("valence"))
+    row_type = _string(row.get("type")).lower()
 
     joined_text = " ".join([content, learn_point])
 
-    if _contains_chinese_digits(content):
+    # Classical poems often use numbers as literary device; exempt them
+    if row_type != "classical_poem" and _contains_chinese_digits(content):
         failed.append("RULE_C1")
         reasons.append("content contains >=3 consecutive digits")
 
     length = len(content)
-    if length < 10 or length > 800:
-        failed.append("RULE_C3")
-        reasons.append(f"content length out of range: {length}")
+    if _is_idiom_row(row):
+        if length < 2 or length > 800:
+            failed.append("RULE_C3")
+            reasons.append(f"content length out of range: {length}")
+    else:
+        if length < 10 or length > 800:
+            failed.append("RULE_C3")
+            reasons.append(f"content length out of range: {length}")
 
     missing_profile_tag = (not profile_tag)
     missing_valence = (not valence)
@@ -105,7 +139,8 @@ def lint_corpus_row(row: dict[str, Any], *, mode: str = "ingestion") -> RowLintR
         failed.append("RULE_C5")
         reasons.append("learn_point missing or too short")
 
-    if not do_not_copy:
+    # Classical poems don't need do_not_copy
+    if row_type != "classical_poem" and not do_not_copy:
         failed.append("RULE_C8")
         reasons.append("do_not_copy missing")
 
@@ -113,9 +148,24 @@ def lint_corpus_row(row: dict[str, Any], *, mode: str = "ingestion") -> RowLintR
         failed.append("RULE_C6")
         reasons.append("placeholder/test marker detected")
 
-    if _verb_ratio(content) < 0.10:
+    # Classical poems often have low verb ratios; exempt them
+    if row_type != "classical_poem" and _verb_ratio(content) < 0.10:
         failed.append("RULE_C7")
         reasons.append("verb ratio below 10%")
+
+    if _is_idiom_row(row):
+        idiom_text = _string(row.get("content") or row.get("title"))
+        if len(idiom_text) > _IDIOM_MAX_LEN:
+            failed.append("RULE_C9")
+            reasons.append(f"idiom length exceeds max {_IDIOM_MAX_LEN}: {len(idiom_text)}")
+
+        if _GARBLED_RE.search(idiom_text):
+            failed.append("RULE_C10")
+            reasons.append("idiom text contains garbled characters")
+
+    if row_type == "modern_lyric" and _contains_modern_blacklist(content):
+        failed.append("RULE_R16_MODERN")
+        reasons.append("modern lyric hits R16 modern blacklist")
 
     return RowLintReport(passed=not failed, failed_rules=failed, reasons=reasons)
 

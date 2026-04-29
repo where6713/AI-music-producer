@@ -9,6 +9,7 @@
 - 长短句律动：每段至少有一处短句打点和一处长句回流，形成"收紧-放开-再收紧"的呼吸节奏。
 - 节奏落点：主歌偏克制、预副歌抬压、副歌给情绪回声，保持低烈度但可循环哼唱的韵律。
 - 副歌押韵目标：副歌各行的行尾字，至少4行同韵（推荐 2/4/6 行或全行压同一韵脚）。押韵优先于具象密度。
+- **禁止语气词填韵**：严禁用"啊/哦/呢/嘛/嗯/哟"等语气词作为行尾韵脚或音节填充。这是最低级的押韵捷径，会让所有行听起来像在向空气发问。韵脚必须落在有语义重量的实词或动词上，例如"茶""家""下""画"——这些字本身就有意象，韵感是附带品而不是唯一功能。
 - 允许适度抽象升华：Chorus 或 Bridge 允许出现1句非具象的情绪总结句，前提是它能被自然哼唱出来，不是说教。
 
 ## 严禁模式（AI 语言失真）
@@ -16,6 +17,20 @@
 - **器官名词堆叠**：全曲脊背/指尖/胸口/锁骨/喉咙加起来不超过3处，超过就是在用身体填词而非写情绪。
 - **模板式释怀**：学会放下/慢慢习惯/终究会好/各自安好 — 这些是已被 R16 profile 规则拦截的套话，生成时也不要往这个方向走。
 - **书面腔宣言**：Bedroom R&B 是耳语式近讲，不是演讲台词。任何听起来像公众号金句或励志海报的句子都应重写。
+
+## Suno Meta-tag 模板
+```
+[Verse - soft female vocals, intimate, lo-fi, acoustic guitar]
+[Pre-Chorus - building emotion, breathy vocals]
+[Chorus - full but restrained, emotional, bittersweet]
+[Bridge - stripped back, single instrument, reflective]
+[Outro - fade, ambient pad, quiet resolution]
+```
+
+## 推荐 Style 组合（直接用于 style.txt）
+```
+chill R&B, soft female vocals, lo-fi, acoustic guitar, bittersweet, late-night, warm mix, intimate
+```
 
 ## Bridge / 最后段的升华要求
 Bridge 或最后一段必须有 1 句"抽象收束 + 回扣前文意象"的句子——不是鸡汤总结，而是把全曲某一个具体意象（光、声音、温度）升华成一个情绪状态，让听众能在这句话里感到"对，就是这样"。

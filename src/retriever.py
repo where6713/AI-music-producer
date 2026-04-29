@@ -19,6 +19,13 @@ CLEAN_CORPUS_FILES = [
     "corpus/_clean/lyrics_modern_zh.json",
 ]
 
+# Golden anchor files: curated high-quality lyricist examples (林夕 etc.)
+# These bypass runtime lint — they are pre-validated golden references.
+GOLDEN_ANCHOR_FILES = [
+    "corpus/_raw/golden_anchors_modern_llm_enriched.json",
+    "corpus/_raw/golden_anchors_classical.json",
+]
+
 PROFILE_IDS = {
     "urban_introspective",
     "classical_restraint",
@@ -75,10 +82,8 @@ def _load_corpus(repo_root: Path) -> list[dict[str, Any]]:
     if not has_clean:
         raise RuntimeError("clean corpus missing: run scripts/run_corpus_ingestion.py --strict")
 
-    source_files = CLEAN_CORPUS_FILES
-
     rows: list[dict[str, Any]] = []
-    for rel in source_files:
+    for rel in CLEAN_CORPUS_FILES:
         fp = repo_root / rel
         if not fp.exists():
             continue
@@ -92,6 +97,24 @@ def _load_corpus(repo_root: Path) -> list[dict[str, Any]]:
                 failed_rules = set(report.failed_rules)
                 if report.passed or (row_type == "classical_poem" and failed_rules == {"RULE_C7"}):
                     rows.append(item)
+
+    # Load golden anchor files (pre-curated, bypass runtime lint)
+    for rel in GOLDEN_ANCHOR_FILES:
+        fp = repo_root / rel
+        if not fp.exists():
+            continue
+        payload = json.loads(fp.read_text(encoding="utf-8"))
+        if isinstance(payload, list):
+            for item in payload:
+                if not isinstance(item, dict):
+                    continue
+                learn_point = str(item.get("learn_point", "")).strip()
+                do_not_copy = str(item.get("do_not_copy", "")).strip()
+                if len(learn_point) >= 5 and do_not_copy:
+                    # Mark with high confidence so they score well in retrieval
+                    item = {**item, "profile_confidence": 0.95, "_source_family": "golden_anchor"}
+                    rows.append(item)
+
     return rows
 
 
@@ -165,16 +188,25 @@ def retrieve_few_shot_examples(
 
     def _quality_pass(row: dict[str, Any]) -> bool:
         learn_point = str(row.get("learn_point", "")).strip()
-        if len(learn_point) < 5:
-            return False
-        do_not_copy = str(row.get("do_not_copy", "")).strip()
-        if not do_not_copy:
-            return False
+        row_type = str(row.get("type", "")).strip().lower()
+        if row_type == "modern_lyric":
+            # 50-char minimum filters placeholder learn_points for modern lyrics
+            # (e.g. "通过意象并置与留白转折完成情绪抬升" = 18 chars is a known placeholder)
+            if len(learn_point) < 50:
+                return False
+            do_not_copy = str(row.get("do_not_copy", "")).strip()
+            if not do_not_copy:
+                return False
+        else:
+            # Classical poems: lower bar, no do_not_copy required
+            if len(learn_point) < 5:
+                return False
         return True
 
     selected: list[dict[str, Any]] = []
     target_max = max(2, min(top_k, 3))
     fallback_level = "none"
+    fallback_reason = "none"
 
     profile_override = str(user_input.profile_override or "").strip()
     if profile_override in PROFILE_IDS:
@@ -191,8 +223,10 @@ def retrieve_few_shot_examples(
         if len(override_selected) >= 2:
             selected = override_selected
             fallback_level = "override_profile_only"
+            fallback_reason = "none"
         else:
             fallback_level = "fallback_to_global"
+            fallback_reason = "override_profile_insufficient"
 
     if not selected:
         for _, row in scored:
@@ -201,6 +235,13 @@ def retrieve_few_shot_examples(
             selected.append(row)
             if len(selected) >= target_max:
                 break
+
+    if fallback_level == "fallback_to_global" and not str(fallback_reason).strip():
+        fallback_reason = (
+            "override_profile_insufficient"
+            if profile_override in PROFILE_IDS
+            else "global_quality_selection"
+        )
 
     if len(selected) < 2:
         raise InsufficientQualityFewShotError(
@@ -258,4 +299,5 @@ def retrieve_few_shot_examples(
         "corpus_balance": _corpus_balance_from_rows(corpus),
         "corpus_monoculture_risk": monoculture_risk,
         "fallback_level": fallback_level,
+        "fallback_reason": fallback_reason,
     }

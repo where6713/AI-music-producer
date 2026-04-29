@@ -1,1 +1,462 @@
-[]
+[
+  {
+    "source_id": "github:local/songci300.json#18",
+    "type": "classical_poem",
+    "source_family": "song_ci_300",
+    "title": "",
+    "author": "王安国",
+    "content": "留春不住。\n费尽莺儿语。\n满地残红宫锦污。\n昨夜南园风雨。\n小怜初上琵琶。\n晓来思绕天涯。\n不肯画堂朱户，春风自在梨花。",
+    "era": "宋",
+    "profile_tag": "classical_restraint",
+    "valence": "mixed",
+    "learn_point": "以花、雨、春等意象，营造求而不得的怅惘的情感氛围，适合纳西索斯式旋律写作",
+    "emotion_tags": [
+      "wistful",
+      "yearning",
+      "self-reflection",
+      "mirror"
+    ],
+    "emotion_core": "求而不得的怅惘",
+    "archetype": "纳西索斯",
+    "musical_traits": {
+      "留白密度": "medium",
+      "节奏型": "推进型",
+      "音域暗示": "高亢",
+      "织体": "单层",
+      "速度感": "中板",
+      "和声色彩": "调式混合"
+    },
+    "lyric_strategies": [
+      {
+        "type": "意象直取",
+        "description": "提取诗中精炼短句，直接作为歌词hook或副歌",
+        "example": "如：'留春不住。'"
+      },
+      {
+        "type": "意境转换",
+        "description": "保留原诗视觉结构，将古典意象替换为现代场景",
+        "example": "将'花、雨'转换为城市/科技意象"
+      },
+      {
+        "type": "情感提纯",
+        "description": "提取'求而不得的怅惘'的情感曲线，完全重写为现代歌词",
+        "example": "保留情感推进逻辑，更换所有具体意象"
+      }
+    ],
+    "core_imagery": [
+      "花",
+      "雨",
+      "春",
+      "风",
+      "夜",
+      "莺"
+    ],
+    "phonetic_rhythm": {
+      "韵脚": "以'。'韵为主",
+      "声调起伏": "古汉语四声，平仄交替",
+      "节奏型": "短句急促",
+      "押韵模式": "7句，末字押韵"
+    },
+    "quotability": "adapt",
+    "_rejected_rules": [
+      "RULE_C2"
+    ],
+    "_rejected_reasons": [
+      "high similarity with same title/profile"
+    ]
+  },
+  {
+    "source_id": "github:local/songci300.json#36",
+    "type": "classical_poem",
+    "source_family": "song_ci_300",
+    "title": "",
+    "author": "王观",
+    "content": "关山魂梦长，塞雁音书少。\n两鬓可怜青，一夜相思老。\n归傍碧纱窗，说与人人道。\n真个别离难，不似相逢好。",
+    "era": "宋",
+    "profile_tag": "classical_restraint",
+    "valence": "mixed",
+    "learn_point": "以山、雁、梦等意象，营造求而不得的怅惘的情感氛围，适合纳西索斯式旋律写作",
+    "emotion_tags": [
+      "wistful",
+      "yearning",
+      "self-reflection",
+      "mirror"
+    ],
+    "emotion_core": "求而不得的怅惘",
+    "archetype": "纳西索斯",
+    "musical_traits": {
+      "留白密度": "high",
+      "节奏型": "推进型",
+      "音域暗示": "起伏",
+      "织体": "单层",
+      "速度感": "中板",
+      "和声色彩": "调式混合"
+    },
+    "lyric_strategies": [
+      {
+        "type": "意象直取",
+        "description": "提取诗中精炼短句，直接作为歌词hook或副歌",
+        "example": "如：'关山魂梦长，塞雁音书少。'"
+      },
+      {
+        "type": "意境转换",
+        "description": "保留原诗视觉结构，将古典意象替换为现代场景",
+        "example": "将'山、雁'转换为城市/科技意象"
+      },
+      {
+        "type": "情感提纯",
+        "description": "提取'求而不得的怅惘'的情感曲线，完全重写为现代歌词",
+        "example": "保留情感推进逻辑，更换所有具体意象"
+      }
+    ],
+    "core_imagery": [
+      "山",
+      "雁",
+      "梦",
+      "窗",
+      "相思",
+      "归"
+    ],
+    "phonetic_rhythm": {
+      "韵脚": "以'。'韵为主",
+      "声调起伏": "古汉语四声，平仄交替",
+      "节奏型": "五言/七言顿挫",
+      "押韵模式": "4句，末字押韵"
+    },
+    "quotability": "direct",
+    "_rejected_rules": [
+      "RULE_C2"
+    ],
+    "_rejected_reasons": [
+      "high similarity with same title/profile"
+    ]
+  },
+  {
+    "source_id": "github:local/songci300.json#111",
+    "type": "classical_poem",
+    "source_family": "song_ci_300",
+    "title": "",
+    "author": "李玉",
+    "content": "篆缕销金鼎。\n醉沈沈、庭阴转午，画堂人静。\n芳草王孙知何处，惟有杨花糁径。\n渐玉枕、腾腾春醒。\n帘外残红春已透，镇无聊、酒厌厌病。\n云鬓乱，未整。\n江南旧事休重省。\n遍天涯、寻消问息，断鸿难倩。\n月满西楼凭栏久，依旧归期未定。\n又只恐、瓶沈金井。\n嘶骑不来银烛暗，枉教人、立尽梧桐影。\n谁伴我，对鸾镜。",
+    "era": "宋",
+    "profile_tag": "classical_restraint",
+    "valence": "mixed",
+    "learn_point": "以云、花、楼等意象，营造逃避现实的沉溺的情感氛围，适合浮士德式旋律写作",
+    "emotion_tags": [
+      "escape",
+      "intoxication",
+      "ambition",
+      "restless"
+    ],
+    "emotion_core": "逃避现实的沉溺",
+    "archetype": "浮士德",
+    "musical_traits": {
+      "留白密度": "low",
+      "节奏型": "推进型",
+      "音域暗示": "起伏",
+      "织体": "多层交织",
+      "速度感": "中板",
+      "和声色彩": "调式混合"
+    },
+    "lyric_strategies": [
+      {
+        "type": "意象直取",
+        "description": "提取诗中精炼短句，直接作为歌词hook或副歌",
+        "example": "如：'篆缕销金鼎。'"
+      },
+      {
+        "type": "意境转换",
+        "description": "保留原诗视觉结构，将古典意象替换为现代场景",
+        "example": "将'云、花'转换为城市/科技意象"
+      },
+      {
+        "type": "情感提纯",
+        "description": "提取'逃避现实的沉溺'的情感曲线，完全重写为现代歌词",
+        "example": "保留情感推进逻辑，更换所有具体意象"
+      }
+    ],
+    "core_imagery": [
+      "云",
+      "花",
+      "楼",
+      "鸿",
+      "江",
+      "春"
+    ],
+    "phonetic_rhythm": {
+      "韵脚": "以'。'韵为主",
+      "声调起伏": "古汉语四声，平仄交替",
+      "节奏型": "五言/七言顿挫",
+      "押韵模式": "12句，末字押韵"
+    },
+    "quotability": "adapt",
+    "_rejected_rules": [
+      "RULE_C2"
+    ],
+    "_rejected_reasons": [
+      "high similarity with same title/profile"
+    ]
+  },
+  {
+    "source_id": "github:local/songci300.json#172",
+    "type": "classical_poem",
+    "source_family": "song_ci_300",
+    "title": "",
+    "author": "欧阳修",
+    "content": "独倚危楼风细细。\n望极离愁，黯黯生天际。\n草色山光残照里。\n无人会得凭阑意。\n也拟疏狂图一醉。\n对酒当歌，强饮还无味。\n衣带渐宽都不悔。\n况伊销得人憔悴。",
+    "era": "宋",
+    "profile_tag": "classical_restraint",
+    "valence": "mixed",
+    "learn_point": "以山、楼、风等意象，营造哀愁的沉溺的情感氛围，适合失乐园式旋律写作",
+    "emotion_tags": [
+      "melancholy",
+      "longing",
+      "escape",
+      "intoxication",
+      "nostalgia"
+    ],
+    "emotion_core": "哀愁的沉溺",
+    "archetype": "失乐园",
+    "musical_traits": {
+      "留白密度": "medium",
+      "节奏型": "推进型",
+      "音域暗示": "起伏",
+      "织体": "单层",
+      "速度感": "中板",
+      "和声色彩": "小调忧郁"
+    },
+    "lyric_strategies": [
+      {
+        "type": "意象直取",
+        "description": "提取诗中精炼短句，直接作为歌词hook或副歌",
+        "example": "如：'独倚危楼风细细。'"
+      },
+      {
+        "type": "意境转换",
+        "description": "保留原诗视觉结构，将古典意象替换为现代场景",
+        "example": "将'山、楼'转换为城市/科技意象"
+      },
+      {
+        "type": "情感提纯",
+        "description": "提取'哀愁的沉溺'的情感曲线，完全重写为现代歌词",
+        "example": "保留情感推进逻辑，更换所有具体意象"
+      }
+    ],
+    "core_imagery": [
+      "山",
+      "楼",
+      "风",
+      "愁",
+      "酒"
+    ],
+    "phonetic_rhythm": {
+      "韵脚": "以'。'韵为主",
+      "声调起伏": "古汉语四声，平仄交替",
+      "节奏型": "短句急促",
+      "押韵模式": "8句，末字押韵"
+    },
+    "quotability": "adapt",
+    "_rejected_rules": [
+      "RULE_C2"
+    ],
+    "_rejected_reasons": [
+      "high similarity with same title/profile"
+    ]
+  },
+  {
+    "source_id": "github:local/songci300.json#173",
+    "type": "classical_poem",
+    "source_family": "song_ci_300",
+    "title": "",
+    "author": "欧阳修",
+    "content": "池塘水绿春微暖。\n记得玉真初见面。\n从头歌韵响铮鏦，入破舞腰红乱旋。\n玉钩帘下香阶畔。\n醉後不知红日晚。\n当时共我赏花人，点检如今无一半。",
+    "era": "宋",
+    "profile_tag": "classical_restraint",
+    "valence": "mixed",
+    "learn_point": "以水、花、春等意象，营造逃避现实的沉溺的情感氛围，适合浮士德式旋律写作",
+    "emotion_tags": [
+      "escape",
+      "intoxication",
+      "ambition",
+      "restless"
+    ],
+    "emotion_core": "逃避现实的沉溺",
+    "archetype": "浮士德",
+    "musical_traits": {
+      "留白密度": "medium",
+      "节奏型": "推进型",
+      "音域暗示": "低沉",
+      "织体": "单层",
+      "速度感": "中板",
+      "和声色彩": "调式混合"
+    },
+    "lyric_strategies": [
+      {
+        "type": "意象直取",
+        "description": "提取诗中精炼短句，直接作为歌词hook或副歌",
+        "example": "如：'池塘水绿春微暖。'"
+      },
+      {
+        "type": "意境转换",
+        "description": "保留原诗视觉结构，将古典意象替换为现代场景",
+        "example": "将'水、花'转换为城市/科技意象"
+      },
+      {
+        "type": "情感提纯",
+        "description": "提取'逃避现实的沉溺'的情感曲线，完全重写为现代歌词",
+        "example": "保留情感推进逻辑，更换所有具体意象"
+      }
+    ],
+    "core_imagery": [
+      "水",
+      "花",
+      "春",
+      "帘"
+    ],
+    "phonetic_rhythm": {
+      "韵脚": "以'。'韵为主",
+      "声调起伏": "古汉语四声，平仄交替",
+      "节奏型": "五言/七言顿挫",
+      "押韵模式": "6句，末字押韵"
+    },
+    "quotability": "adapt",
+    "_rejected_rules": [
+      "RULE_C2"
+    ],
+    "_rejected_reasons": [
+      "high similarity with same title/profile"
+    ]
+  },
+  {
+    "source_id": "github:local/songci300.json#174",
+    "type": "classical_poem",
+    "source_family": "song_ci_300",
+    "title": "",
+    "author": "欧阳修",
+    "content": "燕鸿过後春归去。\n细算浮生千万绪。\n来如春梦几多时，去似朝云无觅处。\n闻琴解神仙侣。\n挽断罗衣留不住。\n劝君莫作独醒人，烂醉花间应有数。",
+    "era": "宋",
+    "profile_tag": "classical_restraint",
+    "valence": "mixed",
+    "learn_point": "以云、琴、梦等意象，营造现实与幻想的撕裂的情感氛围，适合浮士德式旋律写作",
+    "emotion_tags": [
+      "dreamlike",
+      "fractured",
+      "ambition",
+      "restless"
+    ],
+    "emotion_core": "现实与幻想的撕裂",
+    "archetype": "浮士德",
+    "musical_traits": {
+      "留白密度": "medium",
+      "节奏型": "推进型",
+      "音域暗示": "起伏",
+      "织体": "单层",
+      "速度感": "中板",
+      "和声色彩": "调式混合"
+    },
+    "lyric_strategies": [
+      {
+        "type": "意象直取",
+        "description": "提取诗中精炼短句，直接作为歌词hook或副歌",
+        "example": "如：'燕鸿过後春归去。'"
+      },
+      {
+        "type": "意境转换",
+        "description": "保留原诗视觉结构，将古典意象替换为现代场景",
+        "example": "将'云、琴'转换为城市/科技意象"
+      },
+      {
+        "type": "情感提纯",
+        "description": "提取'现实与幻想的撕裂'的情感曲线，完全重写为现代歌词",
+        "example": "保留情感推进逻辑，更换所有具体意象"
+      }
+    ],
+    "core_imagery": [
+      "云",
+      "琴",
+      "梦",
+      "花",
+      "鸿",
+      "春"
+    ],
+    "phonetic_rhythm": {
+      "韵脚": "以'。'韵为主",
+      "声调起伏": "古汉语四声，平仄交替",
+      "节奏型": "五言/七言顿挫",
+      "押韵模式": "6句，末字押韵"
+    },
+    "quotability": "adapt",
+    "_rejected_rules": [
+      "RULE_C2"
+    ],
+    "_rejected_reasons": [
+      "high similarity with same title/profile"
+    ]
+  },
+  {
+    "source_id": "github:local/songci300.json#266",
+    "type": "classical_poem",
+    "source_family": "song_ci_300",
+    "title": "",
+    "author": "汪藻",
+    "content": "新月娟娟，夜寒江静山衔斗。\n起来搔首。\n梅影横窗瘦。\n好个霜天，闲却传杯手。\n君知否。\n乱鸦啼後。\n归兴浓於酒。",
+    "era": "宋",
+    "profile_tag": "classical_restraint",
+    "valence": "mixed",
+    "learn_point": "以山、梅、窗等意象，营造独处的丰盈的情感氛围，适合纳西索斯式旋律写作",
+    "emotion_tags": [
+      "solitude",
+      "introspective",
+      "self-reflection",
+      "mirror"
+    ],
+    "emotion_core": "独处的丰盈",
+    "archetype": "纳西索斯",
+    "musical_traits": {
+      "留白密度": "medium",
+      "节奏型": "推进型",
+      "音域暗示": "起伏",
+      "织体": "单层",
+      "速度感": "慢板",
+      "和声色彩": "调式混合"
+    },
+    "lyric_strategies": [
+      {
+        "type": "意象直取",
+        "description": "提取诗中精炼短句，直接作为歌词hook或副歌",
+        "example": "如：'新月娟娟，夜寒江静山衔斗。'"
+      },
+      {
+        "type": "意境转换",
+        "description": "保留原诗视觉结构，将古典意象替换为现代场景",
+        "example": "将'山、梅'转换为城市/科技意象"
+      },
+      {
+        "type": "情感提纯",
+        "description": "提取'独处的丰盈'的情感曲线，完全重写为现代歌词",
+        "example": "保留情感推进逻辑，更换所有具体意象"
+      }
+    ],
+    "core_imagery": [
+      "山",
+      "梅",
+      "窗",
+      "鸦",
+      "江",
+      "霜"
+    ],
+    "phonetic_rhythm": {
+      "韵脚": "以'。'韵为主",
+      "声调起伏": "古汉语四声，平仄交替",
+      "节奏型": "短句急促",
+      "押韵模式": "7句，末字押韵"
+    },
+    "quotability": "adapt",
+    "_rejected_rules": [
+      "RULE_C2"
+    ],
+    "_rejected_reasons": [
+      "high similarity with same title/profile"
+    ]
+  }
+]

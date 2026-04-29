@@ -1,0 +1,37 @@
+{
+  "timestamp": "2026-04-26T13:58:27.042271+00:00",
+  "source_id": "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics/ΦìëΦ£ó_11265/τ½Öσç║µ¥Ñ_(σ¢╜)_25641613.txt#林夕",
+  "prompt": {
+    "task": "为单首歌词生成高质量学习锚点",
+    "constraints": [
+      "必须像资深乐评人一样写分析，不能套模板句",
+      "learn_point_analysis与do_not_copy_analysis必须是两段完整自然句",
+      "严禁出现作词/作曲/编曲/歌手/专辑/发行等基础信息",
+      "严禁出现作者姓名：林夕、方文山、姚若龙、李宗盛、阿信、黄伟文、厉曼婷",
+      "必须结合原文的具体语句来分析手法（隐喻、视角、动词、留白、叙事推进）",
+      "learn_point_quotes/do_not_copy_quotes中的短句必须逐字来自原文",
+      "输出必须是JSON对象"
+    ],
+    "input": {
+      "source_id": "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics/ΦìëΦ£ó_11265/τ½Öσç║µ¥Ñ_(σ¢╜)_25641613.txt#林夕",
+      "title": "τ½Öσç║µ¥Ñ_(σ¢╜)_25641613",
+      "content": "歌曲国语版k 歌之王\n曲陈辉阳词林夕\n我以为要是唱得用心良苦\n你总会对我多点在乎\n我以为虽然爱情已成往事\n千言万语说出来可以互相安抚\n真实的我们难相处\n唱出你要的幸福"
+    },
+    "output_schema": {
+      "learn_point_analysis": "string",
+      "learn_point_quotes": [
+        "string"
+      ],
+      "do_not_copy_analysis": "string",
+      "do_not_copy_quotes": [
+        "string"
+      ],
+      "emotion_tags": [
+        "string"
+      ],
+      "profile_tag": "string",
+      "valence": "positive|negative|neutral|mixed"
+    }
+  },
+  "raw_response": "{\"id\":\"chatcmpl-b357e318-4da5-4030-b566-2f09f2b9ae46\",\"model\":\"gpt-5.3-codex\",\"object\":\"chat.completion\",\"created\":1777211907,\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"learn_point_analysis\\\": \\\"这段词最精妙的地方在于“表达”与“失效”的反差：前两句连续用“我以为”起势，把主角放在一个自我说服的视角里，先相信“唱得用心良苦”就能换来“多点在乎”，再相信“千言万语”能够“互相安抚”，叙事像两次向前试探，最后却被“真实的我们难相处”一刀收紧，形成从抒情幻觉到关系现实的急坠。动词的选择也很关键，“唱得”“说出来”“安抚”都属于主动修复关系的动作，但落点“唱出你要的幸福”突然把“幸福”的归属让渡给“你要的”，这句既是成全也是退场，留白出一个没被明说的结论：他能唱出幸福，却未必能活在幸福里。\\\",\\n  \\\"learn_point_quotes\\\": [\\n    \\\"我以为要是唱得用心良苦\\\",\\n    \\\"我以为虽然爱情已成往事\\\",\\n    \\\"真实的我们难相处\\\",\\n    \\\"唱出你要的幸福\\\"\\n  ],\\n  \\\"do_not_copy_analysis\\\": \\\"不要把这段写成泛泛的苦情宣言，比如只说“很伤感、很无奈”，因为文本真正的力量来自层层推进的句法和视角变化：两次“我以为”是铺垫，随后“真实的我们”是现实反证，最后“你要的幸福”是关系权力的偏移。也不要脱离原句空谈修辞，如果不扣住“千言万语说出来可以互相安抚”与“难相处”的对撞，就会错过这段词里最有价值的叙事转折与心理落差。\\\",\\n  \\\"do_not_copy_quotes\\\": [\\n    \\\"千言万语说出来可以互相安抚\\\",\\n    \\\"真实的我们难相处\\\"\\n  ],\\n  \\\"emotion_tags\\\": [\\n    \\\"自我辩解\\\",\\n    \\\"失落\\\",\\n    \\\"克制\\\",\\n    \\\"成全\\\"\\n  ],\\n  \\\"profile_tag\\\": \\\"关系挽回失败的第一人称独白\\\",\\n  \\\"valence\\\": \\\"mixed\\\"\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":425,\"completion_tokens\":520,\"total_tokens\":945,\"prompt_tokens_details\":{},\"completion_tokens_details\":{},\"input_tokens\":0,\"output_tokens\":0,\"input_tokens_details\":null}}"
+}

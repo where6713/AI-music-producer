@@ -8,6 +8,7 @@ import typer
 
 from src.claude_client import generate_lyric_payload
 from src.compile import StructuralIncompleteError, write_outputs, write_trace_and_audit
+from src.audio_intake import resolve_prosody_from_ref_audio
 from src.lint import lint_payload
 from src.profile_router import resolve_active_profile
 from src.retriever import InsufficientQualityFewShotError
@@ -93,7 +94,14 @@ def _build_targeted_revise_prompt(payload: dict[str, Any], lint_report: dict[str
         "Targeted revise: fix only the specific failing lines listed below. "
         "All other lines must remain exactly unchanged.\n\n"
         f"Failed rules: {lint_report.get('failed_rules', [])}\n\n"
-        f"Failing lines to fix:\n{lines_block}"
+        f"Failing lines to fix:\n{lines_block}\n\n"
+        "【输出契约——必须严格遵守】\n"
+        "1. 你必须输出完整的、包含 3 个 variants 及完整歌词段落的 JSON 结构。\n"
+        "2. 绝不能只输出修改片段。\n"
+        "3. 未修改的段落必须原样保留，不得省略或截断。\n"
+        "4. 严禁输出 Markdown、解释文字或代码块，只输出符合既有 schema 的 JSON 实体。\n"
+        "5. 字段必须覆盖：few_shot_examples_used, distillation, structure, "
+        "lyrics_by_section, variants, chosen_variant_id, style_tags, exclude_tags。"
     )
 
 
@@ -354,12 +362,14 @@ def produce(
     profile: str = typer.Option("", "--profile"),
     lang: str = typer.Option("zh-CN", "--lang"),
     out_dir: str = typer.Option("out", "--out-dir"),
+    ref_audio: str = typer.Option("", "--ref-audio"),
     verbose: bool = typer.Option(False, "--verbose"),
     dry_run: bool = typer.Option(False, "--dry-run"),
 ) -> None:
     repo_root = Path.cwd()
     target_dir = Path(out_dir)
 
+    ref_audio_path = ref_audio if isinstance(ref_audio, str) else ""
     user_input = UserInput(
         raw_intent=raw_intent,
         language=lang,
@@ -367,6 +377,7 @@ def produce(
         mood_hint=mood,
         vocal_gender_hint=vocal,
         profile_override=profile,
+        ref_audio_path=ref_audio_path,
     )
 
     llm_calls = 1
@@ -430,6 +441,17 @@ def produce(
     trace["active_profile"] = active_profile
     trace["profile_source"] = profile_source
     trace["input_mood_hint"] = user_input.mood_hint
+    if user_input.ref_audio_path:
+        prosody_raw = trace.get("prosody_contract", {}) if isinstance(trace, dict) else {}
+        prosody_fallback = prosody_raw if isinstance(prosody_raw, dict) else {}
+        resolved_prosody = resolve_prosody_from_ref_audio(user_input.ref_audio_path, prosody_fallback, repo_root)
+        trace["prosody_contract"] = resolved_prosody
+        budget_min = int(resolved_prosody.get("syllable_budget_min", 0) or 0)
+        budget_max = int(resolved_prosody.get("syllable_budget_max", 0) or 0)
+        if budget_min > 0:
+            user_input.syllable_budget_min = budget_min
+        if budget_max > 0:
+            user_input.syllable_budget_max = budget_max
     if profile_vote_confidence is not None:
         trace["profile_vote_confidence"] = profile_vote_confidence
     payload, variant_rank = _score_variants(payload, trace=trace)

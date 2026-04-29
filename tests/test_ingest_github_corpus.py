@@ -183,6 +183,7 @@ def test_build_classical_restraint_rows_from_raw_generates_github_ids(tmp_path: 
     assert len(rows) == 2
     assert all(str(row["source_id"]).startswith("github:chinese-poetry/chinese-poetry:") for row in rows)
     assert all(row["profile_tag"] == "classical_restraint" for row in rows)
+    assert all(row.get("source_family") == "poetry_2000" for row in rows)
 
 
 def test_build_club_dance_rows_from_raw_generates_github_ids(tmp_path: Path) -> None:

@@ -1,0 +1,126 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "generated_at": "2026-04-28",
+    "source": ["MiniMax-AI/MiniMax-MCP"],
+    "schema": "records-v1",
+    "role": "secondary-vocab"
+  },
+  "records": [
+    {
+      "source_repo": "MiniMax-AI/MiniMax-MCP",
+      "source_path": "minimax_mcp/server.py#music_generation",
+      "profile": "urban_introspective",
+      "genre_tags": ["pop music", "R&B", "lo-fi pop"],
+      "mood_tags": ["sad", "night", "introspective"],
+      "instrument_tags": ["soft piano", "warm bass", "subtle synth"],
+      "production_tags": ["sample_rate=44100", "bitrate=128000", "format=mp3"],
+      "meta_tags": {
+        "structure": ["[Intro]", "[Verse]", "[Chorus]", "[Bridge]", "[Outro]"],
+        "vocal": ["female vocals", "male vocals"],
+        "effect": ["prompt-based style control"],
+        "param_map": [
+          "style.prompt -> music_generation.prompt",
+          "lyrics.tags -> music_generation.lyrics",
+          "audio.sample_rate -> audio_setting.sample_rate",
+          "audio.bitrate -> audio_setting.bitrate",
+          "audio.format -> audio_setting.format"
+        ]
+      },
+      "example_style_lines": [
+        "pop music, sad, suitable for rainy nights",
+        "R&B, low energy, intimate night mood",
+        "lo-fi pop, introspective, warm and close"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "source_repo": "MiniMax-AI/MiniMax-MCP",
+      "source_path": "README.md#music_generation",
+      "profile": "club_dance",
+      "genre_tags": ["electronic", "dance", "club"],
+      "mood_tags": ["high energy", "festival", "euphoric"],
+      "instrument_tags": ["synth lead", "sub bass", "kick"],
+      "production_tags": ["sample_rate=44100", "bitrate=256000", "format=wav"],
+      "meta_tags": {
+        "structure": ["[Intro]", "[Build-up]", "[Drop]", "[Breakdown]", "[Outro]"],
+        "vocal": ["vocal chops", "processed vocals"],
+        "effect": ["drop focus", "energy build"],
+        "param_map": [
+          "prompt.energy -> music_generation.prompt",
+          "lyrics.drop_structure -> music_generation.lyrics",
+          "hq.audio -> audio_setting(sample_rate/bitrate/format)"
+        ]
+      },
+      "example_style_lines": [
+        "electronic dance, high energy, drop-focused arrangement",
+        "club, euphoric build-up, synth-led drop",
+        "festival dance, powerful kick and sub bass"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "source_repo": "MiniMax-AI/MiniMax-MCP",
+      "source_path": "README.md#music_generation",
+      "profile": "classical_restraint",
+      "genre_tags": ["instrumental", "cinematic", "orchestral"],
+      "mood_tags": ["calm", "meditative", "solemn"],
+      "instrument_tags": ["strings", "piano", "woodwinds"],
+      "production_tags": ["format=wav", "sample_rate=32000", "bitrate=128000"],
+      "meta_tags": {
+        "structure": ["[Intro]", "[Verse]", "[Bridge]", "[Outro]"],
+        "vocal": ["no vocals", "traditional female vocals"],
+        "effect": ["natural space", "gentle dynamics"],
+        "param_map": [
+          "style.instrumental -> prompt",
+          "lyrics.section_tags -> lyrics",
+          "clean_render -> audio_setting"
+        ]
+      },
+      "example_style_lines": [
+        "instrumental, calm, meditative atmosphere",
+        "cinematic orchestral, solemn and spacious",
+        "orchestral restraint, gentle dynamic flow"
+      ],
+      "confidence": "low"
+    }
+  ],
+  "by_profile": {
+    "urban_introspective": {
+      "genre": ["pop music", "R&B", "lo-fi pop"],
+      "mood": ["sad", "night", "introspective"],
+      "vocal": ["female vocals", "male vocals"],
+      "instruments": ["soft piano", "warm bass", "subtle synth"],
+      "production": ["sample_rate=44100", "bitrate=128000", "format=mp3"],
+      "example_combos": [
+        "pop music, sad, suitable for rainy nights",
+        "R&B, low energy, intimate night mood",
+        "lo-fi pop, introspective, warm and close"
+      ]
+    },
+    "club_dance": {
+      "genre": ["electronic", "dance", "club"],
+      "mood": ["high energy", "festival", "euphoric"],
+      "vocal": ["vocal chops", "processed vocals"],
+      "instruments": ["synth lead", "sub bass", "kick"],
+      "production": ["sample_rate=44100", "bitrate=256000", "format=wav"],
+      "example_combos": [
+        "electronic dance, high energy, drop-focused arrangement",
+        "club, euphoric build-up, synth-led drop",
+        "festival dance, powerful kick and sub bass"
+      ]
+    },
+    "classical_restraint": {
+      "genre": ["instrumental", "cinematic", "orchestral"],
+      "mood": ["calm", "meditative", "solemn"],
+      "vocal": ["no vocals", "traditional female vocals"],
+      "instruments": ["strings", "piano", "woodwinds"],
+      "production": ["format=wav", "sample_rate=32000", "bitrate=128000"],
+      "example_combos": [
+        "instrumental, calm, meditative atmosphere",
+        "cinematic orchestral, solemn and spacious",
+        "orchestral restraint, gentle dynamic flow"
+      ]
+    }
+  }
+}

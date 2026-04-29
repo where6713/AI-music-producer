@@ -15,6 +15,51 @@ from src.producer_tools.self_check.gate_g5 import check_gate_g5
 from src.producer_tools.self_check.gate_g6 import check_gate_g6
 
 
+def _resolve_prosody_contract(workspace_root: Path, trace_payload: dict[str, Any]) -> dict[str, Any]:
+    raw = trace_payload.get("prosody_contract", {})
+    if isinstance(raw, dict):
+        bpm = raw.get("bpm")
+        bmin = raw.get("syllable_budget_min")
+        bmax = raw.get("syllable_budget_max")
+        if bpm is not None and bmin is not None and bmax is not None:
+            return {
+                "bpm": bpm,
+                "syllable_budget_min": bmin,
+                "syllable_budget_max": bmax,
+            }
+
+    active_profile = str(trace_payload.get("active_profile", "")).strip()
+    if not active_profile:
+        decision = trace_payload.get("retrieval_profile_decision", {})
+        if isinstance(decision, dict):
+            active_profile = str(decision.get("active_profile", "")).strip()
+    if not active_profile:
+        return {}
+
+    registry_path = workspace_root / "src" / "profiles" / "registry.json"
+    if not registry_path.exists():
+        return {}
+    try:
+        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+    profiles = registry.get("profiles", {}) if isinstance(registry, dict) else {}
+    profile = profiles.get(active_profile, {}) if isinstance(profiles, dict) else {}
+    prosody = profile.get("prosody", {}) if isinstance(profile, dict) else {}
+    if not isinstance(prosody, dict):
+        return {}
+    bpm = prosody.get("bpm")
+    bmin = prosody.get("syllable_budget_min")
+    bmax = prosody.get("syllable_budget_max")
+    if bpm is None or bmin is None or bmax is None:
+        return {}
+    return {
+        "bpm": bpm,
+        "syllable_budget_min": bmin,
+        "syllable_budget_max": bmax,
+    }
+
+
 def _run_g2_check() -> dict[str, Any]:
     return validate_failure_evidence(
         {
@@ -147,6 +192,9 @@ def _pm_audit_checks(
     output_dir: Path,
 ) -> dict[str, dict[str, Any]]:
     out = output_dir
+    prosody_contract = _resolve_prosody_contract(workspace_root, trace_payload)
+    prosody_aligned_flag = bool(trace_payload.get("prosody_matrix_aligned", False))
+    prosody_aligned = prosody_aligned_flag or bool(prosody_contract)
     lint_report = trace_payload.get("lint_report", {}) if isinstance(trace_payload.get("lint_report", {}), dict) else {}
     r14_r16_hits = _count_rule_hits(lint_report, {"R14", "R16_global"})
     craft_score = float(lint_report.get("craft_score", 0.0) or 0.0)
@@ -199,6 +247,10 @@ def _pm_audit_checks(
         "profile_source_recorded": {
             "ok": bool(profile_source),
             "detail": profile_source_detail,
+        },
+        "prosody_matrix_aligned": {
+            "ok": prosody_aligned,
+            "detail": f"prosody_matrix_aligned={prosody_aligned_flag} prosody_contract={prosody_contract}",
         },
     }
     return checks

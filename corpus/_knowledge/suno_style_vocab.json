@@ -1,0 +1,181 @@
+{
+  "_meta": {
+    "version": "2.0",
+    "generated_at": "2026-04-28",
+    "primary_repo": [
+      "danlex/suno-lab",
+      "VRVirtuosos/awesome-suno-prompts"
+    ],
+    "schema": "records-v1",
+    "note": "Primary controlled vocabulary for style tag selection."
+  },
+  "records": [
+    {
+      "source_repo": "VRVirtuosos/awesome-suno-prompts",
+      "source_path": "README.md#pop-prompts",
+      "profile": "urban_introspective",
+      "genre_tags": ["indie pop", "bedroom pop", "chill R&B", "lo-fi R&B"],
+      "mood_tags": ["melancholic", "bittersweet", "introspective", "nostalgic"],
+      "instrument_tags": ["acoustic guitar", "soft piano", "warm bass", "subtle synth pad"],
+      "production_tags": ["lo-fi", "warm mix", "intimate", "close mic", "soft reverb"],
+      "meta_tags": {
+        "structure": ["[Verse]", "[Chorus]", "[Bridge]", "[Outro]"],
+        "vocal": ["soft female vocals", "breathy female vocals", "intimate vocals"],
+        "effect": ["reverb", "tape saturation", "dry-close"],
+        "bpm": ["70-90 BPM", "mid-tempo"]
+      },
+      "example_style_lines": [
+        "chill R&B, soft female vocals, lo-fi, acoustic guitar, bittersweet, late-night",
+        "bedroom pop, breathy vocals, warm bass, introspective, minimal production",
+        "indie pop, intimate vocals, soft piano, melancholic, close mic"
+      ],
+      "confidence": "high"
+    },
+    {
+      "source_repo": "danlex/suno-lab",
+      "source_path": "README.md#prompt-format",
+      "profile": "classical_restraint",
+      "genre_tags": ["Chinese traditional", "ancient Chinese", "neoclassical Chinese", "Chinese folk"],
+      "mood_tags": ["ethereal", "contemplative", "serene", "meditative"],
+      "instrument_tags": ["guqin", "pipa", "erhu", "dizi flute", "guzheng"],
+      "production_tags": ["natural reverb", "spacious", "minimal", "organic"],
+      "meta_tags": {
+        "structure": ["[Intro]", "[Verse]", "[Bridge]", "[Outro]"],
+        "vocal": ["traditional Chinese female vocals", "clear soprano", "light vibrato"],
+        "effect": ["hall reverb", "open space", "quiet dynamics"],
+        "bpm": ["60-80 BPM", "free tempo"]
+      },
+      "example_style_lines": [
+        "ancient Chinese, guqin, pipa, traditional female vocals, ethereal, natural reverb",
+        "Chinese folk, erhu, dizi flute, contemplative, serene, spacious",
+        "neoclassical Chinese, guzheng, meditative, minimal, organic"
+      ],
+      "confidence": "high"
+    },
+    {
+      "source_repo": "VRVirtuosos/awesome-suno-prompts",
+      "source_path": "README.md#pop-prompts",
+      "profile": "uplift_pop",
+      "genre_tags": ["Mandopop", "C-pop", "upbeat pop", "power pop"],
+      "mood_tags": ["uplifting", "joyful", "energetic", "hopeful"],
+      "instrument_tags": ["electric guitar", "piano", "synth", "full drum kit", "claps"],
+      "production_tags": ["polished", "radio-ready", "clean mix", "bright EQ", "wide stereo"],
+      "meta_tags": {
+        "structure": ["[Verse]", "[Pre-Chorus]", "[Chorus]", "[Bridge]", "[Final Chorus]"],
+        "vocal": ["clear female vocals", "powerful female vocalist", "harmonies"],
+        "effect": ["delay", "reverb", "stereo widening"],
+        "bpm": ["100-130 BPM", "uptempo"]
+      },
+      "example_style_lines": [
+        "C-pop, upbeat, clear female vocals, piano, electric guitar, joyful, polished",
+        "Mandopop, bright vocals, full band, energetic, radio-ready, 120 BPM",
+        "power pop, harmonies, synth, claps, hopeful, wide stereo"
+      ],
+      "confidence": "high"
+    },
+    {
+      "source_repo": "VRVirtuosos/awesome-suno-prompts",
+      "source_path": "README.md#edmelectronic-prompts",
+      "profile": "club_dance",
+      "genre_tags": ["EDM", "house", "dance pop", "future bass", "electropop"],
+      "mood_tags": ["euphoric", "high energy", "hypnotic", "sensual"],
+      "instrument_tags": ["4-on-the-floor kick", "sidechain bass", "lead synth", "sub bass", "vocal chops"],
+      "production_tags": ["loud master", "sidechain compression", "wide mix", "drop-ready"],
+      "meta_tags": {
+        "structure": ["[Build-up]", "[Drop]", "[Breakdown]", "[Chorus]"],
+        "vocal": ["processed vocals", "auto-tune", "chant-like"],
+        "effect": ["filter sweep", "riser", "impact", "delay"],
+        "bpm": ["124-135 BPM", "128 BPM"]
+      },
+      "example_style_lines": [
+        "EDM, 128 BPM, sidechain bass, lead synth, female processed vocals, euphoric, drop-ready",
+        "house, 126 BPM, pitched vocals, sub bass, hypnotic, wide mix",
+        "future bass, vocal chops, high energy, loud master, sidechain compression"
+      ],
+      "confidence": "high"
+    },
+    {
+      "source_repo": "danlex/suno-lab",
+      "source_path": "README.md#key-techniques-explored",
+      "profile": "ambient_meditation",
+      "genre_tags": ["ambient", "new age", "meditation music", "soundscape"],
+      "mood_tags": ["peaceful", "healing", "floating", "dreamlike"],
+      "instrument_tags": ["singing bowl", "soft piano", "ambient pad", "nature sounds", "wind chimes"],
+      "production_tags": ["long reverb tail", "spacious mix", "gentle fade", "no hard transients", "binaural"],
+      "meta_tags": {
+        "structure": ["[Intro]", "[Verse]", "[Bridge]", "[Outro]"],
+        "vocal": ["wordless vocals", "humming", "ethereal choir", "no vocals"],
+        "effect": ["reverb", "field recording", "air texture"],
+        "bpm": ["40-60 BPM", "free tempo", "no discernible beat"]
+      },
+      "example_style_lines": [
+        "ambient, singing bowl, soft piano, nature sounds, peaceful, long reverb tail, no vocals",
+        "meditation music, ethereal choir, gentle strings, healing, spacious mix, binaural",
+        "new age, wordless vocals, ambient pad, wind chimes, dreamlike, very slow"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "by_profile": {
+    "urban_introspective": {
+      "genre": ["indie pop", "bedroom pop", "chill R&B", "lo-fi R&B"],
+      "mood": ["melancholic", "bittersweet", "introspective", "nostalgic"],
+      "vocal": ["soft female vocals", "breathy female vocals", "intimate vocals"],
+      "instruments": ["acoustic guitar", "soft piano", "warm bass", "subtle synth pad"],
+      "production": ["lo-fi", "warm mix", "intimate", "close mic", "soft reverb"],
+      "example_combos": [
+        "chill R&B, soft female vocals, lo-fi, acoustic guitar, bittersweet, late-night",
+        "bedroom pop, breathy vocals, warm bass, introspective, minimal production",
+        "indie pop, intimate vocals, soft piano, melancholic, close mic"
+      ]
+    },
+    "classical_restraint": {
+      "genre": ["Chinese traditional", "ancient Chinese", "neoclassical Chinese", "Chinese folk"],
+      "mood": ["ethereal", "contemplative", "serene", "meditative"],
+      "vocal": ["traditional Chinese female vocals", "clear soprano", "light vibrato"],
+      "instruments": ["guqin", "pipa", "erhu", "dizi flute", "guzheng"],
+      "production": ["natural reverb", "spacious", "minimal", "organic"],
+      "example_combos": [
+        "ancient Chinese, guqin, pipa, traditional female vocals, ethereal, natural reverb",
+        "Chinese folk, erhu, dizi flute, contemplative, serene, spacious",
+        "neoclassical Chinese, guzheng, meditative, minimal, organic"
+      ]
+    },
+    "uplift_pop": {
+      "genre": ["Mandopop", "C-pop", "upbeat pop", "power pop"],
+      "mood": ["uplifting", "joyful", "energetic", "hopeful"],
+      "vocal": ["clear female vocals", "powerful female vocalist", "harmonies"],
+      "instruments": ["electric guitar", "piano", "synth", "full drum kit", "claps"],
+      "production": ["polished", "radio-ready", "clean mix", "bright EQ", "wide stereo"],
+      "example_combos": [
+        "C-pop, upbeat, clear female vocals, piano, electric guitar, joyful, polished",
+        "Mandopop, bright vocals, full band, energetic, radio-ready, 120 BPM",
+        "power pop, harmonies, synth, claps, hopeful, wide stereo"
+      ]
+    },
+    "club_dance": {
+      "genre": ["EDM", "house", "dance pop", "future bass", "electropop"],
+      "mood": ["euphoric", "high energy", "hypnotic", "sensual"],
+      "vocal": ["processed vocals", "auto-tune", "chant-like"],
+      "instruments": ["4-on-the-floor kick", "sidechain bass", "lead synth", "sub bass", "vocal chops"],
+      "production": ["loud master", "sidechain compression", "wide mix", "drop-ready"],
+      "example_combos": [
+        "EDM, 128 BPM, sidechain bass, lead synth, female processed vocals, euphoric, drop-ready",
+        "house, 126 BPM, pitched vocals, sub bass, hypnotic, wide mix",
+        "future bass, vocal chops, high energy, loud master, sidechain compression"
+      ]
+    },
+    "ambient_meditation": {
+      "genre": ["ambient", "new age", "meditation music", "soundscape"],
+      "mood": ["peaceful", "healing", "floating", "dreamlike"],
+      "vocal": ["wordless vocals", "humming", "ethereal choir", "no vocals"],
+      "instruments": ["singing bowl", "soft piano", "ambient pad", "nature sounds", "wind chimes"],
+      "production": ["long reverb tail", "spacious mix", "gentle fade", "no hard transients", "binaural"],
+      "example_combos": [
+        "ambient, singing bowl, soft piano, nature sounds, peaceful, long reverb tail, no vocals",
+        "meditation music, ethereal choir, gentle strings, healing, spacious mix, binaural",
+        "new age, wordless vocals, ambient pad, wind chimes, dreamlike, very slow"
+      ]
+    }
+  }
+}

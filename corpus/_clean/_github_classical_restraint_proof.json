@@ -1,9 +1,9 @@
 {
   "repo": "https://github.com/chinese-poetry/chinese-poetry",
   "commit_sha": "909646524737b70544ee7ae17cb76868a0bc8a55",
-  "fetched_at": "2026-04-25T04:11:52.107829+00:00",
-  "accepted_count": 240,
-  "rejected_count": 0,
+  "fetched_at": "2026-04-26T05:40:48.351035+00:00",
+  "accepted_count": 2000,
+  "rejected_count": 27,
   "sample_source_ids": [
     "github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#0",
     "github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#1",

@@ -1,0 +1,37 @@
+{
+  "timestamp": "2026-04-27T01:16:26.550380+00:00",
+  "source_id": "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/陈瑞_7228/太阳的眼泪太阳雨_212448.txt",
+  "prompt": {
+    "task": "为单首歌词生成高质量学习锚点",
+    "constraints": [
+      "必须像资深乐评人一样写分析，不能套模板句",
+      "learn_point_analysis与do_not_copy_analysis必须是两段完整自然句",
+      "严禁出现作词/作曲/编曲/歌手/专辑/发行等基础信息",
+      "严禁出现作者姓名：林夕、方文山、姚若龙、李宗盛、阿信、黄伟文、厉曼婷",
+      "必须结合原文的具体语句来分析手法（隐喻、视角、动词、留白、叙事推进）",
+      "learn_point_quotes/do_not_copy_quotes中的短句必须逐字来自原文",
+      "输出必须是JSON对象"
+    ],
+    "input": {
+      "source_id": "github:gaussic/Chinese-Lyric-Corpus:Chinese_Lyrics.zip/Chinese_Lyrics/陈瑞_7228/太阳的眼泪太阳雨_212448.txt",
+      "title": "太阳的眼泪太阳雨_212448",
+      "content": "凌空的雀 瞬间打湿翅膀\n行走的我 顷刻湿了衣裳\n更湿更冷 是柔软的心房\n抬起头看 天空一半黑暗 一半明亮\n有泪珠 滑落太阳的脸庞\n浅浅的笑靥 笑得牵强\n有雨水穿透 记忆的过往\n梦里的酸楚 独自承当\n心灵灯盏 闪着幽幽的光\n熄灭火焰 用你重复的谎\n爱过恨过 渴望谁来疗伤\n抬起头看 天空一半黑暗 一半明亮\n有泪珠 滑落太阳的脸庞\n浅浅的笑靥 笑得牵强\n有雨水穿透 记忆的过往\n落汤的灵魂 学会遗忘\n有泪珠 滑落太阳的脸庞\n浅浅的笑靥 笑得牵强\n有雨水穿透 记忆的过往\n落汤的灵魂 学会遗忘"
+    },
+    "output_schema": {
+      "learn_point_analysis": "string",
+      "learn_point_quotes": [
+        "string"
+      ],
+      "do_not_copy_analysis": "string",
+      "do_not_copy_quotes": [
+        "string"
+      ],
+      "emotion_tags": [
+        "string"
+      ],
+      "profile_tag": "string",
+      "valence": "positive|negative|neutral|mixed"
+    }
+  },
+  "raw_response": "{\"id\":\"chatcmpl-4ba9cd08-aa02-4c08-9724-172086a80a84\",\"object\":\"chat.completion\",\"created\":1777252572,\"model\":\"gpt-5.3-codex\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"{\\n  \\\"learn_point_analysis\\\": \\\"这首词最值得学习的是把抽象情绪压进可视化场景的能力：开头“凌空的雀 瞬间打湿翅膀”“行走的我 顷刻湿了衣裳”先用外部淋湿建立体感，再顺势落到“更湿更冷 是柔软的心房”，完成从天气到心理的递进。中段“天空一半黑暗 一半明亮”与“有泪珠 滑落太阳的脸庞”把矛盾心境拟人化成天象，随后“有雨水穿透 记忆的过往”用“穿透”这个动词把回忆写成可被击中的实体，叙事上由当下受淋推进到旧伤复发，最后收束在“落汤的灵魂 学会遗忘”，形成从受伤到自我处理的内在弧线。\\\",\\n  \\\"learn_point_quotes\\\": [\\n    \\\"更湿更冷 是柔软的心房\\\",\\n    \\\"天空一半黑暗 一半明亮\\\",\\n    \\\"有泪珠 滑落太阳的脸庞\\\",\\n    \\\"有雨水穿透 记忆的过往\\\",\\n    \\\"落汤的灵魂 学会遗忘\\\"\\n  ],\\n  \\\"do_not_copy_analysis\\\": \\\"需要避免的是同一核心意象在副歌高频原样回放导致的信息停滞：像“有泪珠 滑落太阳的脸庞”“浅浅的笑靥 笑得牵强”“有雨水穿透 记忆的过往”连续重复，情绪浓度虽然稳定，却削弱了后段新发现的力度。另一个可规避点是因果留白过大——“熄灭火焰 用你重复的谎”有力度，但“你”与“谎”的具体情境未继续展开，若想提升叙事推进，可以在后续补一到两笔事件细节，让“爱过恨过 渴望谁来疗伤”的转折更具必然性而不只停留在抒情判断。\\\",\\n  \\\"do_not_copy_quotes\\\": [\\n    \\\"有泪珠 滑落太阳的脸庞\\\",\\n    \\\"浅浅的笑靥 笑得牵强\\\",\\n    \\\"有雨水穿透 记忆的过往\\\",\\n    \\\"熄灭火焰 用你重复的谎\\\"\\n  ],\\n  \\\"emotion_tags\\\": [\\n    \\\"受伤后的清醒\\\",\\n    \\\"压抑与自我修复\\\",\\n    \\\"矛盾心境\\\",\\n    \\\"冷感遗忘\\\"\\n  ],\\n  \\\"profile_tag\\\": \\\"天象隐喻型抒情叙事\\\",\\n  \\\"valence\\\": \\\"mixed\\\"\\n}\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":588,\"completion_tokens\":630,\"total_tokens\":1218}}"
+}

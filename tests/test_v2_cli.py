@@ -286,6 +286,7 @@ def test_pm_audit_prints_all_8_checks(monkeypatch, capsys) -> None:
                     "lyrics_no_residuals": {"ok": True, "detail": "pass"},
                     "postprocess_symbols_absent": {"ok": True, "detail": "pass"},
                     "profile_source_recorded": {"ok": True, "detail": "profile_source=corpus_vote"},
+                    "prosody_matrix_aligned": {"ok": True, "detail": "aligned"},
                 }
             },
         }
@@ -307,7 +308,8 @@ def test_pm_audit_prints_all_8_checks(monkeypatch, capsys) -> None:
     assert "lyrics_no_residuals" in out
     assert "postprocess_symbols_absent" in out
     assert "profile_source_recorded" in out
-    assert "TOTAL: 8, PASS: 8, FAIL: 0, EXIT: 0" in out
+    assert "prosody_matrix_aligned" in out
+    assert "TOTAL: 9, PASS: 9, FAIL: 0, EXIT: 0" in out
 
 
 def test_pm_audit_fails_with_exit_1_when_any_check_red(monkeypatch, capsys) -> None:
@@ -330,6 +332,7 @@ def test_pm_audit_fails_with_exit_1_when_any_check_red(monkeypatch, capsys) -> N
                     "lyrics_no_residuals": {"ok": True, "detail": "pass"},
                     "postprocess_symbols_absent": {"ok": True, "detail": "pass"},
                     "profile_source_recorded": {"ok": True, "detail": "profile_source=corpus_vote"},
+                    "prosody_matrix_aligned": {"ok": True, "detail": "aligned"},
                 }
             },
         }
@@ -343,7 +346,7 @@ def test_pm_audit_fails_with_exit_1_when_any_check_red(monkeypatch, capsys) -> N
     assert err.value.exit_code == 1
     assert "craft_score_floor" in out
     assert "FAIL" in out
-    assert "TOTAL: 8, PASS: 7, FAIL: 1, EXIT: 1" in out
+    assert "TOTAL: 9, PASS: 8, FAIL: 1, EXIT: 1" in out
 
 
 def test_pm_audit_conflict_args_exit_2(monkeypatch, capsys) -> None:
@@ -405,6 +408,7 @@ def test_pm_audit_exits_zero_when_checks_green_even_if_failed_gates_present(monk
                     "lyrics_no_residuals": {"ok": True, "detail": "pass"},
                     "postprocess_symbols_absent": {"ok": True, "detail": "pass"},
                     "profile_source_recorded": {"ok": True, "detail": "profile_source=corpus_vote"},
+                    "prosody_matrix_aligned": {"ok": True, "detail": "aligned"},
                 }
             },
         }
@@ -416,7 +420,7 @@ def test_pm_audit_exits_zero_when_checks_green_even_if_failed_gates_present(monk
 
     out = capsys.readouterr().out
     assert "FAILED_GATES: G1" in out
-    assert "TOTAL: 8, PASS: 8, FAIL: 0, EXIT: 0" in out
+    assert "TOTAL: 9, PASS: 9, FAIL: 0, EXIT: 0" in out
 
 
 def test_pm_audit_prints_failed_gate_details_when_available(monkeypatch, capsys) -> None:
@@ -443,6 +447,7 @@ def test_pm_audit_prints_failed_gate_details_when_available(monkeypatch, capsys)
                     "lyrics_no_residuals": {"ok": True, "detail": "pass"},
                     "postprocess_symbols_absent": {"ok": True, "detail": "pass"},
                     "profile_source_recorded": {"ok": True, "detail": "profile_source=corpus_vote"},
+                    "prosody_matrix_aligned": {"ok": True, "detail": "aligned"},
                 }
             },
         }

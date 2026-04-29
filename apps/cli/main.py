@@ -36,6 +36,7 @@ PM_AUDIT_CHECK_ORDER = [
     "lyrics_no_residuals",
     "postprocess_symbols_absent",
     "profile_source_recorded",
+    "prosody_matrix_aligned",
 ]
 
 
@@ -312,7 +313,7 @@ def pm_audit() -> None:
                         + ": failed_checks="
                         + ",".join([str(x) for x in failed_checks])
                     )
-    typer.echo(f"TOTAL: 8, PASS: {pass_count}, FAIL: {fail_count}, EXIT: {exit_code}")
+    typer.echo(f"TOTAL: 9, PASS: {pass_count}, FAIL: {fail_count}, EXIT: {exit_code}")
     if exit_code != 0:
         raise typer.Exit(code=1)
 
@@ -325,6 +326,7 @@ def produce_command(
     profile: str = "",
     lang: str = "zh-CN",
     out_dir: str = "out",
+    ref_audio: str = "",
     verbose: bool = False,
     dry_run: bool = False,
 ) -> None:
@@ -337,6 +339,7 @@ def produce_command(
             profile=profile,
             lang=lang,
             out_dir=out_dir,
+            ref_audio=ref_audio,
             verbose=verbose,
             dry_run=dry_run,
         )
@@ -358,6 +361,7 @@ def _dispatch_produce_from_argv(argv: list[str]) -> None:
     parser.add_argument("--profile", default="")
     parser.add_argument("--lang", default="zh-CN")
     parser.add_argument("--out-dir", default="out")
+    parser.add_argument("--ref-audio", default="")
     parser.add_argument("--verbose", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     ns = parser.parse_args(argv)
@@ -369,6 +373,7 @@ def _dispatch_produce_from_argv(argv: list[str]) -> None:
         profile=ns.profile,
         lang=ns.lang,
         out_dir=ns.out_dir,
+        ref_audio=ns.ref_audio,
         verbose=ns.verbose,
         dry_run=ns.dry_run,
     )

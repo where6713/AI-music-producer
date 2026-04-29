@@ -118,7 +118,7 @@ PM 审计必须基于命令与产物，不接受口头结论。
 
 1. `pytest -q`
 2. `python -m apps.cli.main gate-check --all`
-3. `python -m apps.cli.main pm-audit`
+3. `python -m apps.cli.main pm-audit --run-id <run_id>`
 4. 对应 Gate 专项命令（如 `scope-check g1`、`failure-evidence-check`、`pass-evidence-check`、`docs-alignment-check`）
 
 若任一命令失败：不得继续下一个 Gate，不得提交“已完成”结论。

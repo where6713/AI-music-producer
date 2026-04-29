@@ -160,7 +160,8 @@ def _row_from_text(*, owner: str, repo: str, rel_path: Path, text: str) -> dict[
         return None
 
     content = "\n".join(lines)
-    source_id = f"github:{owner}/{repo}:{str(rel_path).replace('\\', '/')}"
+    rel_path_posix = str(rel_path).replace("\\", "/")
+    source_id = f"github:{owner}/{repo}:{rel_path_posix}"
     return {
         "source_id": source_id,
         "type": "modern_lyric",
@@ -182,7 +183,8 @@ def _row_from_text_urban_introspective(*, owner: str, repo: str, rel_path: Path,
         return None
 
     content = "\n".join(lines)
-    source_id = f"github:{owner}/{repo}:{str(rel_path).replace('\\', '/')}"
+    rel_path_posix = str(rel_path).replace("\\", "/")
+    source_id = f"github:{owner}/{repo}:{rel_path_posix}"
     return {
         "source_id": source_id,
         "type": "modern_lyric",
@@ -204,7 +206,8 @@ def _row_from_text_club_dance(*, owner: str, repo: str, rel_path: Path, text: st
         return None
 
     content = "\n".join(lines)
-    source_id = f"github:{owner}/{repo}:{str(rel_path).replace('\\', '/')}"
+    rel_path_posix = str(rel_path).replace("\\", "/")
+    source_id = f"github:{owner}/{repo}:{rel_path_posix}"
     return {
         "source_id": source_id,
         "type": "modern_lyric",
@@ -226,7 +229,8 @@ def _row_from_text_ambient_meditation(*, owner: str, repo: str, rel_path: Path, 
         return None
 
     content = "\n".join(lines)
-    source_id = f"github:{owner}/{repo}:{str(rel_path).replace('\\', '/')}"
+    rel_path_posix = str(rel_path).replace("\\", "/")
+    source_id = f"github:{owner}/{repo}:{rel_path_posix}"
     return {
         "source_id": source_id,
         "type": "modern_lyric",
@@ -255,10 +259,12 @@ def _row_from_poem(
     if not _looks_classical(lines, title):
         return None
     content = "\n".join(lines)
-    source_id = f"github:{owner}/{repo}:{str(rel_path).replace('\\', '/')}#{index}"
+    rel_path_posix = str(rel_path).replace("\\", "/")
+    source_id = f"github:{owner}/{repo}:{rel_path_posix}#{index}"
     return {
         "source_id": source_id,
         "type": "classical_poem",
+        "source_family": "poetry_2000",
         "title": title,
         "author": author,
         "emotion_tags": ["nostalgia", "restraint", "imagery"],
@@ -882,7 +888,12 @@ def _replace_urban_rows(main_corpus_path: Path, urban_rows: list[dict[str, Any]]
     else:
         existing = []
 
-    kept = [row for row in existing if str(row.get("profile_tag", "")).strip() != "urban_introspective"]
+    kept = [
+        row
+        for row in existing
+        if str(row.get("profile_tag", "")).strip() != "urban_introspective"
+        or str(row.get("source_family", "")).strip() == "golden_lyricist"
+    ]
     merged = kept + urban_rows
     _write_rows(main_corpus_path, merged)
 
@@ -894,7 +905,12 @@ def _replace_club_rows(main_corpus_path: Path, club_rows: list[dict[str, Any]]) 
     else:
         existing = []
 
-    kept = [row for row in existing if str(row.get("profile_tag", "")).strip() != "club_dance"]
+    kept = [
+        row
+        for row in existing
+        if str(row.get("profile_tag", "")).strip() != "club_dance"
+        or str(row.get("source_family", "")).strip() == "golden_lyricist"
+    ]
     merged = kept + club_rows
     _write_rows(main_corpus_path, merged)
 
@@ -906,7 +922,12 @@ def _replace_ambient_rows(main_corpus_path: Path, ambient_rows: list[dict[str, A
     else:
         existing = []
 
-    kept = [row for row in existing if str(row.get("profile_tag", "")).strip() != "ambient_meditation"]
+    kept = [
+        row
+        for row in existing
+        if str(row.get("profile_tag", "")).strip() != "ambient_meditation"
+        or str(row.get("source_family", "")).strip() == "golden_lyricist"
+    ]
     merged = kept + ambient_rows
     _write_rows(main_corpus_path, merged)
 
@@ -919,7 +940,12 @@ def _replace_all_modern_rows(main_corpus_path: Path, rows_by_profile: dict[str, 
         existing = []
 
     modern_profiles = {"uplift_pop", "urban_introspective", "club_dance", "ambient_meditation"}
-    kept = [row for row in existing if str(row.get("profile_tag", "")).strip() not in modern_profiles]
+    kept = [
+        row
+        for row in existing
+        if str(row.get("profile_tag", "")).strip() not in modern_profiles
+        or str(row.get("source_family", "")).strip() == "golden_lyricist"
+    ]
     merged = list(kept)
     for profile in ["uplift_pop", "urban_introspective", "club_dance", "ambient_meditation"]:
         merged.extend(list(rows_by_profile.get(profile, [])))
