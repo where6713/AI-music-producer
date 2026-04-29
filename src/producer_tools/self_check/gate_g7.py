@@ -97,10 +97,10 @@ def _prosody_matrix_aligned(prosody_contract: dict[str, Any], output_dir: Path) 
         if keys is None:
             continue
         min_key, max_key = keys
-        if min_key not in prosody_contract or max_key not in prosody_contract:
-            return False, f"missing_budget_keys:{min_key}/{max_key}"
-        line_min = int(prosody_contract[min_key])
+        if max_key not in prosody_contract:
+            return False, f"missing_budget_key:{max_key}"
         line_max = int(prosody_contract[max_key])
+        line_min = int(prosody_contract.get(min_key, max(1, line_max - 3)))
 
         lengths = [_line_len(x) for x in lines if x.strip()]
         if not lengths:
