@@ -73,6 +73,8 @@ def test_type_routing_constraints() -> None:
     assert _type_allowed("classical_poem", "club_dance") is False
     assert _type_allowed("modern_lyric", "club_dance") is True
     assert _type_allowed("classical_poem", "classical_restraint") is True
+    assert _type_allowed("classical_poem", "uplift_pop") is False
+    assert _type_allowed("classical_poem", "ambient_meditation") is False
 
 
 def test_source_id_chinese_path_url_encoded_and_classical_priority(tmp_path, monkeypatch) -> None:

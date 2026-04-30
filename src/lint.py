@@ -94,12 +94,12 @@ RULE_DEFINITIONS: dict[str, RuleSeverity] = {
     "R05": RuleSeverity.SOFT_PENALTY,
     "R06": RuleSeverity.SOFT_PENALTY,
     "R14": RuleSeverity.SOFT_PENALTY,  # downgraded: 3 hardcoded phrases are too brittle for HARD_KILL
-    "R15": RuleSeverity.HARD_PENALTY,
+    "R15": RuleSeverity.SOFT_PENALTY,
     "R16_global": RuleSeverity.HARD_KILL,
     "R16_profile": RuleSeverity.HARD_PENALTY,
     "R17": RuleSeverity.SOFT_PENALTY,
-    "R18": RuleSeverity.HARD_PENALTY,
-    "R19": RuleSeverity.HARD_PENALTY,
+    "R18": RuleSeverity.HARD_KILL,
+    "R19": RuleSeverity.HARD_KILL,
 }
 
 RULE_WEIGHTS: dict[str, int] = {
@@ -576,6 +576,27 @@ def lint_payload(
                 detail=f"high-frequency filler tokens detected: total={filler_token_hits}",
             )
         )
+
+    # R19 rhyme-monotony: same character used as line-end ≥3 times = evolved cheat
+    # Catches "下/话" stacking after modal-particle ban. Excludes already-blocked fillers.
+    line_end_chars: list[str] = []
+    for section, idx, line in rows:
+        clean = _strip_inline_metatags(line).strip()
+        if not clean:
+            continue
+        # Strip trailing punctuation to get semantic terminal char
+        tail = clean.rstrip("，。？！、；：""''《》【】…—～·").strip()
+        if tail and "\u4e00" <= tail[-1] <= "\u9fff" and tail[-1] not in filler_endings:
+            line_end_chars.append(tail[-1])
+    end_char_counts = Counter(line_end_chars)
+    for char, count in end_char_counts.items():
+        if count >= 3:
+            violations.append(
+                Violation(
+                    rule="R19",
+                    detail=f"rhyme_monotony: same line-end char '{char}' x{count} (evolved padding cheat)",
+                )
+            )
 
     failed_rules = sorted({v.rule for v in violations})
     severity = evaluate_violation_severity(violations)

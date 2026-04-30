@@ -48,22 +48,29 @@ class InsufficientQualityFewShotError(RuntimeError):
     pass
 
 
+_UPLIFT_TAGS = {"joy", "bright", "happy", "upbeat", "youth", "hope", "青春", "悸动", "阳光", "勇气", "明亮", "初见", "热恋"}
+_DANCE_TAGS = {"dance", "edm", "energy", "club", "release", "热烈", "释放", "躁动", "律动", "groove"}
+_AMBIENT_TAGS = {"meditation", "calm", "peace", "healing", "ambient", "空灵", "平静", "冥想", "疗愈", "静谧"}
+
+
 def _infer_profile_tag(row: dict[str, Any]) -> str:
     explicit = str(row.get("profile_tag", "")).strip()
     if explicit:
         return explicit
 
     row_type = str(row.get("type", "")).strip().lower()
-    tags = [str(x).strip().lower() for x in row.get("emotion_tags", []) if str(x).strip()]
+    tags = {str(x).strip().lower() for x in row.get("emotion_tags", []) if str(x).strip()}
 
     if row_type == "modern_lyric":
-        if any(x in tags for x in {"breakup", "late-night", "regret", "distance", "self-control"}):
-            return "urban_introspective"
+        if tags & _DANCE_TAGS:
+            return "club_dance"
+        if tags & _AMBIENT_TAGS:
+            return "ambient_meditation"
+        if tags & _UPLIFT_TAGS:
+            return "uplift_pop"
         return "urban_introspective"
 
     if row_type == "classical_poem":
-        if any(x in tags for x in {"restraint", "nostalgia", "longing", "night", "separation"}):
-            return "classical_restraint"
         return "classical_restraint"
 
     return ""
@@ -163,9 +170,14 @@ def _corpus_balance_from_rows(corpus: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+_MODERN_LYRIC_PROFILES = {"uplift_pop", "club_dance", "ambient_meditation"}
+
+
 def _type_allowed(row_type: str, profile_override: str) -> bool:
     """Return False for type/profile combinations that should never mix."""
     if row_type == "classical_poem" and profile_override == "club_dance":
+        return False
+    if row_type == "classical_poem" and profile_override in _MODERN_LYRIC_PROFILES:
         return False
     return True
 

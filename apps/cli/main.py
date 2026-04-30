@@ -4,6 +4,7 @@ from pathlib import Path
 import sys
 import argparse
 import os
+from datetime import datetime
 
 import click
 import typer
@@ -360,11 +361,16 @@ def _dispatch_produce_from_argv(argv: list[str]) -> None:
     parser.add_argument("--vocal", default="any")
     parser.add_argument("--profile", default="")
     parser.add_argument("--lang", default="zh-CN")
-    parser.add_argument("--out-dir", default="out")
+    parser.add_argument("--out-dir", default="")
     parser.add_argument("--ref-audio", default="")
     parser.add_argument("--verbose", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
     ns = parser.parse_args(argv)
+    resolved_out_dir = ns.out_dir
+    if not str(resolved_out_dir).strip():
+        run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+        resolved_out_dir = f"out/runs/{run_id}"
+
     produce_command(
         raw_intent=ns.raw_intent,
         genre=ns.genre,
@@ -372,7 +378,7 @@ def _dispatch_produce_from_argv(argv: list[str]) -> None:
         vocal=ns.vocal,
         profile=ns.profile,
         lang=ns.lang,
-        out_dir=ns.out_dir,
+        out_dir=resolved_out_dir,
         ref_audio=ns.ref_audio,
         verbose=ns.verbose,
         dry_run=ns.dry_run,
