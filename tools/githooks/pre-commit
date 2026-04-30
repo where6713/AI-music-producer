@@ -10,6 +10,8 @@ precommit_marker="$git_dir/oost-precommit-pass"
 staged_files="$(git diff --cached --name-only --diff-filter=ACMRD)"
 
 if [ -z "$staged_files" ]; then
+  # Keep hook-chain marker even for metadata-only amend commits.
+  printf '%s\n' "$(date +%s 2>/dev/null || echo 0)" > "$precommit_marker"
   exit 0
 fi
 
