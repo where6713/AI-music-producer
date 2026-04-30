@@ -108,6 +108,13 @@ Rules:
 - Use `example_combos` from vocab as your reference point, then customize
 - Do NOT invent new tags not in the vocab unless user explicitly requests a niche genre
 
+## 反凑韵与自然语序
+
+押韵必须为叙事服务，严禁为了押韵而破坏自然语序。你必须做到：
+1. 拒绝语序倒装：句子必须符合现代汉语正常口语逻辑，禁止诸如“我奔跑在雨中疯狂地”这类欧化倒装。
+2. 拒绝意象注水：允许使用“光、梦、海”等高频韵脚字，但上下句必须有严密的动作-反应或因果逻辑，禁止毫无逻辑的意象堆叠。
+3. 拒绝无效填充：禁止在句尾强加“一个/一次/那么/因为”等词凑节拍；除非特意设计，尽量少用英文单字和数字凑韵。
+
 ## Output Contract
 
 - `lyrics.txt`: section-tagged lyrics for Suno lyrics box.

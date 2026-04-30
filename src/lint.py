@@ -536,6 +536,7 @@ def lint_payload(
     filler_endings = {
         "啊", "哦", "呢", "嘛", "嗯", "哟", "啦", "哼", "哈", "哎", "吖", "呵", "噢", "喔", "呀", "哇", "吧", "吗",
     }
+    forced_connective_endings = {"被", "把", "将", "让", "而", "却", "但", "且", "并"}
     filler_tokens = {
         "啊", "哦", "呢", "嘛", "嗯", "哟", "啦", "哼", "哈", "哎", "吖", "呵", "噢", "喔", "呀", "哇", "吧", "吗", "嘛", "呢",
     }
@@ -550,6 +551,15 @@ def lint_payload(
                 Violation(
                     rule="R19",
                     detail=f"line-end filler detected: {clean[-1]}",
+                    section=section,
+                    line=idx,
+                )
+            )
+        if clean[-1] in forced_connective_endings:
+            violations.append(
+                Violation(
+                    rule="R19",
+                    detail=f"line-end connective detected: {clean[-1]}",
                     section=section,
                     line=idx,
                 )

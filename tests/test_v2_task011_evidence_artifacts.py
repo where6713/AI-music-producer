@@ -4,8 +4,11 @@ from pathlib import Path
 import json
 
 
+FIXTURE_DIR = Path("tests/fixtures/task011_evidence")
+
+
 def test_task011_blind_review_contains_required_metadata() -> None:
-    content = Path("out/task011_ac29_blind_review.md").read_text(encoding="utf-8")
+    content = (FIXTURE_DIR / "task011_ac29_blind_review.md").read_text(encoding="utf-8")
     assert "评审角色" in content
     assert "评审时间" in content
     assert "样本路径" in content
@@ -13,7 +16,7 @@ def test_task011_blind_review_contains_required_metadata() -> None:
 
 
 def test_task011_human_blind_review_raw_schema() -> None:
-    payload = json.loads(Path("out/task011_ac29_human_raw.json").read_text(encoding="utf-8"))
+    payload = json.loads((FIXTURE_DIR / "task011_ac29_human_raw.json").read_text(encoding="utf-8"))
     assert isinstance(payload.get("review_time"), str)
     reviewers = payload.get("reviewers", [])
     samples = payload.get("samples", [])

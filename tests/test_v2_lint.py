@@ -303,3 +303,14 @@ def test_r19_blocks_high_frequency_filler_stacking() -> None:
     report = lint_payload(payload)
     assert "R19" in report["failed_rules"]
     assert any(v["rule"] == "R19" and "high-frequency filler tokens" in v["detail"] for v in report["violations"])
+
+
+def test_r19_blocks_line_end_connective_cheat() -> None:
+    payload = _payload("雨落在肩而", forbidden=[])
+    payload.lyrics_by_section[0].lines = [
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "我把旧梦都收起但"}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "灯影沿着窗框缓缓将"}),
+    ]
+    report = lint_payload(payload)
+    assert "R19" in report["failed_rules"]
+    assert any(v["rule"] == "R19" and "line-end connective detected" in v["detail"] for v in report["violations"])
