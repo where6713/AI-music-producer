@@ -169,7 +169,7 @@ def test_r18_fails_when_section_line_span_exceeds_two() -> None:
         },
     )
     assert "R18" in report["failed_rules"]
-    assert any("line span exceeds 2" in v["detail"] for v in report["violations"])
+    assert any("line span exceeds" in v["detail"] for v in report["violations"])
 
 
 def test_r18_requires_pause_tag_when_line_hits_lower_bound() -> None:

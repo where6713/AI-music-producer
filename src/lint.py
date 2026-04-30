@@ -491,7 +491,7 @@ def lint_payload(
                     violations.append(
                         Violation(
                             rule="R18",
-                            detail=f"line span exceeds 2 in {section.tag}: min={min_len}, max={max_len}",
+                            detail=f"line span exceeds {_SPAN_LIMIT} in {section.tag}: min={min_len}, max={max_len}",
                             section=section.tag,
                             line=0,
                         )
