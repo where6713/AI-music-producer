@@ -601,6 +601,15 @@ def lint_payload(
     failed_rules = sorted({v.rule for v in violations})
     severity = evaluate_violation_severity(violations)
     craft_score = calculate_craft_score(violations)
+
+    # 法则十一：FAIL_REASON 标准化标签（Machine-Readable Failure）
+    fail_reasons: list[str] = []
+    for violation in violations:
+        key = _violation_rule_key(violation)
+        rule_sev = RULE_DEFINITIONS.get(key, RuleSeverity.SOFT_PENALTY)
+        if rule_sev in (RuleSeverity.HARD_KILL, RuleSeverity.HARD_PENALTY):
+            fail_reasons.append(f"[FAIL_REASON: {key}] {violation.detail}")
+
     return {
         "pass": len(violations) == 0 and not severity["is_dead"],
         "failed_rules": failed_rules,
@@ -616,4 +625,5 @@ def lint_payload(
         "penalty_score": severity["penalty_score"],
         "craft_score": craft_score,
         "all_dead_run_status": "",
+        "fail_reasons": fail_reasons,
     }

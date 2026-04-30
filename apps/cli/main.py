@@ -259,7 +259,7 @@ def pm_audit() -> None:
 
     target_out = Path.cwd() / "out"
     if run_id_value:
-        target_out = Path.cwd() / "out" / "task011_runs" / run_id_value
+        target_out = Path.cwd() / "out" / "runs" / run_id_value
         if not target_out.exists() or not target_out.is_dir():
             typer.echo(f"run-id path not found: {target_out}")
             raise typer.Exit(code=2)
