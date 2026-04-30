@@ -156,7 +156,31 @@ def _format_lyrics(payload: LyricPayload) -> str:
     return "\n".join(lines).strip() + "\n"
 
 
-def _format_style(payload: LyricPayload) -> str:
+def _load_profile_bpm(out_dir: Path, profile_id: str) -> int | None:
+    if not profile_id:
+        return None
+    registry_path = out_dir.parent / "src" / "profiles" / "registry.json"
+    if not registry_path.exists():
+        return None
+    payload = json.loads(registry_path.read_text(encoding="utf-8"))
+    profiles = payload.get("profiles", {})
+    if not isinstance(profiles, dict):
+        return None
+    profile = profiles.get(profile_id, {})
+    if not isinstance(profile, dict):
+        return None
+    prosody = profile.get("prosody", {})
+    if not isinstance(prosody, dict):
+        return None
+    bpm = prosody.get("bpm", None)
+    try:
+        parsed = int(bpm)
+    except (TypeError, ValueError):
+        return None
+    return parsed if parsed > 0 else None
+
+
+def _format_style(payload: LyricPayload, trace: dict[str, object], out_dir: Path) -> str:
     tags: list[str] = []
     tags.extend(payload.style_tags.genre)
     tags.extend(payload.style_tags.mood)
@@ -168,7 +192,24 @@ def _format_style(payload: LyricPayload) -> str:
         t = tag.strip()
         if t and t not in unique:
             unique.append(t)
-    return ", ".join(unique[:8]) + "\n"
+
+    active_profile = str(trace.get("active_profile", "")).strip()
+    profile_source = str(trace.get("profile_source", "")).strip()
+    prosody_contract = trace.get("prosody_contract", {}) if isinstance(trace.get("prosody_contract", {}), dict) else {}
+    bpm_val = prosody_contract.get("bpm", None) if isinstance(prosody_contract, dict) else None
+    try:
+        bpm = int(bpm_val)
+    except (TypeError, ValueError):
+        bpm = _load_profile_bpm(out_dir, active_profile) or 0
+
+    base_tags = unique[:5]
+    if active_profile:
+        base_tags.append(f"profile:{active_profile}")
+    if profile_source:
+        base_tags.append(f"profile_source:{profile_source}")
+    if bpm > 0:
+        base_tags.append(f"{bpm} BPM")
+    return ", ".join(base_tags[:8]) + "\n"
 
 
 def _format_exclude(payload: LyricPayload) -> str:
@@ -323,7 +364,7 @@ def write_outputs(payload: LyricPayload, out_dir: Path, trace: dict[str, object]
     out_dir.mkdir(parents=True, exist_ok=True)
     trace = _ensure_retrieval_profile_decision(dict(trace))
     (out_dir / "lyrics.txt").write_text(_format_lyrics(payload), encoding="utf-8")
-    (out_dir / "style.txt").write_text(_format_style(payload), encoding="utf-8")
+    (out_dir / "style.txt").write_text(_format_style(payload, trace, out_dir), encoding="utf-8")
     (out_dir / "exclude.txt").write_text(_format_exclude(payload), encoding="utf-8")
     (out_dir / "lyric_payload.json").write_text(
         payload.model_dump_json(indent=2), encoding="utf-8"
