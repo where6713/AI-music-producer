@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import urllib.parse
 from collections import Counter
 from pathlib import Path
 from typing import Any
@@ -87,10 +88,12 @@ def _load_corpus(repo_root: Path) -> list[dict[str, Any]]:
         fp = repo_root / rel
         if not fp.exists():
             continue
-        payload = json.loads(fp.read_text(encoding="utf-8"))
+        payload = json.loads(fp.read_text(encoding="utf-8-sig"))
         if isinstance(payload, list):
             for item in payload:
                 if not isinstance(item, dict):
+                    continue
+                if any("\ufffd" in str(t) for t in item.get("emotion_tags", [])):
                     continue
                 report = lint_corpus_row(item, mode="runtime")
                 row_type = str(item.get("type", "")).strip().lower()
@@ -103,10 +106,12 @@ def _load_corpus(repo_root: Path) -> list[dict[str, Any]]:
         fp = repo_root / rel
         if not fp.exists():
             continue
-        payload = json.loads(fp.read_text(encoding="utf-8"))
+        payload = json.loads(fp.read_text(encoding="utf-8-sig"))
         if isinstance(payload, list):
             for item in payload:
                 if not isinstance(item, dict):
+                    continue
+                if any("\ufffd" in str(t) for t in item.get("emotion_tags", [])):
                     continue
                 learn_point = str(item.get("learn_point", "")).strip()
                 do_not_copy = str(item.get("do_not_copy", "")).strip()
@@ -158,6 +163,20 @@ def _corpus_balance_from_rows(corpus: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def _type_allowed(row_type: str, profile_override: str) -> bool:
+    """Return False for type/profile combinations that should never mix."""
+    if row_type == "classical_poem" and profile_override == "club_dance":
+        return False
+    return True
+
+
+def _profile_type_priority(row_type: str, profile_override: str) -> int:
+    """Lower value means higher retrieval priority for the active profile."""
+    if profile_override == "classical_restraint":
+        return 0 if row_type == "classical_poem" else 1
+    return 0
+
+
 def retrieve_few_shot_examples(
     user_input: UserInput,
     *,
@@ -184,7 +203,15 @@ def retrieve_few_shot_examples(
         score = len(intent_tokens & row_tokens) * 3 + len(hint_tokens & row_tokens)
         scored.append((score, row))
 
-    scored.sort(key=lambda x: x[0], reverse=True)
+    scored.sort(
+        key=lambda x: (
+            -x[0],
+            _profile_type_priority(
+                str(x[1].get("type", "")).strip().lower(),
+                str(user_input.profile_override or "").strip(),
+            ),
+        )
+    )
 
     def _quality_pass(row: dict[str, Any]) -> bool:
         learn_point = str(row.get("learn_point", "")).strip()
@@ -210,15 +237,26 @@ def retrieve_few_shot_examples(
 
     profile_override = str(user_input.profile_override or "").strip()
     if profile_override in PROFILE_IDS:
-        override_selected: list[dict[str, Any]] = []
+        override_candidates: list[dict[str, Any]] = []
         for _, row in scored:
+            row_type = str(row.get("type", "")).strip().lower()
+            if not _type_allowed(row_type, profile_override):
+                continue
             if _infer_profile_tag(row) != profile_override:
                 continue
             if not _quality_pass(row):
                 continue
-            override_selected.append(row)
-            if len(override_selected) >= target_max:
-                break
+            override_candidates.append(row)
+
+        override_selected = sorted(
+            override_candidates,
+            key=lambda row: _profile_type_priority(
+                str(row.get("type", "")).strip().lower(),
+                profile_override,
+            ),
+        )
+        if len(override_selected) > target_max:
+            override_selected = override_selected[:target_max]
 
         if len(override_selected) >= 2:
             selected = override_selected
@@ -230,6 +268,9 @@ def retrieve_few_shot_examples(
 
     if not selected:
         for _, row in scored:
+            row_type = str(row.get("type", "")).strip().lower()
+            if not _type_allowed(row_type, profile_override):
+                continue
             if not _quality_pass(row):
                 continue
             selected.append(row)
@@ -251,9 +292,11 @@ def retrieve_few_shot_examples(
     normalized: list[dict[str, Any]] = []
     for row in selected:
         profile_tag = _infer_profile_tag(row)
+        raw_source_id = str(row.get("source_id", ""))
+        encoded_source_id = urllib.parse.quote(raw_source_id, safe="-_/:.")
         normalized.append(
             {
-                "source_id": str(row.get("source_id", "")),
+                "source_id": encoded_source_id,
                 "type": str(row.get("type", "modern_lyric")),
                 "title": str(row.get("title", "")),
                 "emotion_tags_matched": [str(x) for x in row.get("emotion_tags", [])[:4]],

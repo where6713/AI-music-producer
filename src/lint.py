@@ -99,6 +99,7 @@ RULE_DEFINITIONS: dict[str, RuleSeverity] = {
     "R16_profile": RuleSeverity.HARD_PENALTY,
     "R17": RuleSeverity.SOFT_PENALTY,
     "R18": RuleSeverity.HARD_PENALTY,
+    "R19": RuleSeverity.HARD_PENALTY,
 }
 
 RULE_WEIGHTS: dict[str, int] = {
@@ -113,6 +114,7 @@ RULE_WEIGHTS: dict[str, int] = {
     "R16_profile": 5,
     "R17": 3,
     "R18": 5,
+    "R19": 5,
 }
 
 R14_FORBIDDEN_PHRASES = [
@@ -313,6 +315,8 @@ def lint_payload(
     # R01 chorus hook line tail (zh-CN)
     # Skipped for profiles that use oblique-tone rhyme schemes (e.g. classical_restraint)
     skip_r01 = bool(profile_cfg.get("skip_R01", False)) if isinstance(profile_cfg, dict) else False
+    if active_profile == "ambient_meditation":
+        skip_r01 = True
     if skip_r01:
         skipped_rules_by_profile.append("R01")
     hook_section = payload.structure.hook_section
@@ -342,7 +346,9 @@ def lint_payload(
                     )
                 )
 
-    # R02 concrete noun overuse <= 3
+    # R02 concrete noun overuse threshold
+    # club_dance allows denser hook repetition, so threshold is relaxed to 7.
+    r02_threshold = 7 if active_profile == "club_dance" else 3
     tokens: list[str] = []
     for line in text_lines:
         for token in jieba.lcut(line):
@@ -351,7 +357,7 @@ def lint_payload(
                 tokens.append(w)
     counts = Counter(tokens)
     for token, count in counts.items():
-        if count > 3:
+        if count > r02_threshold:
             violations.append(
                 Violation(rule="R02", detail=f"token overused: {token} x{count}")
             )
@@ -524,6 +530,52 @@ def lint_payload(
                                 line=idx,
                             )
                         )
+
+    # R19 anti-filler cheat (HARD_PENALTY)
+    # Block line-end modal-particle padding and high-frequency filler stacking.
+    filler_endings = {
+        "啊", "哦", "呢", "嘛", "嗯", "哟", "啦", "哼", "哈", "哎", "吖", "呵", "噢", "喔", "呀", "哇", "吧", "吗",
+    }
+    forced_connective_endings = {"被", "把", "将", "让", "而", "却", "但", "且", "并"}
+    filler_tokens = {
+        "啊", "哦", "呢", "嘛", "嗯", "哟", "啦", "哼", "哈", "哎", "吖", "呵", "噢", "喔", "呀", "哇", "吧", "吗", "嘛", "呢",
+    }
+
+    filler_token_hits = 0
+    for section, idx, line in rows:
+        clean = _strip_inline_metatags(line).strip()
+        if not clean:
+            continue
+        if clean[-1] in filler_endings:
+            violations.append(
+                Violation(
+                    rule="R19",
+                    detail=f"line-end filler detected: {clean[-1]}",
+                    section=section,
+                    line=idx,
+                )
+            )
+        if clean[-1] in forced_connective_endings:
+            violations.append(
+                Violation(
+                    rule="R19",
+                    detail=f"line-end connective detected: {clean[-1]}",
+                    section=section,
+                    line=idx,
+                )
+            )
+        for token in jieba.lcut(clean):
+            w = token.strip()
+            if w in filler_tokens:
+                filler_token_hits += 1
+
+    if filler_token_hits >= 6:
+        violations.append(
+            Violation(
+                rule="R19",
+                detail=f"high-frequency filler tokens detected: total={filler_token_hits}",
+            )
+        )
 
     failed_rules = sorted({v.rule for v in violations})
     severity = evaluate_violation_severity(violations)

@@ -194,3 +194,123 @@ def test_r18_requires_pause_tag_when_line_hits_lower_bound() -> None:
     )
     assert "R18" in report["failed_rules"]
     assert any("missing required metatag" in v["detail"] for v in report["violations"])
+
+
+def test_club_dance_r02_threshold_relaxed_to_seven(tmp_path) -> None:
+    registry = tmp_path / "registry.json"
+    global_rules = tmp_path / "global_rules.json"
+    registry.write_text(
+        json.dumps(
+            {
+                "profiles": {
+                    "club_dance": {
+                        "R15_concrete_density": {"enforced": False},
+                        "R16_profile_forbidden": [],
+                        "R17_first_person_ratio_max": 1.0,
+                    }
+                }
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    global_rules.write_text(
+        json.dumps({"global_always_forbidden": []}, ensure_ascii=False),
+        encoding="utf-8",
+    )
+
+    payload = _payload("beat beat beat beat", forbidden=[])
+    payload.lyrics_by_section[0].lines = [
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "beat beat beat beat"}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "beat beat beat"}),
+    ]
+    payload.lyrics_by_section[1].lines = [
+        payload.lyrics_by_section[1].lines[0].model_copy(update={"primary": "hook line unique"}),
+    ]
+    report = lint_payload(
+        payload,
+        trace={"active_profile": "club_dance"},
+        profiles_registry_path=registry,
+        global_rules_path=global_rules,
+    )
+
+    # exactly 7 repetitions should not fail under relaxed threshold
+    assert "R02" not in report["failed_rules"]
+
+    payload.lyrics_by_section[1].lines.append(payload.lyrics_by_section[1].lines[0].model_copy(update={"primary": "beat"}))
+    report_fail = lint_payload(
+        payload,
+        trace={"active_profile": "club_dance"},
+        profiles_registry_path=registry,
+        global_rules_path=global_rules,
+    )
+    assert "R02" in report_fail["failed_rules"]
+
+
+def test_ambient_meditation_forces_skip_r01(tmp_path) -> None:
+    registry = tmp_path / "registry.json"
+    global_rules = tmp_path / "global_rules.json"
+    registry.write_text(
+        json.dumps(
+            {
+                "profiles": {
+                    "ambient_meditation": {
+                        "R15_concrete_density": {"enforced": False},
+                        "R16_profile_forbidden": [],
+                        "R17_first_person_ratio_max": 0.15,
+                        "skip_R01": False,
+                    }
+                }
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    global_rules.write_text(
+        json.dumps({"global_always_forbidden": []}, ensure_ascii=False),
+        encoding="utf-8",
+    )
+
+    payload = _payload("结束字尾不合规测试x", forbidden=[])
+    report = lint_payload(
+        payload,
+        trace={"active_profile": "ambient_meditation"},
+        profiles_registry_path=registry,
+        global_rules_path=global_rules,
+    )
+
+    assert "R01" not in report["failed_rules"]
+    assert "R01" in report["skipped_rules_by_profile"]
+
+
+def test_r19_blocks_line_end_filler_particles() -> None:
+    payload = _payload("我还在等你啊", forbidden=[])
+    payload.lyrics_by_section[0].lines = [
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "雨停在窗沿啊"}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "灯影又落下来哦"}),
+    ]
+    report = lint_payload(payload)
+    assert "R19" in report["failed_rules"]
+    assert any(v["rule"] == "R19" and "line-end filler detected" in v["detail"] for v in report["violations"])
+
+
+def test_r19_blocks_high_frequency_filler_stacking() -> None:
+    payload = _payload("嗯 嗯 嗯 嗯", forbidden=[])
+    payload.lyrics_by_section[0].lines = [
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "嗯 啊 呀 哇"}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "哦 呢 嘛 吧"}),
+    ]
+    report = lint_payload(payload)
+    assert "R19" in report["failed_rules"]
+    assert any(v["rule"] == "R19" and "high-frequency filler tokens" in v["detail"] for v in report["violations"])
+
+
+def test_r19_blocks_line_end_connective_cheat() -> None:
+    payload = _payload("雨落在肩而", forbidden=[])
+    payload.lyrics_by_section[0].lines = [
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "我把旧梦都收起但"}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "灯影沿着窗框缓缓将"}),
+    ]
+    report = lint_payload(payload)
+    assert "R19" in report["failed_rules"]
+    assert any(v["rule"] == "R19" and "line-end connective detected" in v["detail"] for v in report["violations"])

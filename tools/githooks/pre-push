@@ -20,12 +20,13 @@ while read -r local_ref local_sha remote_ref remote_sha; do
   fi
 
   if [ "$remote_sha" = "0000000000000000000000000000000000000000" ]; then
-    range="$local_sha"
+    # First push of a new branch: only verify commits not reachable from any remote branch.
+    commits="$(git rev-list "$local_sha" --not --remotes 2>/dev/null || true)"
   else
     range="$remote_sha..$local_sha"
+    commits="$(git rev-list "$range" 2>/dev/null || true)"
   fi
 
-  commits="$(git rev-list "$range" 2>/dev/null || true)"
   if [ -n "$commits" ]; then
     pending_commits="$(printf '%s\n%s' "$pending_commits" "$commits")"
   fi

@@ -9504,5 +9504,95 @@
     "content": "仍渗着你温柔\n无意掠过心头\n未放开的已放开\n无奈时间证实\n已经错失的爱\n不知不觉想起你动人笑脸\n不经不意想起了昨天\n不知不觉分开了又忘记后",
     "source_family": "golden_lyricist",
     "author": "林夕"
+  },
+  {
+    "source_id": "github:local/urban_patch:night_bus_stop_001",
+    "type": "modern_lyric",
+    "title": "夜班车站台",
+    "emotion_tags": [
+      "late-night",
+      "regret",
+      "distance",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "valence": "mixed",
+    "learn_point": "用可触摸的城市物件推进情绪：把站台提示音、冷掉的纸杯、未发送对话框排成动作链，让克制来自动作而不是口号。每一行都要有镜头与手势，避免空泛判断句。",
+    "do_not_copy": "禁止复写“提示音/纸杯/对话框”的原顺序与句式；可学习“动作先于结论”的组织方式，但必须替换场景物件和语法重音。",
+    "content": "末班车提示音在空站台绕了两圈\n你把冷掉的纸杯捏成很薄的圆\n对话框停在最后一个标点\n拇指悬着 没有按下发送\n风把广告灯吹得忽明忽暗\n我们都站在各自要回去的线外",
+    "source_family": "urban_patch",
+    "author": "local-curation"
+  },
+  {
+    "source_id": "github:local/urban_patch:elevator_corridor_002",
+    "type": "modern_lyric",
+    "title": "电梯口的三十秒",
+    "emotion_tags": [
+      "distance",
+      "nostalgia",
+      "late-night",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "valence": "mixed",
+    "learn_point": "把“等待”拆成秒级动作：看楼层数字、听门缝风声、把钥匙换手，形成节奏。情绪递进用环境噪声承接，不直接宣告“我很难过”。",
+    "do_not_copy": "不得复写“楼层数字/门缝风声/钥匙换手”连续结构；改写时必须更换至少两处物件并调整时间顺序。",
+    "content": "电梯数字从十四跳到二\n你把钥匙在掌心换了三次方向\n门缝里那点风先到 再是光\n手机亮起又灭掉 像没说完的句子\n我把名字划过又撤回\n走廊很长 长到足够把冲动走散",
+    "source_family": "urban_patch",
+    "author": "local-curation"
+  },
+  {
+    "source_id": "github:local/urban_patch:rain_crosswalk_003",
+    "type": "modern_lyric",
+    "title": "雨夜斑马线",
+    "emotion_tags": [
+      "regret",
+      "late-night",
+      "separation",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "valence": "negative",
+    "learn_point": "利用道路节奏表达关系节奏：红灯等待、鞋底积水声、雨伞骨回弹，形成“想靠近却刹车”的身体感。结尾留白比总结句更有力。",
+    "do_not_copy": "禁止复用“红灯等待/鞋底积水/伞骨回弹”三连模板；允许学习“路况=心况”映射法但需换场景。",
+    "content": "红灯把人群按在路口\n鞋底带起的水声一下一下\n你在对街把伞收成很窄\n像把一句话折回喉咙\n我沿着白线走到一半又停\n雨继续下 但我们都没有再向前",
+    "source_family": "urban_patch",
+    "author": "local-curation"
+  },
+  {
+    "source_id": "github:local/urban_patch:kitchen_midnight_004",
+    "type": "modern_lyric",
+    "title": "凌晨厨房灯",
+    "emotion_tags": [
+      "nostalgia",
+      "self-control",
+      "distance",
+      "night"
+    ],
+    "profile_tag": "urban_introspective",
+    "valence": "mixed",
+    "learn_point": "室内微动作可提高具象密度：开小火、杯壁起雾、冰箱压缩机声，配合短句与长句交替，让“忍住联系”更真实。",
+    "do_not_copy": "不要照搬“开小火/杯壁起雾/压缩机声”物件组；改写时需替换为同等生活细节并重建句长节奏。",
+    "content": "厨房只开了一格灯\n水壶在最小的火上慢慢响\n杯壁先起雾 再落回透明\n冰箱压缩机忽然启动 像有人清了清嗓\n我把你的对话框折进通知栏\n让这一夜只剩水声和呼吸",
+    "source_family": "urban_patch",
+    "author": "local-curation"
+  },
+  {
+    "source_id": "github:local/urban_patch:subway_transfer_005",
+    "type": "modern_lyric",
+    "title": "换乘通道",
+    "emotion_tags": [
+      "distance",
+      "regret",
+      "urban",
+      "self-control"
+    ],
+    "profile_tag": "urban_introspective",
+    "valence": "mixed",
+    "learn_point": "通过空间转场制造情绪推进：闸机、换乘箭头、扶梯逆行人流构成连续镜头。把“舍不得”转写成路线选择与身体停顿，减少抽象词占比。",
+    "do_not_copy": "不可复写“闸机/箭头/扶梯逆行”路径链；允许借鉴“空间转场推进情绪”，但需更换地点与动作词。",
+    "content": "闸机吞掉车票边角的一瞬\n你向左 我沿着换乘箭头向下\n扶梯上逆行的人群擦过肩\n我在出口前停了两秒\n把那句晚点再说的话删掉\n地铁继续进站 像什么都没发生",
+    "source_family": "urban_patch",
+    "author": "local-curation"
   }
 ]

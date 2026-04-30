@@ -1,0 +1,41 @@
+{
+  "review_time": "2026-04-30T15:00:00+08:00",
+  "reviewers": [
+    "reviewer_a",
+    "reviewer_b",
+    "reviewer_c"
+  ],
+  "samples": [
+    "sample-1",
+    "sample-2",
+    "sample-3",
+    "sample-4",
+    "sample-5"
+  ],
+  "reviews": [
+    {
+      "sample": "sample-1",
+      "result": "pass"
+    },
+    {
+      "sample": "sample-2",
+      "result": "pass"
+    },
+    {
+      "sample": "sample-3",
+      "result": "pass"
+    },
+    {
+      "sample": "sample-4",
+      "result": "pass"
+    },
+    {
+      "sample": "sample-5",
+      "result": "fail"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 1
+  }
+}
