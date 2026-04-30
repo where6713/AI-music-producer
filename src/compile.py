@@ -181,20 +181,7 @@ def _load_profile_bpm(out_dir: Path, profile_id: str) -> int | None:
 
 
 def _format_style(payload: LyricPayload, trace: dict[str, object], out_dir: Path) -> str:
-    tags: list[str] = []
-    tags.extend(payload.style_tags.genre)
-    tags.extend(payload.style_tags.mood)
-    tags.extend(payload.style_tags.instruments)
-    tags.extend(payload.style_tags.vocals)
-    tags.extend(payload.style_tags.production)
-    unique = []
-    for tag in tags:
-        t = tag.strip()
-        if t and t not in unique:
-            unique.append(t)
-
     active_profile = str(trace.get("active_profile", "")).strip()
-    profile_source = str(trace.get("profile_source", "")).strip()
     prosody_contract = trace.get("prosody_contract", {}) if isinstance(trace.get("prosody_contract", {}), dict) else {}
     bpm_val = prosody_contract.get("bpm", None) if isinstance(prosody_contract, dict) else None
     try:
@@ -202,14 +189,83 @@ def _format_style(payload: LyricPayload, trace: dict[str, object], out_dir: Path
     except (TypeError, ValueError):
         bpm = _load_profile_bpm(out_dir, active_profile) or 0
 
-    base_tags = unique[:5]
-    if active_profile:
-        base_tags.append(f"profile:{active_profile}")
-    if profile_source:
-        base_tags.append(f"profile_source:{profile_source}")
-    if bpm > 0:
-        base_tags.append(f"{bpm} BPM")
-    return ", ".join(base_tags[:8]) + "\n"
+    base_tags: list[str] = []
+    knowledge_path = out_dir.parent / "corpus" / "_knowledge" / "suno_style_vocab.json"
+    minimax_path = out_dir.parent / "corpus" / "_knowledge" / "minimax_style_vocab.json"
+
+    profile_vocab: dict[str, Any] = {}
+    if active_profile and knowledge_path.exists():
+        try:
+            knowledge = json.loads(knowledge_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            knowledge = {}
+        by_profile = knowledge.get("by_profile", {}) if isinstance(knowledge, dict) else {}
+        profile_vocab = by_profile.get(active_profile, {}) if isinstance(by_profile, dict) else {}
+
+    if (not isinstance(profile_vocab, dict) or not profile_vocab) and active_profile and minimax_path.exists():
+        try:
+            minimax = json.loads(minimax_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            minimax = {}
+        by_profile = minimax.get("by_profile", {}) if isinstance(minimax, dict) else {}
+        profile_vocab = by_profile.get(active_profile, {}) if isinstance(by_profile, dict) else {}
+
+    # Platform dictionary hard-compile order:
+    # profile genre + bpm + mood/vocal + creative<=2
+    if isinstance(profile_vocab, dict):
+        genre = profile_vocab.get("genre", [])
+        mood = profile_vocab.get("mood", [])
+        vocal = profile_vocab.get("vocal", [])
+        instruments = profile_vocab.get("instruments", [])
+        production = profile_vocab.get("production", [])
+
+        if isinstance(genre, list) and genre:
+            g = str(genre[0]).strip()
+            if g:
+                base_tags.append(g)
+
+        if bpm > 0:
+            base_tags.append(f"{bpm} BPM")
+
+        if isinstance(mood, list) and mood:
+            m = str(mood[0]).strip()
+            if m and m not in base_tags:
+                base_tags.append(m)
+
+        if isinstance(vocal, list) and vocal:
+            v = str(vocal[0]).strip()
+            if v and v not in base_tags:
+                base_tags.append(v)
+
+        creative_pool: list[str] = []
+        if isinstance(instruments, list):
+            creative_pool.extend(str(x).strip() for x in instruments if str(x).strip())
+        if isinstance(production, list):
+            creative_pool.extend(str(x).strip() for x in production if str(x).strip())
+        for token in creative_pool:
+            if token and token not in base_tags:
+                base_tags.append(token)
+            if len(base_tags) >= 6:  # genre + bpm + mood + vocal + creative<=2
+                break
+    else:
+        # Safe fallback: keep minimal payload-driven style output
+        if payload.style_tags.genre:
+            base_tags.append(str(payload.style_tags.genre[0]).strip())
+        if bpm > 0:
+            base_tags.append(f"{bpm} BPM")
+        if payload.style_tags.mood:
+            base_tags.append(str(payload.style_tags.mood[0]).strip())
+        if payload.style_tags.vocals:
+            base_tags.append(str(payload.style_tags.vocals[0]).strip())
+        creative = [*payload.style_tags.instruments, *payload.style_tags.production]
+        for token in creative:
+            t = str(token).strip()
+            if t and t not in base_tags:
+                base_tags.append(t)
+            if len(base_tags) >= 6:
+                break
+
+    return ", ".join([x for x in base_tags if x][:6]) + "\n"
 
 
 def _format_exclude(payload: LyricPayload) -> str:
@@ -218,7 +274,16 @@ def _format_exclude(payload: LyricPayload) -> str:
         t = tag.strip()
         if t and t not in unique:
             unique.append(t)
-    return "(" + ", ".join(unique) + ")\n" if unique else "\n"
+    if not unique:
+        unique = [
+            "spoken",
+            "talking",
+            "noise",
+            "acapella",
+            "bad audio",
+            "low quality",
+        ]
+    return "(" + ", ".join(unique) + ")\n"
 
 
 def _load_profile_display_name(out_dir: Path, profile_id: str) -> str:

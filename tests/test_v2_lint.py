@@ -281,3 +281,25 @@ def test_ambient_meditation_forces_skip_r01(tmp_path) -> None:
 
     assert "R01" not in report["failed_rules"]
     assert "R01" in report["skipped_rules_by_profile"]
+
+
+def test_r19_blocks_line_end_filler_particles() -> None:
+    payload = _payload("我还在等你啊", forbidden=[])
+    payload.lyrics_by_section[0].lines = [
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "雨停在窗沿啊"}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "灯影又落下来哦"}),
+    ]
+    report = lint_payload(payload)
+    assert "R19" in report["failed_rules"]
+    assert any(v["rule"] == "R19" and "line-end filler detected" in v["detail"] for v in report["violations"])
+
+
+def test_r19_blocks_high_frequency_filler_stacking() -> None:
+    payload = _payload("嗯 嗯 嗯 嗯", forbidden=[])
+    payload.lyrics_by_section[0].lines = [
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "嗯 啊 呀 哇"}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "哦 呢 嘛 吧"}),
+    ]
+    report = lint_payload(payload)
+    assert "R19" in report["failed_rules"]
+    assert any(v["rule"] == "R19" and "high-frequency filler tokens" in v["detail"] for v in report["violations"])

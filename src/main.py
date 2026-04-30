@@ -105,7 +105,9 @@ def _build_targeted_revise_prompt(payload: dict[str, Any], lint_report: dict[str
         "lyrics_by_section, variants, chosen_variant_id, style_tags, exclude_tags。\n"
         "6. 若 failed rules 含 R18，必须按 section 级别修复：每个触及下边界的段落在 voice_tags_inline 中包含 "
         "(Pause) 或 (Breathe)；每个触及上边界的段落在 voice_tags_inline 中包含 [Fast Flow]。\n"
-        "7. R18 修复必须写入 voice_tags_inline，不能只把标签留在行文本里。"
+        "7. R18 修复必须写入 voice_tags_inline，不能只把标签留在行文本里。\n"
+        "8. 严禁用语气词凑字数作弊：禁止行尾使用 啊/哦/呢/嘛/嗯/哟/啦/哼/哈/哎/吖/呵/噢/喔/呀/哇/吧/吗 等凑韵尾词；"
+        "禁止高频重复语气词堆叠。若触发 R19，必须改为有语义内容的结尾。"
     )
 
 

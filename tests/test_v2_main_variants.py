@@ -111,6 +111,12 @@ def _payload() -> LyricPayload:
 
 def test_score_variants_assigns_rank_and_chosen() -> None:
     payload = _payload()
+    filler_endings = {"啊", "哦", "呢", "嘛", "嗯", "哟", "啦", "哼", "哈", "哎", "吖", "呵", "噢", "喔", "呀", "哇", "吧", "吗"}
+    for section in payload.lyrics_by_section:
+        for line in section.lines:
+            text = str(line.primary or "").strip()
+            if text and text[-1] in filler_endings:
+                line.primary = text[:-1] + "光"
     payload.variants[0].lyrics_by_section = payload.lyrics_by_section
     payload.variants[1].lyrics_by_section = payload.lyrics_by_section
     payload.variants[2].lyrics_by_section = payload.lyrics_by_section
@@ -547,6 +553,12 @@ def test_produce_verbose_prints_profile_source(tmp_path, monkeypatch, capsys) ->
     from src import main as main_mod
 
     payload = _payload()
+    filler_endings = {"啊", "哦", "呢", "嘛", "嗯", "哟", "啦", "哼", "哈", "哎", "吖", "呵", "噢", "喔", "呀", "哇", "吧", "吗"}
+    for section in payload.lyrics_by_section:
+        for line in section.lines:
+            text = str(line.primary or "").strip()
+            if text and text[-1] in filler_endings:
+                line.primary = text[:-1] + "光"
     payload.variants[0].lyrics_by_section = payload.lyrics_by_section
     payload.variants[1].lyrics_by_section = payload.lyrics_by_section
     payload.variants[2].lyrics_by_section = payload.lyrics_by_section
