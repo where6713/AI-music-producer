@@ -281,6 +281,11 @@ def _pm_audit_checks(
     prosody_contract = _resolve_prosody_contract(workspace_root, trace_payload)
     prosody_aligned, prosody_detail = _prosody_matrix_aligned(prosody_contract, out)
     lint_report = trace_payload.get("lint_report", {}) if isinstance(trace_payload.get("lint_report", {}), dict) else {}
+    failed_rules_raw = lint_report.get("failed_rules", []) if isinstance(lint_report, dict) else []
+    failed_rules = {str(x).strip() for x in failed_rules_raw if str(x).strip()} if isinstance(failed_rules_raw, list) else set()
+    required_outputs = ["lyrics.txt", "style.txt", "exclude.txt", "lyric_payload.json", "trace.json"]
+    has_required_outputs = all((out / name).exists() for name in required_outputs)
+    prosody_truth_ok = prosody_aligned and ("R18" not in failed_rules) and has_required_outputs
     r14_r16_hits = _count_rule_hits(lint_report, {"R14", "R16_global"})
     craft_score = float(lint_report.get("craft_score", 0.0) or 0.0)
     is_dead = bool(lint_report.get("is_dead", False))
@@ -334,8 +339,13 @@ def _pm_audit_checks(
             "detail": profile_source_detail,
         },
         "prosody_matrix_aligned": {
-            "ok": prosody_aligned,
-            "detail": f"prosody_matrix_aligned={prosody_aligned} detail={prosody_detail} prosody_contract={prosody_contract}",
+            "ok": prosody_truth_ok,
+            "detail": (
+                f"prosody_matrix_aligned={prosody_aligned} "
+                f"r18_present={('R18' in failed_rules)} "
+                f"has_required_outputs={has_required_outputs} "
+                f"detail={prosody_detail} prosody_contract={prosody_contract}"
+            ),
         },
     }
     return checks
