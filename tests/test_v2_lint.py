@@ -314,3 +314,39 @@ def test_r19_blocks_line_end_connective_cheat() -> None:
     report = lint_payload(payload)
     assert "R19" in report["failed_rules"]
     assert any(v["rule"] == "R19" and "line-end connective detected" in v["detail"] for v in report["violations"])
+
+
+def test_r19_blocks_same_char_rhyme_monotony() -> None:
+    """Same character used ≥3 times as line-end is the post-filler-ban evolved cheat."""
+    payload = _payload("把对话框停下", forbidden=[])
+    # Simulate "下" appearing 4 times as line-end (as in the HYBS run output)
+    payload.lyrics_by_section[0].lines = [
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "手机亮起时 房间像被按下"}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "心跳还不肯放下"}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "钟声过一点还不肯放下"}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "把冲动压回喉下"}),
+    ]
+    report = lint_payload(payload)
+    assert "R19" in report["failed_rules"]
+    assert any(
+        v["rule"] == "R19" and "rhyme_monotony" in v["detail"]
+        for v in report["violations"]
+    )
+
+
+def test_r19_allows_diverse_rhyme_ends() -> None:
+    """Different line-end chars (even if semantically related) must not trigger rhyme_monotony."""
+    payload = _payload("把灯光慢慢按下", forbidden=[])
+    payload.lyrics_by_section[0].lines = [
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "手机亮起时 房间像被按下"}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "心跳还不肯说话"}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "灯影沿窗框的颜色"}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "屏幕照出那杯冷掉的茶"}),
+    ]
+    report = lint_payload(payload)
+    # Each char (下/话/色/茶) appears only once — rhyme_monotony should NOT fire
+    rhyme_violations = [
+        v for v in report["violations"]
+        if v["rule"] == "R19" and "rhyme_monotony" in v["detail"]
+    ]
+    assert len(rhyme_violations) == 0

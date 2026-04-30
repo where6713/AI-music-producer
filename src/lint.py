@@ -577,6 +577,27 @@ def lint_payload(
             )
         )
 
+    # R19 rhyme-monotony: same character used as line-end ≥3 times = evolved cheat
+    # Catches "下/话" stacking after modal-particle ban. Excludes already-blocked fillers.
+    line_end_chars: list[str] = []
+    for section, idx, line in rows:
+        clean = _strip_inline_metatags(line).strip()
+        if not clean:
+            continue
+        # Strip trailing punctuation to get semantic terminal char
+        tail = clean.rstrip("，。？！、；：""''《》【】…—～·").strip()
+        if tail and "\u4e00" <= tail[-1] <= "\u9fff" and tail[-1] not in filler_endings:
+            line_end_chars.append(tail[-1])
+    end_char_counts = Counter(line_end_chars)
+    for char, count in end_char_counts.items():
+        if count >= 3:
+            violations.append(
+                Violation(
+                    rule="R19",
+                    detail=f"rhyme_monotony: same line-end char '{char}' x{count} (evolved padding cheat)",
+                )
+            )
+
     failed_rules = sorted({v.rule for v in violations})
     severity = evaluate_violation_severity(violations)
     craft_score = calculate_craft_score(violations)
