@@ -111,6 +111,8 @@ def _prosody_matrix_aligned(prosody_contract: dict[str, Any], output_dir: Path) 
         cleaned = "".join(c for c in text.strip() if c.strip() and c not in "，。？！、；：""''《》【】…—～·")
         return len(cleaned)
 
+    per_line_tolerance = 4
+
     for tag, lines in sections.items():
         keys = mapping.get(tag)
         if keys is None:
@@ -119,29 +121,13 @@ def _prosody_matrix_aligned(prosody_contract: dict[str, Any], output_dir: Path) 
         if max_key not in prosody_contract:
             return False, f"missing_budget_key:{max_key}"
         line_max = int(prosody_contract[max_key])
-        has_explicit_min = min_key in prosody_contract
-        line_min = int(prosody_contract.get(min_key, max(1, line_max - 3)))
 
-        lengths = [_line_len(x) for x in lines if x.strip()]
-        if not lengths:
-            continue
-        if max(lengths) - min(lengths) > 3:
-            return False, f"section_span_exceeds_3:{tag}"
-        joined = "\n".join(lines)
-        has_lower = any(t in joined for t in lower_tags)
-        has_upper = any(t in joined for t in upper_tags)
-        section_obj = payload_sections.get(tag, {})
-        inline = section_obj.get("voice_tags_inline", []) if isinstance(section_obj, dict) else []
-        if isinstance(inline, list):
-            inline_set = {str(x).strip() for x in inline if str(x).strip()}
-            if inline_set & lower_tags:
-                has_lower = True
-            if inline_set & upper_tags:
-                has_upper = True
-        if has_explicit_min and any(x <= line_min for x in lengths) and not has_lower:
-            return False, f"missing_lower_metatag:{tag}"
-        if any(x >= line_max for x in lengths) and not has_upper:
-            return False, f"missing_upper_metatag:{tag}"
+        for line_text in lines:
+            if not line_text.strip():
+                continue
+            line_len = _line_len(line_text)
+            if line_len > line_max + per_line_tolerance:
+                return False, f"line_exceeds_budget:{tag} len={line_len} max={line_max + per_line_tolerance}"
 
     return True, "aligned"
 

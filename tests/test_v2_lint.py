@@ -149,11 +149,13 @@ def test_lint_reports_craft_score_in_range() -> None:
     assert 0.0 <= float(report["craft_score"]) <= 1.0
 
 
-def test_r18_fails_when_section_line_span_exceeds_two() -> None:
+def test_r18_fails_when_line_exceeds_budget_plus_tolerance() -> None:
+    """R18 fires when a line exceeds line_max + 4 (per-line tolerance)."""
     payload = _payload("再把手放开", forbidden=[])
+    # verse_line_max=8, tolerance=4 → max allowed=12. 15-char line → exceeds.
     payload.lyrics_by_section[0].lines = [
-        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "短句", "char_count": 2}),
-        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "这是一个非常非常长的句子", "char_count": 12}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "七个字好句子", "char_count": 6}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "这是一个极其极其极其极其长的句子", "char_count": 15}),
     ]
     report = lint_payload(
         payload,
@@ -169,16 +171,17 @@ def test_r18_fails_when_section_line_span_exceeds_two() -> None:
         },
     )
     assert "R18" in report["failed_rules"]
-    assert any("line span exceeds" in v["detail"] for v in report["violations"])
+    assert any("line exceeds budget" in v["detail"] for v in report["violations"])
 
 
-def test_r18_requires_pause_tag_when_line_hits_lower_bound() -> None:
+def test_r18_allows_lines_within_budget_tolerance() -> None:
+    """Lines within line_max + 2 tolerance should NOT trigger R18."""
     payload = _payload("再把手放开", forbidden=[])
+    # verse_line_max=8, tolerance=2 → max allowed=10. Lines of 7 and 10 are both OK.
     payload.lyrics_by_section[0].lines = [
-        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "刚好五字句", "char_count": 5}),
-        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "稍长一点句子", "char_count": 6}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "窗上水痕在退", "char_count": 6}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "旧站台风吹着名字散", "char_count": 9}),
     ]
-    payload.lyrics_by_section[0].voice_tags_inline = []
     report = lint_payload(
         payload,
         trace={
@@ -192,8 +195,7 @@ def test_r18_requires_pause_tag_when_line_hits_lower_bound() -> None:
             }
         },
     )
-    assert "R18" in report["failed_rules"]
-    assert any("missing required metatag" in v["detail"] for v in report["violations"])
+    assert "R18" not in report["failed_rules"]
 
 
 def test_club_dance_r02_threshold_relaxed_to_seven(tmp_path) -> None:

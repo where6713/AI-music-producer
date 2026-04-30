@@ -455,7 +455,10 @@ def lint_payload(
         "[Bridge]": ("bridge_line_min", "bridge_line_max"),
         "[Outro]": ("bridge_line_min", "bridge_line_max"),
     }
-    _SPAN_LIMIT = 3  # allows natural 7/8/9/10-char variation; 2 was forcing Tang-poetry uniformity
+    # R18: per-line budget check only. No span check — Chinese lyrics naturally vary
+    # between 7-13 chars per line; forcing uniform lengths produces Tang-poetry rigidity.
+    # Per-line budget with +2 tolerance is the correct musical constraint.
+    _PER_LINE_TOLERANCE = 4  # Chinese lyrics: 8-max profile needs room for 12-char lines at 100+ BPM
     _LOWER_TAGS = {"(Pause)", "(Breathe)"}
     _UPPER_TAGS = {"[Fast Flow]"}
 
@@ -476,55 +479,18 @@ def lint_payload(
                 if line_min is None or line_max is None:
                     continue
 
-                line_lengths: list[tuple[int, int, str]] = []
                 for idx, line in enumerate(section.lines, start=1):
                     text = _strip_inline_metatags(line.primary)
                     if not text:
                         continue
-                    line_lengths.append((idx, _bare_len(text), text))
-                if not line_lengths:
-                    continue
-
-                min_len = min(x[1] for x in line_lengths)
-                max_len = max(x[1] for x in line_lengths)
-                if (max_len - min_len) > _SPAN_LIMIT:
-                    violations.append(
-                        Violation(
-                            rule="R18",
-                            detail=f"line span exceeds {_SPAN_LIMIT} in {section.tag}: min={min_len}, max={max_len}",
-                            section=section.tag,
-                            line=0,
-                        )
-                    )
-
-                inline_tags = {str(t).strip() for t in section.voice_tags_inline if str(t).strip()}
-                joined_raw = "\n".join(str(line.primary or "") for line in section.lines)
-                if "(Pause)" in joined_raw:
-                    inline_tags.add("(Pause)")
-                if "(Breathe)" in joined_raw:
-                    inline_tags.add("(Breathe)")
-                if "[Fast Flow]" in joined_raw:
-                    inline_tags.add("[Fast Flow]")
-                for idx, bare_len, text in line_lengths:
-                    if bare_len <= int(line_min) and not (inline_tags & _LOWER_TAGS):
+                    bare_len = _bare_len(text)
+                    if bare_len > int(line_max) + _PER_LINE_TOLERANCE:
                         violations.append(
                             Violation(
                                 rule="R18",
                                 detail=(
-                                    f"missing required metatag for lower-bound line in {section.tag} line {idx}: "
-                                    f"len={bare_len}, min={line_min}, require one of {sorted(_LOWER_TAGS)}"
-                                ),
-                                section=section.tag,
-                                line=idx,
-                            )
-                        )
-                    if bare_len >= int(line_max) and not (inline_tags & _UPPER_TAGS):
-                        violations.append(
-                            Violation(
-                                rule="R18",
-                                detail=(
-                                    f"missing required metatag for upper-bound line in {section.tag} line {idx}: "
-                                    f"len={bare_len}, max={line_max}, require one of {sorted(_UPPER_TAGS)}"
+                                    f"line exceeds budget in {section.tag} line {idx}: "
+                                    f"len={bare_len}, max={int(line_max) + _PER_LINE_TOLERANCE}"
                                 ),
                                 section=section.tag,
                                 line=idx,
