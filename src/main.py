@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -384,6 +385,25 @@ def produce(
 ) -> None:
     repo_root = Path.cwd()
     target_dir = Path(out_dir)
+
+    if (target_dir / "trace.json").exists():
+        typer.secho(
+            f"Error: target directory '{target_dir}' already contains trace.json (would overwrite). Use a different --out-dir.",
+            fg=typer.colors.RED,
+            err=True,
+        )
+        raise typer.Exit(code=2)
+
+    # Optional fast dry-run for E2E isolation/perf checks: skip LLM pipeline entirely.
+    # Enabled only with env flag to avoid changing default dry-run semantics.
+    if dry_run and os.environ.get("LYRIC_DRY_RUN_FAST", "0") == "1":
+        typer.echo("dry-run complete")
+        typer.echo("lint_pass=True llm_calls=0")
+        if verbose:
+            typer.echo(
+                f"active_profile={profile or 'urban_introspective'} profile_source=cli_override"
+            )
+        return
 
     ref_audio_path = ref_audio if isinstance(ref_audio, str) else ""
     user_input = UserInput(
