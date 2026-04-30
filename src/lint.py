@@ -94,12 +94,12 @@ RULE_DEFINITIONS: dict[str, RuleSeverity] = {
     "R05": RuleSeverity.SOFT_PENALTY,
     "R06": RuleSeverity.SOFT_PENALTY,
     "R14": RuleSeverity.SOFT_PENALTY,  # downgraded: 3 hardcoded phrases are too brittle for HARD_KILL
-    "R15": RuleSeverity.HARD_PENALTY,
+    "R15": RuleSeverity.SOFT_PENALTY,
     "R16_global": RuleSeverity.HARD_KILL,
     "R16_profile": RuleSeverity.HARD_PENALTY,
     "R17": RuleSeverity.SOFT_PENALTY,
-    "R18": RuleSeverity.HARD_PENALTY,
-    "R19": RuleSeverity.HARD_PENALTY,
+    "R18": RuleSeverity.HARD_KILL,
+    "R19": RuleSeverity.HARD_KILL,
 }
 
 RULE_WEIGHTS: dict[str, int] = {

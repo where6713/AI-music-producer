@@ -266,6 +266,23 @@ def test_cli_produce_parses_lang_and_outdir_options(monkeypatch) -> None:
     assert captured["verbose"] is True
 
 
+def test_cli_produce_defaults_to_run_id_dir(monkeypatch) -> None:
+    from apps.cli import main as cli_main
+
+    captured: dict[str, object] = {}
+
+    def _fake_produce(**kwargs):
+        captured.update(kwargs)
+
+    monkeypatch.setattr(cli_main, "produce_v2", _fake_produce)
+    cli_main._dispatch_produce_from_argv([
+        "夜里想起旧人",
+    ])
+
+    out_dir = str(captured.get("out_dir", ""))
+    assert out_dir.startswith("out/runs/")
+
+
 def test_pm_audit_prints_all_8_checks(monkeypatch, capsys) -> None:
     from apps.cli import main as cli_main
 

@@ -46,7 +46,7 @@ def _make_payload(*, chorus_line: str) -> LyricPayload:
                         {"primary": "夜色还在窗沿徘徊", "backing": "", "tail_pinyin": "", "char_count": 8},
                         {"primary": "指尖悬在未发的对白", "backing": "", "tail_pinyin": "", "char_count": 9},
                         {"primary": "理智把冲动轻轻按开", "backing": "", "tail_pinyin": "", "char_count": 9},
-                        {"primary": "把号码放下吧", "backing": "", "tail_pinyin": "", "char_count": 6},
+                        {"primary": "把号码放下", "backing": "", "tail_pinyin": "", "char_count": 5},
                     ],
                 },
                 {
@@ -159,3 +159,39 @@ def test_lint_marks_r16_global_phrase_as_dead(tmp_path) -> None:
 
     assert "R16" in report["failed_rules"]
     assert "R16_global" in report["hard_kill_rules"]
+
+
+def test_lint_marks_r18_prosody_violation_as_dead() -> None:
+    payload = _make_payload(chorus_line="我还在等你回来")
+    payload.lyrics_by_section[0].lines = [
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "短句", "char_count": 2}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "这是一个非常非常长的句子", "char_count": 12}),
+    ]
+    report = lint_payload(
+        payload,
+        trace={
+            "prosody_contract": {
+                "verse_line_min": 5,
+                "verse_line_max": 8,
+                "chorus_line_min": 5,
+                "chorus_line_max": 8,
+                "bridge_line_min": 5,
+                "bridge_line_max": 10,
+            }
+        },
+    )
+
+    assert report["is_dead"] is True
+    assert "R18" in report["hard_kill_rules"]
+
+
+def test_lint_marks_r19_filler_cheat_as_dead() -> None:
+    payload = _make_payload(chorus_line="我还在等你啊")
+    payload.lyrics_by_section[0].lines = [
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "雨停在窗沿啊"}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "灯影又落下来哦"}),
+    ]
+    report = lint_payload(payload)
+
+    assert report["is_dead"] is True
+    assert "R19" in report["hard_kill_rules"]
