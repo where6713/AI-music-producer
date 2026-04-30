@@ -98,8 +98,8 @@ RULE_DEFINITIONS: dict[str, RuleSeverity] = {
     "R16_global": RuleSeverity.HARD_KILL,
     "R16_profile": RuleSeverity.HARD_PENALTY,
     "R17": RuleSeverity.SOFT_PENALTY,
-    "R18": RuleSeverity.HARD_KILL,
-    "R19": RuleSeverity.HARD_KILL,
+    "R18": RuleSeverity.HARD_PENALTY,  # prosody budget: quality gate, not content veto
+    "R19": RuleSeverity.HARD_PENALTY,  # anti-filler/monotony: quality gate, not content veto
 }
 
 RULE_WEIGHTS: dict[str, int] = {

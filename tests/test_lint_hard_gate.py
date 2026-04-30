@@ -161,7 +161,10 @@ def test_lint_marks_r16_global_phrase_as_dead(tmp_path) -> None:
     assert "R16_global" in report["hard_kill_rules"]
 
 
-def test_lint_marks_r18_prosody_violation_as_dead() -> None:
+def test_lint_marks_r18_prosody_violation_as_hard_penalty_not_dead() -> None:
+    # R18 is HARD_PENALTY: prosody budget violations lower craft_score and trigger
+    # targeted revise, but must NOT kill output entirely. PRD requires 输出三件套.
+    # Content vetoes (R03, R16_global) are the only HARD_KILLs.
     payload = _make_payload(chorus_line="我还在等你回来")
     payload.lyrics_by_section[0].lines = [
         payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "短句", "char_count": 2}),
@@ -181,11 +184,15 @@ def test_lint_marks_r18_prosody_violation_as_dead() -> None:
         },
     )
 
-    assert report["is_dead"] is True
-    assert "R18" in report["hard_kill_rules"]
+    assert "R18" in report["failed_rules"]
+    assert report["is_dead"] is False  # HARD_PENALTY: craft_score drops, triggers revise, does NOT kill
+    assert "R18" not in report["hard_kill_rules"]
+    assert report["craft_score"] < 1.0  # penalty is reflected in score
 
 
-def test_lint_marks_r19_filler_cheat_as_dead() -> None:
+def test_lint_marks_r19_filler_cheat_as_hard_penalty_not_dead() -> None:
+    # R19 is HARD_PENALTY: filler/monotony violations lower craft_score and trigger
+    # targeted revise, but must NOT kill output entirely. PRD requires 输出三件套.
     payload = _make_payload(chorus_line="我还在等你啊")
     payload.lyrics_by_section[0].lines = [
         payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "雨停在窗沿啊"}),
@@ -193,5 +200,7 @@ def test_lint_marks_r19_filler_cheat_as_dead() -> None:
     ]
     report = lint_payload(payload)
 
-    assert report["is_dead"] is True
-    assert "R19" in report["hard_kill_rules"]
+    assert "R19" in report["failed_rules"]
+    assert report["is_dead"] is False  # HARD_PENALTY: craft_score drops, triggers revise, does NOT kill
+    assert "R19" not in report["hard_kill_rules"]
+    assert report["craft_score"] < 1.0
