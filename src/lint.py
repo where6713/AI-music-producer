@@ -313,6 +313,8 @@ def lint_payload(
     # R01 chorus hook line tail (zh-CN)
     # Skipped for profiles that use oblique-tone rhyme schemes (e.g. classical_restraint)
     skip_r01 = bool(profile_cfg.get("skip_R01", False)) if isinstance(profile_cfg, dict) else False
+    if active_profile == "ambient_meditation":
+        skip_r01 = True
     if skip_r01:
         skipped_rules_by_profile.append("R01")
     hook_section = payload.structure.hook_section
@@ -342,7 +344,9 @@ def lint_payload(
                     )
                 )
 
-    # R02 concrete noun overuse <= 3
+    # R02 concrete noun overuse threshold
+    # club_dance allows denser hook repetition, so threshold is relaxed to 7.
+    r02_threshold = 7 if active_profile == "club_dance" else 3
     tokens: list[str] = []
     for line in text_lines:
         for token in jieba.lcut(line):
@@ -351,7 +355,7 @@ def lint_payload(
                 tokens.append(w)
     counts = Counter(tokens)
     for token, count in counts.items():
-        if count > 3:
+        if count > r02_threshold:
             violations.append(
                 Violation(rule="R02", detail=f"token overused: {token} x{count}")
             )
