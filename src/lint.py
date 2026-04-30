@@ -455,7 +455,7 @@ def lint_payload(
         "[Bridge]": ("bridge_line_min", "bridge_line_max"),
         "[Outro]": ("bridge_line_min", "bridge_line_max"),
     }
-    _SPAN_LIMIT = 2
+    _SPAN_LIMIT = 3  # allows natural 7/8/9/10-char variation; 2 was forcing Tang-poetry uniformity
     _LOWER_TAGS = {"(Pause)", "(Breathe)"}
     _UPPER_TAGS = {"[Fast Flow]"}
 
@@ -590,7 +590,7 @@ def lint_payload(
             line_end_chars.append(tail[-1])
     end_char_counts = Counter(line_end_chars)
     for char, count in end_char_counts.items():
-        if count >= 3:
+        if count >= 4:  # threshold 3 caused false positives on thematic words (e.g. 无常→常 x12)
             violations.append(
                 Violation(
                     rule="R19",

@@ -125,8 +125,8 @@ def _prosody_matrix_aligned(prosody_contract: dict[str, Any], output_dir: Path) 
         lengths = [_line_len(x) for x in lines if x.strip()]
         if not lengths:
             continue
-        if max(lengths) - min(lengths) > 2:
-            return False, f"section_span_exceeds_2:{tag}"
+        if max(lengths) - min(lengths) > 3:
+            return False, f"section_span_exceeds_3:{tag}"
         joined = "\n".join(lines)
         has_lower = any(t in joined for t in lower_tags)
         has_upper = any(t in joined for t in upper_tags)

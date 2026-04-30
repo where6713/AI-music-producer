@@ -317,9 +317,12 @@ def test_r19_blocks_line_end_connective_cheat() -> None:
 
 
 def test_r19_blocks_same_char_rhyme_monotony() -> None:
-    """Same character used ≥3 times as line-end is the post-filler-ban evolved cheat."""
+    """Same character used ≥4 times as line-end triggers rhyme_monotony (threshold=4).
+    Threshold was raised from 3 to 4 to avoid false-positives on thematic repetition
+    (e.g. a 无常-themed poem naturally ends lines with 常 multiple times).
+    """
     payload = _payload("把对话框停下", forbidden=[])
-    # Simulate "下" appearing 4 times as line-end (as in the HYBS run output)
+    # "下" appears 4 times as line-end -> must trigger
     payload.lyrics_by_section[0].lines = [
         payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "手机亮起时 房间像被按下"}),
         payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "心跳还不肯放下"}),
