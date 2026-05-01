@@ -1,5 +1,20 @@
 {
   "schema_version": 1,
   "current_task_owner": "docs/整改task.json",
-  "tasks": []
+  "tasks": [
+    {
+      "id": "TASK-025",
+      "title": "corpus/_clean mojibake 上游清洗管线修复",
+      "status": "blocked-by-investigation",
+      "owner": "tbd"
+    },
+    {
+      "id": "TASK-026",
+      "title": "golden_dozen 12 首华语经典原文人工补齐",
+      "status": "blocked-by-asset",
+      "depends_on": [
+        "TASK-025"
+      ]
+    }
+  ]
 }
