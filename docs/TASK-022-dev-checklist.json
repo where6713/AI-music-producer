@@ -1,0 +1,278 @@
+{
+  "task_id": "TASK-022",
+  "title": "V2 极简化重构 — 实施落地",
+  "rfc_ref": "docs/task021_v2_rfc.md (v2 revision 2)",
+  "global_constraints": {
+    "total_line_budget_v2_modules": 300,
+    "buffer_lines": 20,
+    "single_file_hard_cap": "见各 step file_budget,不允许自行抬高",
+    "no_legacy_touch": "本 task 不删 V1 (V1 砍除留给 TASK-024),仅新增 src/v2/* 与 corpus/_index.json + corpus/golden_dozen/",
+    "branch_naming": "feat/task022-v2-implementation",
+    "commit_convention": "feat(v2): <subject>  /  chore(v2): <subject>",
+    "no_skip_hooks": "禁止 --no-verify;若被 docs-check 阻断,先做 Step 0",
+    "tests_must_pass": "现有 246 pytest 全绿;V2 仅新增测试不得改老用例"
+  },
+
+  "steps": [
+    {
+      "step": 0,
+      "title": "前置清理 + RFC 预算修正",
+      "blocking_for_next": true,
+      "actions": [
+        "在 docs/task021_v2_rfc.md Section B1 把单文件 hard cap 收紧到: perceive_music<=70 / distill_emotion<=50 / select_corpus<=40 / compose<=60 / main<=30 / self_review<=30 (合计 280 行 + 20 行 buffer = 300)",
+        "新建/补齐 docs/current_task_index.json 占位 (空 array 即可),解除 docs-check hook 阻断",
+        "本地跑一次 git commit --dry-run 或 pre-commit 确认 hook 不再 fail"
+      ],
+      "deliverables": ["docs/task021_v2_rfc.md (修订)", "docs/current_task_index.json"],
+      "acceptance": "git commit 不再被 docs-check / pm-audit 阻断;预算之和 ≤300"
+    },
+
+    {
+      "step": 1,
+      "title": "数据层 — corpus 索引脚本",
+      "file_path": "scripts/build_corpus_index.py",
+      "file_budget": 50,
+      "depends_on": [0],
+      "spec": {
+        "scan_dirs": [
+          "corpus/_clean/",
+          "corpus/urban_introspective/",
+          "corpus/classical_restraint/",
+          "corpus/uplift_pop/",
+          "corpus/club_dance/",
+          "corpus/ambient_meditation/",
+          "corpus/indie_groove/",
+          "corpus/golden_dozen/"
+        ],
+        "output_path": "corpus/_index.json",
+        "record_schema": {
+          "id": "string (相对路径作为稳定 ID)",
+          "title": "string",
+          "author": "string",
+          "first_line": "string (歌词第一句,<=40 字)",
+          "summary_50chars": "string (文本前 50 字,做摘要召回用)",
+          "emotion_tags": "string[]",
+          "char_count": "int"
+        },
+        "rules": [
+          "纯离线脚本,不调 LLM,不进 runtime pipeline",
+          "缺字段则跳过该条并打 warning,不中断",
+          "stdout 打印总条数与各目录条数"
+        ]
+      },
+      "acceptance": "执行后 corpus/_index.json 存在;条数 >= corpus 实际文件数 80%;字段齐全"
+    },
+
+    {
+      "step": 2,
+      "title": "数据层 — Golden Dozen 策展",
+      "dir_path": "corpus/golden_dozen/",
+      "depends_on": [0],
+      "spec": {
+        "naming": "<artist>_<title>.txt (UTF-8, LF)",
+        "files_required": [
+          "HYBS_dancing_with_my_phone.txt",
+          "gao_wu_ren_airen_cuo_guo.txt",
+          "deca_joins_hai_lang.txt",
+          "chen_yi_xun_k_ge_zhi_wang_mandarin.txt",
+          "tian_fu_zhen_xiao_xing_yun.txt",
+          "zhou_jielun_qing_hua_ci.txt",
+          "wuyuetian_jue_jiang.txt",
+          "zhang_xuan_bao_bei.txt",
+          "zhou_jielun_qing_tian.txt",
+          "khalil_fong_san_ren_you.txt",
+          "cai_yi_lin_mei_gui_shao_nian.txt",
+          "lin_jun_jie_xiu_lian_ai_qing.txt"
+        ],
+        "header_comment_required": "每个文件首部用 # 注释三行: # source: <来源>  /  # style: <谱系>  /  # texture: <肌理标签>",
+        "fallback": "若 corpus/_clean/ 已有可定位文本,优先链接/拷贝;无则外补,但必须在 header 注明来源"
+      },
+      "acceptance": "12 个文件齐全;每个文件首部 3 行 metadata 注释完整;build_corpus_index.py 能扫到全部 12 条"
+    },
+
+    {
+      "step": 3,
+      "title": "V2 骨架 — 创建 src/v2/ 包",
+      "file_path": "src/v2/__init__.py",
+      "file_budget": 5,
+      "depends_on": [0],
+      "spec": {
+        "content": "仅 from . import perceive_music, distill_emotion, select_corpus, compose, self_review, main",
+        "no_logic": true
+      },
+      "acceptance": "import src.v2 不报错"
+    },
+
+    {
+      "step": 4,
+      "title": "Step 1 模块 — 音乐感知",
+      "file_path": "src/v2/perceive_music.py",
+      "file_budget": 70,
+      "depends_on": [3],
+      "spec": {
+        "function": "perceive(ref_audio_path: str, user_intent: str) -> dict",
+        "output_keys": ["bpm_estimate", "groove", "narrative_density", "vocal_persona", "free_text_portrait"],
+        "llm_calls": 1,
+        "llm_provider": "现有 claude_client",
+        "audio_lib_policy": "本 task 仅 LLM 推理 portrait,不调 librosa/mutagen;TASK-020 后切真实特征",
+        "fallback": "无 ref_audio 时降级为纯 user_intent 文本推理,不抛异常"
+      },
+      "acceptance": "单测:给定一段中文 intent 文本能稳定返回 5 个字段全非空"
+    },
+
+    {
+      "step": 5,
+      "title": "Step 2 模块 — 情感蒸馏",
+      "file_path": "src/v2/distill_emotion.py",
+      "file_budget": 50,
+      "depends_on": [4],
+      "spec": {
+        "function": "distill(intent: str, portrait: dict) -> dict",
+        "output_keys": ["central_image", "arc", "metaphor"],
+        "llm_calls": 1,
+        "constraint": "central_image 必须是单一具象意象;arc 必须是 3 拍以内情绪曲线描述;metaphor 必须可视化"
+      },
+      "acceptance": "单测:输出三个字段非空,且 central_image 字符数 <=20"
+    },
+
+    {
+      "step": 6,
+      "title": "Step 3a 模块 — corpus 召回降级 (C0)",
+      "file_path": "src/v2/select_corpus.py",
+      "file_budget": 40,
+      "depends_on": [1, 5],
+      "spec": {
+        "function": "recall(portrait: dict, index_path: str = 'corpus/_index.json') -> list[dict]",
+        "no_llm": true,
+        "primary_strategy": "Plan A — 用 portrait.emotion/groove/vocal_persona 关键词与 record.emotion_tags + summary_50chars 做轻量语义相似度 (jieba 分词 + 词集合 IoU 即可),取 top 80-120",
+        "fallback_strategy": "Plan B — 若 Plan A 召回 <80 条,改字数分桶 (<=150 / 150-300 / >300) + portrait 期望肌理选桶,抽样到 100 条",
+        "hard_cap_output": 120,
+        "must_include": "corpus/golden_dozen/ 12 首一定带上,不参与召回竞争 (锚点)",
+        "anti_pattern_forbidden": [
+          "禁止读取 profile_tag 字段做硬路由",
+          "禁止用 hint_scoring_disjoint_v2 风格的关键字打分函数",
+          "禁止依赖 src/profile_router.py (V1 路由层,即将砍除)"
+        ]
+      },
+      "acceptance": "单测:任意 portrait 输入下输出 92-120 条 (含 12 首 golden_dozen);两个不同 portrait 的召回交集占比 <70% (证明确实在区分)"
+    },
+
+    {
+      "step": 7,
+      "title": "Step 3b 模块 — 双 pass 作曲核心",
+      "file_path": "src/v2/compose.py",
+      "file_budget": 60,
+      "depends_on": [6],
+      "spec": {
+        "function": "compose(portrait: dict, emotion: dict, recalled_records: list[dict]) -> dict",
+        "output_keys": ["lyrics", "style", "exclude"],
+        "llm_calls": 2,
+        "pass1": {
+          "input": "portrait + emotion + golden_dozen 全文 + 召回 corpus 摘要 (<=120 条 summary_50chars)",
+          "output_format": "JSON array of corpus IDs (LLM 自选 5-10 个)",
+          "validation": "解析失败或返回 0 个则用 golden_dozen 兜底"
+        },
+        "pass2": {
+          "input": "pass1 选中 IDs 对应全文 + portrait + emotion + golden_dozen 全文",
+          "output_format": "JSON {lyrics, style, exclude} (lyrics 含段落标记)",
+          "validation": "段落格式 5 条 hard check (沿用 lint.py 残留部分)"
+        },
+        "session_constraint": "两个 pass 共用同一会话上下文,不开新对话",
+        "context_budget_guard": "若 pass1 prompt > 12k tokens,自动从 recalled_records 末尾砍到 12k 以内并 log warning"
+      },
+      "acceptance": "端到端跑通一次能产出三件套;pass1 选中 IDs 在召回池内 (无幻觉)"
+    },
+
+    {
+      "step": 8,
+      "title": "Step 4 模块 — 自审修缮",
+      "file_path": "src/v2/self_review.py",
+      "file_budget": 30,
+      "depends_on": [7],
+      "spec": {
+        "function": "review(draft: dict) -> dict",
+        "llm_calls": 1,
+        "scope": "仅做表达层修缮 (措辞、韵脚自然度、句式拐杖检测)",
+        "forbidden": [
+          "不得增删主段落 (Verse/Chorus/Bridge 数量必须保持)",
+          "不得改变 central_image / metaphor",
+          "不得复活 R01-R19 lint 门禁"
+        ],
+        "output": "{lyrics, style, exclude, review_notes}  — review_notes 是 LLM 给的诊断纸条,仅写入日志,不暴露给用户"
+      },
+      "acceptance": "单测:对一份故意有'我把…'句式拐杖的 draft 跑一次,review_notes 必须命中该问题"
+    },
+
+    {
+      "step": 9,
+      "title": "CLI 编排 — main.py",
+      "file_path": "src/v2/main.py",
+      "file_budget": 30,
+      "depends_on": [4, 5, 6, 7, 8],
+      "spec": {
+        "cli_flags": [
+          "--ref-audio <path>",
+          "--intent <str>",
+          "--out <dir>",
+          "--legacy  (切回 V1 入口,直接 delegate 给 src/main.py)",
+          "--draft-mode  (跳过 self_review,产出 pass2 raw)"
+        ],
+        "pipeline_order": "perceive -> distill -> recall -> compose(2-pass) -> self_review",
+        "diagnostic_dump": "out/runs/<ts>/trace.json 必须含 portrait / emotion / recalled_ids (含 golden) / selected_ids / draft / final / review_notes 全链路"
+      },
+      "acceptance": "python -m src.v2.main --ref-audio <flac> --intent '<text>' --out out/runs/smoke 能产出 lyrics.txt + style.txt + exclude.txt + trace.json"
+    },
+
+    {
+      "step": 10,
+      "title": "Smoke E2E + 单测",
+      "depends_on": [9],
+      "spec": {
+        "smoke_case": "ref_audio=F:/Onedrive/桌面/Dancing with my phone - HYBS.flac, intent='夜里独自开车想念一个人', 期望产物可读且非空",
+        "unit_tests_required": [
+          "test_perceive_music: 5 字段非空",
+          "test_distill_emotion: 3 字段非空 + central_image <=20 字",
+          "test_select_corpus: 召回 92-120 条 + golden 12 锚点",
+          "test_compose_pass1_id_grounding: pass1 IDs ⊆ 召回池",
+          "test_self_review_no_section_change: 段落数前后一致"
+        ],
+        "regression": "现有 246 pytest 全绿"
+      },
+      "acceptance": "新增测试全过 + 246 老测试全绿 + smoke 产物人眼可读"
+    },
+
+    {
+      "step": 11,
+      "title": "提交与验收准备",
+      "depends_on": [10],
+      "actions": [
+        "git push origin feat/task022-v2-implementation",
+        "开 PR,标题: feat(v2): TASK-022 极简化重构落地",
+        "PR 描述列出: 新增文件清单 + 行数实测 + smoke trace.json 链接",
+        "等架构师二审通过后进入 TASK-023 (5x5=25 E2E 验收)"
+      ],
+      "non_goals": [
+        "不动 V1 任何代码 (砍除留给 TASK-024)",
+        "不改 lint.py 门禁逻辑",
+        "不修 audio analysis (留给 TASK-020)"
+      ],
+      "acceptance": "PR 通过 hook + CI 绿 + 架构师 review approve"
+    }
+  ],
+
+  "exit_criteria_for_task_022": [
+    "src/v2/ 6 模块全部落地,实测总行数 <=300",
+    "corpus/_index.json 生成成功",
+    "corpus/golden_dozen/ 12 首齐全",
+    "smoke E2E 产物可读",
+    "246 + 新增单测全绿",
+    "未触碰 V1 代码、未跳 hook、未抬预算"
+  ],
+
+  "if_blocked_protocol": {
+    "predicted_block_a": "pass1 prompt > 12k tokens — 按 compose.context_budget_guard 截断,不要回退到 profile 路由",
+    "predicted_block_b": "召回池 <80 条 — 切 Plan B 字数分桶,不要去复活 hint_scoring",
+    "predicted_block_c": "single_file_hard_cap 撞墙 — 立即停手提报,不要把逻辑外溢到第 7 个文件",
+    "predicted_block_d": "audio_lib 报错 — 按 perceive_music.fallback 降级为纯 LLM 推理,不要装 librosa"
+  }
+}
