@@ -14,11 +14,11 @@ def distill_emotion(intent: str, portrait: dict[str, object]) -> dict[str, str]:
         arc = "descend-then-breathe"
     if valence == "positive":
         arc = "lift-and-resolve"
-    central_image = "city lights"
-    if "classical" in str(portrait.get("texture", "")):
-        central_image = "ink rain on porcelain"
-    elif "indie" in str(portrait.get("texture", "")):
-        central_image = "a late bus stop"
+    central_image = "灯火"
+    if "classical" in str(portrait.get("genre_guess", "")):
+        central_image = "青瓷与旧雨"
+    elif "indie" in str(portrait.get("genre_guess", "")):
+        central_image = "末班公交车"
     metaphor = "weather as feeling"
     return {
         "valence": valence,

@@ -8,7 +8,7 @@ def select_corpus(index_path: Path, portrait: dict[str, object], limit: int = 10
     rows = json.loads(index_path.read_text(encoding="utf-8"))
     if not isinstance(rows, list):
         return []
-    words = [str(portrait.get("texture", "")), str(portrait.get("tempo", "")), str(portrait.get("energy", ""))]
+    words = [str(portrait.get("genre_guess", "")), str(portrait.get("bpm_range", "")), str(portrait.get("vibe", ""))]
     q = " ".join(words).lower()
     scored: list[tuple[int, dict[str, object]]] = []
     for row in rows:
@@ -16,6 +16,8 @@ def select_corpus(index_path: Path, portrait: dict[str, object], limit: int = 10
             continue
         text = f"{row.get('title','')} {row.get('summary_50chars','')} {' '.join(row.get('emotion_tags', []) or [])}".lower()
         score = sum(1 for t in q.split() if t and t in text)
+        if "indie pop" in q and "slot01_indie_lazy" in str(row.get("id", "")):
+            score += 3
         scored.append((score, row))
     scored.sort(key=lambda x: x[0], reverse=True)
     top = [r for s, r in scored if s > 0][:limit]
