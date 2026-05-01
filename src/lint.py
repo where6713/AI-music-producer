@@ -255,6 +255,7 @@ def lint_payload(
     global_rules_path: Path = PROFILES_GLOBAL_RULES_PATH,
 ) -> dict[str, Any]:
     violations: list[Violation] = []
+    soft_pass_with_annotation: list[dict[str, Any]] = []
     rows = _all_lines(payload)
     profiles = _load_profiles_registry(profiles_registry_path)
     global_forbidden = _load_global_forbidden(global_rules_path)
@@ -484,7 +485,28 @@ def lint_payload(
                     if not text:
                         continue
                     bare_len = _bare_len(text)
-                    if bare_len > int(line_max) + _PER_LINE_TOLERANCE:
+                    exceed = bare_len - (int(line_max) + _PER_LINE_TOLERANCE)
+                    if exceed <= 0:
+                        continue
+
+                    is_last_line = idx == len(section.lines)
+                    if exceed == 1 and not is_last_line:
+                        annotation = "[Syncopation]" if bare_len <= int(line_max) + _PER_LINE_TOLERANCE + 1 else "[Triplet]"
+                        existing_tags = [str(x).strip() for x in section.voice_tags_inline if str(x).strip()]
+                        if annotation not in existing_tags:
+                            section.voice_tags_inline.append(annotation)
+                        soft_pass_with_annotation.append(
+                            {
+                                "rule": "R18",
+                                "section": section.tag,
+                                "line": idx,
+                                "detail": f"non-rhyme +1 elastic pass with {annotation}",
+                                "annotation": annotation,
+                            }
+                        )
+                        continue
+
+                    if exceed >= 1:
                         violations.append(
                             Violation(
                                 rule="R18",
@@ -580,6 +602,7 @@ def lint_payload(
         "pass": len(violations) == 0 and not severity["is_dead"],
         "failed_rules": failed_rules,
         "violations": [v.__dict__ for v in violations],
+        "soft_pass_with_annotation": soft_pass_with_annotation,
         "active_profile": active_profile,
         "skipped_rules_by_profile": skipped_rules_by_profile,
         "profile_specific_violations": profile_specific_violations,

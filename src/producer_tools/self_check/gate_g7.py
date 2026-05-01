@@ -65,15 +65,15 @@ def _parse_lyrics_sections(lyrics_path: Path) -> dict[str, list[str]]:
 
 def _prosody_matrix_aligned(prosody_contract: dict[str, Any], output_dir: Path) -> tuple[bool, str]:
     if not isinstance(prosody_contract, dict) or not prosody_contract:
-        return False, "prosody_contract_missing"
+        return False, "missing_prosody_contract"
 
     lyrics_path = output_dir / "lyrics.txt"
     if not lyrics_path.exists():
-        return False, "lyrics.txt missing"
+        return False, "missing_output:lyrics.txt"
 
     sections = _parse_lyrics_sections(lyrics_path)
     if not sections:
-        return False, "lyrics_sections_missing"
+        return False, "missing_output:lyrics_sections"
 
     payload_sections: dict[str, dict[str, Any]] = {}
     payload_path = output_dir / "lyric_payload.json"
@@ -122,12 +122,19 @@ def _prosody_matrix_aligned(prosody_contract: dict[str, Any], output_dir: Path) 
             return False, f"missing_budget_key:{max_key}"
         line_max = int(prosody_contract[max_key])
 
-        for line_text in lines:
+        total_lines = len(lines)
+        for idx, line_text in enumerate(lines, start=1):
             if not line_text.strip():
                 continue
             line_len = _line_len(line_text)
-            if line_len > line_max + per_line_tolerance:
-                return False, f"line_exceeds_budget:{tag} len={line_len} max={line_max + per_line_tolerance}"
+            exceed = line_len - (line_max + per_line_tolerance)
+            # Keep pm-audit aligned with lint R18 elasticity:
+            # non-rhyme lines with +1 overflow are SOFT_PASS.
+            is_last_line = idx == total_lines
+            if exceed == 1 and not is_last_line:
+                continue
+            if exceed > 0:
+                return False, f"rule_failure:R18 line_exceeds_budget:{tag} len={line_len} max={line_max + per_line_tolerance}"
 
     return True, "aligned"
 
@@ -272,6 +279,14 @@ def _pm_audit_checks(
     required_outputs = ["lyrics.txt", "style.txt", "exclude.txt", "lyric_payload.json", "trace.json"]
     has_required_outputs = all((out / name).exists() for name in required_outputs)
     prosody_truth_ok = prosody_aligned and ("R18" not in failed_rules) and has_required_outputs
+    if not has_required_outputs:
+        failure_kind = "missing_output"
+    elif "R18" in failed_rules:
+        failure_kind = "rule_failure:R18"
+    elif not prosody_aligned:
+        failure_kind = "rule_failure:prosody_alignment"
+    else:
+        failure_kind = "none"
     r14_r16_hits = _count_rule_hits(lint_report, {"R14", "R16_global"})
     craft_score = float(lint_report.get("craft_score", 0.0) or 0.0)
     is_dead = bool(lint_report.get("is_dead", False))
@@ -330,6 +345,7 @@ def _pm_audit_checks(
                 f"prosody_matrix_aligned={prosody_aligned} "
                 f"r18_present={('R18' in failed_rules)} "
                 f"has_required_outputs={has_required_outputs} "
+                f"failure_kind={failure_kind} "
                 f"detail={prosody_detail} prosody_contract={prosody_contract}"
             ),
         },
@@ -359,7 +375,7 @@ def _proof_check(
         llm_calls = int(llm_calls_raw)
     except (TypeError, ValueError):
         llm_calls = -1
-    llm_calls_ok = llm_calls in {1, 2}
+    llm_calls_ok = 1 <= llm_calls <= 4
 
     decision = trace_payload.get("retrieval_profile_decision")
     decision_reason = decision.get("decision_reason") if isinstance(decision, dict) else ""

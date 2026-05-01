@@ -20,6 +20,15 @@ app = typer.Typer(help="Lyric Craftsman CLI (PRD v2.0)")
 
 STRUCTURAL_REVISE_PROMPT = "下游要求 V/C/V/C/Bridge/C 中必须有 Verse 与 Chorus 各 >=1 段，每段 >=5 行"
 
+SECTION_REBIRTH_REVISE_PROMPT = (
+    "段级重生 revise：以 section 为单位重写，不做行级补丁。"
+    "必须保留情绪锚点（emotional_register/core_tension）与主题连续性；"
+    "允许换意象、允许重排句式；"
+    "严禁倒装凑句尾（被/把/将/让/而/却/但/且/并等残缺尾词），"
+    "严禁语气词凑韵尾（啊/哦/呢/嘛/嗯/哟/啦/哼/哈/哎/吖/呵/噢/喔/呀/哇/吧/吗），"
+    "严禁删字硬压预算导致语义残缺。"
+    "输出完整 JSON（3 variants），并确保歌词可唱、语义连贯。"
+)
 
 def _safe_float(value: Any, *, default: float = 0.0) -> float:
     try:
@@ -109,8 +118,36 @@ def _build_targeted_revise_prompt(payload: dict[str, Any], lint_report: dict[str
         "8. 严禁用语气词凑字数作弊：禁止行尾使用 啊/哦/呢/嘛/嗯/哟/啦/哼/哈/哎/吖/呵/噢/喔/呀/哇/吧/吗 等凑韵尾词；"
         "禁止高频重复语气词堆叠。若触发 R19，必须改为有语义内容的结尾。\n"
         "9. 禁止把介词/连词/残缺副词强行放在句尾（被/把/将/让/而/却/但/且/并），"
-        "不得用语法残句凑节拍。"
+        "不得用语法残句凑节拍。\n"
+        "10. 完成局部修复后，必须通读整首歌词一次，确保语义连贯、情绪路径一致、末句完整可唱。"
     )
+
+
+def _only_r18_r19_quality_failure(lint_report: dict[str, Any]) -> bool:
+    failed_raw = lint_report.get("failed_rules", []) if isinstance(lint_report, dict) else []
+    failed = {str(x).strip() for x in failed_raw if str(x).strip()} if isinstance(failed_raw, list) else set()
+    return bool(failed) and failed.issubset({"R18", "R19"})
+
+
+def _allow_best_draft_after_revise(llm_calls: int, lint_report: dict[str, Any]) -> bool:
+    """After one targeted revise, prefer outputting best draft over empty result.
+
+    This keeps fail-loud for true content hazards (`is_dead`), but avoids
+    discarding usable drafts on residual quality penalties.
+    """
+    if llm_calls < 2:
+        return False
+    if not isinstance(lint_report, dict):
+        return False
+    if bool(lint_report.get("is_dead", False)):
+        return False
+    status = str(lint_report.get("all_dead_run_status", "")).strip().upper()
+    if status == "REJECTED":
+        return False
+    failed_raw = lint_report.get("failed_rules", [])
+    failed = {str(x).strip() for x in failed_raw if str(x).strip()} if isinstance(failed_raw, list) else set()
+    # Only relax quality floor for rhythm/rhyme classes after revise.
+    return bool(failed & {"R18", "R19"})
 
 
 def _guard_targeted_revise_scope(
@@ -120,7 +157,7 @@ def _guard_targeted_revise_scope(
 ) -> None:
     failed_rules_raw = lint_report.get("failed_rules", []) if isinstance(lint_report, dict) else []
     failed_rules = {str(x).strip() for x in failed_rules_raw if str(x).strip()}
-    targeted_rules = {"R01", "R05", "R06"}
+    targeted_rules = {"R01", "R05", "R06", "R18", "R19"}
     if not failed_rules or not failed_rules.issubset(targeted_rules):
         return
 
@@ -162,7 +199,13 @@ def _choose_targeted_revise_prompt(payload: LyricPayload, lint_report: dict[str,
     failed_rules = [str(x).strip() for x in failed_rules_raw] if isinstance(failed_rules_raw, list) else []
     if "R00" in failed_rules or (not payload.lyrics_by_section):
         return STRUCTURAL_REVISE_PROMPT
-    return _build_targeted_revise_prompt(payload.model_dump(), lint_report)
+    if any(x in {"R18", "R19"} for x in failed_rules):
+        return SECTION_REBIRTH_REVISE_PROMPT
+    base = _build_targeted_revise_prompt(payload.model_dump(), lint_report)
+    return (
+        base
+        + "\n10. 最后一行必须是完整语义句，禁止使用残句、半句、或仅凭语气维持押韵的尾句。"
+    )
 
 
 def _derive_prosody_matrix_aligned(payload: LyricPayload, lint_report: dict[str, Any], trace: dict[str, Any]) -> bool:
@@ -176,6 +219,83 @@ def _derive_prosody_matrix_aligned(payload: LyricPayload, lint_report: dict[str,
     if not isinstance(prosody, dict) or not prosody:
         return False
     return any(k in prosody for k in ("verse_line_max", "chorus_line_max", "bridge_line_max"))
+
+
+def _append_call_trace(
+    trace: dict[str, Any],
+    *,
+    call_stage: int,
+    model_used: str,
+    trigger_reason: str,
+    before_lint: dict[str, Any] | None,
+    after_lint: dict[str, Any] | None,
+) -> None:
+    calls = trace.get("call_history", [])
+    if not isinstance(calls, list):
+        calls = []
+    calls.append(
+        {
+            "call_stage": call_stage,
+            "model_used": model_used,
+            "trigger_reason": trigger_reason,
+            "quality_delta": {
+                "before": {
+                    "craft_score": float((before_lint or {}).get("craft_score", 0.0) or 0.0),
+                    "failed_rules": list((before_lint or {}).get("failed_rules", [])),
+                },
+                "after": {
+                    "craft_score": float((after_lint or {}).get("craft_score", 0.0) or 0.0),
+                    "failed_rules": list((after_lint or {}).get("failed_rules", [])),
+                },
+            },
+        }
+    )
+    trace["call_history"] = calls
+
+
+def _needs_call3_for_r18_r19(lint_report: dict[str, Any], llm_calls: int) -> bool:
+    if llm_calls != 2:
+        return False
+    failed_raw = lint_report.get("failed_rules", []) if isinstance(lint_report, dict) else []
+    failed = {str(x).strip() for x in failed_raw if str(x).strip()} if isinstance(failed_raw, list) else set()
+    return bool(failed & {"R18", "R19"})
+
+
+def _should_trigger_call3(lint_report: dict[str, Any], llm_calls: int) -> bool:
+    if llm_calls != 2:
+        return False
+    failed_raw = lint_report.get("failed_rules", []) if isinstance(lint_report, dict) else []
+    failed = {str(x).strip() for x in failed_raw if str(x).strip()} if isinstance(failed_raw, list) else set()
+    return bool(failed)
+
+
+def _has_call3_blocking_pollution(lint_report: dict[str, Any]) -> bool:
+    failed_raw = lint_report.get("failed_rules", []) if isinstance(lint_report, dict) else []
+    failed = {str(x).strip() for x in failed_raw if str(x).strip()} if isinstance(failed_raw, list) else set()
+    return bool(failed & {"R03", "R14", "R16"})
+
+
+def _is_quality_regression(before_lint: dict[str, Any], after_lint: dict[str, Any]) -> bool:
+    if bool(after_lint.get("is_dead", False)):
+        return False
+    before_failed = before_lint.get("failed_rules", []) if isinstance(before_lint, dict) else []
+    after_failed = after_lint.get("failed_rules", []) if isinstance(after_lint, dict) else []
+    before_count = len(before_failed) if isinstance(before_failed, list) else 0
+    after_count = len(after_failed) if isinstance(after_failed, list) else 0
+    return after_count > before_count
+
+
+def _has_nonempty_sections(payload: LyricPayload) -> bool:
+    for section in payload.lyrics_by_section:
+        if section.lines:
+            return True
+    return False
+
+
+def _has_structural_empty_payload(lint_report: dict[str, Any]) -> bool:
+    failed_raw = lint_report.get("failed_rules", []) if isinstance(lint_report, dict) else []
+    failed = {str(x).strip() for x in failed_raw if str(x).strip()} if isinstance(failed_raw, list) else set()
+    return "R00" in failed
 
 
 def _score_variants(payload: LyricPayload, *, trace: dict[str, Any] | None = None) -> tuple[LyricPayload, dict[str, Any]]:
@@ -496,6 +616,14 @@ def produce(
         trace["profile_vote_confidence"] = profile_vote_confidence
     payload, variant_rank = _score_variants(payload, trace=trace)
     lint_report = lint_payload(payload, trace=trace)
+    _append_call_trace(
+        trace,
+        call_stage=1,
+        model_used=str(trace.get("model_used", "")),
+        trigger_reason="initial_generation",
+        before_lint=None,
+        after_lint=lint_report,
+    )
 
     warning_report = ""
     revise_evidence: dict[str, Any] = {}
@@ -562,6 +690,122 @@ def produce(
 
         if not lint_report["pass"]:
             warning_report = "lint failed after targeted revise; output best draft"
+        _append_call_trace(
+            trace,
+            call_stage=2,
+            model_used=str(revise_trace.get("model_used", trace.get("model_used", ""))),
+            trigger_reason="targeted_revise",
+            before_lint=lint_before_postprocess if isinstance(locals().get("lint_before_postprocess"), dict) else None,
+            after_lint=lint_report,
+        )
+
+    if _should_trigger_call3(lint_report, llm_calls):
+        if _has_call3_blocking_pollution(lint_report):
+            trace["run_status"] = "REJECTED"
+            trace["error_stage"] = "call3_pollution_blocked"
+            trace["llm_calls"] = llm_calls
+            if dry_run:
+                typer.echo("dry-run complete")
+                typer.echo("run_status=REJECTED call3 pollution blocked")
+                raise typer.Exit(code=2)
+            _write_rejected_trace(target_dir, trace)
+            raise typer.Exit(code=2)
+        try:
+            review_payload, review_trace = generate_lyric_payload(
+                user_input,
+                repo_root=repo_root,
+                targeted_revise_prompt=SECTION_REBIRTH_REVISE_PROMPT,
+                temperature_override=0.2,
+            )
+        except Exception as exc:
+            _fail_generation_error(target_dir, stage="call3_r18_r19_review", exc=exc, dry_run=dry_run)
+
+        prev_lint = lint_report
+        _guard_targeted_revise_scope(payload, review_payload, lint_report)
+        review_payload, review_rank = _score_variants(review_payload, trace=trace)
+        review_lint = lint_payload(review_payload, trace=trace)
+
+        if not _has_structural_empty_payload(review_lint) and not _is_quality_regression(prev_lint, review_lint):
+            payload = review_payload
+            variant_rank = review_rank
+            lint_report = review_lint
+            llm_calls = 3
+        elif _is_quality_regression(prev_lint, review_lint):
+            trace["quality_regression_rollback"] = True
+            trace["rolled_back_stage"] = "call3"
+            before_failed = prev_lint.get("failed_rules", []) if isinstance(prev_lint, dict) else []
+            after_failed = review_lint.get("failed_rules", []) if isinstance(review_lint, dict) else []
+            trace["quality_regression_delta"] = max(
+                (len(after_failed) if isinstance(after_failed, list) else 0)
+                - (len(before_failed) if isinstance(before_failed, list) else 0),
+                0,
+            )
+
+        usage_prev = trace.get("usage", {})
+        usage_next = review_trace.get("usage", {})
+        trace["usage"] = {
+            "input_tokens": int(usage_prev.get("input_tokens", 0)) + int(usage_next.get("input_tokens", 0)),
+            "output_tokens": int(usage_prev.get("output_tokens", 0)) + int(usage_next.get("output_tokens", 0)),
+            "total_tokens": int(usage_prev.get("total_tokens", 0)) + int(usage_next.get("total_tokens", 0)),
+        }
+        trace["call3_review_trace"] = review_trace
+        trace["call3_role"] = "audit_only"
+        _append_call_trace(
+            trace,
+            call_stage=3,
+            model_used=str(review_trace.get("model_used", trace.get("model_used", ""))),
+            trigger_reason="R18_R19_persist_after_call2",
+            before_lint=prev_lint,
+            after_lint=lint_report,
+        )
+
+        if llm_calls == 3 and _should_trigger_call3(lint_report, llm_calls):
+            try:
+                final_payload, final_trace = generate_lyric_payload(
+                    user_input,
+                    repo_root=repo_root,
+                    targeted_revise_prompt=SECTION_REBIRTH_REVISE_PROMPT,
+                )
+            except Exception as exc:
+                _fail_generation_error(target_dir, stage="call4_final_rebirth", exc=exc, dry_run=dry_run)
+
+            prev_lint = lint_report
+            _guard_targeted_revise_scope(payload, final_payload, lint_report)
+            final_payload, final_rank = _score_variants(final_payload, trace=trace)
+            final_lint = lint_payload(final_payload, trace=trace)
+
+            if not _has_structural_empty_payload(final_lint) and not _is_quality_regression(prev_lint, final_lint):
+                payload = final_payload
+                variant_rank = final_rank
+                lint_report = final_lint
+                llm_calls = 4
+            elif _is_quality_regression(prev_lint, final_lint):
+                trace["quality_regression_rollback"] = True
+                trace["rolled_back_stage"] = "call4"
+                before_failed = prev_lint.get("failed_rules", []) if isinstance(prev_lint, dict) else []
+                after_failed = final_lint.get("failed_rules", []) if isinstance(final_lint, dict) else []
+                trace["quality_regression_delta"] = max(
+                    (len(after_failed) if isinstance(after_failed, list) else 0)
+                    - (len(before_failed) if isinstance(before_failed, list) else 0),
+                    0,
+                )
+
+            usage_prev = trace.get("usage", {})
+            usage_next = final_trace.get("usage", {})
+            trace["usage"] = {
+                "input_tokens": int(usage_prev.get("input_tokens", 0)) + int(usage_next.get("input_tokens", 0)),
+                "output_tokens": int(usage_prev.get("output_tokens", 0)) + int(usage_next.get("output_tokens", 0)),
+                "total_tokens": int(usage_prev.get("total_tokens", 0)) + int(usage_next.get("total_tokens", 0)),
+            }
+            trace["call4_final_trace"] = final_trace
+            _append_call_trace(
+                trace,
+                call_stage=4,
+                model_used=str(final_trace.get("model_used", trace.get("model_used", ""))),
+                trigger_reason="review_found_prosody_issues",
+                before_lint=prev_lint,
+                after_lint=lint_report,
+            )
 
     lint_before_postprocess = lint_report
     lint_report = lint_payload(payload, trace=trace)
@@ -577,7 +821,7 @@ def produce(
     trace["lint_report"] = lint_report
     trace["prosody_matrix_aligned"] = _derive_prosody_matrix_aligned(payload, lint_report, trace)
     trace["llm_calls"] = llm_calls
-    trace["max_llm_calls_per_run"] = 2
+    trace["max_llm_calls_per_run"] = 4
     _apply_retrieval_profile_decision(trace)
 
     hard_reject = bool(lint_report.get("is_dead", False)) or (
@@ -594,7 +838,15 @@ def produce(
 
     craft_score = float(lint_report.get("craft_score", 0.0) or 0.0)
     if craft_score < 0.85:
-        _fail_quality_floor(target_dir, trace, dry_run=dry_run)
+        # After one revise, keep output continuity for non-dead drafts.
+        # This prevents empty-result UX when only quality penalties remain.
+        if _allow_best_draft_after_revise(llm_calls, lint_report):
+            warning_report = "lint failed after targeted revise; output best draft"
+        else:
+            if _has_nonempty_sections(payload) and str(trace.get("normalize_branch", "")).strip():
+                warning_report = "quality floor failed; outputs emitted with warnings"
+            else:
+                _fail_quality_floor(target_dir, trace, dry_run=dry_run)
 
     if dry_run:
         typer.echo("dry-run complete")

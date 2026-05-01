@@ -327,6 +327,7 @@ def _call_openai_compatible(
     skill_text: str,
     prompt: dict[str, Any],
     temperature: float,
+    force_json_object: bool = False,
 ) -> tuple[str, dict[str, int]]:
     endpoint = config.base_url.rstrip("/") + "/chat/completions"
     payload = {
@@ -337,6 +338,8 @@ def _call_openai_compatible(
         ],
         "temperature": temperature,
     }
+    if force_json_object:
+        payload["response_format"] = {"type": "json_object"}
     req = request.Request(
         endpoint,
         data=json.dumps(payload).encode("utf-8"),
@@ -889,14 +892,91 @@ def _normalize_variants(raw: Any, base_sections: list[dict[str, Any]]) -> tuple[
 def _normalize_payload_dict(
     payload_dict: dict[str, Any], *, user_input: UserInput, model_used: str, few_shot_examples: list[dict[str, Any]], repo_root: Path, active_profile: str
 ) -> dict[str, Any]:
+    normalized, _ = _normalize_payload_dict_with_meta(
+        payload_dict,
+        user_input=user_input,
+        model_used=model_used,
+        few_shot_examples=few_shot_examples,
+        repo_root=repo_root,
+        active_profile=active_profile,
+    )
+    return normalized
+
+
+def _normalize_payload_dict_with_meta(
+    payload_dict: dict[str, Any], *, user_input: UserInput, model_used: str, few_shot_examples: list[dict[str, Any]], repo_root: Path, active_profile: str
+) -> tuple[dict[str, Any], dict[str, Any]]:
     lyrics_by_section = _extract_base_sections(payload_dict)
     structure = _normalize_structure(payload_dict.get("structure"), [x["tag"] for x in lyrics_by_section])
     variants, chosen_from_variants = _normalize_variants(payload_dict.get("variants"), lyrics_by_section)
-    chosen = str(
-        payload_dict.get("chosen_variant_id") or payload_dict.get("chosen_variant") or chosen_from_variants or "a"
+    chosen_raw = str(
+        payload_dict.get("chosen_variant_id") or payload_dict.get("chosen_variant") or ""
     ).strip().lower()
-    if chosen not in {"a", "b", "c"}:
-        chosen = "a"
+    chosen = chosen_raw if chosen_raw in {"a", "b", "c"} else "a"
+    normalize_branch = "list_passthrough"
+    chosen_variant_id_source = "raw"
+    chosen_variant_id_resolved: str | None = chosen
+
+    raw_lbs = payload_dict.get("lyrics_by_section")
+    if isinstance(raw_lbs, dict):
+        lowers = {str(k).strip().lower() for k in raw_lbs.keys()}
+        variant_ids = {str(v.get("variant_id", "")).strip().lower() for v in variants if isinstance(v, dict)}
+        variant_ids = {x for x in variant_ids if x}
+        variant_keyed = bool(lowers) and (
+            lowers.issubset({"a", "b", "c"})
+            or (variant_ids and lowers.issubset(variant_ids))
+        )
+        if variant_keyed:
+            candidate_key = chosen_raw if chosen_raw in {"a", "b", "c"} else ""
+            candidate = raw_lbs.get(candidate_key) if candidate_key else None
+            extracted = []
+            if isinstance(candidate, dict):
+                extracted = _build_section_rows(candidate, [x for x in candidate.keys() if isinstance(x, str)])
+            elif isinstance(candidate, list):
+                extracted = [x for x in candidate if isinstance(x, dict)]
+            if extracted:
+                lyrics_by_section = extracted
+                normalize_branch = "variant_map_chosen"
+                chosen = candidate_key
+                chosen_variant_id_resolved = candidate_key
+                chosen_variant_id_source = "raw"
+            else:
+                top1 = ""
+                ranked = sorted(
+                    [v for v in variants if isinstance(v, dict)],
+                    key=lambda x: int((x.get("lint_result") or {}).get("rank", 99) or 99),
+                )
+                if ranked:
+                    top1 = str(ranked[0].get("variant_id", "")).strip().lower()
+                if top1:
+                    candidate = raw_lbs.get(top1)
+                    extracted = []
+                    if isinstance(candidate, dict):
+                        extracted = _build_section_rows(candidate, [x for x in candidate.keys() if isinstance(x, str)])
+                    elif isinstance(candidate, list):
+                        extracted = [x for x in candidate if isinstance(x, dict)]
+                    if extracted:
+                        lyrics_by_section = extracted
+                        chosen = top1
+                        normalize_branch = "variant_map_fallback_top1"
+                        chosen_variant_id_resolved = top1
+                        chosen_variant_id_source = "lint_top1"
+                if not extracted:
+                    for key in ("a", "b", "c"):
+                        candidate = raw_lbs.get(key)
+                        if isinstance(candidate, dict):
+                            extracted = _build_section_rows(candidate, [x for x in candidate.keys() if isinstance(x, str)])
+                        elif isinstance(candidate, list):
+                            extracted = [x for x in candidate if isinstance(x, dict)]
+                        else:
+                            extracted = []
+                        if extracted:
+                            lyrics_by_section = extracted
+                            chosen = key
+                            normalize_branch = "variant_map_fallback_first_nonempty"
+                            chosen_variant_id_resolved = key
+                            chosen_variant_id_source = "first_nonempty"
+                            break
     for item in variants:
         if item["variant_id"] == chosen:
             candidate_sections = item.get("lyrics_by_section", [])
@@ -934,7 +1014,16 @@ def _normalize_payload_dict(
     }
     prosody_contract = _load_profile_prosody(repo_root, active_profile)
     _apply_prosody_metatag_contract(synthesized, prosody_contract)
-    return synthesized
+    return synthesized, {
+        "normalize_branch": normalize_branch,
+        "chosen_variant_id_resolved": chosen_variant_id_resolved,
+        "chosen_variant_id_source": chosen_variant_id_source,
+    }
+
+
+def _needs_parser_repair(normalized_payload: dict[str, Any]) -> bool:
+    rows = normalized_payload.get("lyrics_by_section", []) if isinstance(normalized_payload, dict) else []
+    return not (isinstance(rows, list) and len(rows) > 0)
 
 
 def _apply_prosody_metatag_contract(payload: dict[str, Any], prosody_contract: dict[str, Any]) -> None:
@@ -1011,6 +1100,7 @@ def generate_lyric_payload(
     repo_root: Path,
     model: str = "claude-opus-4-1-20250805",
     targeted_revise_prompt: str | None = None,
+    temperature_override: float | None = None,
 ) -> tuple[LyricPayload, dict[str, Any]]:
     env_map = _read_env_map(repo_root)
     config = _resolve_provider_config(env_map, default_model=model)
@@ -1077,6 +1167,11 @@ def generate_lyric_payload(
     if targeted_revise_prompt:
         prompt["targeted_revise_prompt"] = targeted_revise_prompt
     generation_temperature = 0.6 if targeted_revise_prompt else 0.8
+    if isinstance(temperature_override, (int, float)):
+        generation_temperature = float(temperature_override)
+
+    parser_repair_call = False
+    parser_repair_reason = ""
 
     if config.provider == "anthropic":
         from anthropic import Anthropic
@@ -1124,7 +1219,7 @@ def generate_lyric_payload(
                 break
 
     shape_validation_report = _validate_payload_shape(payload_dict)
-    normalized_payload = _normalize_payload_dict(
+    normalized_payload, normalize_meta = _normalize_payload_dict_with_meta(
         payload_dict,
         user_input=user_input,
         model_used=config.model,
@@ -1140,6 +1235,84 @@ def generate_lyric_payload(
             for ex in few_shot_examples
         ],
     )
+
+    if _needs_parser_repair(normalized_payload):
+        parser_repair_call = True
+        parser_repair_reason = "R00_empty_after_normalize"
+        repair_prompt = dict(prompt)
+        repair_prompt["parser_repair_instruction"] = (
+            "Return strict JSON object only (no markdown). Ensure lyrics_by_section uses non-empty variant-keyed sections (a/b/c), "
+            "and chosen_variant_id points to a non-empty variant."
+        )
+        if config.provider == "anthropic":
+            from anthropic import Anthropic
+
+            client = Anthropic(api_key=config.api_key)
+            message = client.messages.create(
+                model=config.model,
+                max_tokens=4096,
+                temperature=generation_temperature,
+                system=skill_text,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": json.dumps(repair_prompt, ensure_ascii=False),
+                    }
+                ],
+            )
+            text_blocks = [
+                block.text for block in message.content if getattr(block, "type", "") == "text"
+            ]
+            repaired_raw_text = "\n".join(text_blocks)
+            repair_usage = {
+                "input_tokens": int(getattr(message.usage, "input_tokens", 0) or 0),
+                "output_tokens": int(getattr(message.usage, "output_tokens", 0) or 0),
+                "total_tokens": int(
+                    (getattr(message.usage, "input_tokens", 0) or 0)
+                    + (getattr(message.usage, "output_tokens", 0) or 0)
+                ),
+            }
+        else:
+            repaired_raw_text, repair_usage = _call_openai_compatible(
+                config=config,
+                skill_text=skill_text,
+                prompt=repair_prompt,
+                temperature=generation_temperature,
+                force_json_object=True,
+            )
+
+        usage = {
+            "input_tokens": int(usage.get("input_tokens", 0)) + int(repair_usage.get("input_tokens", 0)),
+            "output_tokens": int(usage.get("output_tokens", 0)) + int(repair_usage.get("output_tokens", 0)),
+            "total_tokens": int(usage.get("total_tokens", 0)) + int(repair_usage.get("total_tokens", 0)),
+        }
+
+        payload_dict = _extract_json_block(repaired_raw_text)
+        if not any(k in payload_dict for k in _LYRIC_KEYS):
+            for _v in payload_dict.values():
+                if isinstance(_v, dict) and any(k in _v for k in _LYRIC_KEYS):
+                    payload_dict = _v
+                    break
+
+        shape_validation_report = _validate_payload_shape(payload_dict)
+        normalized_payload, normalize_meta = _normalize_payload_dict_with_meta(
+            payload_dict,
+            user_input=user_input,
+            model_used=config.model,
+            repo_root=repo_root,
+            active_profile=active_profile,
+            few_shot_examples=[
+                {
+                    "source_id": ex["source_id"],
+                    "type": ex["type"],
+                    "title": ex["title"],
+                    "emotion_tags_matched": ex["emotion_tags_matched"],
+                }
+                for ex in few_shot_examples
+            ],
+        )
+        raw_text = repaired_raw_text
+
     payload = LyricPayload.model_validate(normalized_payload)
 
     prosody_contract = _load_profile_prosody(repo_root, active_profile)
@@ -1170,10 +1343,16 @@ def generate_lyric_payload(
         "corpus_monoculture_risk": corpus_monoculture_risk,
         "raw_model_output": raw_text,
         "normalized_payload": normalized_payload,
+        "normalize_branch": normalize_meta.get("normalize_branch", "list_passthrough"),
+        "chosen_variant_id_resolved": normalize_meta.get("chosen_variant_id_resolved"),
+        "chosen_variant_id_source": normalize_meta.get("chosen_variant_id_source", "raw"),
+        "parser_repair_call": parser_repair_call,
+        "repair_reason": parser_repair_reason,
         "shape_validation_report": shape_validation_report,
         "stage": "revise" if targeted_revise_prompt else "initial",
         "style_vocab_metrics": normalized_payload.get("style_vocab_metrics", {}),
         "prosody_contract": prosody_contract,
         "prosody_matrix_aligned": False,
+        "temperature": generation_temperature,
     }
     return payload, trace

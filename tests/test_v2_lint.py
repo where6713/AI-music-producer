@@ -198,6 +198,56 @@ def test_r18_allows_lines_within_budget_tolerance() -> None:
     assert "R18" not in report["failed_rules"]
 
 
+def test_r18_non_rhyme_plus_one_is_soft_pass_with_annotation() -> None:
+    payload = _payload("再把手放开", forbidden=[])
+    payload.lyrics_by_section[0].lines = [
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "abcdefg", "char_count": 7}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "abcdefghijklm", "char_count": 13}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "abcde", "char_count": 5}),
+    ]
+    report = lint_payload(
+        payload,
+        trace={
+            "prosody_contract": {
+                "verse_line_min": 5,
+                "verse_line_max": 8,
+                "chorus_line_min": 5,
+                "chorus_line_max": 8,
+                "bridge_line_min": 5,
+                "bridge_line_max": 10,
+            }
+        },
+    )
+    assert "R18" not in report["failed_rules"]
+    soft = report.get("soft_pass_with_annotation", [])
+    assert isinstance(soft, list) and len(soft) >= 1
+    assert soft[0]["rule"] == "R18"
+    assert any(tag in payload.lyrics_by_section[0].voice_tags_inline for tag in ["[Syncopation]", "[Triplet]"])
+
+
+def test_r18_rhyme_line_plus_one_remains_hard_fail() -> None:
+    payload = _payload("再把手放开", forbidden=[])
+    payload.lyrics_by_section[0].lines = [
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "abcdefg", "char_count": 7}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "abcde", "char_count": 5}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "abcdefghijklm", "char_count": 13}),
+    ]
+    report = lint_payload(
+        payload,
+        trace={
+            "prosody_contract": {
+                "verse_line_min": 5,
+                "verse_line_max": 8,
+                "chorus_line_min": 5,
+                "chorus_line_max": 8,
+                "bridge_line_min": 5,
+                "bridge_line_max": 10,
+            }
+        },
+    )
+    assert "R18" in report["failed_rules"]
+
+
 def test_club_dance_r02_threshold_relaxed_to_seven(tmp_path) -> None:
     registry = tmp_path / "registry.json"
     global_rules = tmp_path / "global_rules.json"
