@@ -1,5 +1,5 @@
 {
-  "version": "2.1.1",
+  "version": "2.2.0",
   "policy": {
     "mode": "ai-oriented",
     "single_source_required": true,
@@ -20,12 +20,14 @@
     },
     {
       "topic_id": "pm_role_rules",
-      "owner_file": "docs/🎵 AI 音乐生成系统产品经理 (PM) Role & Rule.md",
-      "owner_marker": "### 🎵 AI 音乐生成系统产品经理 (PM) Role & Rule",
+      "owner_file": "docs/PM_Role_and_Rule.md",
+      "owner_marker": "# AI 音乐生成系统产品经理 (PM) Role & Rule",
       "forbidden_fulltext_outside_owner": [
-        "开发审计补充铁律",
-        "禁止旁路生成，必须走产品主链路",
-        "v2.1 关键字段缺失即一票否决"
+        "法则十三：诊断优先于修补 · 风格验收优先于 Lint 数字",
+        "法则十四：任务边界冻结",
+        "llm_calls <= 4",
+        "draft_mode",
+        "禁止旁路生成"
       ]
     },
     {
@@ -70,14 +72,6 @@
         "RULE-16（反漂移）",
         "RULE-17（最小复杂度）",
         "RULE-18（可安装性）"
-      ]
-    },
-    {
-      "topic_id": "task_index",
-      "owner_file": "docs/current_task_index.json",
-      "owner_marker": "\"current_task_owner\"",
-      "forbidden_fulltext_outside_owner": [
-        "Task canonical routing entry for tests/scripts"
       ]
     }
   ]
