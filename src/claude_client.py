@@ -17,6 +17,7 @@ PROFILE_IDS = {
     "club_dance",
     "ambient_meditation",
     "classical_restraint",
+    "indie_groove",
 }
 
 
@@ -1341,6 +1342,9 @@ def generate_lyric_payload(
         "profile_vote_confidence": profile_vote_confidence,
         "corpus_balance": corpus_balance,
         "corpus_monoculture_risk": corpus_monoculture_risk,
+        "audio_feature_vote": str(retrieval.get("audio_feature_vote", "") if isinstance(retrieval, dict) else ""),
+        "audio_feature_vote_reason": str(retrieval.get("audio_feature_vote_reason", "") if isinstance(retrieval, dict) else ""),
+        "audio_feature_vote_confidence": float(retrieval.get("audio_feature_vote_confidence", 0.0) if isinstance(retrieval, dict) else 0.0),
         "raw_model_output": raw_text,
         "normalized_payload": normalized_payload,
         "normalize_branch": normalize_meta.get("normalize_branch", "list_passthrough"),

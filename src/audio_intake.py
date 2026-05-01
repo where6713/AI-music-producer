@@ -6,6 +6,34 @@ import re
 from typing import Any
 from urllib import request
 
+_GROOVE_HIGH_KEYWORDS = {
+    "dance", "edm", "house", "club", "drop", "festival", "爆裂", "躁动", "舞曲", "电音",
+}
+_GROOVE_MID_KEYWORDS = {
+    "indie", "groove", "mid-tempo", "midtempo", "syncopation", "swing", "bounce", "funk",
+    "bedroom", "lofi", "chill", "律动", "中速", "切分", "松弛", "慵懒", "微醺",
+}
+_GROOVE_LOW_KEYWORDS = {
+    "ambient", "meditation", "new age", "calm", "healing", "piano solo", "drone", "sleep",
+    "冥想", "空灵", "平静", "疗愈", "慢板", "极简",
+}
+
+
+def _infer_groove_level(*, filename: str, raw_intent: str, genre_hint: str, mood_hint: str) -> tuple[str, str]:
+    haystack = " ".join([filename, raw_intent, genre_hint, mood_hint]).lower()
+    reasons: list[str] = []
+    if any(x in haystack for x in sorted(_GROOVE_HIGH_KEYWORDS)):
+        reasons.append("keyword:high")
+        return "high", ";".join(reasons)
+    if any(x in haystack for x in sorted(_GROOVE_MID_KEYWORDS)):
+        reasons.append("keyword:mid")
+        return "mid", ";".join(reasons)
+    if any(x in haystack for x in sorted(_GROOVE_LOW_KEYWORDS)):
+        reasons.append("keyword:low")
+        return "low", ";".join(reasons)
+    reasons.append("default:low")
+    return "low", ";".join(reasons)
+
 
 def _read_env_map(repo_root: Path) -> dict[str, str]:
     env_path = repo_root / ".env"
@@ -232,3 +260,41 @@ def resolve_prosody_from_ref_audio(ref_audio_path: str, fallback: dict[str, Any]
 
     out["audio_intake"] = {"ok": False, "reason": "bpm_unavailable", "path": str(path)}
     return out
+
+
+def derive_audio_feature_vote(
+    *,
+    ref_audio_path: str,
+    raw_intent: str,
+    genre_hint: str,
+    mood_hint: str,
+    prosody_contract: dict[str, Any],
+    repo_root: Path,
+) -> dict[str, Any]:
+    prosody = resolve_prosody_from_ref_audio(ref_audio_path, prosody_contract, repo_root)
+    bpm = int(prosody.get("bpm", 0) or 0)
+    filename = Path(str(ref_audio_path or "")).stem
+    groove_level, groove_reason = _infer_groove_level(
+        filename=filename,
+        raw_intent=raw_intent,
+        genre_hint=genre_hint,
+        mood_hint=mood_hint,
+    )
+    groove_mid_or_above = groove_level in {"mid", "high"}
+    reasons = [
+        f"bpm={bpm}",
+        f"bpm_source={prosody.get('bpm_source', '')}",
+        f"groove_level={groove_level}",
+        f"groove_rule={groove_reason}",
+        f"filename={filename}",
+        f"intent={raw_intent}",
+        f"genre_hint={genre_hint}",
+        f"mood_hint={mood_hint}",
+    ]
+    return {
+        "bpm": bpm,
+        "groove_level": groove_level,
+        "groove_mid_or_above": groove_mid_or_above,
+        "audio_feature_vote_reason": " | ".join(reasons),
+        "prosody_contract": prosody,
+    }

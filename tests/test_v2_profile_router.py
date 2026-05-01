@@ -6,6 +6,7 @@ import pytest
 
 from src.profile_router import (
     AmbiguousProfileError,
+    OverrideConflictError,
     load_profile_typical_moods,
     resolve_active_profile,
 )
@@ -53,7 +54,7 @@ def test_profile_router_prefers_cli_override(tmp_path) -> None:
         user_input,
         repo_root=tmp_path,
         retrieval_vote="urban_introspective",
-        vote_confidence=1.0,
+        vote_confidence=0.69,
     )
 
     assert active_profile == "classical_restraint"
@@ -129,3 +130,19 @@ def test_load_profile_typical_moods_returns_registry_values(tmp_path) -> None:
     _seed_registry(tmp_path)
     moods = load_profile_typical_moods(tmp_path, "urban_introspective")
     assert "克制释怀" in moods
+
+
+def test_profile_router_blocks_override_conflict_when_vote_confident(tmp_path) -> None:
+    _seed_registry(tmp_path)
+    user_input = UserInput(raw_intent="test", profile_override="classical_restraint")
+
+    with pytest.raises(OverrideConflictError) as err:
+        resolve_active_profile(
+            user_input,
+            repo_root=tmp_path,
+            retrieval_vote="urban_introspective",
+            vote_confidence=0.7,
+        )
+
+    assert "override=classical_restraint" in str(err.value)
+    assert "vote_profile=urban_introspective" in str(err.value)

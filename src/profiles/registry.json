@@ -90,6 +90,21 @@
       "abstraction_tolerance": "very_high",
       "additional_constraints": "鼓励留白；允许不完整句；禁止叙事推进感",
       "prosody": {"bpm": 60, "syllable_budget_min": 140, "syllable_budget_max": 200, "verse_line_max": 11, "chorus_line_max": 8, "bridge_line_max": 15}
+    },
+    "indie_groove": {
+      "display_name": "独立律动",
+      "typical_genres": ["indie pop", "bedroom pop", "dream pop", "lo-fi indie", "chill indie"],
+      "typical_moods": ["慵懒", "微醺", "散漫", "午后", "松弛", "微甜", "半梦半醒"],
+      "craft_focus": "留白呼吸 + groove 驱动 + 低叙事密度 + 半抽象意象",
+      "R15_concrete_density": {"verse_min": 1, "chorus_min": 0, "enforced": false},
+      "R16_profile_forbidden": ["霓虹天空", "电流心动", "带电的心", "燃烧星空", "慢慢好起来"],
+      "R17_first_person_ratio_max": 0.5,
+      "narrative_style": "fragmented_scene_loop",
+      "variant_differentiation": "情绪饱和度（淡/中/浓）+ 画面清晰度",
+      "chorus_repetition_allowed": true,
+      "abstraction_tolerance": "medium",
+      "note": "本 profile 允许重复 loop 式结构，因为 groove 感优先于叙事推进感；禁止说教式情绪总结",
+      "prosody": {"bpm": 100, "syllable_budget_min": 170, "syllable_budget_max": 240, "verse_line_max": 9, "chorus_line_max": 7, "bridge_line_max": 11}
     }
   }
 }

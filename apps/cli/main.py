@@ -12,7 +12,7 @@ from rich.console import Console
 from rich.table import Table
 
 from src.main import produce as produce_v2
-from src.profile_router import AmbiguousProfileError
+from src.profile_router import AmbiguousProfileError, OverrideConflictError
 from src.producer_tools.self_check.gate_g0 import check_gate_g0
 from src.producer_tools.self_check.gate_g1 import check_gate_g1
 from src.producer_tools.self_check.gate_g2 import validate_failure_evidence
@@ -350,6 +350,9 @@ def produce_command(
             typer.echo(
                 f"- {row.get('profile_id','')} | {row.get('display_name','')} | {row.get('craft_focus','')}"
             )
+        raise typer.Exit(code=1)
+    except OverrideConflictError as err:
+        typer.echo(str(err))
         raise typer.Exit(code=1)
 
 

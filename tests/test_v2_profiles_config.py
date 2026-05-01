@@ -18,6 +18,7 @@ def test_profile_registry_contains_required_profiles() -> None:
         "uplift_pop",
         "club_dance",
         "ambient_meditation",
+        "indie_groove",
     }
     assert required.issubset(set(profiles.keys()))
 

@@ -19,8 +19,12 @@ class UserInput(BaseModel):
         "uplift_pop",
         "club_dance",
         "ambient_meditation",
+        "indie_groove",
     ] = ""
     ref_audio_path: str = ""
+    audio_bpm_hint: int = 0
+    audio_groove_mid_or_above: bool = False
+    audio_feature_vote_reason: str = ""
     syllable_budget_min: int = 0
     syllable_budget_max: int = 0
 

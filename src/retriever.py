@@ -33,6 +33,7 @@ PROFILE_IDS = {
     "uplift_pop",
     "club_dance",
     "ambient_meditation",
+    "indie_groove",
 }
 
 MIN_PROFILE_COVERAGE = {
@@ -41,6 +42,7 @@ MIN_PROFILE_COVERAGE = {
     "uplift_pop": 150,
     "club_dance": 100,
     "ambient_meditation": 80,
+    "indie_groove": 80,
 }
 
 
@@ -51,6 +53,22 @@ class InsufficientQualityFewShotError(RuntimeError):
 _UPLIFT_TAGS = {"joy", "bright", "happy", "upbeat", "youth", "hope", "青春", "悸动", "阳光", "勇气", "明亮", "初见", "热恋"}
 _DANCE_TAGS = {"dance", "edm", "energy", "club", "release", "热烈", "释放", "躁动", "律动", "groove"}
 _AMBIENT_TAGS = {"meditation", "calm", "peace", "healing", "ambient", "空灵", "平静", "冥想", "疗愈", "静谧"}
+_INDIE_TAGS = {
+    "indie",
+    "groove",
+    "mid-tempo",
+    "midtempo",
+    "syncopation",
+    "swing",
+    "lofi",
+    "bedroom",
+    "chill",
+    "慵懒",
+    "微醺",
+    "松弛",
+    "律动",
+    "中速",
+}
 
 
 def _infer_profile_tag(row: dict[str, Any]) -> str:
@@ -62,6 +80,8 @@ def _infer_profile_tag(row: dict[str, Any]) -> str:
     tags = {str(x).strip().lower() for x in row.get("emotion_tags", []) if str(x).strip()}
 
     if row_type == "modern_lyric":
+        if tags & _INDIE_TAGS:
+            return "indie_groove"
         if tags & _DANCE_TAGS:
             return "club_dance"
         if tags & _AMBIENT_TAGS:
@@ -201,6 +221,7 @@ def retrieve_few_shot_examples(
         raise InsufficientQualityFewShotError(
             "insufficient quality few-shot samples after pre-injection validation"
         )
+    balance = _corpus_balance_from_rows(corpus)
 
     intent_tokens = set(_tokenize(user_input.raw_intent))
     hint_tokens = set(_tokenize(" ".join([user_input.genre_hint, user_input.mood_hint]).strip()))
@@ -323,6 +344,17 @@ def retrieve_few_shot_examples(
     if not return_metadata:
         return normalized
 
+    audio_vote = ""
+    audio_vote_confidence = 0.0
+    audio_vote_reason = str(user_input.audio_feature_vote_reason or "").strip()
+    bpm_i = int(user_input.audio_bpm_hint or 0)
+    groove_mid_or_above = bool(user_input.audio_groove_mid_or_above)
+    if 95 <= bpm_i <= 115 and groove_mid_or_above:
+        audio_vote = "indie_groove"
+        audio_vote_confidence = 0.72
+        if not audio_vote_reason:
+            audio_vote_reason = f"audio_feature_vote bpm={bpm_i} groove_mid_or_above={groove_mid_or_above}"
+
     votes = Counter(
         sample["profile_tag"]
         for sample in normalized
@@ -334,6 +366,10 @@ def retrieve_few_shot_examples(
     else:
         profile_vote = ""
         vote_confidence = 0.0
+
+    if audio_vote == "indie_groove" and audio_vote_confidence > vote_confidence:
+        profile_vote = audio_vote
+        vote_confidence = audio_vote_confidence
 
     monoculture_risk = False
     if len(votes) == 1 and normalized:
@@ -351,8 +387,11 @@ def retrieve_few_shot_examples(
         "profile_vote": profile_vote,
         "vote_confidence": vote_confidence,
         "profile_vote_counts": dict(votes),
-        "corpus_balance": _corpus_balance_from_rows(corpus),
+        "corpus_balance": balance,
         "corpus_monoculture_risk": monoculture_risk,
         "fallback_level": fallback_level,
         "fallback_reason": fallback_reason,
+        "audio_feature_vote": audio_vote,
+        "audio_feature_vote_reason": audio_vote_reason,
+        "audio_feature_vote_confidence": audio_vote_confidence,
     }

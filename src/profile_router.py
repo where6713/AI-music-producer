@@ -13,6 +13,19 @@ class AmbiguousProfileError(RuntimeError):
         self.candidates = candidates
 
 
+class OverrideConflictError(RuntimeError):
+    def __init__(self, *, override: str, vote_profile: str, confidence: float) -> None:
+        message = (
+            "override-vote conflict blocked: "
+            f"override={override} vote_profile={vote_profile} confidence={confidence:.2f}. "
+            "Action: confirm override or rerun without --profile."
+        )
+        super().__init__(message)
+        self.override = override
+        self.vote_profile = vote_profile
+        self.confidence = confidence
+
+
 def _norm(value: str) -> str:
     return value.strip().lower()
 
@@ -61,6 +74,14 @@ def resolve_active_profile(
         raise AmbiguousProfileError([])
 
     if user_input.profile_override and user_input.profile_override in registry:
+        vote = _norm(retrieval_vote)
+        override = _norm(user_input.profile_override)
+        if vote and vote in registry and vote != override and vote_confidence >= 0.7:
+            raise OverrideConflictError(
+                override=user_input.profile_override,
+                vote_profile=vote,
+                confidence=float(vote_confidence),
+            )
         return user_input.profile_override, "cli_override", None
 
     genre_hint = _norm(user_input.genre_hint)

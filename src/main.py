@@ -9,9 +9,9 @@ import typer
 
 from src.claude_client import generate_lyric_payload
 from src.compile import StructuralIncompleteError, write_outputs, write_trace_and_audit
-from src.audio_intake import resolve_prosody_from_ref_audio
+from src.audio_intake import derive_audio_feature_vote, resolve_prosody_from_ref_audio
 from src.lint import lint_payload
-from src.profile_router import resolve_active_profile
+from src.profile_router import OverrideConflictError, resolve_active_profile
 from src.retriever import InsufficientQualityFewShotError
 from src.schemas import LyricPayload, UserInput
 
@@ -539,12 +539,26 @@ def produce(
         profile_override=profile,
         ref_audio_path=ref_audio_path,
     )
+    if user_input.ref_audio_path:
+        audio_vote = derive_audio_feature_vote(
+            ref_audio_path=user_input.ref_audio_path,
+            raw_intent=user_input.raw_intent,
+            genre_hint=user_input.genre_hint,
+            mood_hint=user_input.mood_hint,
+            prosody_contract={},
+            repo_root=repo_root,
+        )
+        user_input.audio_bpm_hint = int(audio_vote.get("bpm", 0) or 0)
+        user_input.audio_groove_mid_or_above = bool(audio_vote.get("groove_mid_or_above", False))
+        user_input.audio_feature_vote_reason = str(audio_vote.get("audio_feature_vote_reason", ""))
 
     llm_calls = 1
     try:
         payload, trace = generate_lyric_payload(user_input, repo_root=repo_root)
     except InsufficientQualityFewShotError as exc:
         _fail_generation_error(target_dir, stage="few_shot_quality_gate", exc=exc, dry_run=dry_run)
+    except OverrideConflictError as exc:
+        _fail_generation_error(target_dir, stage="override_vote_conflict", exc=exc, dry_run=dry_run)
     except Exception as exc:
         _fail_generation_error(target_dir, stage="initial_generation", exc=exc, dry_run=dry_run)
     trace.setdefault("retrieval_profile_source", "initial")
@@ -591,12 +605,15 @@ def produce(
             _write_rejected_trace(target_dir, trace)
             raise typer.Exit(code=2)
 
-    active_profile, profile_source, profile_vote_confidence = resolve_active_profile(
-        user_input,
-        repo_root=repo_root,
-        retrieval_vote=str(trace.get("retrieval_profile_vote", "")),
-        vote_confidence=_safe_float(trace.get("retrieval_vote_confidence", 0.0), default=0.0),
-    )
+    try:
+        active_profile, profile_source, profile_vote_confidence = resolve_active_profile(
+            user_input,
+            repo_root=repo_root,
+            retrieval_vote=str(trace.get("retrieval_profile_vote", "")),
+            vote_confidence=_safe_float(trace.get("retrieval_vote_confidence", 0.0), default=0.0),
+        )
+    except OverrideConflictError as exc:
+        _fail_generation_error(target_dir, stage="override_vote_conflict", exc=exc, dry_run=dry_run)
 
     trace["active_profile"] = active_profile
     trace["profile_source"] = profile_source
