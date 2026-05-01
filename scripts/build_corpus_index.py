@@ -4,6 +4,15 @@ ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "corpus"
 DIRS = ["_clean", "urban_introspective", "classical_restraint", "uplift_pop", "club_dance", "ambient_meditation", "indie_groove", "golden_dozen"]
 
+
+def _read_text(path: Path) -> str | None:
+    for enc in ("utf-8-sig", "utf-8", "gbk", "cp936", "big5"):
+        try:
+            return path.read_text(encoding=enc)
+        except UnicodeDecodeError:
+            continue
+    return None
+
 def _row(item: dict, src: str) -> dict:
     content = str(item.get("content", "")).strip()
     first = next((ln.strip() for ln in content.splitlines() if ln.strip()), "")
@@ -24,13 +33,19 @@ def main() -> None:
         if not p.exists():
             continue
         for f in sorted(p.glob("*.json")):
-            data = json.loads(f.read_text(encoding="utf-8"))
+            text = _read_text(f)
+            if text is None:
+                continue
+            data = json.loads(text)
             for it in (data if isinstance(data, list) else []):
                 if isinstance(it, dict) and str(it.get("content", "")).strip():
                     out.append(_row(it, f"corpus/{d}/{f.name}"))
                     by_dir[d] += 1
         for f in sorted(p.glob("*.txt")):
-            lines = f.read_text(encoding="utf-8").splitlines()
+            text = _read_text(f)
+            if text is None:
+                continue
+            lines = text.splitlines()
             body = [ln for ln in lines if not ln.strip().startswith("#")]
             content = "\n".join(ln for ln in body if ln.strip())
             if not content.strip():
@@ -38,6 +53,10 @@ def main() -> None:
             out.append(_row({"source_id": f"corpus/{d}/{f.name}", "title": f.stem, "content": content}, ""))
             by_dir[d] += 1
     (CORPUS / "_index.json").write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
+    blob = json.dumps(out, ensure_ascii=False)
+    print(f"zh_hit_周杰伦={blob.count('周杰伦')}")
+    print(f"zh_hit_五月天={blob.count('五月天')}")
+    print(f"zh_hit_倔强={blob.count('倔强')}")
     print(f"total={len(out)}")
     print(f"by_dir={json.dumps(by_dir, ensure_ascii=False)}")
 if __name__ == "__main__":
