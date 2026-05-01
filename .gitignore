@@ -20,3 +20,5 @@ out/*
 # Local secrets
 .env
 .claude/settings.local.json
+
+corpus/_index.json

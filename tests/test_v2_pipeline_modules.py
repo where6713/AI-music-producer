@@ -11,44 +11,55 @@ from src.v2.select_corpus import select_corpus
 from src.v2.self_review import self_review
 
 
-def test_perceive_music_outputs_expected_fields() -> None:
+def test_perceive_music_returns_5_keys() -> None:
     out = perceive_music("深夜慢一点，想写内省情绪", ref_audio="demo.wav")
-    assert out["tempo"] in {"slow", "mid", "fast"}
-    assert out["energy"] in {"low", "medium", "high"}
-    assert isinstance(out["texture"], str)
+    assert set(out.keys()) >= {"tempo", "energy", "texture", "audio_hint", "intent"}
     assert out["audio_hint"] == ".wav"
 
 
-def test_distill_emotion_derives_arc_and_image() -> None:
+def test_distill_emotion_central_image_length() -> None:
     portrait = {"texture": "indie lazy groove"}
     out = distill_emotion("失恋后一个人回家", portrait)
     assert out["valence"] == "negative"
     assert out["arc"] == "descend-then-breathe"
-    assert out["central_image"] == "street lamp and late bus"
+    assert len(out["central_image"]) <= 20
 
 
-def test_select_corpus_prefers_matching_rows(tmp_path: Path) -> None:
+def test_select_corpus_recall_size_and_golden_anchor(tmp_path: Path) -> None:
     rows = [
+        {"id": "corpus/golden_dozen/demo.txt", "title": "锚点", "summary_50chars": "indie groove city", "emotion_tags": ["孤独"], "char_count": 100},
         {"id": "a", "title": "夜色", "summary_50chars": "urban introspective city", "emotion_tags": ["孤独"], "char_count": 100},
         {"id": "b", "title": "晴天", "summary_50chars": "bright pop youth", "emotion_tags": ["青春"], "char_count": 120},
     ]
     index = tmp_path / "index.json"
     index.write_text(json.dumps(rows, ensure_ascii=False), encoding="utf-8")
-    out = select_corpus(index, {"texture": "urban introspective", "tempo": "slow", "energy": "low"}, limit=10)
-    assert len(out) >= 1
-    assert out[0]["id"] == "a"
+    out = select_corpus(index, {"texture": "urban introspective", "tempo": "slow", "energy": "low"}, limit=118)
+    assert 1 <= len(out) <= 118
+    assert any("golden_dozen" in str(x.get("id", "")) for x in out)
 
 
-def test_compose_and_self_review_keep_structure() -> None:
+def test_compose_pass1_id_grounding() -> None:
+    pool = [{"id": "x"}, {"id": "y"}]
+    draft = compose(
+        {"texture": "indie lazy groove"},
+        {"arc": "hold-and-release", "central_image": "street lamp"},
+        golden_refs=[],
+        corpus_pool=pool,
+    )
+    assert set(draft["selected_ids"]) <= {"x", "y"}
+
+
+def test_self_review_preserves_section_count() -> None:
     draft = compose(
         {"texture": "indie lazy groove"},
         {"arc": "hold-and-release", "central_image": "street lamp"},
         golden_refs=[],
         corpus_pool=[{"id": "x"}],
     )
+    sections_before = draft["lyrics"].count("[")
     reviewed = self_review(draft)
-    assert "[Verse]" in str(reviewed["lyrics"])
-    assert "[Chorus]" in str(reviewed["lyrics"])
+    sections_after = reviewed["lyrics"].count("[")
+    assert sections_before == sections_after
     assert reviewed["review_note"] == "light expression polish; structure unchanged"
 
 

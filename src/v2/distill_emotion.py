@@ -16,9 +16,9 @@ def distill_emotion(intent: str, portrait: dict[str, object]) -> dict[str, str]:
         arc = "lift-and-resolve"
     central_image = "city lights"
     if "classical" in str(portrait.get("texture", "")):
-        central_image = "ink rain and porcelain"
+        central_image = "ink rain on porcelain"
     elif "indie" in str(portrait.get("texture", "")):
-        central_image = "street lamp and late bus"
+        central_image = "a late bus stop"
     metaphor = "weather as feeling"
     return {
         "valence": valence,
