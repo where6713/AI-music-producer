@@ -99,7 +99,10 @@ RULE_DEFINITIONS: dict[str, RuleSeverity] = {
     "R16_profile": RuleSeverity.HARD_PENALTY,
     "R17": RuleSeverity.SOFT_PENALTY,
     "R18": RuleSeverity.HARD_PENALTY,  # prosody budget: quality gate, not content veto
-    "R19": RuleSeverity.HARD_PENALTY,  # anti-filler/monotony: quality gate, not content veto
+    "R19a": RuleSeverity.HARD_KILL,    # line-end filler/connective particles: content veto
+    "R19b": RuleSeverity.HARD_KILL,    # same-char rhyme-end ≥3 across section: content veto
+    "R19b_soft": RuleSeverity.SOFT_PENALTY,  # same-char rhyme-end exactly 2: advisory only
+    "R19": RuleSeverity.HARD_PENALTY,  # legacy alias kept for backward-compat with existing tests
 }
 
 RULE_WEIGHTS: dict[str, int] = {
@@ -114,7 +117,10 @@ RULE_WEIGHTS: dict[str, int] = {
     "R16_profile": 5,
     "R17": 3,
     "R18": 5,
-    "R19": 5,
+    "R19a": 8,
+    "R19b": 6,
+    "R19b_soft": 3,
+    "R19": 5,  # legacy alias
 }
 
 R14_FORBIDDEN_PHRASES = [
@@ -519,8 +525,8 @@ def lint_payload(
                             )
                         )
 
-    # R19 anti-filler cheat (HARD_PENALTY)
-    # Block line-end modal-particle padding and high-frequency filler stacking.
+    # R19a (HARD_KILL): line-end modal-particle / connective padding.
+    # These are content vetoes — a lyric ending with 啊/哦 or dangling 把/而 is unpublishable.
     filler_endings = {
         "啊", "哦", "呢", "嘛", "嗯", "哟", "啦", "哼", "哈", "哎", "吖", "呵", "噢", "喔", "呀", "哇", "吧", "吗",
     }
@@ -537,7 +543,7 @@ def lint_payload(
         if clean[-1] in filler_endings:
             violations.append(
                 Violation(
-                    rule="R19",
+                    rule="R19a",
                     detail=f"line-end filler detected: {clean[-1]}",
                     section=section,
                     line=idx,
@@ -546,7 +552,7 @@ def lint_payload(
         if clean[-1] in forced_connective_endings:
             violations.append(
                 Violation(
-                    rule="R19",
+                    rule="R19a",
                     detail=f"line-end connective detected: {clean[-1]}",
                     section=section,
                     line=idx,
@@ -560,12 +566,12 @@ def lint_payload(
     if filler_token_hits >= 6:
         violations.append(
             Violation(
-                rule="R19",
+                rule="R19a",
                 detail=f"high-frequency filler tokens detected: total={filler_token_hits}",
             )
         )
 
-    # R19 rhyme-monotony: same character used as line-end ≥3 times = evolved cheat
+    # R19b: same-char rhyme-end monotony (HARD_KILL ≥3, SOFT_PENALTY exactly 2).
     # Catches "下/话" stacking after modal-particle ban. Excludes already-blocked fillers.
     line_end_chars: list[str] = []
     for section, idx, line in rows:
@@ -578,11 +584,18 @@ def lint_payload(
             line_end_chars.append(tail[-1])
     end_char_counts = Counter(line_end_chars)
     for char, count in end_char_counts.items():
-        if count >= 4:  # threshold 3 caused false positives on thematic words (e.g. 无常→常 x12)
+        if count >= 3:
             violations.append(
                 Violation(
-                    rule="R19",
+                    rule="R19b",
                     detail=f"rhyme_monotony: same line-end char '{char}' x{count} (evolved padding cheat)",
+                )
+            )
+        elif count == 2:
+            violations.append(
+                Violation(
+                    rule="R19b_soft",
+                    detail=f"rhyme_monotony: same line-end char '{char}' x{count} (advisory)",
                 )
             )
 

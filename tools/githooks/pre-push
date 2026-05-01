@@ -105,9 +105,10 @@ if [ -n "$python_cmd" ]; then
     # shellcheck disable=SC2086
     $python_cmd -m pytest -q
 
-    echo "[pre-push] $python_cmd -m apps.cli.main pm-audit"
-    # shellcheck disable=SC2086
-    $python_cmd -m apps.cli.main pm-audit
+    # pm-audit (probabilistic/LLM-dependent) removed from pre-push:
+    # Running stochastic gates in a commit hook is an anti-pattern — it makes
+    # push success a function of LLM output quality rather than code correctness.
+    # Full 9/9 quality audit is preserved in nightly CI and manual gate-check --quality.
 
     ran_any_test=1
   fi

@@ -444,6 +444,40 @@ def _proof_check(
     }
 
 
+def _schema_only_check(workspace_root: Path, output_dir: Path | None = None) -> dict[str, Any]:
+    """Lightweight schema-integrity check for RUN_FROM_HOOK=1 mode.
+
+    Only verifies that the three required output artefacts exist and are parseable.
+    No LLM calls, no pm-audit, no stochastic quality gates.
+    Full 9/9 quality audit runs in nightly CI or manual `gate-check --quality`.
+    """
+    out = output_dir if output_dir is not None else (workspace_root / "out")
+    required = ["lyrics.txt", "style.txt", "exclude.txt"]
+    missing = [name for name in required if not (out / name).exists()]
+
+    trace_valid = True
+    if (out / "trace.json").exists():
+        try:
+            json.loads((out / "trace.json").read_text(encoding="utf-8", errors="ignore"))
+        except json.JSONDecodeError:
+            trace_valid = False
+
+    audit_valid = True
+    if (out / "audit.md").exists():
+        text = (out / "audit.md").read_text(encoding="utf-8", errors="ignore")
+        audit_valid = bool(text.strip())
+
+    ok = not missing and trace_valid and audit_valid
+    return {
+        "status": "pass" if ok else "fail",
+        "mode": "schema_only",
+        "missing_files": missing,
+        "trace_json_valid": trace_valid,
+        "audit_md_valid": audit_valid,
+        "note": "RUN_FROM_HOOK=1: schema integrity only. Full quality audit: gate-check --quality",
+    }
+
+
 def check_gate_g7(
     workspace_root: Path,
     *,
@@ -451,6 +485,11 @@ def check_gate_g7(
     strict_pm_audit: bool = False,
     proof_output_dir: Path | None = None,
 ) -> dict[str, Any]:
+    # Hook mode: skip all stochastic checks, only verify artefact schema integrity.
+    # This prevents push success from depending on LLM output quality (anti-pattern).
+    if os.getenv("RUN_FROM_HOOK", "").strip() == "1":
+        return _schema_only_check(workspace_root, output_dir=proof_output_dir)
+
     g1_target_sha = os.getenv("G1_TARGET_SHA", "").strip()
     g1_require_target = os.getenv("G1_REQUIRE_TARGET_SHA", "").strip().lower() in {
         "1",

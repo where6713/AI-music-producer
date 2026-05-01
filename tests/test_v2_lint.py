@@ -336,62 +336,83 @@ def test_ambient_meditation_forces_skip_r01(tmp_path) -> None:
 
 
 def test_r19_blocks_line_end_filler_particles() -> None:
+    # R19a: line-end filler is now HARD_KILL (content veto).
     payload = _payload("我还在等你啊", forbidden=[])
     payload.lyrics_by_section[0].lines = [
         payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "雨停在窗沿啊"}),
         payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "灯影又落下来哦"}),
     ]
     report = lint_payload(payload)
-    assert "R19" in report["failed_rules"]
-    assert any(v["rule"] == "R19" and "line-end filler detected" in v["detail"] for v in report["violations"])
+    assert "R19a" in report["failed_rules"]
+    assert any(v["rule"] == "R19a" and "line-end filler detected" in v["detail"] for v in report["violations"])
+    assert "R19a" in report["hard_kill_rules"]
 
 
 def test_r19_blocks_high_frequency_filler_stacking() -> None:
+    # R19a: high-frequency filler stacking is HARD_KILL.
     payload = _payload("嗯 嗯 嗯 嗯", forbidden=[])
     payload.lyrics_by_section[0].lines = [
         payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "嗯 啊 呀 哇"}),
         payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "哦 呢 嘛 吧"}),
     ]
     report = lint_payload(payload)
-    assert "R19" in report["failed_rules"]
-    assert any(v["rule"] == "R19" and "high-frequency filler tokens" in v["detail"] for v in report["violations"])
+    assert "R19a" in report["failed_rules"]
+    assert any(v["rule"] == "R19a" and "high-frequency filler tokens" in v["detail"] for v in report["violations"])
+    assert "R19a" in report["hard_kill_rules"]
 
 
 def test_r19_blocks_line_end_connective_cheat() -> None:
+    # R19a: line-end connective is HARD_KILL.
     payload = _payload("雨落在肩而", forbidden=[])
     payload.lyrics_by_section[0].lines = [
         payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "我把旧梦都收起但"}),
         payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "灯影沿着窗框缓缓将"}),
     ]
     report = lint_payload(payload)
-    assert "R19" in report["failed_rules"]
-    assert any(v["rule"] == "R19" and "line-end connective detected" in v["detail"] for v in report["violations"])
+    assert "R19a" in report["failed_rules"]
+    assert any(v["rule"] == "R19a" and "line-end connective detected" in v["detail"] for v in report["violations"])
+    assert "R19a" in report["hard_kill_rules"]
 
 
 def test_r19_blocks_same_char_rhyme_monotony() -> None:
-    """Same character used ≥4 times as line-end triggers rhyme_monotony (threshold=4).
-    Threshold was raised from 3 to 4 to avoid false-positives on thematic repetition
-    (e.g. a 无常-themed poem naturally ends lines with 常 multiple times).
+    """Same character used ≥3 times as line-end triggers R19b (HARD_KILL).
+    Threshold lowered from 4 to 3 — R19b is now a content veto, not advisory.
     """
     payload = _payload("把对话框停下", forbidden=[])
-    # "下" appears 4 times as line-end -> must trigger
+    # "下" appears 3 times as line-end -> must trigger R19b (HARD_KILL)
     payload.lyrics_by_section[0].lines = [
         payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "手机亮起时 房间像被按下"}),
         payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "心跳还不肯放下"}),
-        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "钟声过一点还不肯放下"}),
         payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "把冲动压回喉下"}),
     ]
     report = lint_payload(payload)
-    assert "R19" in report["failed_rules"]
+    assert "R19b" in report["failed_rules"]
     assert any(
-        v["rule"] == "R19" and "rhyme_monotony" in v["detail"]
+        v["rule"] == "R19b" and "rhyme_monotony" in v["detail"]
         for v in report["violations"]
     )
+    assert "R19b" in report["hard_kill_rules"]
+
+
+def test_r19b_soft_fires_at_exactly_two() -> None:
+    """Same char appearing exactly 2× as line-end triggers R19b_soft (SOFT_PENALTY, not kill).
+    Chorus line ends in '来' so only '下' from the two verse lines contributes to count=2.
+    """
+    payload = _payload("灯影又落下来", forbidden=[])  # chorus ends in '来', not '下'
+    payload.lyrics_by_section[0].lines = [
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "手机亮起时 房间像被按下"}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "心跳还不肯放下"}),
+        payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "灯影沿窗框的颜色"}),
+    ]
+    report = lint_payload(payload)
+    assert "R19b_soft" in report["failed_rules"]
+    assert "R19b" not in report["failed_rules"]  # exactly 2, not ≥3
+    assert report["is_dead"] is False  # SOFT_PENALTY only
 
 
 def test_r19_allows_diverse_rhyme_ends() -> None:
     """Different line-end chars (even if semantically related) must not trigger rhyme_monotony."""
-    payload = _payload("把灯光慢慢按下", forbidden=[])
+    payload = _payload("灯影又落下来", forbidden=[])  # chorus ends in '来', diverse from verse ends
     payload.lyrics_by_section[0].lines = [
         payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "手机亮起时 房间像被按下"}),
         payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "心跳还不肯说话"}),
@@ -402,6 +423,6 @@ def test_r19_allows_diverse_rhyme_ends() -> None:
     # Each char (下/话/色/茶) appears only once — rhyme_monotony should NOT fire
     rhyme_violations = [
         v for v in report["violations"]
-        if v["rule"] == "R19" and "rhyme_monotony" in v["detail"]
+        if v["rule"] in {"R19b", "R19b_soft"} and "rhyme_monotony" in v["detail"]
     ]
     assert len(rhyme_violations) == 0

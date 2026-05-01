@@ -191,9 +191,9 @@ def test_lint_marks_r18_prosody_violation_as_hard_penalty_not_dead() -> None:
     assert report["craft_score"] < 1.0
 
 
-def test_lint_marks_r19_filler_cheat_as_hard_penalty_not_dead() -> None:
-    # R19 is HARD_PENALTY: filler/monotony violations lower craft_score and trigger
-    # targeted revise, but must NOT kill output entirely. PRD requires 输出三件套.
+def test_lint_marks_r19a_filler_cheat_as_hard_kill() -> None:
+    # R19a is now HARD_KILL: line-end filler is a content veto.
+    # A lyric ending in 啊/哦 is unpublishable — no retries, output is rejected.
     payload = _make_payload(chorus_line="我还在等你啊")
     payload.lyrics_by_section[0].lines = [
         payload.lyrics_by_section[0].lines[0].model_copy(update={"primary": "雨停在窗沿啊"}),
@@ -201,7 +201,6 @@ def test_lint_marks_r19_filler_cheat_as_hard_penalty_not_dead() -> None:
     ]
     report = lint_payload(payload)
 
-    assert "R19" in report["failed_rules"]
-    assert report["is_dead"] is False  # HARD_PENALTY: craft_score drops, triggers revise, does NOT kill
-    assert "R19" not in report["hard_kill_rules"]
-    assert report["craft_score"] < 1.0
+    assert "R19a" in report["failed_rules"]
+    assert report["is_dead"] is True  # HARD_KILL: content veto, output rejected
+    assert "R19a" in report["hard_kill_rules"]
