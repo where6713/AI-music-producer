@@ -26,20 +26,44 @@ def test_perceive_music_returns_5_keys() -> None:
     assert out["audio_hint"] == ".wav"
 
 
-def test_distill_emotion_motive_and_hook_seed() -> None:
+def test_distill_emotion_outputs_creative_brief() -> None:
     import src.v2.distill_emotion as distill_mod
 
     portrait = {"texture": "indie lazy groove"}
     def _fake_call(_prompt, temperature=0.3):
-        return '{"inner_motive":"x","arc":"y","hook_seed":"z"}', {"tokens_in": 1, "tokens_out": 1}
+        return '{"central_image":"票根","cognitive_hook":"我先睡了","arc_3_stations":["否认-装没事","承认-痛被看见","放过-不再追问"]}', {"tokens_in": 1, "tokens_out": 1}
 
     monkeypatch = pytest.MonkeyPatch()
     monkeypatch.setattr(distill_mod, "llm_call", _fake_call)
     out = distill_emotion("失恋后一个人回家", portrait)
     monkeypatch.undo()
-    assert isinstance(out["inner_motive"], str)
-    assert isinstance(out["arc"], str)
-    assert isinstance(out["hook_seed"], str)
+    assert isinstance(out["central_image"], str) and out["central_image"]
+    assert isinstance(out["cognitive_hook"], str)
+    assert len(out["cognitive_hook"]) <= 8
+    assert not out["cognitive_hook"].endswith(("吗", "呢", "吧"))
+    assert len(out["central_image"]) <= 4
+    assert isinstance(out["arc_3_stations"], list) and len(out["arc_3_stations"]) == 3
+
+
+def test_distill_central_image_not_geographic() -> None:
+    import src.v2.distill_emotion as distill_mod
+
+    monkeypatch = pytest.MonkeyPatch()
+    monkeypatch.setattr(distill_mod, "llm_call", lambda _prompt, temperature=0.3: ('{"central_image":"收费站","cognitive_hook":"我先睡了","arc_3_stations":["否认-装没事","承认-痛被看见","放过-不再追问"]}', {"tokens_in": 1, "tokens_out": 1}))
+    with pytest.raises(RuntimeError):
+        distill_emotion("夜里独自开车想念一个人", {"texture": "indie"})
+    monkeypatch.undo()
+
+
+def test_distill_hook_max_8_chars() -> None:
+    import src.v2.distill_emotion as distill_mod
+
+    monkeypatch = pytest.MonkeyPatch()
+    monkeypatch.setattr(distill_mod, "llm_call", lambda _prompt, temperature=0.3: ('{"central_image":"票根","cognitive_hook":"还要等天亮吗","arc_3_stations":["否认-装没事","承认-痛被看见","放过-不再追问"]}', {"tokens_in": 1, "tokens_out": 1}))
+    out = distill_emotion("夜里独自开车想念一个人", {"texture": "indie"})
+    monkeypatch.undo()
+    assert len(str(out["cognitive_hook"])) <= 8
+    assert not str(out["cognitive_hook"]).endswith(("吗", "呢", "吧"))
 
 
 def test_select_corpus_recall_size_and_golden_anchor(tmp_path: Path) -> None:
@@ -103,7 +127,7 @@ def test_select_golden_anchors_fallback_global_when_no_match(tmp_path: Path) -> 
     b.write_text("# source: x\n# style: 慢板抒情\n# texture: x\n# version: v1\n\n词", encoding="utf-8")
     out, mode = select_golden_anchors_with_mode([{"id": str(b)}, {"id": str(a)}], {"genre_guess": "electro dance"})
     assert mode == "fallback_global"
-    assert [x["id"] for x in out] == [str(a), str(b)]
+    assert [x["id"] for x in out] == [str(a)]
 
 
 def test_select_golden_anchors_cap_two_sorted_when_three_match(tmp_path: Path) -> None:
@@ -116,7 +140,7 @@ def test_select_golden_anchors_cap_two_sorted_when_three_match(tmp_path: Path) -
         f.write_text("# source: x\n# style: indie pop 慵懒\n# texture: x\n# version: v1\n\n词", encoding="utf-8")
     out, mode = select_golden_anchors_with_mode([{"id": str(c)}, {"id": str(a)}, {"id": str(b)}], {"genre_guess": "indie pop"})
     assert mode == "matched"
-    assert [x["id"] for x in out] == [str(a), str(b)]
+    assert [x["id"] for x in out] == [str(a)]
 
 
 def test_select_corpus_empty_pool_marks_mode(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -158,7 +182,7 @@ def test_compose_pass1_id_grounding() -> None:
     monkeypatch.setattr(compose_mod, "llm_call", lambda _prompt, temperature=0.9: ('{"lyrics":"[Verse 1]\\n灯慢慢熄了\\n[Chorus]\\n我只轻轻说再见","style":"x","exclude":"x"}', {"tokens_in": 1, "tokens_out": 1}))
     draft = compose(
         {"texture": "indie lazy groove"},
-        {"arc": "压抑→冲动→克制→释然", "inner_motive": "想联络却不敢", "hook_seed": "我还要等你吗"},
+        {"central_image": "票根", "cognitive_hook": "我先睡了", "arc_3_stations": ["否认-装没事", "承认-痛被看见", "放过-不再追问"]},
         golden_refs=[],
         corpus_pool=pool,
     )
@@ -176,32 +200,66 @@ def test_self_review_preserves_section_count(monkeypatch: pytest.MonkeyPatch) ->
     monkeypatch.setattr(compose_mod, "llm_call", _fake_compose_call)
     draft = compose(
         {"texture": "indie lazy groove"},
-        {"arc": "压抑→冲动→克制→释然", "inner_motive": "删了又写", "hook_seed": "你会回头吗"},
+        {"central_image": "票根", "cognitive_hook": "我先睡了", "arc_3_stations": ["否认-装没事", "承认-痛被看见", "放过-不再追问"]},
         golden_refs=[],
         corpus_pool=[{"id": "x"}],
     )
-    monkeypatch.setattr(review_mod, "llm_call", lambda _prompt, temperature=0.3: ("[Verse 1]\n灯慢慢熄了\n[Chorus]\n我只轻轻说再见", {"tokens_in": 1, "tokens_out": 1}))
+    monkeypatch.setattr(review_mod, "llm_call", lambda _prompt, temperature=0.3: ("[Verse 1]\n票根装没事\n[Verse 2]\n票根见了痛\n[Chorus]\n我先睡了\n我先睡了\n[Bridge]\n票根不追问", {"tokens_in": 1, "tokens_out": 1}))
     sections_before = draft["lyrics"].count("[")
     reviewed = self_review(draft)
     sections_after = reviewed["lyrics"].count("[")
-    assert sections_before == sections_after
-    assert isinstance(reviewed["review_notes"], str)
+    assert 4 <= sections_after <= 5
+    assert "[Verse 3]" not in reviewed["lyrics"]
+    assert isinstance(reviewed["review_notes"], dict)
 
 
 def test_self_review_retries_on_hook_too_long(monkeypatch: pytest.MonkeyPatch) -> None:
     from src.v2 import self_review as mod
 
-    draft = {"lyrics": "[Verse 1]\n灯慢慢熄了\n[Chorus]\n我只是想你想你想你想你想你", "selected_ids": [], "selection_mode": "matched"}
+    draft = {"lyrics": "[Verse 1]\n灯慢慢熄了\n[Verse 2]\n还在走\n[Bridge]\n晚一点", "selected_ids": [], "selection_mode": "matched", "brief": {"central_image": "票根", "cognitive_hook": "我先睡了", "arc_3_stations": ["否认-装没事", "承认-痛被看见", "放过-不再追问"]}}
     calls = {"n": 0}
 
     def fake_call(_prompt, temperature=0.3):
         calls["n"] += 1
-        return "[Verse 1]\n灯慢慢熄了\n[Chorus]\n我只轻轻说再见", {"tokens_in": 1, "tokens_out": 1}
+        return "[Verse 1]\n票根装没事\n[Verse 2]\n票根见了痛\n[Chorus]\n我先睡了\n我先睡了\n[Bridge]\n票根不追问", {"tokens_in": 1, "tokens_out": 1}
 
     monkeypatch.setattr(mod, "llm_call", fake_call)
     out = mod.self_review(draft)
     assert out["retry_count"] == 1
-    assert out["quality_gate_failed"] is False
+
+
+def test_self_review_flags_missing_hook_pipeline(monkeypatch: pytest.MonkeyPatch) -> None:
+    from src.v2 import self_review as mod
+
+    draft = {
+        "lyrics": "[Verse 1]\n我装没事\n[Verse 2]\n不再追问\n[Chorus]\n天亮\n风把灯吹暗\n[Bridge]\n我先睡了",
+        "selected_ids": [],
+        "selection_mode": "matched",
+        "brief": {"central_image": "票根", "cognitive_hook": "我先睡了", "arc_3_stations": ["否认-装没事", "承认-痛被看见", "放过-不再追问"]},
+    }
+    monkeypatch.setattr(mod, "llm_call", lambda _prompt, temperature=0.3: (draft["lyrics"], {"tokens_in": 1, "tokens_out": 1}))
+    out = mod.self_review(draft)
+    assert out["quality_gate_failed"] is True
+    assert "brief_violation_hook" in out["failure_reasons"]
+
+
+def test_compose_passes_brief_to_prompt(monkeypatch: pytest.MonkeyPatch) -> None:
+    import src.v2.compose as compose_mod
+
+    seen = {"prompt": ""}
+
+    def fake_call(prompt: str, temperature: float = 0.9):
+        seen["prompt"] = prompt
+        return '{"lyrics":"[Verse 1]\\n末班地铁\\n[Verse 2]\\n末班地铁\\n[Verse 3]\\n末班地铁\\n[Bridge]\\n我先睡了\\n[Chorus]\\n末班地铁","style":"x","exclude":"x"}', {"tokens_in": 1, "tokens_out": 1}
+
+    monkeypatch.setattr(compose_mod, "llm_call", fake_call)
+    compose(
+        {"texture": "indie lazy groove"},
+        {"central_image": "票根", "cognitive_hook": "我先睡了", "arc_3_stations": ["否认-装没事", "承认-痛被看见", "放过-不再追问"]},
+        golden_refs=[],
+        corpus_pool=[{"id": "x"}],
+    )
+    assert "<brief>" in seen["prompt"]
 
 
 def test_run_v2_end_to_end_with_local_index(tmp_path: Path) -> None:
@@ -249,21 +307,14 @@ def test_trace_records_surgical_fix_mode(tmp_path: Path, monkeypatch: pytest.Mon
     import src.v2.self_review as mod
 
     draft = {
-        "lyrics": "[Verse 1]\n后视镜里的人还在看我\n[Chorus]\n我只轻轻说再见",
+        "lyrics": "[Verse 1]\n后视镜里的人还在看我\n[Verse 2]\n还是看我\n[Verse 3]\n没变\n[Bridge]\n晚一点\n[Chorus]\n我只轻轻说再见",
         "selected_ids": [],
         "selection_mode": "matched",
+        "brief": {"central_image": "票根", "cognitive_hook": "我先睡了", "arc_3_stations": ["否认-装没事", "承认-痛被看见", "放过-不再追问"]},
     }
-    calls: list[str] = []
-
-    def fake_call(prompt: str, temperature: float = 0.3):
-        calls.append(prompt[:20])
-        if len(calls) == 1:
-            return "[Verse 1]\n后视镜里的人还在看我\n[Chorus]\n我只轻轻说再见", {"tokens_in": 1, "tokens_out": 1}
-        return "[Verse 1]\n灯慢慢熄了\n[Chorus]\n我只轻轻说再见", {"tokens_in": 1, "tokens_out": 1}
-
-    monkeypatch.setattr(mod, "llm_call", fake_call)
+    monkeypatch.setattr(mod, "llm_call", lambda _prompt, temperature=0.3: ("[Verse 1]\n票根装没事\n[Verse 2]\n票根见了痛\n[Chorus]\n我先睡了\n我先睡了\n[Bridge]\n票根不追问", {"tokens_in": 1, "tokens_out": 1}))
     reviewed = mod.self_review(draft)
     dump_outputs(tmp_path, reviewed)
     trace = json.loads((tmp_path / "trace.json").read_text(encoding="utf-8"))
-    assert trace["retry_modes"] == ["full_revise", "surgical_fix"]
-    assert reviewed["retry_count"] == 2
+    assert trace["retry_modes"] == ["surgical_fix"]
+    assert reviewed["retry_count"] == 1
