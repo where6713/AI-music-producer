@@ -15,14 +15,27 @@ from src.v2.self_review import self_review
 
 
 def test_perceive_music_returns_5_keys() -> None:
+    import src.v2.perceive_music as perceive_mod
+
+    monkey = pytest.MonkeyPatch()
+    monkey.setattr(perceive_mod, "llm_call", lambda _prompt, temperature=0.3: ('{"genre_guess":"indie pop","bpm_range":"100-120","vibe":"x","audio_hint":".wav","intent":"x"}', {"tokens_in": 1, "tokens_out": 1}))
     out = perceive_music("深夜慢一点，想写内省情绪", ref_audio="demo.wav")
+    monkey.undo()
     assert set(out.keys()) >= {"genre_guess", "bpm_range", "vibe", "audio_hint", "intent"}
     assert out["audio_hint"] == ".wav"
 
 
 def test_distill_emotion_motive_and_hook_seed() -> None:
+    import src.v2.distill_emotion as distill_mod
+
     portrait = {"texture": "indie lazy groove"}
+    def _fake_call(_prompt, temperature=0.3):
+        return '{"inner_motive":"x","arc":"y","hook_seed":"z"}', {"tokens_in": 1, "tokens_out": 1}
+
+    monkeypatch = pytest.MonkeyPatch()
+    monkeypatch.setattr(distill_mod, "llm_call", _fake_call)
     out = distill_emotion("失恋后一个人回家", portrait)
+    monkeypatch.undo()
     assert isinstance(out["inner_motive"], str)
     assert isinstance(out["arc"], str)
     assert isinstance(out["hook_seed"], str)
@@ -137,28 +150,57 @@ def test_select_golden_anchors_reads_real_filesystem(tmp_path: Path, monkeypatch
 
 
 def test_compose_pass1_id_grounding() -> None:
+    import src.v2.compose as compose_mod
+
     pool = [{"id": "x"}, {"id": "y"}]
+    monkeypatch = pytest.MonkeyPatch()
+    monkeypatch.setattr(compose_mod, "llm_call", lambda _prompt, temperature=0.9: ('{"lyrics":"[Verse 1]\\n灯慢慢熄了\\n[Chorus]\\n我只轻轻说再见","style":"x","exclude":"x"}', {"tokens_in": 1, "tokens_out": 1}))
     draft = compose(
         {"texture": "indie lazy groove"},
         {"arc": "压抑→冲动→克制→释然", "inner_motive": "想联络却不敢", "hook_seed": "我还要等你吗"},
         golden_refs=[],
         corpus_pool=pool,
     )
+    monkeypatch.undo()
     assert draft["selected_ids"] == []
 
 
-def test_self_review_preserves_section_count() -> None:
+def test_self_review_preserves_section_count(monkeypatch: pytest.MonkeyPatch) -> None:
+    import src.v2.compose as compose_mod
+    import src.v2.self_review as review_mod
+
+    def _fake_compose_call(_prompt, temperature=0.9):
+        return '{"lyrics":"[Verse 1]\\n灯慢慢熄了\\n[Chorus]\\n我只轻轻说再见","style":"x","exclude":"x"}', {"tokens_in": 1, "tokens_out": 1}
+
+    monkeypatch.setattr(compose_mod, "llm_call", _fake_compose_call)
     draft = compose(
         {"texture": "indie lazy groove"},
         {"arc": "压抑→冲动→克制→释然", "inner_motive": "删了又写", "hook_seed": "你会回头吗"},
         golden_refs=[],
         corpus_pool=[{"id": "x"}],
     )
+    monkeypatch.setattr(review_mod, "llm_call", lambda _prompt, temperature=0.3: ("[Verse 1]\n灯慢慢熄了\n[Chorus]\n我只轻轻说再见", {"tokens_in": 1, "tokens_out": 1}))
     sections_before = draft["lyrics"].count("[")
     reviewed = self_review(draft)
     sections_after = reviewed["lyrics"].count("[")
     assert sections_before == sections_after
     assert isinstance(reviewed["review_notes"], str)
+
+
+def test_self_review_retries_on_hook_too_long(monkeypatch: pytest.MonkeyPatch) -> None:
+    from src.v2 import self_review as mod
+
+    draft = {"lyrics": "[Verse 1]\n灯慢慢熄了\n[Chorus]\n我只是想你想你想你想你想你", "selected_ids": [], "selection_mode": "matched"}
+    calls = {"n": 0}
+
+    def fake_call(_prompt, temperature=0.3):
+        calls["n"] += 1
+        return "[Verse 1]\n灯慢慢熄了\n[Chorus]\n我只轻轻说再见", {"tokens_in": 1, "tokens_out": 1}
+
+    monkeypatch.setattr(mod, "llm_call", fake_call)
+    out = mod.self_review(draft)
+    assert out["retry_count"] == 1
+    assert out["quality_gate_failed"] is False
 
 
 def test_run_v2_end_to_end_with_local_index(tmp_path: Path) -> None:
