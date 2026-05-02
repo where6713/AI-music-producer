@@ -15,12 +15,12 @@ def run_v2(raw_intent: str, ref_audio: str = "", index_path: str = "corpus/_inde
     golden = (preferred + [x for x in pool if "golden_dozen" in str(x.get("id", ""))])[:12]
     draft = compose(portrait, emotion, golden_refs=golden, corpus_pool=pool)
     final = self_review(draft)
-    final["portrait"] = portrait
-    final["emotion"] = emotion
-    final["recalled_pool_size"] = len(pool)
-    final["golden_refs_used"] = len(golden)
+    all_m = portrait.get("_llm_meta", []) + emotion.get("_llm_meta", []) + draft.get("_llm_calls", []) + final.get("_llm_calls", [])
+    final.update(portrait=portrait, emotion=emotion, recalled_pool_size=len(pool),
+                 golden_refs_used=draft.get("golden_refs_used", 0), llm_total_calls=len(all_m),
+                 llm_total_input_tokens=sum(int(m.get("tokens_in", 0)) for m in all_m),
+                 llm_total_output_tokens=sum(int(m.get("tokens_out", 0)) for m in all_m))
     return final
-
 
 if __name__ == "__main__":
     args = parse_cli()

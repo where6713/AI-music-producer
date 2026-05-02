@@ -1,32 +1,30 @@
 from __future__ import annotations
-
 from ._quality_rules import check
+from .llm_runtime import call as llm_call
 
+_PROMPT = (
+    "修改以下歌词，消除所有违规项，保持原有段落结构（不增删[Section]标记）。\n"
+    "原歌词：\n{lyrics}\n违规项：{violations}\n"
+    "仅输出修改后的完整歌词文本（无 JSON，无任何额外说明）。"
+)
 
 def self_review(draft: dict[str, object], max_retries: int = 1) -> dict[str, object]:
     lyrics = str(draft.get("lyrics", "")).strip()
     violations = check(lyrics)
     out = dict(draft)
+    retry_count = 0
+    llm_calls_meta: list[dict[str, object]] = []
     if not violations:
-        out["review_notes"] = "passed"
-        out["quality_gate_failed"] = False
-        return out
+        return {**out, "review_notes": "passed", "quality_gate_failed": False, "retry_count": 0, "_llm_calls": []}
     for _ in range(max_retries):
-        lyrics = _try_fix(lyrics)
+        retry_count += 1
+        prompt = _PROMPT.format(lyrics=lyrics, violations="; ".join(violations))
+        content, meta = llm_call(prompt, temperature=0.3)
+        llm_calls_meta.append(meta)
+        lyrics = content.strip()
         violations = check(lyrics)
         if not violations:
             break
-    out["lyrics"] = lyrics
-    out["review_notes"] = "; ".join(violations) if violations else "fixed"
-    out["quality_gate_failed"] = bool(violations)
-    if violations:
-        out["needs_rewrite"] = True
-    return out
-
-
-def _try_fix(text: str) -> str:
-    text = text.replace("我把", "")
-    text = text.replace("让天亮替我回答", "等天亮给出回答")
-    text = text.replace("把晚安留给", "把问候留在")
-    text = text.replace("city lights", "灯火")
-    return text
+    note = "; ".join(violations) if violations else "fixed"
+    return {**out, "lyrics": lyrics, "review_notes": note, "quality_gate_failed": bool(violations),
+            "needs_rewrite": bool(violations), "retry_count": retry_count, "_llm_calls": llm_calls_meta}
