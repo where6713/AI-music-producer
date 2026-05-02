@@ -1,0 +1,6 @@
+# source: fixture
+# style: indie pop 慵懒
+# texture: x
+# version: test
+
+你说晚风刚好

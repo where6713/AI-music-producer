@@ -26,11 +26,14 @@ def pick_golden(pool: list[dict[str, object]], genre_guess: str) -> tuple[list[d
     uniq: dict[str, dict[str, object]] = {}
     for row in pool:
         sid = str(row.get("id", ""))
-        if "golden_dozen" in sid and sid not in uniq:
+        p = Path(sid)
+        if p.suffix.lower() == ".txt" and p.exists() and sid not in uniq:
             uniq[sid] = row
     matched = [sid for sid in uniq if style_tokens(sid) & genre]
     if matched:
         ids = sorted(matched)[:2]
         return [uniq[i] for i in ids], "matched"
+    if not uniq:
+        return [], "empty_pool"
     ids = sorted(uniq.keys())[:2]
     return [uniq[i] for i in ids], "fallback_global"

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 
@@ -24,4 +25,6 @@ def dump_outputs(out_dir: Path, out: dict[str, object]) -> None:
         "recalled_pool_size", "golden_refs_used", "pass1_selected_ids_count",
         "retry_count", "llm_total_calls", "llm_total_input_tokens", "llm_total_output_tokens",
     )}
+    if trace.get("selection_mode") == "empty_pool":
+        print("WARNING: golden_dozen empty, anchor=0", file=sys.stderr)
     (out_dir / "trace.json").write_text(json.dumps(trace, ensure_ascii=False, indent=2), encoding="utf-8")

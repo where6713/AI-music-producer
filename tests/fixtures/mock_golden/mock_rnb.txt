@@ -1,0 +1,6 @@
+# source: fixture
+# style: R&B 律动
+# texture: x
+# version: test
+
+节拍贴着心跳

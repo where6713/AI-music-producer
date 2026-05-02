@@ -12,6 +12,7 @@ def run_v2(raw_intent: str, ref_audio: str = "", index_path: str = "corpus/_inde
     emotion = distill_emotion(raw_intent, portrait)
     pool = select_corpus(Path(index_path), portrait, limit=100)
     golden, selection_mode = select_golden_anchors_with_mode(pool, portrait)
+    portrait["selection_mode"] = selection_mode
     draft = compose(portrait, emotion, golden_refs=golden, corpus_pool=pool)
     final = self_review(draft)
     all_m = portrait.get("_llm_meta", []) + emotion.get("_llm_meta", []) + draft.get("_llm_calls", []) + final.get("_llm_calls", [])

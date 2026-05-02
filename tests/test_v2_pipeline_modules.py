@@ -105,6 +105,24 @@ def test_select_golden_anchors_cap_two_sorted_when_three_match(tmp_path: Path) -
     assert [x["id"] for x in out] == [str(a), str(b)]
 
 
+def test_select_corpus_empty_pool_marks_mode() -> None:
+    out, mode = select_golden_anchors_with_mode([], {"genre_guess": "R&B"})
+    assert out == []
+    assert mode == "empty_pool"
+
+
+def test_select_corpus_matched_path_with_fixtures() -> None:
+    root = Path(__file__).parent / "fixtures" / "mock_golden"
+    rnb = root / "mock_rnb.txt"
+    indie = root / "mock_indie.txt"
+    out, mode = select_golden_anchors_with_mode(
+        [{"id": str(indie)}, {"id": str(rnb)}],
+        {"genre_guess": "R&B"},
+    )
+    assert mode == "matched"
+    assert any(str(rnb) == str(x.get("id", "")) for x in out)
+
+
 def test_compose_pass1_id_grounding() -> None:
     pool = [{"id": "x"}, {"id": "y"}]
     draft = compose(
