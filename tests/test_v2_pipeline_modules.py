@@ -8,6 +8,7 @@ import pytest
 
 from src.v2.compose import compose
 from src.v2.distill_emotion import distill_emotion
+from src.v2._io import dump_outputs
 from src.v2.main import run_v2
 from src.v2.perceive_music import perceive_music
 from src.v2.select_corpus import select_corpus, select_golden_anchors, select_golden_anchors_with_mode
@@ -223,3 +224,46 @@ def test_run_v2_end_to_end_with_local_index(tmp_path: Path) -> None:
     assert isinstance(out.get("lyrics"), str)
     assert isinstance(out.get("style"), str)
     assert isinstance(out.get("exclude"), str)
+
+
+def test_trace_schema_has_retry_fields(tmp_path: Path) -> None:
+    payload = {
+        "lyrics": "[Verse 1]\n灯慢慢熄了\n[Chorus]\n我只轻轻说再见",
+        "style": "indie pop",
+        "exclude": "rap",
+        "quality_gate_failed": False,
+        "selection_mode": "matched",
+        "retry_count": 0,
+        "retry_modes": [],
+        "failure_reasons": [],
+    }
+    dump_outputs(tmp_path, payload)
+    trace = json.loads((tmp_path / "trace.json").read_text(encoding="utf-8"))
+    assert "retry_modes" in trace
+    assert "failure_reasons" in trace
+    assert trace["retry_modes"] == []
+    assert trace["failure_reasons"] == []
+
+
+def test_trace_records_surgical_fix_mode(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    import src.v2.self_review as mod
+
+    draft = {
+        "lyrics": "[Verse 1]\n后视镜里的人还在看我\n[Chorus]\n我只轻轻说再见",
+        "selected_ids": [],
+        "selection_mode": "matched",
+    }
+    calls: list[str] = []
+
+    def fake_call(prompt: str, temperature: float = 0.3):
+        calls.append(prompt[:20])
+        if len(calls) == 1:
+            return "[Verse 1]\n后视镜里的人还在看我\n[Chorus]\n我只轻轻说再见", {"tokens_in": 1, "tokens_out": 1}
+        return "[Verse 1]\n灯慢慢熄了\n[Chorus]\n我只轻轻说再见", {"tokens_in": 1, "tokens_out": 1}
+
+    monkeypatch.setattr(mod, "llm_call", fake_call)
+    reviewed = mod.self_review(draft)
+    dump_outputs(tmp_path, reviewed)
+    trace = json.loads((tmp_path / "trace.json").read_text(encoding="utf-8"))
+    assert trace["retry_modes"] == ["full_revise", "surgical_fix"]
+    assert reviewed["retry_count"] == 2
