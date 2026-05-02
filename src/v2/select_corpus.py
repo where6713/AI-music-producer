@@ -24,3 +24,12 @@ def select_corpus(index_path: Path, portrait: dict[str, object], limit: int = 10
     if len(top) < min(limit, 80):
         top = [r for _, r in scored[:limit]]
     return top
+
+
+def select_golden_anchors(pool: list[dict[str, object]], portrait: dict[str, object]) -> list[dict[str, object]]:
+    q = str(portrait.get("genre_guess", "")).lower()
+    pref = "slot01_indie_lazy" if "indie" in q else "slot"
+    golden = [r for r in pool if "golden_dozen" in str(r.get("id", ""))]
+    hard = [r for r in golden if pref in str(r.get("id", ""))]
+    pick = (hard + golden)[:2]
+    return pick if pick else golden[:2]

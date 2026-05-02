@@ -3,8 +3,11 @@ from ._quality_rules import check
 from .llm_runtime import call as llm_call
 
 _PROMPT = (
-    "修改以下歌词，消除所有违规项，保持原有段落结构（不增删[Section]标记）。\n"
+    "修改以下歌词，消除所有违规项并通过主观检查，保持原有段落结构（不增删[Section]标记）。\n"
     "原歌词：\n{lyrics}\n违规项：{violations}\n"
+    "主观检查：Q1副歌是否有hook(<=10字/口语/可重复/含矛盾或反问)，没有就改写副歌；\n"
+    "Q2 verse若堆砌视觉场景道具，退一步改为情绪状态本身；\n"
+    "Q3 若有倒装或欧化句(替...做.../将...折好)，改成口语直叙。\n"
     "仅输出修改后的完整歌词文本（无 JSON，无任何额外说明）。"
 )
 

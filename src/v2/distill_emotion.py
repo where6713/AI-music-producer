@@ -3,15 +3,14 @@ import json, re
 from .llm_runtime import call as llm_call
 
 _PROMPT = (
-    "你是情感提炼师。根据歌词意图和风格画像，提炼情感参数。\n"
+    "你是情感提炼师。根据歌词意图和风格画像，提炼关系状态与演唱动机。\n"
     "意图：{intent}\n风格画像：{portrait}\n"
-    "valence 判断规则（必须严格遵守）：\n"
-    "  含'失恋/难过/痛/孤独/离开/分手/一个人' → negative\n"
-    "  含'开心/希望/阳光/热恋/喜欢/快乐' → positive\n"
-    "  其他 → mixed\n"
-    "arc 规则：negative→descend-then-breathe; positive→lift-and-resolve; mixed→hold-and-release\n"
+    "只输出中文，不允许英文词；歌手名或英文歌名可保留。\n"
+    "inner_motive：中文一句，<=15字，必须是关系状态/内在动机，不得写视觉场景。\n"
+    "arc：中文情绪曲线，如'压抑→冲动→克制→释然'。\n"
+    "hook_seed：中文一句，<=12字，口语化，且含矛盾感或反问。\n"
     "输出严格 JSON（无 markdown，无注释）：\n"
-    '{{"valence":"...","arc":"...","central_image":"(中文意象,≤10字)","metaphor":"...","intent_focus":"..."}}'
+    '{{"inner_motive":"...","arc":"...","hook_seed":"..."}}'
 )
 
 def distill_emotion(intent: str, portrait: dict[str, object]) -> dict[str, str]:
@@ -26,10 +25,8 @@ def distill_emotion(intent: str, portrait: dict[str, object]) -> dict[str, str]:
         if i == -1 or j == -1:
             raise RuntimeError(f"distill_emotion: non-JSON from LLM: {s[:200]}")
         data = json.loads(s[i:j + 1])
-    data.setdefault("valence", "mixed")
-    data.setdefault("arc", "hold-and-release")
-    data.setdefault("central_image", "灯火")
-    data.setdefault("metaphor", "weather as feeling")
-    data.setdefault("intent_focus", (intent or "")[:120])
+    data.setdefault("inner_motive", "想联络却不敢")
+    data.setdefault("arc", "压抑→冲动→克制→释然")
+    data.setdefault("hook_seed", "我还要等你吗")
     data["_llm_meta"] = [llm_meta]
     return data

@@ -20,12 +20,12 @@ def test_perceive_music_returns_5_keys() -> None:
     assert out["audio_hint"] == ".wav"
 
 
-def test_distill_emotion_central_image_length() -> None:
+def test_distill_emotion_motive_and_hook_seed() -> None:
     portrait = {"texture": "indie lazy groove"}
     out = distill_emotion("失恋后一个人回家", portrait)
-    assert out["valence"] == "negative"
-    assert out["arc"] == "descend-then-breathe"
-    assert len(out["central_image"]) <= 20
+    assert isinstance(out["inner_motive"], str)
+    assert isinstance(out["arc"], str)
+    assert isinstance(out["hook_seed"], str)
 
 
 def test_select_corpus_recall_size_and_golden_anchor(tmp_path: Path) -> None:
@@ -45,17 +45,17 @@ def test_compose_pass1_id_grounding() -> None:
     pool = [{"id": "x"}, {"id": "y"}]
     draft = compose(
         {"texture": "indie lazy groove"},
-        {"arc": "hold-and-release", "central_image": "street lamp"},
+        {"arc": "压抑→冲动→克制→释然", "inner_motive": "想联络却不敢", "hook_seed": "我还要等你吗"},
         golden_refs=[],
         corpus_pool=pool,
     )
-    assert set(draft["selected_ids"]) <= {"x", "y"}
+    assert draft["selected_ids"] == []
 
 
 def test_self_review_preserves_section_count() -> None:
     draft = compose(
         {"texture": "indie lazy groove"},
-        {"arc": "hold-and-release", "central_image": "street lamp"},
+        {"arc": "压抑→冲动→克制→释然", "inner_motive": "删了又写", "hook_seed": "你会回头吗"},
         golden_refs=[],
         corpus_pool=[{"id": "x"}],
     )
