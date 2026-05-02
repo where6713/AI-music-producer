@@ -1,7 +1,7 @@
 from __future__ import annotations
-
+import json, re
 from pathlib import Path
-
+from .llm_runtime import call as llm_call
 
 KNOWN = {
     "HYBS": {"genre_guess": "indie pop", "bpm_range": "100-120", "vibe": "公路慵懒"},
@@ -14,37 +14,36 @@ KNOWN = {
     "林俊杰": {"genre_guess": "流行", "bpm_range": "80-100", "vibe": "情绪推进"},
 }
 
+_PROMPT = (
+    "你是音乐风格分析师。根据意图和参考，推断风格画像。\n"
+    "意图：{intent}\n参考音乐/艺人：{ref}\n已知风格提示：{hint}\n"
+    "genre_guess 候选值：indie pop / 流行 / classical_cn / R&B / folk / 摇滚 / EDM\n"
+    "输出严格 JSON（无 markdown 包裹，无注释）：\n"
+    '{{"genre_guess":"...","bpm_range":"...","vibe":"...","intent":"..."}}'
+)
 
 def perceive_music(intent: str, ref_audio: str = "") -> dict[str, object]:
-    text = (intent or "").strip()
-    low = text.lower()
+    hint = ""
     for key, meta in KNOWN.items():
-        if key.lower() in low or (ref_audio and key.lower() in str(ref_audio).lower()):
-            out = dict(meta)
-            out["intent"] = text
-            out["audio_hint"] = Path(ref_audio).suffix.lower() if ref_audio else "none"
-            return out
-    tempo = "mid"
-    if any(k in low for k in ("dance", "edm", "快", "躁", "燃")):
-        tempo = "fast"
-    elif any(k in low for k in ("慢", "夜", "静", "疗愈", "雨")):
-        tempo = "slow"
-    energy = {"fast": "high", "slow": "low"}.get(tempo, "medium")
-    genre = "indie pop"
-    if any(k in low for k in ("古风", "国风", "古典")):
-        genre = "classical_cn"
-    elif any(k in low for k in ("indie", "慵懒", "松弛", "bedroom")):
-        genre = "indie pop"
-    elif any(k in low for k in ("流行", "青春", "阳光")):
-        genre = "流行"
-    bpm = {"fast": "120-140", "slow": "<80"}.get(tempo, "80-100")
-    vibe = "雨夜独白"
-    if tempo == "fast":
-        vibe = "派对前夜"
-    return {
-        "genre_guess": genre,
-        "bpm_range": bpm,
-        "vibe": vibe,
-        "audio_hint": Path(ref_audio).suffix.lower() if ref_audio else "none",
-        "intent": text,
-    }
+        if key.lower() in (intent or "").lower() or key.lower() in str(ref_audio).lower():
+            hint = json.dumps(meta, ensure_ascii=False)
+            break
+    audio_hint = Path(ref_audio).suffix.lower() if ref_audio else "none"
+    prompt = _PROMPT.format(intent=intent or "", ref=ref_audio or "无", hint=hint or "无")
+    content, llm_meta = llm_call(prompt, temperature=0.3)
+    s = re.sub(r'^```(?:json)?\s*', '', content.strip())
+    s = re.sub(r'\s*```$', '', s)
+    try:
+        data = json.loads(s)
+    except json.JSONDecodeError:
+        i, j = s.find('{'), s.rfind('}')
+        if i == -1 or j == -1:
+            raise RuntimeError(f"perceive_music: non-JSON from LLM: {s[:200]}")
+        data = json.loads(s[i:j + 1])
+    data.setdefault("genre_guess", "indie pop")
+    data.setdefault("bpm_range", "80-100")
+    data.setdefault("vibe", "夜色情绪")
+    data.setdefault("intent", intent or "")
+    data["audio_hint"] = audio_hint
+    data["_llm_meta"] = [llm_meta]
+    return data
