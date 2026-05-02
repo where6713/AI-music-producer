@@ -1,3 +1,4 @@
+# FROZEN after step-A-bis (commit 2cd1ffb). Do not modify without architect approval.
 from __future__ import annotations
 
 import json

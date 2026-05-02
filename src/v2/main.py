@@ -16,8 +16,11 @@ def run_v2(raw_intent: str, ref_audio: str = "", index_path: str = "corpus/_inde
     draft = compose(portrait, emotion, golden_refs=golden, corpus_pool=pool)
     final = self_review(draft)
     all_m = portrait.get("_llm_meta", []) + emotion.get("_llm_meta", []) + draft.get("_llm_calls", []) + final.get("_llm_calls", [])
+    selected_basenames = [Path(str(x.get("id", ""))).name for x in golden if str(x.get("id", ""))]
+    anchor_paths = [str(x.get("id", "")) for x in golden if str(x.get("id", ""))]
     final.update(portrait=portrait, motive=emotion.get("inner_motive", ""), hook_seed=emotion.get("hook_seed", ""),
-                 selection_mode=selection_mode, recalled_pool_size=len(pool),
+                 selection_mode=selection_mode, selected_ids=selected_basenames, anchor_source_paths=anchor_paths,
+                 recalled_pool_size=len(pool),
                   golden_refs_used=draft.get("golden_refs_used", 0), llm_total_calls=len(all_m),
                   llm_total_input_tokens=sum(int(m.get("tokens_in", 0)) for m in all_m),
                   llm_total_output_tokens=sum(int(m.get("tokens_out", 0)) for m in all_m))
