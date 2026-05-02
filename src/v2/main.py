@@ -66,6 +66,7 @@ def run_v2(raw_intent: str, ref_audio: str = "", index_path: str = "corpus/_inde
         out_dir = Path(os.getenv("V2_SMOKE_OUT", "out/runs/patch7_smoke_1"))
         out_dir.mkdir(parents=True, exist_ok=True)
         lines = [
+            f"[RUN] out={out_dir}",
             f"[DISTILL] emotion_focus: {brief.get('emotion_focus','')}",
             f"[ANCHOR] song_name: {anchor_song_name} / chorus excerpt:\n{anchor_chorus}",
             f"[PERSONA_A] selected: {portrait.get('persona_used','')}",
