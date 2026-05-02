@@ -2,7 +2,7 @@ from __future__ import annotations
 
 _KEYS = (
     "portrait", "lyrics", "style", "exclude", "emotion_focus", "persona_used",
-    "selected_ids", "anchor_source_paths", "anchor_used", "anchor_song_name", "anchor_chorus_status",
+    "selected_ids", "anchor_source_paths", "anchor_song_name", "anchor_chorus_status", "anchor_chorus",
     "review_skipped", "review_decision", "review_reason", "lyrics_changed", "polish_passes", "polish_diffs",
     "platform_adapt_status", "platform_adapt_raw_response",
     "llm_total_input_tokens", "llm_total_output_tokens", "llm_total_calls",
