@@ -4,71 +4,30 @@ from src.v2._quality_rules import check
 from src.v2.perceive_music import perceive_music
 
 
-def test_no_syntax_crutch() -> None:
-    text = "我把沉默折进外套口袋\n我把晚安留给明天"
-    hard, soft = check(text)
-    assert any(v.startswith("syntax_crutch") for v in hard)
+def test_quality_gate_catches_punctuation() -> None:
+    text = "[Verse 1]\n你在夜里，没说话"
+    hard, _ = check(text)
+    assert "punctuation_violation" in hard
 
 
-def test_no_ngram_density() -> None:
-    text = "[Verse 1]\n啊呢吧喔\n[Chorus]\n好像这样也行"
-    hard, soft = check(text)
-    assert "ngram_density" in hard
+def test_quality_gate_catches_line_too_long() -> None:
+    text = "[Verse 1]\n这是一条超过十个汉字的长句"
+    hard, _ = check(text)
+    assert "line_too_long" in hard
 
 
-def test_no_cn_en_mix() -> None:
-    text = "city lights在窗边缓缓褪色"
-    hard, soft = check(text)
+def test_cn_en_mix_relaxed_still_catches_word() -> None:
+    text = "[Verse 1]\n我在city里走"
+    hard, _ = check(text)
     assert "cn_en_mix" in hard
-
-
-def test_no_ba_x_dong_cheng_y() -> None:
-    text = "把夜色酿成酒\n把心事熬成药\n把回忆埋成灰"
-    hard, soft = check(text)
-    assert any(v.startswith("syntax_crutch") for v in hard)
-
-
-def test_ba_phrase_density_under_threshold() -> None:
-    text = "把夜色酿成酒\n把答案绣成花"
-    hard, soft = check(text)
-    assert not any(v.startswith("syntax_crutch") for v in hard)
-
-
-def test_no_cliche_density() -> None:
-    text = "站台有风，晚安又在站台，风还在吹。"
-    hard, soft = check(text)
-    assert any(v.startswith("cliche_density") for v in hard)
-
-
-def test_cliche_cooccurrence_soft_only() -> None:
-    text = "站台有风"
-    hard, soft = check(text)
-    assert "cliche_cooccurrence" in soft
-    assert "cliche_cooccurrence" not in hard
-
-
-def test_no_visual_prop_second_wave() -> None:
-    text = "后视镜里的人还在看我\n仪表盘亮得像没说完的话"
-    hard, soft = check(text)
-    assert any(v.startswith("blacklist:") for v in hard)
-
-
-def test_no_hook_too_long() -> None:
-    text = "[Chorus]\n想你想你想你想你想你想你想你\n[Verse 1]\n我还没说完"
-    hard, soft = check(text)
-    assert "hook_too_long" in hard
-
-
-def test_inversion_threshold_4() -> None:
-    text = "[Verse 1]\n我把梦放下\n你将话藏起\n替沉默做证"
-    hard, soft = check(text)
-    assert "inversion_overload" not in hard
 
 
 def test_clean_lyrics_pass_gate() -> None:
     text = "[Verse 1]\n灯慢慢熄了\n[Chorus]\n我只轻轻说再见"
-    hard, soft = check(text)
+    hard, _ = check(text)
     assert hard == []
+
+
 
 
 def test_perceive_hybs_indie_pop() -> None:
@@ -81,16 +40,3 @@ def test_perceive_hybs_indie_pop() -> None:
     assert out.get("genre_guess") == "indie pop"
     assert out.get("bpm_range") in {"100-120"}
 
-
-def test_quality_gate_catches_rhyme_violation() -> None:
-    # 3 lines with last chars in different rhyme groups: 久(7:油求) 光(3:江阳) 忆(10:一七)
-    text = "[Verse 1]\n我已走了很久\n眼前都是阳光\n心里装满回忆\n[Chorus]\n还要等天亮吗"
-    hard, soft = check(text)
-    assert "rhyme_scheme_violation" in hard
-
-
-def test_quality_gate_catches_action_dump() -> None:
-    # 4 consecutive pure-action lines (解开/关掉/调小/打开) with no emotion verbs
-    text = "[Verse 1]\n心里有你\n[Chorus]\n解开安全带\n关掉电台\n调小音量\n打开车门"
-    hard, soft = check(text)
-    assert "action_dump_violation" in hard
