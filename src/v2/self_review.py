@@ -3,7 +3,7 @@ from __future__ import annotations
 from ._quality_rules import check
 
 
-def self_review(draft: dict[str, object], max_retries: int = 2) -> dict[str, object]:
+def self_review(draft: dict[str, object], max_retries: int = 1) -> dict[str, object]:
     lyrics = str(draft.get("lyrics", "")).strip()
     violations = check(lyrics)
     out = dict(draft)
