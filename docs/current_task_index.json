@@ -15,6 +15,11 @@
       "depends_on": [
         "TASK-025"
       ]
+    },
+    {
+      "id": "TASK-027",
+      "title": "V2 测试套件 LLM 真测/逻辑测分层审计",
+      "status": "blocked-by-step12-rerun"
     }
   ]
 }

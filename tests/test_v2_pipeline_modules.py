@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
+
+import pytest
 
 from src.v2.compose import compose
 from src.v2.distill_emotion import distill_emotion
@@ -64,6 +67,8 @@ def test_self_review_preserves_section_count() -> None:
 
 
 def test_run_v2_end_to_end_with_local_index(tmp_path: Path) -> None:
+    if not os.getenv("OPENAI_API_KEY"):
+        pytest.skip("needs real LLM")
     rows = [
         {
             "id": "corpus/golden_dozen/demo.txt",
