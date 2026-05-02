@@ -13,7 +13,7 @@ def test_pipeline_produces_non_empty_lyrics(monkeypatch) -> None:
     import src.v2.perceive_music as perceive_mod
     import src.v2.distill_emotion as distill_mod
     import src.v2.compose as compose_mod
-    import src.v2.self_review as review_mod
+    import src.v2.second_pass as review_mod
     import src.v2.select_corpus as corpus_mod
 
     monkeypatch.setattr(perceive_mod, "llm_call", lambda _p, temperature=0.3: ('{"genre_guess":"indie pop","bpm_range":"100-120","vibe":"x","audio_hint":".wav","intent":"x"}', {"tokens_in": 1, "tokens_out": 1}))
@@ -27,10 +27,11 @@ def test_pipeline_produces_non_empty_lyrics(monkeypatch) -> None:
     out = run_v2("夜里独自开车想念一个人", index_path=str(Path("corpus/_index.json")))
     assert isinstance(out.get("lyrics"), str) and out["lyrics"].strip()
     assert isinstance(out.get("emotion_focus"), str) and out["emotion_focus"].strip()
+    assert out.get("polish_passes") == 1
 
 
 def test_polish_stops_when_output_unchanged(monkeypatch) -> None:
-    import src.v2.self_review as review_mod
+    import src.v2.second_pass as review_mod
 
     calls = {"n": 0}
 
@@ -41,8 +42,8 @@ def test_polish_stops_when_output_unchanged(monkeypatch) -> None:
         return "[Verse 1]\n今夜风很轻", {"tokens_in": 1, "tokens_out": 1}
 
     monkeypatch.setattr(review_mod, "llm_call", fake_call)
-    out = review_mod.self_review({"lyrics": "[Verse 1]\n今夜风很轻", "brief": {"brief": "一段笔记"}})
-    assert out["polish_passes"] == 2
+    out = review_mod.second_pass({"lyrics": "[Verse 1]\n今夜风很轻", "brief": {"emotion_focus": "一段笔记"}})
+    assert out["polish_passes"] == 1
 
 
 def test_persona_selection_by_genre() -> None:
@@ -64,6 +65,13 @@ def test_select_corpus_raises_on_missing() -> None:
         assert False
     except FileNotFoundError:
         assert True
+
+
+def test_extract_anchor_chorus_never_empty(tmp_path) -> None:
+    p = tmp_path / "x.txt"
+    p.write_text("# source: x\n\n第一行\n第二行\n第三行\n第四行\n", encoding="utf-8")
+    out = extract_anchor_chorus(str(p))
+    assert isinstance(out, str) and out.strip()
 
 
 def test_platform_adapt_raises_on_bad_json(monkeypatch) -> None:
