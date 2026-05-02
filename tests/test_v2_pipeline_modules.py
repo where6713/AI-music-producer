@@ -10,7 +10,7 @@ from src.v2.compose import compose
 from src.v2.distill_emotion import distill_emotion
 from src.v2.main import run_v2
 from src.v2.perceive_music import perceive_music
-from src.v2.select_corpus import select_corpus
+from src.v2.select_corpus import select_corpus, select_golden_anchors, select_golden_anchors_with_mode
 from src.v2.self_review import self_review
 
 
@@ -39,6 +39,70 @@ def test_select_corpus_recall_size_and_golden_anchor(tmp_path: Path) -> None:
     out = select_corpus(index, {"texture": "urban introspective", "tempo": "slow", "energy": "low"}, limit=118)
     assert 1 <= len(out) <= 118
     assert any("golden_dozen" in str(x.get("id", "")) for x in out)
+
+
+def test_select_golden_anchors_dedup_selected_ids(tmp_path: Path) -> None:
+    p = tmp_path / "corpus" / "golden_dozen"
+    p.mkdir(parents=True)
+    a = p / "a.txt"
+    a.write_text("# source: x\n# style: indie pop 慵懒\n# texture: x\n# version: v1\n\n词", encoding="utf-8")
+    pool = [
+        {"id": str(a)},
+        {"id": str(a)},
+    ]
+    out = select_golden_anchors(pool, {"genre_guess": "indie pop"})
+    assert len(out) == 1
+    assert out[0]["id"] == str(a)
+
+
+def test_select_golden_anchors_match_by_style_header(tmp_path: Path) -> None:
+    p = tmp_path / "corpus" / "golden_dozen"
+    p.mkdir(parents=True)
+    indie = p / "indie.txt"
+    indie.write_text("# source: x\n# style: indie pop 慵懒\n# texture: x\n# version: v1\n\n词", encoding="utf-8")
+    ballad = p / "ballad.txt"
+    ballad.write_text("# source: x\n# style: 慢板抒情\n# texture: x\n# version: v1\n\n词", encoding="utf-8")
+    pool = [
+        {"id": str(ballad)},
+        {"id": str(indie)},
+    ]
+    out = select_golden_anchors(pool, {"genre_guess": "indie pop"})
+    assert out
+    assert out[0]["id"] == str(indie)
+
+
+def test_select_golden_anchors_style_token_intersection(tmp_path: Path) -> None:
+    p = tmp_path / "corpus" / "golden_dozen"
+    p.mkdir(parents=True)
+    indie = p / "indie.txt"
+    indie.write_text("# source: x\n# style: 慵懒 indie pop\n# texture: x\n# version: v1\n\n词", encoding="utf-8")
+    out = select_golden_anchors([{"id": str(indie)}], {"genre_guess": "indie pop"})
+    assert out and out[0]["id"] == str(indie)
+
+
+def test_select_golden_anchors_fallback_global_when_no_match(tmp_path: Path) -> None:
+    p = tmp_path / "corpus" / "golden_dozen"
+    p.mkdir(parents=True)
+    a = p / "a.txt"
+    b = p / "b.txt"
+    a.write_text("# source: x\n# style: 古典中国风\n# texture: x\n# version: v1\n\n词", encoding="utf-8")
+    b.write_text("# source: x\n# style: 慢板抒情\n# texture: x\n# version: v1\n\n词", encoding="utf-8")
+    out, mode = select_golden_anchors_with_mode([{"id": str(b)}, {"id": str(a)}], {"genre_guess": "electro dance"})
+    assert mode == "fallback_global"
+    assert [x["id"] for x in out] == [str(a), str(b)]
+
+
+def test_select_golden_anchors_cap_two_sorted_when_three_match(tmp_path: Path) -> None:
+    p = tmp_path / "corpus" / "golden_dozen"
+    p.mkdir(parents=True)
+    a = p / "a.txt"
+    b = p / "b.txt"
+    c = p / "c.txt"
+    for f in (a, b, c):
+        f.write_text("# source: x\n# style: indie pop 慵懒\n# texture: x\n# version: v1\n\n词", encoding="utf-8")
+    out, mode = select_golden_anchors_with_mode([{"id": str(c)}, {"id": str(a)}, {"id": str(b)}], {"genre_guess": "indie pop"})
+    assert mode == "matched"
+    assert [x["id"] for x in out] == [str(a), str(b)]
 
 
 def test_compose_pass1_id_grounding() -> None:

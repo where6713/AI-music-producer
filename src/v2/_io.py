@@ -20,7 +20,7 @@ def dump_outputs(out_dir: Path, out: dict[str, object]) -> None:
     (out_dir / "style.txt").write_text(str(out.get("style", "")), encoding="utf-8")
     (out_dir / "exclude.txt").write_text(str(out.get("exclude", "")), encoding="utf-8")
     trace = {k: out.get(k) for k in (
-        "portrait", "emotion", "selected_ids", "review_notes", "quality_gate_failed",
+        "portrait", "motive", "hook_seed", "selected_ids", "quality_gate_failed", "selection_mode", "review_notes",
         "recalled_pool_size", "golden_refs_used", "pass1_selected_ids_count",
         "retry_count", "llm_total_calls", "llm_total_input_tokens", "llm_total_output_tokens",
     )}

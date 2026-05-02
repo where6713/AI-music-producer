@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from ._golden_match import pick_golden
 
 
 def select_corpus(index_path: Path, portrait: dict[str, object], limit: int = 100) -> list[dict[str, object]]:
@@ -27,9 +28,9 @@ def select_corpus(index_path: Path, portrait: dict[str, object], limit: int = 10
 
 
 def select_golden_anchors(pool: list[dict[str, object]], portrait: dict[str, object]) -> list[dict[str, object]]:
-    q = str(portrait.get("genre_guess", "")).lower()
-    pref = "slot01_indie_lazy" if "indie" in q else "slot"
-    golden = [r for r in pool if "golden_dozen" in str(r.get("id", ""))]
-    hard = [r for r in golden if pref in str(r.get("id", ""))]
-    pick = (hard + golden)[:2]
-    return pick if pick else golden[:2]
+    picked, _ = pick_golden(pool, str(portrait.get("genre_guess", "")))
+    return picked
+
+
+def select_golden_anchors_with_mode(pool: list[dict[str, object]], portrait: dict[str, object]) -> tuple[list[dict[str, object]], str]:
+    return pick_golden(pool, str(portrait.get("genre_guess", "")))
