@@ -17,13 +17,13 @@ def _load_texts(ids: list[str]) -> str:
 
 def compose(portrait, emotion, golden_refs, corpus_pool) -> dict[str, object]:
     ps = json.dumps(portrait, ensure_ascii=False)
-    brief = json.dumps(emotion, ensure_ascii=False)
+    brief = str(emotion.get("brief", "")) if isinstance(emotion, dict) else str(emotion)
     golden_texts = _load_texts([str(x.get("id", "")) for x in golden_refs])
     ids = [str(x.get("id", "")) for x in golden_refs[:2] if str(x.get("id", ""))]
     pre = f"<brief>{brief}</brief>\n"
     if str(portrait.get("selection_mode", "")) == "empty_pool":
         pre += "⚠️ 当前无 anchor 参考,请严格按 brief 创作。\n"
-    c1, m1 = llm_call(pre + P1.format(portrait=ps, golden=golden_texts, n=len(golden_refs)), temperature=0.9)
+    c1, m1 = llm_call(pre + P1.format(portrait=ps, brief=brief, golden=golden_texts, n=len(golden_refs)), temperature=0.9)
     s = re.sub(r'^```(?:json)?\s*', '', c1.strip())
     s = re.sub(r'\s*```$', '', s)
     try:
