@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import re
 from pathlib import Path
 
@@ -21,19 +22,34 @@ def style_tokens(path: str) -> set[str]:
     return set()
 
 
-def pick_golden(pool: list[dict[str, object]], genre_guess: str) -> tuple[list[dict[str, object]], str]:
+def _repo_golden_files() -> list[str]:
+    root = Path(__file__).resolve().parents[2] / "corpus" / "golden_dozen"
+    return [str(p) for p in sorted(root.glob("*.txt"))]
+
+
+def _pick(uniq: dict[str, dict[str, object]], genre_guess: str) -> tuple[list[dict[str, object]], str]:
     genre = _tokens(genre_guess)
+    matched = [sid for sid in uniq if style_tokens(sid) & genre]
+    if matched:
+        ids = sorted(set(matched))[:2]
+        return [uniq[i] for i in ids], "matched"
+    if not uniq:
+        return [], "empty_pool"
+    ids = sorted(set(uniq.keys()))[:2]
+    return [uniq[i] for i in ids], "fallback_global"
+
+
+def pick_golden(pool: list[dict[str, object]], genre_guess: str) -> tuple[list[dict[str, object]], str]:
     uniq: dict[str, dict[str, object]] = {}
     for row in pool:
         sid = str(row.get("id", ""))
         p = Path(sid)
         if p.suffix.lower() == ".txt" and p.exists() and sid not in uniq:
             uniq[sid] = row
-    matched = [sid for sid in uniq if style_tokens(sid) & genre]
-    if matched:
-        ids = sorted(matched)[:2]
-        return [uniq[i] for i in ids], "matched"
-    if not uniq:
+    if uniq:
+        return _pick(uniq, genre_guess)
+    if os.getenv("V2_DISABLE_FS_FALLBACK") == "1":
         return [], "empty_pool"
-    ids = sorted(uniq.keys())[:2]
-    return [uniq[i] for i in ids], "fallback_global"
+    fs = {sid: {"id": sid} for sid in _repo_golden_files()}
+    picked, mode = _pick(fs, genre_guess)
+    return picked, "fallback_filesystem" if fs else mode

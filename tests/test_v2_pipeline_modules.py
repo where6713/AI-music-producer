@@ -105,8 +105,9 @@ def test_select_golden_anchors_cap_two_sorted_when_three_match(tmp_path: Path) -
     assert [x["id"] for x in out] == [str(a), str(b)]
 
 
-def test_select_corpus_empty_pool_marks_mode() -> None:
-    out, mode = select_golden_anchors_with_mode([], {"genre_guess": "R&B"})
+def test_select_corpus_empty_pool_marks_mode(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("V2_DISABLE_FS_FALLBACK", "1")
+    out, mode = select_golden_anchors_with_mode([{"id": "corpus/_clean/x.txt"}], {"genre_guess": "R&B"})
     assert out == []
     assert mode == "empty_pool"
 
@@ -121,6 +122,18 @@ def test_select_corpus_matched_path_with_fixtures() -> None:
     )
     assert mode == "matched"
     assert any(str(rnb) == str(x.get("id", "")) for x in out)
+
+
+def test_select_golden_anchors_reads_real_filesystem(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    g = tmp_path / "corpus" / "golden_dozen"
+    g.mkdir(parents=True)
+    (g / "aa.txt").write_text("# source: t\n# style: r&b 律动\n# texture: x\n# version: t\n\n词", encoding="utf-8")
+    (g / "bb.txt").write_text("# source: t\n# style: r&b 律动\n# texture: x\n# version: t\n\n词", encoding="utf-8")
+    monkeypatch.setenv("V2_DISABLE_FS_FALLBACK", "0")
+    monkeypatch.setattr("src.v2._golden_match._repo_golden_files", lambda: [str(g / "aa.txt"), str(g / "bb.txt")])
+    out, mode = select_golden_anchors_with_mode([], {"genre_guess": "r&b"})
+    assert mode == "fallback_filesystem"
+    assert 1 <= len(out) <= 2
 
 
 def test_compose_pass1_id_grounding() -> None:
