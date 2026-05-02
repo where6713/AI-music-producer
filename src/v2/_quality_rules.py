@@ -1,5 +1,11 @@
 import re
-from ._quality_rules_data import BA_I_PATTERN, BA_PATTERN, CLICHE, CN_EN, HOOK, ORPHAN, SYNTAX, VISUAL
+from ._quality_rules_data import BA_I_PATTERN, BA_PATTERN, CLICHE, CN_EN, HOOK, ORPHAN, SYNTAX, VISUAL, RHYME_TABLE, ACTION_V, EMOT_V
+
+
+def _rhyme_rate(s: str) -> float:
+    k = [RHYME_TABLE[l.rstrip()[-1]] for l in s.splitlines()
+         if l.strip() and l.strip()[0] not in ("[", "#") and l.rstrip() and l.rstrip()[-1] in RHYME_TABLE]
+    return (k.count(max(set(k), key=k.count)) / len(k)) if len(k) >= 3 else 1.0
 
 
 def check(text: str) -> tuple[list[str], list[str]]:
@@ -24,4 +30,11 @@ def check(text: str) -> tuple[list[str], list[str]]:
     h = HOOK.search(text)
     if h and len(h.group(1).strip()) > 10:
         hard.append("hook_too_long")
+    for s in re.split(r"(?=\[(?:Verse|Chorus|Pre-Chorus|Bridge))", text):
+        if s.strip() and re.search(r"[\u4e00-\u9fff]", s) and _rhyme_rate(s) < 0.6:
+            hard.append("rhyme_scheme_violation"); break
+    lns = [l for l in text.splitlines() if l.strip() and not l.strip().startswith("[")]
+    if any(all(any(a in lns[j] for a in ACTION_V) and not any(e in lns[j] for e in EMOT_V)
+               for j in range(i, i + 3)) for i in range(max(0, len(lns) - 2))):
+        hard.append("action_dump_violation")
     return hard, soft
