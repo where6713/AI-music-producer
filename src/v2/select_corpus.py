@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from ._golden_match import pick_golden
 
@@ -35,3 +36,24 @@ def select_golden_anchors(pool: list[dict[str, object]], portrait: dict[str, obj
 
 def select_golden_anchors_with_mode(pool: list[dict[str, object]], portrait: dict[str, object]) -> tuple[list[dict[str, object]], str]:
     return pick_golden(pool, str(portrait.get("genre_guess", "")))
+
+
+def extract_anchor_chorus(anchor_file: str) -> str:
+    p = Path(anchor_file)
+    if not p.exists():
+        raise FileNotFoundError(f"no anchor file: {anchor_file}")
+    text = p.read_text(encoding="utf-8", errors="ignore")
+    lines = [x.strip() for x in text.splitlines() if x.strip()]
+    chorus = []
+    in_ch = False
+    for line in lines:
+        if re.search(r"\[(?:Chorus|副歌)\]", line, re.I):
+            in_ch = True
+            continue
+        if in_ch and line.startswith("["):
+            break
+        if in_ch:
+            chorus.append(line)
+    if not chorus:
+        raise FileNotFoundError("no anchor chorus for genre")
+    return "\n".join(chorus[:12])
