@@ -22,3 +22,19 @@ def test_pipeline_produces_non_empty_lyrics(monkeypatch) -> None:
     out = run_v2("夜里独自开车想念一个人", index_path=str(Path("corpus/_index.json")))
     assert isinstance(out.get("lyrics"), str) and out["lyrics"].strip()
     assert isinstance(out.get("brief"), str) and out["brief"].strip()
+
+
+def test_polish_stops_when_output_unchanged(monkeypatch) -> None:
+    import src.v2.self_review as review_mod
+
+    calls = {"n": 0}
+
+    def fake_call(_p, temperature=0.3):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            return "[Verse 1]\n今夜风很轻", {"tokens_in": 1, "tokens_out": 1}
+        return "[Verse 1]\n今夜风很轻", {"tokens_in": 1, "tokens_out": 1}
+
+    monkeypatch.setattr(review_mod, "llm_call", fake_call)
+    out = review_mod.self_review({"lyrics": "[Verse 1]\n今夜风很轻", "brief": {"brief": "一段笔记"}})
+    assert out["polish_passes"] == 2
