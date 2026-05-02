@@ -85,8 +85,17 @@ def _run_v0_algorithmic(idx: list[dict], src_rows: dict[str, dict]) -> None:
             if rid in used_ids:
                 continue
             tags = " ".join(str(x) for x in r.get("emotion_tags", [])).lower()
-            if any(k.lower() in tags for k in kws):
+            text = f"{r.get('title','')} {r.get('summary_50chars','')}".lower()
+            if any(k.lower() in tags or k.lower() in text for k in kws):
                 matched.append(r)
+        if slot == "slot01_indie_lazy" and not matched:
+            for r in pool:
+                rid = str(r.get("id", ""))
+                if rid in used_ids:
+                    continue
+                text = f"{r.get('title','')} {r.get('summary_50chars','')} {' '.join(r.get('emotion_tags', []) or [])}".lower()
+                if any(k in text for k in ("夜", "chill", "lofi", "慵懒", "松弛", "bedroom", "mid")):
+                    matched.append(r)
         random.shuffle(matched)
         selected = matched[:target]
         slot_hits[slot] = len(selected)

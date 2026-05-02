@@ -1,0 +1,7 @@
+# source: github:chinese-poetry/chinese-poetry:元曲/yuanqu.json#758
+# style: 01_indie_lazy
+# texture: nostalgia, restraint, imagery
+# version: v0-algorithmic (TODO: TASK-026 替换为人工策展真经典)
+你这短命贼怎将我来胡雕刺？迭配去别处官司，世不曾见这等跷蹊事。
+哭的我气噎声丝，诉不出一肚嗟咨。
+想天公难道不悲慈？只愿得你嫡亲伯父登时至，两下里质对个如何是？看你那能牙利齿，说我甚过犯公私？。
