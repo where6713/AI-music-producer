@@ -31,11 +31,11 @@ def _pick(uniq: dict[str, dict[str, object]], genre_guess: str) -> tuple[list[di
     genre = _tokens(genre_guess)
     matched = [sid for sid in uniq if style_tokens(sid) & genre]
     if matched:
-        ids = sorted(set(matched))[:2]
+        ids = sorted(set(matched))[:1]
         return [uniq[i] for i in ids], "matched"
     if not uniq:
         return [], "empty_pool"
-    ids = sorted(set(uniq.keys()))[:2]
+    ids = sorted(set(uniq.keys()))[:1]
     return [uniq[i] for i in ids], "fallback_global"
 
 
