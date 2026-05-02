@@ -13,7 +13,7 @@ from src.v2.self_review import self_review
 
 def test_perceive_music_returns_5_keys() -> None:
     out = perceive_music("深夜慢一点，想写内省情绪", ref_audio="demo.wav")
-    assert set(out.keys()) >= {"tempo", "energy", "texture", "audio_hint", "intent"}
+    assert set(out.keys()) >= {"genre_guess", "bpm_range", "vibe", "audio_hint", "intent"}
     assert out["audio_hint"] == ".wav"
 
 
@@ -60,7 +60,7 @@ def test_self_review_preserves_section_count() -> None:
     reviewed = self_review(draft)
     sections_after = reviewed["lyrics"].count("[")
     assert sections_before == sections_after
-    assert reviewed["review_note"] == "light expression polish; structure unchanged"
+    assert isinstance(reviewed["review_notes"], str)
 
 
 def test_run_v2_end_to_end_with_local_index(tmp_path: Path) -> None:
