@@ -1,7 +1,7 @@
-from ._persona import PERSONA
+from ._persona import PERSONA_B
 
 POLISH = (
-    f"{PERSONA}\n\n"
+    f"{PERSONA_B}\n\n"
     "刚才你完成了一份初稿。现在是凌晨 工作室只剩你一个人 你又把稿子拿起来 从头读一遍。\n"
     "这是再听一次 看哪一句还能更准。\n"
     "唱起来不顺手 有更精确的字 韵走丢了 画面虚了 情绪太满或太薄 就动笔改它。\n"
