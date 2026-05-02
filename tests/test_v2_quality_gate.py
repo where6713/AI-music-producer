@@ -80,3 +80,17 @@ def test_perceive_hybs_indie_pop() -> None:
     monkey.undo()
     assert out.get("genre_guess") == "indie pop"
     assert out.get("bpm_range") in {"100-120"}
+
+
+def test_quality_gate_catches_rhyme_violation() -> None:
+    # 3 lines with last chars in different rhyme groups: 久(7:油求) 光(3:江阳) 忆(10:一七)
+    text = "[Verse 1]\n我已走了很久\n眼前都是阳光\n心里装满回忆\n[Chorus]\n还要等天亮吗"
+    hard, soft = check(text)
+    assert "rhyme_scheme_violation" in hard
+
+
+def test_quality_gate_catches_action_dump() -> None:
+    # 4 consecutive pure-action lines (解开/关掉/调小/打开) with no emotion verbs
+    text = "[Verse 1]\n心里有你\n[Chorus]\n解开安全带\n关掉电台\n调小音量\n打开车门"
+    hard, soft = check(text)
+    assert "action_dump_violation" in hard
