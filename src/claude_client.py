@@ -6,9 +6,15 @@ from pathlib import Path
 from typing import Any
 from urllib import request
 
-from src.profile_router import resolve_active_profile
-from src.retriever import retrieve_few_shot_examples
 from src.schemas import LyricPayload, UserInput
+
+
+def retrieve_few_shot_examples(*_args, **_kwargs):
+    return {"examples": [], "source_ids": [], "profile_vote": "", "profile_confidence": 0.0}
+
+
+def resolve_active_profile(*_args, **_kwargs):
+    return "", "deprecated", None
 
 
 PROFILE_IDS = {

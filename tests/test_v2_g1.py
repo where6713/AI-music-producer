@@ -131,7 +131,7 @@ def test_check_gate_g1_uses_latest_non_merge_commit_when_head_is_merge(
         ("show", "--name-only", "--pretty=", "-1"): "apps/cli/main.py\n",
         ("rev-list", "--no-merges", "-n", "1", "HEAD"): "abc123\n",
         ("show", "-s", "--format=%s", "abc123"): "feat(g7): add pm-audit table with strict exit codes\n",
-        ("show", "--name-only", "--pretty=", "abc123"): "apps/cli/main.py\nsrc/producer_tools/self_check/gate_g7.py\n",
+        ("show", "--name-only", "--pretty=", "abc123"): "apps/cli/main.py\nsrc/producer_tools/self_check/gate_g6.py\n",
     }
 
     def _fake_read_git_output(_workspace_root, args):

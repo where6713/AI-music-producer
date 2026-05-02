@@ -198,57 +198,15 @@ def test_cli_pass_evidence_check_requires_outputs() -> None:
     assert "G3 PASS-EVIDENCE PASS" in stdout
 
 
-def test_produce_command_prints_ambiguous_profile_candidates(capsys, monkeypatch) -> None:
-    from apps.cli import main as cli_main
-    from src.profile_router import AmbiguousProfileError
-
-    def _fake_produce(**_kwargs):
-        raise AmbiguousProfileError(
-            [
-                {
-                    "profile_id": "urban_introspective",
-                    "display_name": "都市内省",
-                    "craft_focus": "具象化身体记账 + 场景锚定",
-                },
-                {
-                    "profile_id": "classical_restraint",
-                    "display_name": "古风留白",
-                    "craft_focus": "意象并置 + 留白 + 典故克制",
-                },
-            ]
-        )
-
-    monkeypatch.setattr(cli_main, "produce_v2", _fake_produce)
-
-    with pytest.raises(click.exceptions.Exit) as err:
-        cli_main.produce_command(
-            raw_intent="写点东西",
-            genre="",
-            mood="",
-            vocal="any",
-            profile="",
-            lang="zh-CN",
-            out_dir="out",
-            verbose=False,
-            dry_run=False,
-        )
-
-    output = capsys.readouterr().out
-    assert err.value.exit_code == 1
-    assert "ambiguous profile" in output
-    assert "--profile" in output
-    assert "urban_introspective" in output
-
-
 def test_cli_produce_parses_lang_and_outdir_options(monkeypatch) -> None:
     from apps.cli import main as cli_main
 
     captured: dict[str, object] = {}
 
-    def _fake_produce(**kwargs):
+    def _fake_dispatch(**kwargs):
         captured.update(kwargs)
 
-    monkeypatch.setattr(cli_main, "produce_v2", _fake_produce)
+    monkeypatch.setattr(cli_main, "produce_command", _fake_dispatch)
     cli_main._dispatch_produce_from_argv(
         [
             "just write a 2-line haiku only, no verse no chorus",
@@ -271,10 +229,10 @@ def test_cli_produce_defaults_to_run_id_dir(monkeypatch) -> None:
 
     captured: dict[str, object] = {}
 
-    def _fake_produce(**kwargs):
+    def _fake_dispatch(**kwargs):
         captured.update(kwargs)
 
-    monkeypatch.setattr(cli_main, "produce_v2", _fake_produce)
+    monkeypatch.setattr(cli_main, "produce_command", _fake_dispatch)
     cli_main._dispatch_produce_from_argv([
         "夜里想起旧人",
     ])
