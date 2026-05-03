@@ -1,5 +1,5 @@
 from __future__ import annotations
-from ._review_prompts import POLISH
+from ._prompts import POLISH_PROMPT, PERSONA_B
 from .llm_runtime import call as llm_call
 
 
@@ -12,7 +12,7 @@ def _changed_lines(a: str, b: str) -> list[int]:
 def second_pass(draft: dict[str, object]) -> dict[str, object]:
     lyrics = str(draft.get("lyrics", "")).strip()
     brief = str(draft.get("brief", {}).get("emotion_focus", "") if isinstance(draft.get("brief"), dict) else "")
-    out, meta = llm_call(POLISH.format(brief=brief, lyrics=lyrics), temperature=0.3)
+    out, meta = llm_call(POLISH_PROMPT.format(persona_b=PERSONA_B, emotion_focus=brief, lyrics=lyrics), temperature=0.3)
     txt = (out or "").strip() or lyrics
     decision, reason = ("kept_as_is", txt.splitlines()[0][1:].strip()) if txt.startswith("#") else ("revised", "")
     if txt.startswith("#"):

@@ -6,7 +6,7 @@ from .distill_emotion import distill_emotion
 from .perceive_music import perceive_music
 from .select_corpus import extract_anchor_chorus, select_corpus, select_golden_anchors_with_mode
 from .second_pass import second_pass
-from ._persona import select_persona_a, PERSONA_BANK, PERSONA_B
+from ._prompts import select_persona_a
 from .platform_adapt import PlatformAdaptError, adapt
 import os, sys
 

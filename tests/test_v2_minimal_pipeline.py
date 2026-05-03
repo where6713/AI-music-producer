@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from src.v2.main import run_v2
-from src.v2._persona import select_persona_a
+from src.v2._prompts import select_persona_a
 from src.v2.distill_emotion import distill_emotion
 from src.v2.select_corpus import extract_anchor_chorus
 from src.v2.platform_adapt import PlatformAdaptError, adapt
