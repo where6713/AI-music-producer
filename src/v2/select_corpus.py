@@ -2,9 +2,9 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 from pathlib import Path
-from ._golden_match import pick_golden
 
 
 def select_corpus(index_path: Path, portrait: dict[str, object], limit: int = 100) -> list[dict[str, object]]:
@@ -30,12 +30,48 @@ def select_corpus(index_path: Path, portrait: dict[str, object], limit: int = 10
 
 
 def select_golden_anchors(pool: list[dict[str, object]], portrait: dict[str, object]) -> list[dict[str, object]]:
-    picked, _ = pick_golden(pool, str(portrait.get("genre_guess", "")))
+    picked, _ = _pick_golden(pool, str(portrait.get("genre_guess", "")))
     return picked
 
 
 def select_golden_anchors_with_mode(pool: list[dict[str, object]], portrait: dict[str, object]) -> tuple[list[dict[str, object]], str]:
-    return pick_golden(pool, str(portrait.get("genre_guess", "")))
+    return _pick_golden(pool, str(portrait.get("genre_guess", "")))
+
+
+def _tokens(text: str) -> set[str]:
+    return {x for x in re.split(r"[\s,，/]+", (text or "").strip().lower()) if x}
+
+
+def _style_tokens(path: str) -> set[str]:
+    p = Path(path)
+    if not p.exists() or p.suffix.lower() != ".txt":
+        return set()
+    for line in p.read_text(encoding="utf-8", errors="ignore").splitlines()[:8]:
+        if line.lower().startswith("# style:"):
+            return _tokens(line.split(":", 1)[1])
+    return set()
+
+
+def _repo_golden_files() -> list[str]:
+    root = Path(__file__).resolve().parents[2] / "corpus" / "golden_dozen"
+    return [str(p) for p in sorted(root.glob("*.txt"))]
+
+
+def _pick_golden(pool: list[dict[str, object]], genre_guess: str) -> tuple[list[dict[str, object]], str]:
+    uniq: dict[str, dict[str, object]] = {}
+    for row in pool:
+        sid = str(row.get("id", ""))
+        if Path(sid).exists() and Path(sid).suffix.lower() == ".txt" and sid not in uniq:
+            uniq[sid] = row
+    if not uniq and os.getenv("V2_DISABLE_FS_FALLBACK") != "1":
+        uniq = {sid: {"id": sid} for sid in _repo_golden_files()}
+    if not uniq:
+        return [], "empty_pool"
+    g = _tokens(genre_guess)
+    matched = [sid for sid in uniq if _style_tokens(sid) & g]
+    ids = sorted(set(matched if matched else uniq.keys()))[:1]
+    mode = "matched" if matched else "fallback_global"
+    return [uniq[i] for i in ids], mode
 
 
 def extract_anchor_chorus(anchor_file: str) -> str:
