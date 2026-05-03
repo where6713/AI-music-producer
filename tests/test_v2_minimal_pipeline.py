@@ -83,3 +83,25 @@ def test_platform_adapt_raises_on_bad_json(monkeypatch) -> None:
         assert False
     except PlatformAdaptError:
         assert True
+
+
+def test_run_v2_writes_trace_keys(monkeypatch) -> None:
+    import src.v2.perceive_music as perceive_mod
+    import src.v2.distill_emotion as distill_mod
+    import src.v2.compose as compose_mod
+    import src.v2.second_pass as pass_mod
+    import src.v2.platform_adapt as adapt_mod
+    import src.v2.select_corpus as corpus_mod
+
+    monkeypatch.setattr(perceive_mod, "llm_call", lambda _p, temperature=0.3: ('{"genre_guess":"indie pop","bpm_range":"100-120","vibe":"x","audio_hint":".wav","intent":"x"}', {"tokens_in": 1, "tokens_out": 1}))
+    monkeypatch.setattr(distill_mod, "llm_call", lambda _p, temperature=0.3: ("凌晨高速 一个女人对旧人说再见", {"tokens_in": 1, "tokens_out": 1}))
+    monkeypatch.setattr(compose_mod, "llm_call", lambda _p, temperature=0.9: ('{"lyrics":"[主歌]\\n夜路很轻","style":"x","exclude":"x"}', {"tokens_in": 1, "tokens_out": 1}))
+    monkeypatch.setattr(pass_mod, "llm_call", lambda _p, temperature=0.3: ("[主歌]\n夜路很轻", {"tokens_in": 1, "tokens_out": 1}))
+    monkeypatch.setattr(adapt_mod, "llm_call", lambda _p, temperature=0.3: ('{"style":"x","exclude":"x"}', {"tokens_in": 1, "tokens_out": 1}))
+    monkeypatch.setattr(corpus_mod, "select_corpus", lambda _i, _p, limit=100: [{"id": "x.txt"}])
+    monkeypatch.setattr(corpus_mod, "select_golden_anchors_with_mode", lambda _pool, _p: ([{"id": "x.txt"}], "matched"))
+    monkeypatch.setattr(corpus_mod, "extract_anchor_chorus", lambda _f: "副歌一\n副歌二\n副歌三\n副歌四")
+
+    out = run_v2("夜里独自开车想念一个人", index_path=str(Path("corpus/_index.json")))
+    assert "anchor_chorus_status" in out
+    assert "polish_passes" in out
